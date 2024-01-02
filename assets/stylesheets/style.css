@@ -225,16 +225,15 @@ pre {
 }
 
 /* All color-related stuff. Some colors from flexoki are utilized. */
-/*! flexoki | MIT License | Copyright (c) 2023 Steph Ango github.com/kepano/flexoki */
+/*! flexoki | MIT License | Copyright (c) 2023 Steph Ango https://github.com/kepano/flexoki */
 body {
   background-color: #FFFCF0; /*var(--flexoki-paper)*/
   color: #100F0F; /*var(--flexoki-black)*/
 }
 a, a:visited { color: #100F0F; /*var(--flexoki-black)*/ }
-time, .post-arrow, .about-author, footer,
-.about-author a, .about-author a:visited,
+time, .post-arrow, .about-author, footer, .about-author a, .about-author a:visited,
 ol > li::marker, ul > li::marker {
-  color: #878580; /*var(--flexoki-500)*/
+  color: #575653; /*var(--flexoki-700)*/
 }
 tr { border-bottom-color: #CECDC3; /*var(--flexoki-200)*/ }
 @media (prefers-color-scheme: dark) {
