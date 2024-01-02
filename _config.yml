@@ -1,0 +1,7 @@
+title: Paul Miller
+description: Paul Miller — entrepreneur. I make projects which help developers to build awesome things
+url: https://paulmillr.com
+permalink: /posts/:title/
+markdown: kramdown
+include: [".well-known"]
+exclude: ["demos/nostr/node_modules", "demos/nostr-2", "demos/qr/node_modules", "noble/demo-ecc", "Makefile", "README.md", "demos/noble/node_modules", "noble/node_modules"]

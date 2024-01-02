@@ -1,0 +1,27 @@
+---
+layout: base
+---
+
+<article>
+  <content>
+    <h2>{{ page.title }}</h2>
+    {% if page.date != null %}
+      <time datetime="{{ page.date | date: "%Y-%m-%d" }}">{{ page.date | date: "%d %b %y" }}</time>
+    {% endif %}
+    <section class="post-content">{{ content }}</section>
+    {% if page.twitter != null %}
+      <div class="page-comments"><a href="{{ page.twitter }}">Comment this post on X.com</a></div>
+    {% endif %}
+
+    <div id="noble-demos"></div>
+  </content>
+</article>
+
+<!-- noble demos -->
+<script src="../media/noble/main.js"></script>
+<link rel="stylesheet" href="../media/noble/main.css" />
+
+<!-- nobleCiphers, nobleCurves, nobleHashes global variables to be able to mess around -->
+<script async src="../media/noble/noble-ciphers.js"></script>
+<script async src="../media/noble/noble-curves.js"></script>
+<script async src="../media/noble/noble-hashes.js"></script>

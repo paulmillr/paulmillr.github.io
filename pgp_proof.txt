@@ -1,0 +1,23 @@
+Proving ownership of
+- paulmillr.com/pgp_proof.txt via paulmillr.com/pgp_proof.txt.asc
+- twitter.com/paulmillr
+- github.com/paulmillr via gist.github.com/paulmillr/cb3ad3b9cd4ac849eb1def3634f93421
+
+- Active key: Paul Miller (PGP 697079DA6878B89B) from 3 Jul 2022
+- Revoked key: Paul Miller (PGP 46BEEF337A641ABB) was active from 15 Apr 2020 to 2 Jul 2022
+
+Full pubkey:
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEYr45ABYJKwYBBAHaRw8BAQdAFq4gVWOS0mUU7s9Wb42FqvOuVWdAtZKDnE7u
+tmLKshe0IFBhdWwgTWlsbGVyIDxwYXVsQHBhdWxtaWxsci5jb20+iJQEExYKADwW
+IQR4qJzRCVl4LiP/hEdpcHnaaHi4mwUCYr45AAIbAwULCQgHAgMiAgEGFQoJCAsC
+BBYCAwECHgcCF4AACgkQaXB52mh4uJstlAD+JwGraqchzntLTdCuJEtXTbsbeDdt
+xhDWtIQnLr89sGUA/2yoGFf/MpAN+EeVMVwKDpOMVIx++ZGu2DKly9rI2o4PuDgE
+Yr45ABIKKwYBBAGXVQEFAQEHQIfhU1EVR53PjiWl+dRRmj8JTfbLwVXm23EMIoWf
+fxFDAwEIB4h4BBgWCgAgFiEEeKic0QlZeC4j/4RHaXB52mh4uJsFAmK+OQACGwwA
+CgkQaXB52mh4uJtl1wEA3LR5n/oT4mAt5D8EDYTafzQyMQ8rtlFnQ1BwSS3YB0IA
+/jpPLc9qjI53cWmaiUc9L5k+ia+wftVstVZD+A/ALUkL
+=eT5U
+-----END PGP PUBLIC KEY BLOCK-----

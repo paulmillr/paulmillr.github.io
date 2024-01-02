@@ -1,0 +1,93 @@
+---
+layout: base
+---
+
+<div class="main-page">
+  <section class="about-author">
+    <p>
+      I make projects which help developers to build awesome things.
+      I adore learning more about infosec &amp; austrian economics.
+    </p>
+    <p>
+      Check out my <a href="https://github.com/paulmillr">github</a>,
+      ping me on
+      <a href="https://twitter.com/paulmillr">twitter</a>, <a href="https://paulmillr.com/demos/nostr/#?user=npub10jcnehsxwrjepupvh602pl83up0dh3wv3fqfwv062smygqvpeuwsk03kag">nostr</a>
+      or send me
+      <a href="mailto:&#112;&#97;&#117;&#108;&#43;&#115;&#105;&#116;&#101;&#64;&#112;&#97;&#117;&#108;&#109;&#105;&#108;&#108;&#114;&#46;&#99;&#111;&#109;">an email</a>.
+
+      My PGP is <a href="https://paulmillr.com/pgp_proof.txt">697079DA6878B89B</a>.
+
+      You could fund my work with <a href="/funding">sponsorship</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Creating</h2>
+    <ul class="projects">
+      <li>
+        <a href="./noble/"><strong>noble</strong></a>
+        0-dependency cryptography:
+        <a href="https://github.com/paulmillr/noble-ciphers/">ciphers</a>,
+        <a href="https://github.com/paulmillr/noble-curves/">curves</a>,
+        <a href="https://github.com/paulmillr/noble-hashes/">hashes</a>
+      </li>
+      <li>
+        <a href="./noble/#scure"><strong>scure</strong></a> audited micro-libraries:
+        <a href="https://github.com/paulmillr/scure-base">base</a>,
+        <a href="https://github.com/paulmillr/scure-bip32">bip32</a>,
+        <a href="https://github.com/paulmillr/scure-bip39">bip39</a>,
+        <a href="https://github.com/paulmillr/scure-btc-signer">btc-signer</a>,
+        <a href="https://github.com/paulmillr/scure-starknet">starknet</a>
+      </li>
+      <li>
+        web3:
+        <a href="https://github.com/ethereum/js-ethereum-cryptography">js-eth-cryptography</a>,
+        <a href="https://github.com/paulmillr/micro-eth-signer">eth-signer</a>,
+          <a href="https://github.com/paulmillr/micro-sol-signer">sol-signer</a>,
+          <a href="https://github.com/paulmillr/micro-web3">micro-web3</a>,
+          <a href="https://github.com/paulmillr/tx-tor-broadcaster">tx-tor-broadcaster</a>
+      </li>
+      <li>
+        security:
+        <a href="https://github.com/paulmillr/nip44">nip44</a> for nostr,
+        <a href="https://github.com/paulmillr/encrypted-dns">encrypted-dns</a>,
+        <a href="https://github.com/paulmillr/ed25519-keygen">ed25519-keygen</a>,
+        <a href="https://github.com/paulmillr/bls12-381-keygen">bls12-381-keygen</a>,
+        <a href="https://github.com/paulmillr/micro-otp">otp</a>,
+        <a href="https://github.com/paulmillr/micro-password-generator">password-generator</a>,
+        <a href="https://github.com/paulmillr/steg">steganography</a>
+      </li>
+      <li>
+        others:
+        <a href="https://github.com/paulmillr/chokidar">chokidar</a>,
+        <a href="https://github.com/paulmillr/qr">qr</a>,
+        <a href="https://github.com/paulmillr/micro-packed">packed</a>,
+        <a href="https://github.com/paulmillr/micro-should">should</a>,
+        <a href="https://github.com/paulmillr/micro-bmark">bmark</a>,
+        <a href="https://github.com/paulmillr/dotfiles">dotfiles</a>
+      </li>
+      <li>
+        apps:
+        <a href="/demos/nostr/">nostr.spa</a>,
+        <a href="/demos/qr/">qr</a>,
+        <a href="/demos/steg/">steganography</a>,
+        <a href="/noble/#demo">elliptic curve calculator</a>
+      </li>
+    </ul>
+
+    Signed backups: <a href="https://github.com/paulmillr/backup">github</a>, <a href="https://gitlab.com/paulmillr/backup">gitlab</a>.
+    Old projects: <a href="https://github.com/brunch/brunch">brunch</a>, <a href="https://github.com/chaplinjs/chaplin">chaplin</a>, <a href="https://github.com/paulmillr/es6-shim">es6-shim</a>.
+  </section>
+
+  <section>
+    <h2>Writing</h2>
+    <ul class="post-list">
+      {% for post in site.posts %}
+      <li>
+        <time datetime="{{ post.date | date: "%Y-%m-%d" }}" data-mo="{{ post.date | date: "%b %Y" }}" class="post-date">{{ post.date | date: "%Y" }}</time> <span class="post-arrow">»</span>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>

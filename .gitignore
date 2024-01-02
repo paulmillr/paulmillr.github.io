@@ -1,0 +1,6 @@
+.DS_Store
+.jekyll-cache
+/_site/
+/Gemfile.lock
+/noble/demo-ecc/npm-shrinkwrap.json
+/demos/nostr/_site
