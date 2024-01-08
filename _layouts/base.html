@@ -15,7 +15,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="alternate" type="application/rss+xml" title="Paul Miller" href="/feed.xml" />
   <link rel="stylesheet" href="/assets/stylesheets/style.css?v=3">
-{% if page.highlight %}  <link rel="stylesheet" href="/assets/stylesheets/highlight.css">{% endif %}
 </head>
 <body>
   <nav>
@@ -30,10 +29,10 @@
         <span>/</span>
         <span>writing</span>
         <span>/</span>
-        <a href="{{ page.url }}">{{ page.date | date: "%b %Y" }}</a>
+        {{ page.date | date: "%b %Y" }}
       {% elsif page.title != null %}
         <span>/</span>
-        <a href="{{ page.url }}">{{ page.title }}</a>
+        {{ page.title }}
       {% endif %}
     </span>
     <span class="author-photo-img-wrap">
