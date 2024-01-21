@@ -98,6 +98,13 @@ export const connectedRelayUrl = reactive({
   }
 })
 
+export const connectedRelayUrls = reactive({
+  value: <string[]>([]),
+  update(value: string[]) {
+    this.value = value
+  }
+})
+
 export const selectedRelay = reactive({
   value: '',
   update(relay: string) {

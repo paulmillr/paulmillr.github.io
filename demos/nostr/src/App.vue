@@ -6,11 +6,13 @@
     getEventHash,
     signEvent,
     nip19,
+    nip10,
     SimplePool,
     parseReferences,
     type Sub,
     type Relay,
-    type Event
+    type Event,
+    type Filter
   } from 'nostr-tools'
 
   import type { EventExtended, LogContentPart } from './types'
@@ -28,6 +30,7 @@
     cachedUrlNpub, 
     isConnectingToRelay,
     connectedRelayUrl,
+    connectedRelayUrls,
     selectedRelay,
     showImages,
     nsec,
@@ -58,6 +61,9 @@
   const signedJson = ref('')
 
   let newEvents = ref<{ id: string; pubkey: string; }[]>([]);
+  const paginationEventsIds = ref<string[]>([]);
+  const currentPage = ref(1);
+  const pagesCount = ref(1);
 
   let showNewEventsBadge = ref(false)
   let newEventsBadgeCount = ref(0)
@@ -139,6 +145,27 @@
     } else {
       updateUrlHash(tab)
     }
+  }
+
+  const showFeedPage = async (page: number) => {
+    const relay = currentRelay.value
+    if (!relay) return
+
+    const limit = DEFAULT_EVENTS_COUNT
+    const start = (page - 1) * limit
+    const end = start + limit
+
+    const reversedIds = paginationEventsIds.value.slice().reverse()
+    const idsToShow = reversedIds.slice(start, end)
+
+    const postsEvents = await relay.list([{ ids: idsToShow }]);
+    let posts = await injectAuthorsToNotes(postsEvents)
+    posts = await injectLikesToNotes(posts)
+    posts = await injectRepostsToNotes(posts)
+    posts = await injectReferencesToNotes(posts)
+
+    events.value = posts as EventExtended[]
+    currentPage.value = page
   }
 
   const logStr = (msg: string) => {
@@ -329,6 +356,34 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  const listRootEvents = (relay: Relay, filters: Filter[]) => {
+    return new Promise(resolve => {
+      const events: Event[] = []
+      let filtersLimit:number
+      let newFilters = filters
+      if (filters && filters.length && filters[0].limit) {
+        let { limit, ...restFilters } = filters[0]
+        newFilters = [restFilters]
+        filtersLimit = limit
+      }
+      const sub = relay.sub(newFilters)
+      sub.on('event', (event: Event) => {
+        const nip10Data = nip10.parse(event)
+        if (nip10Data.reply || nip10Data.root) {
+          return;
+        }
+        events.push(event)
+        if (filtersLimit && events.length >= filtersLimit) {
+          resolve(events)
+          sub.unsub()
+        }
+      })
+      sub.on('eose', () => {
+        sub.unsub()
+      })
+    })
+  }
+
   async function handleRelayConnect() {
     if (isConnectingToRelay.value) return
 
@@ -399,7 +454,8 @@
       newEvents.value = []
 
       const limit = DEFAULT_EVENTS_COUNT;
-      const postsEvents = await relay.list([{ kinds: [1], limit }])
+      // const postsEvents = await relay.list([{ kinds: [1], limit }])
+      const postsEvents = await listRootEvents(relay, [{ kinds: [1], limit }]) as Event[]
 
       let posts = await injectAuthorsToNotes(postsEvents)
       posts = await injectLikesToNotes(posts)
@@ -407,15 +463,21 @@
       posts = await injectReferencesToNotes(posts)
 
       eventsIds.clear()
-      posts.forEach((e: Event) => eventsIds.add(e.id))
+      posts.forEach((e: Event) => {
+        eventsIds.add(e.id);
+        paginationEventsIds.value.push(e.id);
+      })
       events.value = posts as EventExtended[]
 
       connectedRelayUrl.update(isCustom ? 'custom' : relayUrl)
+      connectedRelayUrls.update([relayUrl]) // further it can be an array of a few relays
       isConnectingToRelay.update(false)
 
       relaySub = relay.sub([{ kinds: [1], limit: 1 }])
       relaySub.on('event', (event: Event) => {
         if (eventsIds.has(event.id)) return;
+        const nip10Data = nip10.parse(event)
+        if (nip10Data.reply || nip10Data.root) return;
         newEvents.value.push({ id: event.id, pubkey: event.pubkey })
       })
       curInterval = setInterval(updateNewEventsElement, 3000)
@@ -439,7 +501,15 @@
     newEvents.value = newEvents.value.filter(item => !eventsToShow.includes(item));
 
     const ids = eventsToShow.map(e => e.id)
-    const postsEvents = await relay.list([{ ids }]);
+    const limit = DEFAULT_EVENTS_COUNT;
+
+    paginationEventsIds.value = paginationEventsIds.value.concat(ids)
+    const firstPageIds = paginationEventsIds.value.slice(-limit)
+
+    pagesCount.value = Math.ceil(paginationEventsIds.value.length / limit)
+    currentPage.value = 1
+
+    const postsEvents = await relay.list([{ ids: firstPageIds }]);
     let posts = await injectAuthorsToNotes(postsEvents)
     posts = await injectLikesToNotes(posts)
     posts = await injectRepostsToNotes(posts)
@@ -447,7 +517,8 @@
 
     // update view
     posts.forEach((e: Event) => eventsIds.add(e.id))
-    events.value = posts.concat(events.value) as EventExtended[]
+    events.value = posts as EventExtended[]
+
     showNewEventsBadge.value = false
 
     logHtmlParts([
@@ -622,6 +693,7 @@
     newEvents.value = []
 
     connectedRelayUrl.update('')
+    connectedRelayUrls.update([])
     relaySub.unsub()
     relay.close()
 
@@ -759,7 +831,7 @@
   </div>
 
   <!-- Relay feed -->
-  <div v-if="currentTab.value === 'feed' || currentTab.value === 'message' || currentTab.value === 'log'">
+  <div id="feed" v-if="currentTab.value === 'feed' || currentTab.value === 'message' || currentTab.value === 'log'">
     <div class="columns">
       <div :class="['events', { 'd-md-none': currentTab.value === 'log' }]">
         <div class="connecting-notice" v-if="isConnectingToRelay.value">
@@ -780,7 +852,39 @@
           :pubKey="pubKey"
           :showImages="showImages.value"
           @toggleRawData="handleToggleRawData"
+          :currentRelays="connectedRelayUrls.value"
         />
+
+        <div v-if="pagesCount > 1" class="pagination">
+          Pages: 
+          <span v-if="pagesCount < 5">
+            <a @click="showFeedPage(page)" :class="['pagination__link', { 'pagination__link_active': currentPage == page }]" v-for="page in pagesCount" :href="`#feed`">
+              {{ page }}
+            </a>
+          </span>
+          <span v-if="pagesCount >= 5">
+            <a v-if="currentPage >= 3" @click="showFeedPage(1)" :class="['pagination__link']" :href="`#feed`">
+              1
+            </a>
+            <span v-if="currentPage > 3">...</span>
+
+            <a v-if="currentPage != 1" @click="showFeedPage(currentPage - 1)" :class="['pagination__link']" :href="`#feed`">
+              {{ currentPage - 1 }}
+            </a>
+            <a @click="showFeedPage(currentPage)" :class="['pagination__link pagination__link_active']" :href="`#feed`">
+              {{ currentPage }}
+            </a>
+            <a v-if="currentPage != pagesCount" @click="showFeedPage(currentPage + 1)" :class="['pagination__link']" :href="`#feed`">
+              {{ currentPage + 1 }}
+            </a>
+
+            <span v-if="currentPage < (pagesCount - 2)">...</span>
+
+            <a v-if="currentPage <= (pagesCount - 2)" @click="showFeedPage(pagesCount)" :class="['pagination__link']" :href="`#feed`">
+              {{ pagesCount }}
+            </a>
+          </span>
+        </div>
       </div>
 
       <div :class="['log-wrapper', { 'd-md-none': currentTab.value !== 'log' }]">
@@ -924,6 +1028,7 @@
 
   .new-events {
     position: absolute;
+    z-index: 1;
     padding: 4px 8px;
     top: 17px;
     left: 50%;
@@ -1059,5 +1164,13 @@
     .signed-json-btn-wrapper .error {
        margin-top: 0;
     }
+  }
+
+  .pagination__link {
+    margin-left: 5px;
+  }
+
+  .pagination__link_active {
+    color:#3aa99f;
   }
 </style>

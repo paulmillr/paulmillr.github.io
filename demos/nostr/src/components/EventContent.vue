@@ -242,36 +242,44 @@
 </script>
 
 <template>
-  <div :class="['event__main-content', { 'event__main-content_custom': pubKey === event.pubkey }]">
-    <div v-if="!event.showRawData" class="event__presentable-date">
-      <div v-if="showImages.value && event.author" class="event-img">
-        <img class="author-pic" :src="event.author.picture" alt="img" :title="`Avatar for ${event.author.name}`">
-      </div>
-      <div class="event-content">
-        <div class="event-header">
-          <div>
-            <b>{{ displayName(event.author, event.pubkey) }}</b>
+  <div class="event-card">
+    <div :class="['event-card__content', {'flipped': event.showRawData }]">
+      <div :class="['event-card__front', 'event__presentable-date', { 'event-card__front_custom': pubKey === event.pubkey }]">
+        <div v-if="showImages.value && event.author" class="event-img">
+          <img class="author-pic" :src="event.author.picture" alt="img" :title="`Avatar for ${event.author.name}`">
+        </div>
+        <div class="event-content">
+          <div class="event-header">
+            <div>
+              <b>{{ displayName(event.author, event.pubkey) }}</b>
+            </div>
+            <div>
+              {{ formatedDate(event.created_at) }}
+            </div>
           </div>
-          <div>
-            {{ formatedDate(event.created_at) }}
+  
+          <div class="event-body">
+            <EventText :event="event" :slice="sliceText" />
+          </div>
+  
+          <div class="event-footer">
+            <EventActionsBar :hasReplyBtn="hasReplyBtn" @showReplyField="handleToggleReplyField" :likes="event.likes" :reposts="0" />
+            <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
+              {...}
+            </span>
           </div>
         </div>
-        <EventText :event="event" :slice="sliceText" />
-
-        <div class="event-footer">
-          <EventActionsBar :hasReplyBtn="hasReplyBtn" @showReplyField="handleToggleReplyField" :likes="event.likes" :reposts="0" />
+      </div>
+  
+      <div :class="['event-card__back', { 'event-card__back_custom': pubKey === event.pubkey, 'event-details-first': index === 0 }]">
+        <div class="event__raw-data">
+          <RawData :event="event" :authorEvent="event.authorEvent" />
+        </div>
+        <div class="event-footer-code-wrapper">
           <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
             {...}
           </span>
         </div>
-      </div>
-    </div>
-    <div :class="[{ 'event-details-first': index === 0 }]" v-if="event.showRawData">
-      <RawData :event="event" :authorEvent="event.authorEvent" />
-      <div class="event-footer-code-wrapper">
-        <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
-          {...}
-        </span>
       </div>
     </div>
   </div>
@@ -331,13 +339,51 @@
     margin-top: 5px;
   }
 
-  .event__main-content {
-    border: 1px solid #878580;
+  .event-body {
+    min-height: 60px;
+  }
+
+  .event-card {
+    perspective: 40rem;
+  }
+
+  .event-card__content {
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    position: relative;
+  }
+
+  .event-card__content.flipped {
+    transform: rotateX(-180deg);
+  }
+
+  .event-card__front, .event-card__back {
+    backface-visibility: hidden;
+    border: 1px solid white;
     padding: 14px;
   }
 
-  .event__main-content_custom {
+  .event-card__front_custom, .event-card__back_custom {
     border-color: #0092bf;
+  }
+
+  .event-card__back {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    transform: rotateX(-180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .event__raw-data {
+    margin-top: 28px;
+    overflow-y: hidden;
+    margin-bottom: 2px;
+  }
+
+  .event-card__content.flipped .event__raw-data {
+    overflow-y: scroll;
   }
 
   .event__presentable-date {

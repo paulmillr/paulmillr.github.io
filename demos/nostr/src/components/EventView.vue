@@ -28,7 +28,7 @@
     currentRelays?: string[]
     sliceText?: number
     sliceTextReply?: number
-    showReplies?: boolean
+    showReplies?: boolean,
     hasReplyBtn?: boolean
   }>()
 

@@ -29,6 +29,8 @@
   import DownloadIcon from './../icons/DownloadIcon.vue'
   import EventView from './EventView.vue'
 
+  import { isSHA256Hex } from '../utils'
+
   import { pool as p } from './../store'
   const pool = p.value
 
@@ -49,6 +51,7 @@
   const isLoadingFallback = ref(false)
   const showLoadingTextNotes = ref(false)
   const isAutoConnectOnSearch = ref(false)
+  const isEventSearch = ref(false)
   
   const nip05toURL = (identifier: string) => {
     const [name, domain] = identifier.split('@')
@@ -85,23 +88,30 @@
   }
 
   const handleGetUserInfo = async () => {
-    const npubVal = npub.value.trim()
-    const nsecVal = nsec.value.trim()
+    const searchVal = npub.value.trim()
+    let isHexSearch = false
 
-    if (!npubVal.length) {
-      pubKeyError.value = 'Public key is required.'
-      if (nsecVal.length) {
-        pubKeyError.value += ' Please check your private key, it seems to be invalid if you want to generate public key from private.'
-      }
+    if (!searchVal.length) {
+      pubKeyError.value = 'Public key or event id is required.'
       return
     }
 
-    try {
-      let { data } = nip19.decode(npubVal)
-      pubHex.value = data.toString()
-    } catch (e) {
-      pubKeyError.value = 'Public key is invalid. Please check it and try again.'
-      return
+    if (isSHA256Hex(searchVal)) {
+      pubHex.value = searchVal
+      isHexSearch = true
+    } else {
+      try {
+        let { data, type } = nip19.decode(searchVal)
+        if (type !== 'npub' && type !== 'note') {
+          pubKeyError.value = 'Public key or event id should be in npub or note format, or hex.'
+          return
+        }
+        isEventSearch.value = type === 'note'
+        pubHex.value = data.toString()
+      } catch (e) {
+        pubKeyError.value = 'Public key or event id is invalid. Please check it and try again.'
+        return
+      }
     }
 
     let relay: Relay
@@ -127,6 +137,17 @@
     pubKeyError.value = ''
     showLoadingUser.value = true
 
+    // in case of searching for one event, loading this event firstly to get user pubHex
+    let notesEvents: EventExtended[] = []
+    if (isEventSearch.value || isHexSearch) {
+      const eventId = pubHex.value
+      notesEvents = await relay.list([{ ids: [eventId] }]) as EventExtended[]
+      if (notesEvents.length) {
+        pubHex.value = notesEvents[0].pubkey
+        isEventSearch.value = true
+      }
+    }
+
     const authorMeta = await relay.get({ kinds: [0], limit: 1, authors: [pubHex.value] })
     if (!authorMeta) {
       showLoadingUser.value = false
@@ -147,23 +168,27 @@
     showNotFoundError.value = false
 
     // routing
-    updateUrlUser(npubVal)
-    cachedUrlNpub.update(npubVal)
+    updateUrlUser(searchVal)
+    cachedUrlNpub.update(searchVal)
 
     showLoadingTextNotes.value = true
 
     checkAndShowNip05()
 
-    let notesEvents = await relay.list([{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
+    // event was loaded before in case of searching for one event
+    // filtering for replies only when searching for user, otherwise we show the post even if it is a reply
+    if (!isEventSearch.value) {
+      notesEvents = await relay.list([{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
 
-    const repliesIds = new Set()
-    notesEvents.forEach((event) => {
-      const nip10Data = nip10.parse(event)
-      if (nip10Data.reply || nip10Data.root) {
-        repliesIds.add(event.id)
-      }
-    })
-    notesEvents = notesEvents.filter((event) => !repliesIds.has(event.id))
+      const repliesIds = new Set()
+      notesEvents.forEach((event) => {
+        const nip10Data = nip10.parse(event)
+        if (nip10Data.reply || nip10Data.root) {
+          repliesIds.add(event.id)
+        }
+      })
+      notesEvents = notesEvents.filter((event) => !repliesIds.has(event.id))
+    }
 
     notesEvents = injectAuthorToNotes(notesEvents, userDetails.value)
     notesEvents = await props.injectLikesToNotes(notesEvents)
@@ -235,18 +260,46 @@
   }
 
   const handleSearchFallback = async () => {
-    const npubVal = npub.value.trim()
-    try {
-      let { data } = nip19.decode(npubVal)
-      pubHex.value = data.toString()
-    } catch (e) {
-      notFoundFallbackError.value = 'Something went wrong. Please check public key and try again.'
+    const searchVal = npub.value.trim()
+    let isHexSearch = false
+
+    if (!searchVal.length) {
+      notFoundFallbackError.value = 'Public key or event id is required.'
       return
     }
 
+    if (isSHA256Hex(searchVal)) {
+      pubHex.value = searchVal
+      isHexSearch = true
+    } else {
+      try {
+        let { data, type } = nip19.decode(searchVal)
+        if (type !== 'npub' && type !== 'note') {
+          notFoundFallbackError.value = 'Public key or event id should be in npub or note format, or hex.'
+          return
+        }
+        isEventSearch.value = type === 'note'
+        pubHex.value = data.toString()
+      } catch (e) {
+        notFoundFallbackError.value = 'Public key or event id is invalid. Please check it and try again.'
+        return
+      }
+    }
+
     isLoadingFallback.value = true
+
+    // in case of searching for one event, loading this event firstly to get user pubHex
+    let notesEvents: EventExtended[] = []
+    if (isEventSearch.value || isHexSearch) {
+      const eventId = pubHex.value
+      notesEvents = await pool.list(fallbackRelays, [{ ids: [eventId] }]) as EventExtended[]
+      if (notesEvents.length) {
+        pubHex.value = notesEvents[0].pubkey
+        isEventSearch.value = true
+      }
+    }
+
     const authorMeta = await pool.get(fallbackRelays, { kinds: [0], limit: 1, authors: [pubHex.value] })
-    
     if (!authorMeta) {
       isLoadingFallback.value = false
       notFoundFallbackError.value = 'User was not found on listed relays.'
@@ -269,23 +322,25 @@
     isUserHasValidNip05.update(false)
 
     // routing
-    updateUrlUser(npubVal)
-    cachedUrlNpub.update(npubVal)
+    updateUrlUser(searchVal)
+    cachedUrlNpub.update(searchVal)
 
     showLoadingTextNotes.value = true
 
     checkAndShowNip05()
 
-    let notesEvents = await pool.list(fallbackRelays, [{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
+    if (!isEventSearch.value) {
+      notesEvents = await pool.list(fallbackRelays, [{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
 
-    const repliesIds = new Set()
-    notesEvents.forEach((event) => {
-      const nip10Data = nip10.parse(event)
-      if (nip10Data.reply || nip10Data.root) {
-        repliesIds.add(event.id)
-      }
-    })
-    notesEvents = notesEvents.filter((event) => !repliesIds.has(event.id))
+      const repliesIds = new Set()
+      notesEvents.forEach((event) => {
+        const nip10Data = nip10.parse(event)
+        if (nip10Data.reply || nip10Data.root) {
+          repliesIds.add(event.id)
+        }
+      })
+      notesEvents = notesEvents.filter((event) => !repliesIds.has(event.id))
+    }
 
     notesEvents = injectAuthorToNotes(notesEvents, userDetails.value)
     notesEvents = await props.injectLikesToNotes(notesEvents, fallbackRelays)
@@ -319,11 +374,11 @@
 <template>
   <div class="field">
     <label class="field-label" for="user_public_key">
-      <strong>Profile's public key</strong>
+      <strong>Profile's public key or event id</strong>
       <button @click="handleGeneratePublicFromPrivate" class="random-key-btn">Use mine</button>
     </label>
     <div class="field-elements">
-      <input @input="handleInputNpub" v-model="npub.value" class="pubkey-input" id="user_public_key" type="text" placeholder="npub..." />
+      <input @input="handleInputNpub" v-model="npub.value" class="pubkey-input" id="user_public_key" type="text" placeholder="npub, note, hex of pubkey or note id..." />
       <button @click="handleGetUserInfo" class="get-user-btn">
         {{ isAutoConnectOnSearch ? 'Connect & Search' : 'Search' }}
       </button>
@@ -334,7 +389,7 @@
   </div>
 
   <div class="loading-notice" v-if="showLoadingUser">
-    Loading user info...
+    Loading event info...
   </div>
 
   <UserEvent
@@ -386,17 +441,27 @@
     </div>
   </UserEvent>
 
-  <div v-if="showLoadingTextNotes">Loading user notes...</div>
-  <h3 v-if="userNotesEvents.value.length > 0 && !showLoadingTextNotes">User notes</h3>
+  <div v-if="showLoadingTextNotes">Loading notes...</div>
+  <h3 v-if="userNotesEvents.value.length > 0 && !showLoadingTextNotes">
+    <span v-if="isEventSearch">Event info</span>
+    <span v-else>User notes</span>
+  </h3>
 
   <template :key="event.id" v-for="(event, i) in userNotesEvents.value">
-    <EventView :hasReplyBtn="true" :showReplies="true" :currentRelays="currentRelays" :index="i" @toggleRawData="handleToggleRawData" :event="(event as EventExtended)" />
+    <EventView 
+      :hasReplyBtn="true" 
+      :showReplies="true" 
+      :currentRelays="currentRelays" 
+      :index="i" 
+      @toggleRawData="handleToggleRawData" 
+      :event="(event as EventExtended)" 
+    />
   </template>
 
   <div class="not-found" v-if="showNotFoundError">
     <div class="not-found__desc">
-      User was not found on selected relay. 
-      Please try to connect to another one or you can try to load info about this user from the list of popular relays:
+      Data was not found on selected relay.
+      Please try to connect to another one or you can try to load info from the list of popular relays:
     </div>
     <div>
       <button @click="handleSearchFallback" class="fallback-search-btn">

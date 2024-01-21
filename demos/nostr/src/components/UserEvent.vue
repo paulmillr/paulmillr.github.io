@@ -109,7 +109,7 @@
         </div>
     </div>
 
-    <RawData v-if="showRawData" :event="event" :authorEvent="authorEvent" />
+    <RawData v-if="showRawData" :isUserEvent="true" :event="event" :authorEvent="authorEvent" />
 
     <div class="event-footer" :class="{ 'event-footer_block': isUserProfile }">
       <EventActionsBar v-if="!isUserProfile" :likes="likes" :reposts="reposts" />

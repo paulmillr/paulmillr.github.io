@@ -5,6 +5,7 @@
   defineProps<{
     events: EventExtended[]
     pubKey: string
+    currentRelays: string[]
   }>()
 
   const emit = defineEmits(['toggleRawData'])
@@ -16,15 +17,17 @@
 
 <template>
   <div>
-    <template v-for="(event, i) in events">
+    <template v-for="(event, i) in events" :key="event.id">
       <EventView 
         class="event"
         @toggleRawData="handleToggleRawData" 
         :event="event" 
-        :pubKey="pubKey" 
+        :pubKey="pubKey"
         :index="i" 
-        :showReplies="false"
+        :showReplies="true"
+        :hasReplyBtn="true"
         :sliceText="150"
+        :currentRelays="currentRelays"
       />
     </template>
   </div>

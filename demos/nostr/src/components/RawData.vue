@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
   import { nip19, type Event } from 'nostr-tools'
-  import type { Author, EventExtended } from './../types'
+  import type { EventExtended } from './../types'
 
   const props = defineProps<{
     event: EventExtended
     authorEvent: Event
+    isUserEvent?: Boolean
   }>()
   const rawDataActiveTab = ref(1)
   const showAuthorTab = ref(true)
@@ -34,7 +35,7 @@
 
 <template>
   <div class="event-details">
-    <div>
+    <div :class="['event-details__header', { 'event-details__header_user': isUserEvent }]">
       <span @click="() => handleRawDataTabClick(1)" :class="['event-details__tab', { 'event-details__tab_active': rawDataActiveTab === 1 }]">Note</span>
       <span v-if="showAuthorTab" @click="() => handleRawDataTabClick(2)" :class="['event-details__tab', { 'event-details__tab_active': rawDataActiveTab === 2 }]">Author</span>
       <span @click="() => handleRawDataTabClick(3)" :class="['event-details__tab', { 'event-details__tab_active': rawDataActiveTab === 3 }]">Author content</span>
@@ -62,6 +63,16 @@ npub: {{ nip19.npubEncode(event.pubkey) }}</pre>
 </template>
 
 <style scoped>
+  .event-details__header {
+    position: fixed;
+    top: 10px;
+    left: 15px;
+  }
+  
+  .event-details__header_user {
+    position: static;
+  }
+
   .event-details__tab {
     cursor: pointer;
     margin-right: 6px;
@@ -87,5 +98,10 @@ npub: {{ nip19.npubEncode(event.pubkey) }}</pre>
 
   .event-details__no-user {
     margin-top: 10px;
+  }
+
+  .event-details .highlight {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 </style>

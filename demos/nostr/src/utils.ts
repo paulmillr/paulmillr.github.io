@@ -161,3 +161,7 @@ export const isWsAvailable = (url: string) => {
     return Promise.resolve(false);
   }
 }
+
+export const isSHA256Hex = (hex:string) => {
+  return /^[a-f0-9]{64}$/.test(hex);
+}
