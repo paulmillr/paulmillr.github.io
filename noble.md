@@ -90,7 +90,7 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
 * [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
 * [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 
-### Playground
+### Demo
 
 You can try out noble in the browser JS console of the webpage. There are 3 global variables: `nobleCiphers`, `nobleCurves`, `nobleHashes`. The webpage also has two demo apps:
 
