@@ -5,14 +5,6 @@ import {
   type Event
 } from 'nostr-tools'
 
-export const updateUrlHash = (hash: string) => {
-  window.location.hash = hash
-}
-
-export const updateUrlUser = (npub: string) => {
-  window.location.hash = `#?user=${npub}`
-}
-
 export const normalizeUrl = (url: string) => {
   const norm = url.trim()
   if (!norm.startsWith('ws://') && !norm.startsWith('wss://')) {
@@ -21,7 +13,14 @@ export const normalizeUrl = (url: string) => {
   return norm
 }
 
-export const injectAuthorsToNotes = async (postsEvents: Event[], authorsEvents: Event[]) => {
+export const injectDataToNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+  const likes = injectLikesToNotes(posts, relays, relaysPool)
+  const reposts = injectRepostsToNotes(posts, relays, relaysPool)
+  const references = injectReferencesToNotes(posts, relays, relaysPool)
+  return Promise.all([likes, reposts, references])
+}
+
+export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: Event[]) => {
   const tempPostsEvents = [...postsEvents] as EventExtended[]
 
   const postsWithAuthor: Event[] = [];
@@ -45,18 +44,14 @@ export const injectAuthorsToNotes = async (postsEvents: Event[], authorsEvents: 
   return postsWithAuthor;
 }
 
-export const injectReferencesToNotes = async (postsEvents: Event[], relays: string[] = [], relaysPool: SimplePool | null) => {
-  const eventsWithReferences: EventExtended[] = [];
+export const injectReferencesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
   
   let pool = relaysPool || new SimplePool({ getTimeout: 5600 })
 
   for (const event of postsEvents) {
-    const extendedEvent = event as EventExtended
-
     if (!contentHasMentions(event.content)) {
-      extendedEvent.references = []
-      eventsWithReferences.push(extendedEvent)
+      event.references = []
       continue
     }
 
@@ -74,22 +69,18 @@ export const injectReferencesToNotes = async (postsEvents: Event[], relays: stri
       referencesToInject.push(referencesWithProfile)
     }
 
-    extendedEvent.references = referencesToInject
-    eventsWithReferences.push(extendedEvent)
+    event.references = referencesToInject
   }
-
-  return eventsWithReferences
 }
 
-export const injectLikesToNotes = async (postsEvents: Event[], relays: string[] = []) => {
+export const injectLikesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
 
   const postsIds = postsEvents.map((e: Event) => e.id)
+  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
 
-  const pool = new SimplePool({ getTimeout: 5600 })
   const likeEvents = await pool.list(relays, [{ kinds: [7], "#e": postsIds }])
 
-  const postsWithLikes: Event[] = [];
   postsEvents.forEach(postEvent => {
     let likes = 0
     likeEvents.forEach(likedEvent => {
@@ -98,23 +89,18 @@ export const injectLikesToNotes = async (postsEvents: Event[], relays: string[] 
         likes++
       }
     })
-    const tempEvent = postEvent as EventExtended
-    tempEvent.likes = likes
-    postsWithLikes.push(tempEvent)
+    postEvent.likes = likes
   })
-
-  return postsWithLikes
 }
 
-export const injectRepostsToNotes = async (postsEvents: Event[], fallbackRelays: string[] = []) => {
-  if (!fallbackRelays.length) return postsEvents
+export const injectRepostsToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+  if (!relays.length) return postsEvents
 
   const postsIds = postsEvents.map((e: Event) => e.id)
 
-  const pool = new SimplePool({ getTimeout: 5600 })
-  const repostEvents = await pool.list(fallbackRelays, [{ kinds: [6], "#e": postsIds }])
+  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  const repostEvents = await pool.list(relays, [{ kinds: [6], "#e": postsIds }])
 
-  const postsWithReposts: Event[] = [];
   postsEvents.forEach(postEvent => {
     let reposts = 0
     repostEvents.forEach(repostEvent => {
@@ -123,12 +109,8 @@ export const injectRepostsToNotes = async (postsEvents: Event[], fallbackRelays:
         reposts++
       }
     })
-    const tempEvent = postEvent as EventExtended
-    tempEvent.reposts = reposts
-    postsWithReposts.push(tempEvent)
+    postEvent.reposts = reposts
   })
-
-  return postsWithReposts
 }
 
 export const contentHasMentions = (content: string) => {

@@ -9,14 +9,12 @@
     SimplePool
   } from 'nostr-tools'
   import {
-    injectLikesToNotes,
-    injectRepostsToNotes,
-    injectReferencesToNotes,
-    injectAuthorsToNotes
+    injectAuthorsToNotes,
+    injectDataToNotes
   } from './../utils'
 
-  import { pool as p } from './../store'
-  const pool = p.value
+  import { eventPool } from './../store'
+  const pool = eventPool.value
 
   const emit = defineEmits(['toggleRawData'])
   const replyErr = ref('')
@@ -66,9 +64,8 @@
     showMoreRepliesBtn.value = replies.length > 1
     let reply = replies[0] as EventExtended
 
-    let tempReplies = await injectLikesToNotes([reply], currentRelays)
-    tempReplies = await injectRepostsToNotes(tempReplies, currentRelays)
-    tempReplies = await injectReferencesToNotes(tempReplies, currentRelays, pool as SimplePool)
+    let tempReplies = [reply]
+    await injectDataToNotes(tempReplies as EventExtended[], currentRelays, pool as SimplePool)
 
     reply = tempReplies[0] as EventExtended
     const authorMeta = await pool.get(currentRelays, { kinds: [0], limit: 1, authors: [reply.pubkey] })
@@ -113,11 +110,9 @@
     const authors = replies.map((e: any) => e.pubkey)
     const uniqueAuthors = [...new Set(authors)]
     const authorsEvents = await pool.list(currentRelays, [{ kinds: [0], authors: uniqueAuthors }])
+    replies = injectAuthorsToNotes(replies, authorsEvents)
 
-    replies = await injectAuthorsToNotes(replies, authorsEvents)
-    replies = await injectLikesToNotes(replies, currentRelays)
-    replies = await injectRepostsToNotes(replies, currentRelays)
-    replies = await injectReferencesToNotes(replies, currentRelays, pool as SimplePool)
+    await injectDataToNotes(replies as EventExtended[], currentRelays, pool as SimplePool)
 
     eventReplies.value = replies as EventExtended[]
     showAllReplies.value = true

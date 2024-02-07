@@ -1,14 +1,15 @@
 <script setup lang="ts">
   import { onBeforeUpdate, onMounted, ref } from 'vue';
-  import type { EventExtended, EventTextPart } from './../types'
+  import { useRouter } from 'vue-router'
   import { nip19 } from 'nostr-tools'
-  import { currentTab, npub } from './../store'
-  import { updateUrlUser } from './../utils'
+  import type { EventExtended, EventTextPart } from './../types'
+  import { npub, isRoutingUser } from './../store'
 
   const props = defineProps<{
     event: EventExtended
     slice?: number
   }>()
+  const router = useRouter()
 
   const contentParts = ref<EventTextPart[]>([])
   
@@ -103,10 +104,9 @@
 
   const handleClickMention = (mentionNpub: string | undefined) => {
     if (!mentionNpub) return
-    updateUrlUser(mentionNpub)
-    currentTab.update('user')
     npub.update(mentionNpub)
-    window.scrollTo({ top: 0 })
+    isRoutingUser.update(true)
+    router.push({ path: `/user/${mentionNpub}` })
   }
 </script>
 
@@ -117,7 +117,7 @@
         {{ part.value }}
       </span>
       <span v-if="part.type === 'profile'">
-        <a @click.prevent="() => handleClickMention(part.npub)" :href="`#?user=${part.npub}`">
+        <a @click.prevent="() => handleClickMention(part.npub)" href='#'>
           {{ part.value }}
         </a>
       </span>

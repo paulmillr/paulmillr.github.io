@@ -16,7 +16,6 @@
 
 <style scoped>
   .tab-link {
-    color: white;
     color: #0092bf;
     margin-right: 15px;
     cursor: pointer;

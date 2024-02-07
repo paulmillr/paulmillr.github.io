@@ -3,7 +3,7 @@
     showImages: boolean
   }>()
 
-  const emit = defineEmits(['handlePrivacyClick', 'toggleImages']);
+  const emit = defineEmits(['toggleImages']);
 </script>
 
 <template>
@@ -12,7 +12,7 @@
       <input @change="emit('toggleImages')" class="show-images__input" type="checkbox" id="show-feed-images" :checked="props.showImages" />
       <label class="show-images__label" for="show-feed-images"> Show avatars</label>
     </span>
-    <small> (<a @click="emit('handlePrivacyClick')" href="#?help=privacy">Exposes your IP</a>)</small>
+    <small> (<router-link :to="{ path: '/help', hash: '#privacy' }">Exposes your IP</router-link>)</small>
   </div>
 </template>
 

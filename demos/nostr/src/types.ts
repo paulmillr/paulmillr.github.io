@@ -32,3 +32,8 @@ export type LogContentPart = {
   type: string,
   value: string
 }
+
+export type ShortPubkeyEvent = {
+  id: string,
+  pubkey: string
+}

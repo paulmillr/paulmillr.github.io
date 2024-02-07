@@ -1,9 +1,11 @@
 <script setup lang="ts">
-  import { ref, watchEffect } from 'vue'
+  import { ref, watchEffect, onMounted } from 'vue'
   import { nip19, verifySignature, type Event } from 'nostr-tools'
   import RawData from './RawData.vue'
   import EventActionsBar from './EventActionsBar.vue'
   import type { Author, EventExtended } from './../types'
+  import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
+  import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
 
   const props = defineProps<{
     event: EventExtended
@@ -14,8 +16,6 @@
   }>()
 
   const event = ref<Event>()
-  const isSigVerified = ref(false)
-  const isSigValid = ref(false)
   const showRawData = ref(false)
   const showHexId = ref(false)
   const showHexPubkey = ref(false)
@@ -27,6 +27,7 @@
   const likes = ref(0)
   const reposts = ref(0)
   const isUserProfile = ref(false)
+  const isSigVerified = ref(false)
 
   watchEffect(() => {
     event.value = props.event
@@ -39,15 +40,13 @@
     isUserProfile.value = props.isUserProfile
   })
 
+  onMounted(() => {
+    isSigVerified.value = verifySignature(props.event as Event)
+  })
+
   const formatedDate = (timestamp: number) => {
     const ms = timestamp * 1000
     return new Date(ms).toLocaleString();
-  }
-
-  const handleCheckSignature = () => {
-    if (isSigVerified.value) return
-    isSigVerified.value = true
-    isSigValid.value = verifySignature(event.value as Event)
   }
 
   const handleToggleRawData = () => {
@@ -95,34 +94,27 @@
         <div class="header-col"><b>Date: </b></div>
         <div class="content-col"><code>{{ formatedDate(created_at) }}</code></div>
       </div>
-        <div class="btn-field">
-          <label class="btn-field__label"><b>Signature:</b></label>
-          <input
-            class="btn-field__input"
-            readonly
-            v-model="sig"
-            type="text"
-          >
-          <button @click="handleCheckSignature" class="btn-field__btn">
-            {{ !isSigVerified && !isSigValid ? 'Check' : isSigVerified && isSigValid ?  'Ok ✅' : '❌' }}
-          </button>
-        </div>
     </div>
 
     <RawData v-if="showRawData" :isUserEvent="true" :event="event" :authorEvent="authorEvent" />
 
-    <div class="event-footer" :class="{ 'event-footer_block': isUserProfile }">
-      <EventActionsBar v-if="!isUserProfile" :likes="likes" :reposts="reposts" />
-      <span class="event-footer-code" @click="handleToggleRawData">{...}</span>
+    <div class="event-footer" :class="{ 'event-footer_flex-end': !showRawData }">
+      <div v-if="showRawData" :class="['event-footer__signature', { 'event-footer__signature_invalid': !isSigVerified }]">
+        <CheckSquareIcon v-if="isSigVerified" /> 
+        <InvalidSignatureIcon v-if="!isSigVerified" />
+        <span class="event-footer__signature-text">
+          {{ isSigVerified ? 'Signature is valid' : 'Invalid signature' }}
+        </span>
+      </div>
+      <div>
+        <EventActionsBar v-if="!isUserProfile" :likes="likes" :reposts="reposts" />
+        <span class="event-footer-code" @click="handleToggleRawData">{...}</span>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-  .event__header {
-    margin-bottom: 15px;
-  }
-
   .event__field {
     display: flex;
     flex-direction: column;
@@ -150,10 +142,7 @@
   .code-wrapper button {
     margin-left: 10px;
     font-size: 14px;
-  }
-
-  .col {
-    padding: 4px 0;
+    min-width: 60px;
   }
 
   .header-col {
@@ -181,64 +170,6 @@
     line-break: anywhere;
   }
 
-  .btn-field {
-    display: flex;
-    align-items: start;
-    flex-direction: column;
-    position: relative;
-  }
-
-  @media (min-width: 768px) {
-    .btn-field {
-      display: flex;
-      align-items: center;
-      flex-direction: row;
-    }
-  }
-
-  .btn-field__label {
-    margin-right: 10px;
-    color: #999;
-  }
-
-  .btn-field__input {
-    flex-grow: 1;
-    background: transparent;
-    padding: 10px 12px;
-    border: 1px solid white;
-    font-size: 1.125rem;
-    color: #ddd;
-    font-weight: normal;
-    font-family: 'PT Mono', 'Menlo', monospace;
-
-    padding: 10px 2%;
-    width: 96%;
-    margin-top: 5px;
-  }
-
-  @media (min-width: 768px) {
-    .btn-field__input {
-      padding: 10px 80px 10px 12px;
-      width: 100%;
-      margin-top: 0;
-    }
-  }
-
-  .btn-field__btn {
-    position: absolute;
-    right: 0;
-    top: 3px;
-    width: 60px;
-  }
-
-  @media (min-width: 768px) {
-    .btn-field__btn {
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-  }
-
   .event {
     border: 1px solid white;
     padding: 14px;
@@ -253,9 +184,8 @@
     margin-top: 10px;
   }
 
-  .event-footer_block {
-    display: block;
-    text-align: right;    
+  .event-footer_flex-end {
+    justify-content: flex-end;
   }
 
   .event-footer-code {
@@ -264,5 +194,18 @@
 
   button {
     cursor: pointer;
+  }
+
+  .event-footer__signature {
+    display: flex;
+    align-items: center;
+  }
+
+  .event-footer__signature-text {
+    margin-left: 5px;
+  }
+
+  .event-footer__signature_invalid {
+    color: red;
   }
 </style>

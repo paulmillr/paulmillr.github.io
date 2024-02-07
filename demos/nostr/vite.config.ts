@@ -13,17 +13,22 @@ export default defineConfig({
     }
   },
   build: {
+    assetsDir: 'assets',
+    assetsInlineLimit: 0,
     rollupOptions: {
       input: 'src/main.ts',
       output: {
         entryFileNames: 'main.js',
         assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split('.').at(1);
-          if (extType == 'css') return 'main.css';
-          return `assets/${extType}/[name]-[hash][extname]`;
+          if (assetInfo.name) {
+            let extType = assetInfo.name.split('.').at(1);
+            if (extType === 'css') return `main.css`;
+          }
+          return 'assets/[name]-[hash][extname]'
         }
       }
     },
-    outDir: './dist'
+    cssCodeSplit: false,
+    outDir: 'dist',
   },
 })

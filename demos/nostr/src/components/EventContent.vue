@@ -1,18 +1,30 @@
 <script setup lang="ts">
-  import { onBeforeUpdate, ref } from 'vue'
-  import { nip19, getPublicKey, getEventHash, signEvent, parseReferences, SimplePool, nip10 } from 'nostr-tools'
-  import { showImages } from './../store'
+  import { onMounted, onBeforeUpdate, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { 
+    nip19, 
+    getPublicKey, 
+    getEventHash, 
+    signEvent, 
+    parseReferences, 
+    SimplePool, 
+    nip10,
+    verifySignature,
+    type Event
+  } from 'nostr-tools'
   import type { EventExtended } from './../types'
   import RawData from './RawData.vue'
   import EventActionsBar from './EventActionsBar.vue'
   import EventText from './EventText.vue'
-  import { nsec } from './../store'
+  import { nsec, isRoutingUser, npub, showImages } from './../store'
   import {
-    injectLikesToNotes,
-    injectRepostsToNotes,
-    injectReferencesToNotes,
-    injectAuthorsToNotes
+    injectAuthorsToNotes,
+    injectDataToNotes
   } from './../utils'
+  import LinkIcon from './../icons/LinkIcon.vue'
+  import CheckIcon from './../icons/CheckIcon.vue'
+  import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
+  import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
 
   const emit = defineEmits(['toggleRawData', 'showReplyField', 'sendReply', 'resetSentStatus'])
   const replyText = ref('')
@@ -32,10 +44,14 @@
     currentRelays?: string[]
   }>()
 
+  const router = useRouter()
+
   const showReplyField = ref(false)
   const isPublishingReply = ref(false)
   const eventReplies = ref<EventExtended[]>([])
   const showReplies = ref(false)
+  const isCopiedEventLink = ref(false)
+  const isSigVerified = ref(false)
 
   const handleToggleRawData = (eventId: string) => {
     if (props.isRootEvent) {
@@ -52,6 +68,10 @@
       minute: 'numeric'
     })
   }
+
+  onMounted(() => {
+    isSigVerified.value = verifySignature(props.event as Event)
+  })
 
   onBeforeUpdate(() => {
     if (props.isRootEvent) {
@@ -220,11 +240,9 @@
     const authors = replies.map((e: any) => e.pubkey)
     const uniqueAuthors = [...new Set(authors)]
     const authorsEvents = await pool.list(currentRelays, [{ kinds: [0], authors: uniqueAuthors }])
+    replies = injectAuthorsToNotes(replies, authorsEvents)
 
-    replies = await injectAuthorsToNotes(replies, authorsEvents)
-    replies = await injectLikesToNotes(replies, currentRelays)
-    replies = await injectRepostsToNotes(replies, currentRelays)
-    replies = await injectReferencesToNotes(replies, currentRelays, pool)
+    await injectDataToNotes(replies as EventExtended[], currentRelays, pool)
 
     eventReplies.value = replies as EventExtended[]
     event.hasReplies = true
@@ -239,6 +257,25 @@
   const handleHideReplies = () => {
     showReplies.value = false
   }
+
+  const handleCopyEventLink = () => {
+    const { origin, pathname } = window.location
+    let noteId = nip19.noteEncode(props.event.id)
+    const eventLink = `${origin}/${pathname}#?event=${noteId}`
+    navigator.clipboard.writeText(eventLink)
+    isCopiedEventLink.value = true
+    setTimeout(() => {
+      isCopiedEventLink.value = false
+    }, 2000)
+  }
+
+  const handleUserClick = (e: any) => {
+    e.preventDefault()
+    const urlNpub = nip19.npubEncode(props.event.pubkey)
+    npub.update(urlNpub)
+    isRoutingUser.update(true)
+    router.push({ path: `/user/${urlNpub}` })
+  }
 </script>
 
 <template>
@@ -251,7 +288,7 @@
         <div class="event-content">
           <div class="event-header">
             <div>
-              <b>{{ displayName(event.author, event.pubkey) }}</b>
+              <a class="event-username-link" @click="handleUserClick" href="#"><b>{{ displayName(event.author, event.pubkey) }}</b></a>
             </div>
             <div>
               {{ formatedDate(event.created_at) }}
@@ -264,9 +301,15 @@
   
           <div class="event-footer">
             <EventActionsBar :hasReplyBtn="hasReplyBtn" @showReplyField="handleToggleReplyField" :likes="event.likes" :reposts="0" />
-            <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
-              {...}
-            </span>
+            <div class="event-footer__right-actions">
+              <div class="event-footer__link-wrapper">
+                <CheckIcon v-if="isCopiedEventLink" class="event-footer-copy-icon event-footer-copy-icon_check" />
+                <LinkIcon v-if="!isCopiedEventLink" @click="handleCopyEventLink" title="Copy link" class="event-footer-copy-icon" />
+              </div>
+              <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
+                {...}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -276,9 +319,22 @@
           <RawData :event="event" :authorEvent="event.authorEvent" />
         </div>
         <div class="event-footer-code-wrapper">
-          <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
-            {...}
-          </span>
+          <div :class="['event-footer__signature', { 'event-footer__signature_invalid' : !isSigVerified }]">
+            <CheckSquareIcon v-if="isSigVerified" /> 
+            <InvalidSignatureIcon v-if="!isSigVerified" />
+            <span class="event-footer__signature-text">
+              {{ isSigVerified ? 'Signature is valid' : 'Invalid signature' }}
+            </span>
+          </div>
+          <div class="event-footer__right-actions">
+            <div class="event-footer__link-wrapper">
+              <CheckIcon v-if="isCopiedEventLink" class="event-footer-copy-icon event-footer-copy-icon_check" />
+              <LinkIcon v-if="!isCopiedEventLink" @click="handleCopyEventLink" title="Copy link" class="event-footer-copy-icon" />
+            </div>
+            <span @click="() => handleToggleRawData(event.id)" title="See raw data" class="event-footer-code">
+              {...}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -402,6 +458,11 @@
     border-radius: 50%;
   }
 
+  .event-username-link {
+    color: #0092bf;
+    text-decoration: none;
+  }
+
   .event-content {
     flex-grow: 1;
   }
@@ -418,11 +479,6 @@
     }
   }
 
-  .highlight {
-    overflow-y: hidden;
-    font-size: 14px;
-  }
-
   .event-footer {
     margin-top: 10px;
     display: flex;
@@ -434,38 +490,13 @@
   }
 
   .event-footer-code-wrapper {
-    text-align: right;
+    margin-top: 2px;
+    display: flex;
+    justify-content: space-between;
   }
 
   .event-details-first {
     margin-top: 30px;
-  }
-
-  @media (min-width: 1024px) {
-    .event-details__tab {
-      margin-right: 20px;
-    }
-  }
-
-  .event-details__tab {
-    cursor: pointer;
-    margin-right: 6px;
-    display: inline-block;
-    color: #0092bf;
-  }
-
-  @media (min-width: 768px) {
-    .event-details__tab {
-      margin-right: 15px;
-    }
-  }
-
-  .event-details__tab_active {
-    text-decoration: underline;
-  }
-
-  .event-details__no-user {
-    margin-top: 10px;
   }
 
   .reply-field__textarea {
@@ -490,5 +521,42 @@
     flex-grow: 1;
     text-align: right;
     margin-right: 10px;
+  }
+
+  .event-footer__right-actions {
+    display: inline-flex;
+  }
+
+  .event-footer__link-wrapper {
+    position: relative;
+  }
+
+  .event-footer-copy-icon {
+    cursor: pointer;
+    margin-right: 4px;
+    margin-top: 4px;
+  }
+
+  @media (min-width: 375px) {
+    .event-footer-copy-icon {
+      margin-right: 10px;
+    }
+  }
+
+  .event-footer-copy-icon_check {
+    cursor: auto;
+  }
+
+  .event-footer__signature {
+    display: flex;
+    align-items: center;
+  }
+
+  .event-footer__signature-text {
+    margin-left: 5px;
+  }
+
+  .event-footer__signature_invalid {
+    color: red;
   }
 </style>

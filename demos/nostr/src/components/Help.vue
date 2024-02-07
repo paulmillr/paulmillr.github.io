@@ -1,20 +1,22 @@
 <script setup lang="ts">
   import { onBeforeUpdate, onMounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
 
-  const props = defineProps<{
+  defineProps<{
     showPrivacy: number
   }>()
-
+  
+  const route = useRoute()
   const privacyEl = ref<null | HTMLElement>(null)
 
   onMounted(() => {
-    if (privacyEl.value && props.showPrivacy) {
+    if (privacyEl.value && route.hash == '#privacy') {
       privacyEl.value.scrollIntoView()
     }
   })
 
   onBeforeUpdate(() => {
-    if (privacyEl.value && props.showPrivacy) {
+    if (privacyEl.value && route.hash == '#privacy') {
       privacyEl.value.scrollIntoView()
     }
   })

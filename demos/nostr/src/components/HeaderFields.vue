@@ -22,7 +22,7 @@
     wsError: string
   }>()
 
-  const emit = defineEmits(['relayConnect', 'relayDisconnect', 'handlePrivacyClick'])
+  const emit = defineEmits(['relayConnect', 'relayDisconnect'])
 
   const showCustomRelayUrl = ref(false)
   const showConnectBtn = computed(() => {
@@ -68,10 +68,6 @@
   const handleRelayDisconnect = () => {
     emit('relayDisconnect')
   }
-
-  const handlePrivacyClick = () => {
-    emit('handlePrivacyClick')
-  }
 </script>
 
 <template>
@@ -101,7 +97,6 @@
           <ShowImagesCheckbox 
             :showImages="showImages.value" 
             @toggleImages="toggleImages" 
-            @handlePrivacyClick="handlePrivacyClick" 
           />
         </div>
       </div>
