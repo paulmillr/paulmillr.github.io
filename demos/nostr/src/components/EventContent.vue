@@ -261,7 +261,7 @@
   const handleCopyEventLink = () => {
     const { origin, pathname } = window.location
     let noteId = nip19.noteEncode(props.event.id)
-    const eventLink = `${origin}/${pathname}#?event=${noteId}`
+    const eventLink = `${origin}${pathname}#/event/${noteId}`
     navigator.clipboard.writeText(eventLink)
     isCopiedEventLink.value = true
     setTimeout(() => {

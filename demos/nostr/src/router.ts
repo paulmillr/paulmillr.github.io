@@ -10,13 +10,12 @@ import User from './components/User.vue'
 
 const routes = [
   { 
-    path: '/', 
+    path: '/feed', 
     name: 'Feed', 
     components: { 
       default: Feed,
       messageInput: MessageInput
-    }, 
-    alias: ['/feed']
+    },
   },
   { 
     path: '/message', 
@@ -49,6 +48,21 @@ const routes = [
     path: '/help',
     name: 'Help',
     component: Help
+  },
+  {
+    path: '/',
+    component: Help,
+    beforeEnter: (to: any, from: any, next: any) => {
+      const userId = to.query.user
+      const eventId = to.query.event
+      if (userId?.length) {
+        next({ path: `/user/${userId}` })
+      } else if (eventId?.length) {
+        next({ path: `/event/${eventId}` })
+      } else {
+        next()
+      }
+    }
   }
 ]
 

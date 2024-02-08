@@ -20,7 +20,6 @@
   import {
     userEvent,
     userDetails,
-    cachedNpub,
     cachedUrlNpub,
     nsec,
     isUserHasValidNip05,
@@ -69,7 +68,7 @@
 
   onMounted(() => {
     // first mount when npub presented in url, run only once 
-    if (route.params?.id?.length && !cachedNpub.value.length && !currentRelay.value.status) {
+    if (route.params?.id?.length && !currentRelay.value.status) {
       npub.update(route.params.id as string)
       cachedUrlNpub.update(npub.value)
       if (!currentRelay.value.status) {
@@ -84,20 +83,26 @@
       handleGetUserInfo()
       return
     }
-
-    if (cachedNpub.value.length) {
-      npub.update(cachedNpub.value)
-      return
-    }
   })
 
   watch(
     () => route.params,
     (newVal, prevVal) => {
-      if (newVal.id !== prevVal.id) {
+      console.log('watch user')
+      if (isRoutingUser.value && newVal.id !== prevVal.id) {
         cachedUrlNpub.update(npub.value)
         isRoutingUser.update(false)
         handleGetUserInfo()
+      } else if (newVal.id !== prevVal.id) { 
+        /* 
+          Redirect.
+          This is for case when pasing new url to the browser search field and type enter.
+          In the case application is not being recreated by scratch, 
+          so we handle updating of npub search field and clearing previous data by our own. 
+        */ 
+        npub.update(newVal.id as string)
+        cachedUrlNpub.update(npub.value)
+        flushData()
       }
     },
   )
@@ -132,6 +137,13 @@
 
     userNotesEvents.update(posts as EventExtended[])
     currentPage.value = page
+  }
+
+  const flushData = () => {
+    userEvent.update({} as Event)
+    userDetails.update({} as Author)
+    userNotesEvents.update([] as EventExtended[])
+    userNotesEventsIds.update([])
   }
 
   const handleGetUserInfo = async () => {
@@ -182,10 +194,7 @@
     }
     isAutoConnectOnSearch.value = false
 
-    userEvent.update({} as Event)
-    userDetails.update({} as Author)
-    userNotesEvents.update([] as EventExtended[])
-    userNotesEventsIds.update([])
+    flushData()
     isUsingFallbackSearch.update(false)
 
     pubKeyError.value = ''

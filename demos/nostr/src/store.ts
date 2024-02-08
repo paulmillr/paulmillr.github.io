@@ -49,13 +49,6 @@ export const cachedUrlNpub = reactive({
   }
 })
 
-export const cachedNpub = reactive({
-  value: '',
-  update(npub: string) {
-    this.value = npub
-  }
-})
-
 export const npub = reactive({
   value: '',
   update(npub: string) {
