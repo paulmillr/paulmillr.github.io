@@ -72,19 +72,26 @@ Noble's non-cryptographic sister project. Audited micro-libraries:
 GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents), [curves](https://github.com/paulmillr/noble-curves/network/dependents), [hashes](https://github.com/paulmillr/noble-hashes/network/dependents). Below are selected apps and libraries. To add your own, [leave a comment](https://github.com/paulmillr/noble-curves/discussions/90).
 
 * [protonmail](https://github.com/ProtonMail/WebClients), [metamask](https://gist.github.com/paulmillr/4f268f448d4e4dc31ff99503f6935a29), [nostr](https://github.com/nbd-wtf/nostr-tools), [bluesky](https://github.com/bluesky-social/atproto)
-* Bitcoin libraries: [scure-btc-signer](https://github.com/paulmillr/scure-btc-signer), [tapscript](https://github.com/cmdruid/tapscript)
-* Ethereum libraries: [ethereum-cryptography](https://github.com/ethereum/js-ethereum-cryptography), [micro-eth-signer](https://github.com/paulmillr/micro-eth-signer), [ethers](https://github.com/ethers-io/ethers.js), [viem](https://viem.sh), [@ethereumjs](https://github.com/ethereumjs/ethereumjs-monorepo), [gridplus-lattice-sdk](https://github.com/GridPlus/lattice-eth2-utils),
-* Solana libraries: [micro-sol-signer](https://github.com/paulmillr/micro-sol-signer), [solana-web3.js](https://github.com/solana-labs/solana-web3.js)
-* Other web3 stuff: HDkey libraries ([scure-bip32](https://github.com/paulmillr/scure-bip32), [bip32](https://github.com/bitcoinjs/bip32)), [aztec](https://github.com/AztecProtocol/aztec-packages), [polkadot.js](https://github.com/polkadot-js/common), [drand](https://github.com/drand/drand-client), [moneroj](https://github.com/beritani/moneroj), [near-api-js](https://github.com/near/near-api-js/blob/7c9142fed5a0ca10a710bd519f7d3543bd2a5a95/packages/crypto/package.json#L23)
+* Blockchain libraries:
+    * Bitcoin: [scure-btc-signer](https://github.com/paulmillr/scure-btc-signer), [tapscript](https://github.com/cmdruid/tapscript)
+    * Ethereum: [ethereum-cryptography](https://github.com/ethereum/js-ethereum-cryptography), [micro-eth-signer](https://github.com/paulmillr/micro-eth-signer), [ethers](https://github.com/ethers-io/ethers.js), [viem](https://viem.sh), [@ethereumjs](https://github.com/ethereumjs/ethereumjs-monorepo), [gridplus-lattice-sdk](https://github.com/GridPlus/lattice-eth2-utils),
+    * Solana: [micro-sol-signer](https://github.com/paulmillr/micro-sol-signer), [solana-web3.js](https://github.com/solana-labs/solana-web3.js)
+    * Avalanche: [avalanchejs](https://github.com/ava-labs/avalanchejs)
+    * NEAR: [near-api-js](https://github.com/near/near-api-js/blob/7c9142fed5a0ca10a710bd519f7d3543bd2a5a95/packages/crypto/package.json#L23)
+    * Polkadot: [polkadot.js](https://github.com/polkadot-js/common)
+    * Monero: [moneroj](https://github.com/beritani/moneroj), [cs-monero](https://github.com/CoinSpace/cs-monero-wallet)
+    * Trezor: [trezor-suite](https://github.com/trezor/trezor-suite/blob/f420619d60b3a88731865a3964857f6ba614ff6a/packages/connect/package.json#L53)
+    * [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client)
+    * HDkey ([scure-bip32](https://github.com/paulmillr/scure-bip32), [bip32](https://github.com/bitcoinjs/bip32))
 * Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app)
-* [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet utilizes noble and scure heavily to support different protocols from scratch:
-    * [btc](https://github.com/CoinSpace/cs-bitcoin-wallet) - build with `@noble/curves`, `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@scure/btc-signer`.
-    * [evm](https://github.com/CoinSpace/cs-evm-wallet) - `@noble/hashes`, `@scure/bip32`, and `micro-eth-signer`.
-    * [sol](https://github.com/CoinSpace/cs-solana-wallet) - `@noble/curves`, `@scure/base`, `ed25519-keygen`, and `micro-sol-signer`.
-    * [eos](https://github.com/CoinSpace/cs-eos-wallet) - implemented on top of `@noble/curves`, `@noble/hashes`, and `@scure/base` only.
-    * [tron](https://github.com/CoinSpace/cs-tron-wallet) - `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@noble/curves` through `tronlib`.
-    * [xmr](https://github.com/CoinSpace/cs-monero-wallet) - `@scure/bip32`, `@noble/hashes`, `@scure/base`.
-    * [ada](https://github.com/CoinSpace/cs-cardano-wallet) - `@noble/hashes` and `@scure/base`.
+* [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet with support for many different networks:
+    * [btc](https://github.com/CoinSpace/cs-bitcoin-wallet) - build with `@noble/curves`, `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@scure/btc-signer`
+    * [evm](https://github.com/CoinSpace/cs-evm-wallet) - `@noble/hashes`, `@scure/bip32`, and `micro-eth-signer`
+    * [sol](https://github.com/CoinSpace/cs-solana-wallet) - `@noble/curves`, `@scure/base`, `ed25519-keygen`, and `micro-sol-signer`
+    * [eos](https://github.com/CoinSpace/cs-eos-wallet) - implemented on top of `@noble/curves`, `@noble/hashes`, and `@scure/base` only
+    * [tron](https://github.com/CoinSpace/cs-tron-wallet) - `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@noble/curves` through `tronlib`
+    * [xmr](https://github.com/CoinSpace/cs-monero-wallet) - `@scure/bip32`, `@noble/hashes`, `@scure/base`
+    * [ada](https://github.com/CoinSpace/cs-cardano-wallet) - `@noble/hashes` and `@scure/base`
 * [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
 * [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation
 * [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
