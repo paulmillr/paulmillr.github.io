@@ -9,13 +9,11 @@
 
   const props = defineProps<{
     event: EventExtended
-    authorEvent: Event
     author: Author
     isUserProfile: boolean
     key: string
   }>()
 
-  const event = ref<Event>()
   const showRawData = ref(false)
   const showHexId = ref(false)
   const showHexPubkey = ref(false)
@@ -30,7 +28,6 @@
   const isSigVerified = ref(false)
 
   watchEffect(() => {
-    event.value = props.event
     id.value = props.event.id
     sig.value = props.event.sig
     pubkey.value = props.event.pubkey
@@ -60,43 +57,45 @@
       <slot>No content for event</slot>
       <hr>
 
-      <div class="event__field">
-        <div class="header-col"><b>Author: </b></div>
-        <div class="content-col content-col_code">
-          <div class="code-wrapper">
-            <code>
-              {{ showHexPubkey ? pubkey : nip19.npubEncode(pubkey) }}
-            </code>
-            <button @click="showHexPubkey = !showHexPubkey">
-              {{ showHexPubkey ? 'npub' : 'hex' }}
-            </button>
-          </div>
+      <div class="event__code-block">
+        <div class="event__code-title">
+          <b>Author: </b>
+          <button class="event__code-btn" @click="showHexPubkey = !showHexPubkey">
+            {{ showHexPubkey ? 'npub' : 'hex' }}
+          </button>
+        </div>
+        <div class="content-col_code">
+          <code class="event__code">
+            {{ showHexPubkey ? pubkey : nip19.npubEncode(pubkey) }}
+          </code>
         </div>
       </div>
-      <div class="event__field">
-        <div class="header-col"><b>Event id: </b></div>
-        <div class="content-col content-col_code">
-          <div class="code-wrapper">
-            <code>
-              {{ showHexId ? id : nip19.neventEncode({ id }) }}
-            </code>
-            <button @click="showHexId = !showHexId">
-              {{ showHexId ? 'nevent' : 'hex' }}
-            </button>
-          </div>
+
+      <div class="event__code-block">
+        <div class="event__code-title">
+          <b>Event id: </b>
+          <button class="event__code-btn" @click="showHexId = !showHexId">
+            {{ showHexId ? 'nevent' : 'hex' }}
+          </button>
+        </div>
+        <div class="content-col_code">
+          <code class="event__code">
+            {{ showHexId ? id : nip19.neventEncode({ id }) }}
+          </code>
         </div>
       </div>
-      <div class="event__field">
-        <div class="header-col"><b>Kind: </b></div>
-        <div class="content-col"><code>0 - PROFILE METADATA</code></div>
-      </div>
-      <div class="event__field">
-        <div class="header-col"><b>Date: </b></div>
-        <div class="content-col"><code>{{ formatedDate(created_at) }}</code></div>
+
+      <div>
+        <div class="header-col"><b>Created: </b></div>
+        <div class="content-col_code">
+          <code class="event__code">
+            {{ formatedDate(created_at) }}
+          </code>
+        </div>
       </div>
     </div>
 
-    <RawData v-if="showRawData" :isUserEvent="true" :event="event" :authorEvent="authorEvent" />
+    <RawData v-if="showRawData" :isUserEvent="true" :event="event" :authorEvent="event" />
 
     <div class="event-footer" :class="{ 'event-footer_flex-end': !showRawData }">
       <div v-if="showRawData" :class="['event-footer__signature', { 'event-footer__signature_invalid': !isSigVerified }]">
@@ -115,55 +114,28 @@
 </template>
 
 <style scoped>
-  .event__field {
+  .event__code-block {
+    margin-bottom: 10px;
+  }
+
+  .event__code-title {
+    color: #999;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  @media (min-width: 768px) {
-    .event__field {
-      flex-direction: row;
-    }
+  .event__code-btn {
+    font-size: 16px;
+    padding: 0 10px;
   }
 
-  .code-wrapper {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: end;
-  }
-
-  @media (min-width: 768px) {
-    .code-wrapper {
-      flex-direction: row;
-      align-items: center;
-    }
-  }
-
-  .code-wrapper button {
-    margin-left: 10px;
-    font-size: 14px;
-    min-width: 60px;
+  .event__code {
+    font-size: 15px;
   }
 
   .header-col {
-    text-align: left;
     color: #999;
-  }
-
-  @media (min-width: 768px) {
-    .header-col {
-      text-align: right;
-    }
-  }
-
-  .content-col {
-    padding-left: 0px;
-  }
-
-  @media (min-width: 768px) {
-    .content-col {
-      padding-left: 10px;
-    }
   }
 
   .content-col_code {
@@ -173,6 +145,7 @@
   .event {
     border: 1px solid white;
     padding: 14px;
+    padding-top: 0;
     margin-top: 25px;
   }
 
@@ -181,7 +154,6 @@
   .event-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
   }
 
   .event-footer_flex-end {

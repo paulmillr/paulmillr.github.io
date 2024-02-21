@@ -1,22 +1,11 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
-  import {
-    nip19,
-    generatePrivateKey,
-  } from 'nostr-tools'
-  
+  import { nip19, generatePrivateKey } from 'nostr-tools'
   import ShowImagesCheckbox from './ShowImagesCheckbox.vue'
-
   import { DEFAULT_RELAYS } from './../app'
-  import { 
-    connectedRelayUrl, 
-    selectedRelay, 
-    isConnectingToRelay,
-    showImages,
-    nsec,
-    isRememberedUser,
-    customRelayUrl,
-  } from './../store'
+  import { useRelay } from '@/stores/Relay'
+  import { useImages } from '@/stores/Images'
+  import { useNsec } from '@/stores/Nsec'
 
   const props = defineProps<{
     wsError: string
@@ -24,41 +13,45 @@
 
   const emit = defineEmits(['relayConnect', 'relayDisconnect'])
 
+  const relayStore = useRelay()
+  const imagesStore = useImages()
+  const nsecStore = useNsec()
+  
   const showCustomRelayUrl = ref(false)
   const showConnectBtn = computed(() => {
-    return selectedRelay.value !== connectedRelayUrl.value
+    return relayStore.selectedRelay !== relayStore.connectedRelayUrl
   })
 
-  selectedRelay.update(DEFAULT_RELAYS[0])
+  relayStore.setSelectedRelay(DEFAULT_RELAYS[0])
 
   const handleRelaySelect = (event: any) => {
     const value = event.target.value
     showCustomRelayUrl.value = value === 'custom'
-    selectedRelay.update(value)
+    relayStore.setSelectedRelay(value)
   }
 
   const handleNsecInput = (event: any) => {
-    if (isRememberedUser.value) {
-      localStorage.setItem('privkey', nsec.value as string)
+    if (nsecStore.rememberMe) {
+      localStorage.setItem('privkey', nsecStore.nsec as string)
     }
   }
 
   const handleGenerateRandomPrivKey = () => {
     const privKeyHex = generatePrivateKey()
-    nsec.update(nip19.nsecEncode(privKeyHex))
+    nsecStore.updateNsec(nip19.nsecEncode(privKeyHex))
   }
 
   const handleRememberMe = () => {
-    if (isRememberedUser.value) {
+    if (nsecStore.rememberMe) {
       localStorage.setItem('rememberMe', 'true')
-      localStorage.setItem('privkey', nsec.value as string)
+      localStorage.setItem('privkey', nsecStore.nsec as string)
     } else {
       localStorage.clear()
     }
   }
 
   const toggleImages = () => {
-    showImages.update(!showImages.value)
+    imagesStore.updateShowImages(!imagesStore.showImages)
   }
 
   const handleRelayConnect = () => {
@@ -86,7 +79,7 @@
               <option value="custom">custom url</option>
             </select>
             <button v-if="showConnectBtn" @click="handleRelayConnect" class="select-relay__btn">
-              {{ isConnectingToRelay.value ? 'Connecting...' : 'Connect' }}
+              {{ relayStore.isConnectingToRelay ? 'Connecting...' : 'Connect' }}
             </button>
             <button v-else @click="handleRelayDisconnect" class="select-relay__btn">
               Disconnect
@@ -95,7 +88,7 @@
         </div>
         <div class="show-images">
           <ShowImagesCheckbox 
-            :showImages="showImages.value" 
+            :showImages="imagesStore.showImages" 
             @toggleImages="toggleImages" 
           />
         </div>
@@ -105,11 +98,11 @@
           <strong>Private key (optional)</strong>
         </label>
         <div class="field-elements">
-          <input @input="handleNsecInput" v-model="nsec.value" class="priv-key-input" id="priv_key" type="password" placeholder="nsec..." />
+          <input @input="handleNsecInput" v-model="nsecStore.nsec" class="priv-key-input" id="priv_key" type="password" placeholder="nsec..." />
           <button @click="handleGenerateRandomPrivKey" class="random-key-btn">Random</button>
         </div>
         <div class="remember-me">
-          <input @change="handleRememberMe" class="remember-me__input" type="checkbox" id="remember-me" v-model="isRememberedUser.value" />
+          <input @change="handleRememberMe" class="remember-me__input" type="checkbox" id="remember-me" v-model="nsecStore.rememberMe" />
           <label class="remember-me__label" for="remember-me"> Remember me</label>
         </div>
       </div>
@@ -125,7 +118,7 @@
     </label>
     <div class="field-elements">
       <input 
-        v-model="customRelayUrl.value" 
+        v-model="relayStore.customRelayUrl" 
         class="relay-input" 
         id="relay_url" 
         type="text" 

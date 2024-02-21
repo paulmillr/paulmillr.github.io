@@ -1,12 +1,10 @@
 <script setup lang="ts">
   import { ref, defineEmits } from 'vue'
   import { nip19, getPublicKey, getEventHash, signEvent } from 'nostr-tools'
-  import { 
-    nsec, 
-    pubkeyFromPrivate,
-    messageToBroadcastFeed,
-    currentRelay
-  } from './../store'
+  import { useNsec } from '@/stores/Nsec'
+  import { useRelay } from '@/stores/Relay'
+  import { usePubKey } from '@/stores/PubKey'
+  import { useFeed } from '@/stores/Feed'
 
   const props = defineProps<{
     sentEventIds: Set<string>,
@@ -15,16 +13,21 @@
 
   const emit = defineEmits(['broadcastEvent'])
 
+  const nsecStore = useNsec()
+  const relayStore = useRelay()
+  const pubKeyStore = usePubKey()
+  const feedStore = useFeed()
+
   const msgErr = ref('')
 
   const handleSendMessage = async () => {
-    const nsecValue = nsec.value ? nsec.value.trim() : ''
+    const nsecValue = nsecStore.nsec ? nsecStore.nsec.trim() : ''
     if (!nsecValue.length) {
       msgErr.value = 'Please provide your private key or generate random key.'
       return;
     }
 
-    const messageValue = messageToBroadcastFeed.value.trim()
+    const messageValue = feedStore.messageToBroadcast.trim()
     if (!messageValue.length) {
       msgErr.value = 'Please provide message to broadcast.'
       return;
@@ -34,13 +37,13 @@
     try {
       const { data } = nip19.decode(nsecValue)
       privKey = data as string
-      pubkeyFromPrivate.update(getPublicKey(privKey))
+      pubKeyStore.updateKeyFromPrivate(getPublicKey(privKey))
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
       return;
     }
 
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay || relay.status !== 1) {
       msgErr.value = 'Please connect to relay first.'
       return;
@@ -48,7 +51,7 @@
 
     const event = {
       kind: 1,
-      pubkey: pubkeyFromPrivate.value,
+      pubkey: pubKeyStore.fromPrivate,
       created_at: Math.floor(Date.now() / 1000),
       content: messageValue,
       tags: [],
@@ -69,7 +72,7 @@
   }
 
   const handleInput = (event: any) => {
-    messageToBroadcastFeed.update(event?.target?.value)
+    feedStore.updateMessageToBroadcast(event?.target?.value)
   }
 </script>
 
@@ -87,7 +90,7 @@
             id="message"
             cols="30"
             rows="3"
-            :value="messageToBroadcastFeed.value"
+            :value="feedStore.messageToBroadcast"
             @input="handleInput"
             placeholder='Test message 👋'></textarea>
         </div>

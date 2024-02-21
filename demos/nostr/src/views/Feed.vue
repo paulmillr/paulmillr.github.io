@@ -10,35 +10,32 @@
     injectDataToNotes
   } from './../utils'
   import { DEFAULT_EVENTS_COUNT } from './../app'
-  import {
-    isConnectingToRelay,
-    connectedRelayUrls,
-    showImages,
-    currentRelay,
-    feedEvents,
-    pubkeyFromPrivate,
-    relaysFeedPool,
-    showNewEventsBadgeFeed,
-    newEventsBadgeImageUrlsFeed,
-    newEventsBadgeCountFeed,
-    paginationEventsIdsFeed
-  } from './../store'
   import type { EventExtended, LogContentPart } from './../types';
+  import { useRelay } from '@/stores/Relay'
+  import { useImages } from '@/stores/Images'
+  import { useFeed } from '@/stores/Feed'
+  import { usePubKey } from '@/stores/PubKey'
+  import { usePool } from '@/stores/Pool'
 
   defineProps<{
     eventsLog: LogContentPart[][]
   }>()
 
-  const pool = relaysFeedPool.value
+  const relayStore = useRelay()
+  const imagesStore = useImages()
+  const feedStore = useFeed()
+  const pubKeyStore = usePubKey()
+  const poolStore = usePool()
+
   const emit = defineEmits(['loadNewRelayEvents'])
 
   // loading new events
-  const newAuthorImg1 = computed(() => newEventsBadgeImageUrlsFeed.value[0])
-  const newAuthorImg2 = computed(() => newEventsBadgeImageUrlsFeed.value[1])
+  const newAuthorImg1 = computed(() => feedStore.newEventsBadgeImageUrls[0])
+  const newAuthorImg2 = computed(() => feedStore.newEventsBadgeImageUrls[1])
 
   // pagination
   const currentPage = ref(1);
-  const pagesCount = computed(() => Math.ceil(paginationEventsIdsFeed.value.length / DEFAULT_EVENTS_COUNT));
+  const pagesCount = computed(() => Math.ceil(feedStore.paginationEventsIds.length / DEFAULT_EVENTS_COUNT));
   const route = useRoute()
   const currPath = computed(() => route.path)
 
@@ -57,19 +54,15 @@
     }
   })
 
-  const toggleEventRawData = (eventId: string) => {
-    feedEvents.toggleRawData(eventId)
-  }
-
   const showFeedPage = async (page: number) => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay) return
 
     const limit = DEFAULT_EVENTS_COUNT
     const start = (page - 1) * limit
     const end = start + limit
 
-    const reversedIds = paginationEventsIdsFeed.value.slice().reverse()
+    const reversedIds = feedStore.paginationEventsIds.slice().reverse()
     const idsToShow = reversedIds.slice(start, end)
 
     const postsEvents = await relay.list([{ ids: idsToShow }]);
@@ -78,13 +71,13 @@
     let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
 
     const relaysUrls = [relay.url]
-    await injectDataToNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
+    await injectDataToNotes(posts as EventExtended[], relaysUrls, poolStore.feedPool as SimplePool)
 
-    feedEvents.update(posts as EventExtended[])
+    feedStore.updateEvents(posts as EventExtended[])
     currentPage.value = page
   }
 
-  const loadNewRelayEvents = () => {
+  const loadNewRelayEvents = async () => {
     emit('loadNewRelayEvents')
   }
 </script>
@@ -93,25 +86,25 @@
   <div id="feed">
     <div class="columns">
       <div :class="['events', { 'd-md-none': currPath === '/log' }]">
-        <div class="connecting-notice" v-if="isConnectingToRelay.value">
-          Loading {{ currentRelay ? 'new' : '' }} relay feed...
+        <div class="connecting-notice" v-if="relayStore.isConnectingToRelay">
+          Loading {{ relayStore.currentRelay ? 'new' : '' }} relay feed...
         </div>
 
-        <div @click="loadNewRelayEvents" v-if="showNewEventsBadgeFeed.value" class="new-events">
-          <div v-if="showImages.value" class="new-events__imgs">
+        <div @click="loadNewRelayEvents" v-if="feedStore.showNewEventsBadge" class="new-events">
+          <div v-if="imagesStore.showImages" class="new-events__imgs">
             <img class="new-events__img" :src="newAuthorImg1" alt="img">
             <img class="new-events__img" :src="newAuthorImg2" alt="img">
           </div>
-          <span class="new-events__text">{{ newEventsBadgeCountFeed.value }} new notes</span>
+          <span class="new-events__text">{{ feedStore.newEventsBadgeCount }} new notes</span>
           <b class="new-events__arrow">↑</b>
         </div>
 
         <RelayEventsList
-          :events="feedEvents.value"
-          :pubKey="pubkeyFromPrivate.value"
-          :showImages="showImages.value"
-          @toggleRawData="toggleEventRawData"
-          :currentRelays="connectedRelayUrls.value"
+          :events="feedStore.events"
+          :pubKey="pubKeyStore.fromPrivate"
+          :showImages="imagesStore.showImages"
+          @toggleRawData="feedStore.toggleEventRawData"
+          :currentRelays="relayStore.connectedRelayUrls"
         />
 
         <Pagination 

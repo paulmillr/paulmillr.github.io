@@ -1,20 +1,22 @@
 <script setup lang="ts">
-  import {nextTick, onMounted, onUpdated, ref } from 'vue'
+  import {nextTick, onMounted, ref } from 'vue'
   import type { EventExtended } from './../types'
   import EventContent from './EventContent.vue'
   import ExpandArrow from './../icons/ExpandArrow.vue'
 
   import {
     nip10,
-    SimplePool
+    SimplePool,
+    type Event
   } from 'nostr-tools'
   import {
     injectAuthorsToNotes,
     injectDataToNotes
   } from './../utils'
 
-  import { eventPool } from './../store'
-  const pool = eventPool.value
+  import { usePool } from '@/stores/Pool'
+  const poolStore = usePool()
+  const pool = poolStore.eventPool
 
   const emit = defineEmits(['toggleRawData'])
   const replyErr = ref('')
@@ -53,7 +55,7 @@
     let replies = await pool.list(currentRelays, [{ kinds: [1], '#e': [event.id] }])
 
     // filter first level replies
-    replies = replies.filter((reply) => {
+    replies = replies.filter((reply: Event) => {
       const nip10Data = nip10.parse(reply)
       return !nip10Data.reply && nip10Data?.root?.id === event.id
     })
@@ -97,7 +99,7 @@
     isLoadingThread.value = true
     let replies = await pool.list(currentRelays, [{ kinds: [1], '#e': [event.id] }])
 
-    replies = replies.filter((reply) => {
+    replies = replies.filter((reply: Event) => {
       const nip10Data = nip10.parse(reply)
       return !nip10Data.reply && nip10Data?.root?.id === event.id
     })

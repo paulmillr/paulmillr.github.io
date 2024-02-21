@@ -1,11 +1,7 @@
 <script setup lang="ts">
   import { ref, defineEmits } from 'vue'
-  import { 
-    currentRelay,
-    additionalRelaysCountSignedEvent,
-    additionalRelaysUrlsSignedEvent,
-    signedJsonFeed
-  } from './../store'
+  import { useRelay } from '@/stores/Relay'
+  import { useFeed } from '@/stores/Feed'
 
   defineProps<{
     isSendingMessage: boolean
@@ -13,24 +9,25 @@
   }>()
 
   const emit = defineEmits(['broadcastEvent'])
-
+  const relayStore = useRelay()
+  const feedStore = useFeed()
   const jsonErr = ref('')
 
   const handleSendSignedEvent = () => {
-    if (!signedJsonFeed.value.length) {
+    if (!feedStore.signedJson.length) {
       jsonErr.value = 'Provide signed event.'
       return;
     }
 
     let event;
     try {
-      event = JSON.parse(signedJsonFeed.value)
+      event = JSON.parse(feedStore.signedJson)
     } catch (e) {
       jsonErr.value = 'Invalid JSON. Please check it and try again.'
       return;
     }
 
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay || relay.status !== 1) {
       jsonErr.value = 'Please connect to relay first.'
       return;
@@ -42,18 +39,18 @@
   }
 
   const handleClickAddNewField = () => {
-    const newCount = additionalRelaysCountSignedEvent.value + 1
-    additionalRelaysCountSignedEvent.update(newCount)
+    const newCount = relayStore.additionalRelaysCountForSignedEvent + 1
+    relayStore.updateAdditionalRelaysCountForSignedEvent(newCount)
   }
 
   const handleJsonInput = (event: any) => {
-    signedJsonFeed.update(event?.target?.value)
+    feedStore.updateSignedJson(event?.target?.value)
   }
 
   const handleRelayInput = (event: any, index: number) => {
     const value = event?.target?.value
     if (value) {
-      additionalRelaysUrlsSignedEvent.updateRelay(index, value)
+      relayStore.updateRelayAdditionalRelaysUrlsForSignedEvent(index, value)
     }
   }
 </script>
@@ -74,16 +71,16 @@
           Add relay
         </button>
 
-        <div v-if="additionalRelaysCountSignedEvent.value > 0" class="additional-relays">
+        <div v-if="relayStore.additionalRelaysCountForSignedEvent > 0" class="additional-relays">
           <div class="additional-relay-field">
             <span>1.</span>
             <input 
               readonly 
-              :value="currentRelay.value?.url ? `${currentRelay.value?.url} (already selected)` : 'Firstly connect to default relay'" 
+              :value="relayStore.currentRelay?.url ? `${relayStore.currentRelay?.url} (already selected)` : 'Firstly connect to default relay'" 
               type="text"
             >
           </div>
-          <div v-for="i in additionalRelaysCountSignedEvent.value">
+          <div v-for="i in relayStore.additionalRelaysCountForSignedEvent">
             <div class="additional-relay-field">
               <span>{{ i + 1 }}.</span>
               <input @input="(event) => handleRelayInput(event, i)" placeholder="[wss://]relay.example.com" type="text">
@@ -105,7 +102,7 @@
         cols="30"
         rows="5"
         @input="handleJsonInput"
-        placeholder='{"kind":1,"pubkey":"5486dbb083512982669fa180aa02d722ce35054233cea724061fbc5f39f81aa3","created_at":1685664152,"content":"Test message 👋","tags":[],"id":"89adae408121ba6d721203365becff4d312292a9dd9b7a35ffa230a1483b09a2","sig":"b2592ae88ba1040c928e458dd6822413f148c8cc4f478d992e024e8c9d9648b96e6ce6dc564ab5815675007f824d9e9f634f8dbde554afeb6e594bcaac4389dd"}'>{{ signedJsonFeed.value }}</textarea>
+        placeholder='{"kind":1,"pubkey":"5486dbb083512982669fa180aa02d722ce35054233cea724061fbc5f39f81aa3","created_at":1685664152,"content":"Test message 👋","tags":[],"id":"89adae408121ba6d721203365becff4d312292a9dd9b7a35ffa230a1483b09a2","sig":"b2592ae88ba1040c928e458dd6822413f148c8cc4f478d992e024e8c9d9648b96e6ce6dc564ab5815675007f824d9e9f634f8dbde554afeb6e594bcaac4389dd"}'>{{ feedStore.signedJson }}</textarea>
       </div>
     </div>
     <div class="signed-json-btn-wrapper">

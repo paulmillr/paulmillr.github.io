@@ -3,13 +3,16 @@
   import { useRouter } from 'vue-router'
   import { nip19 } from 'nostr-tools'
   import type { EventExtended, EventTextPart } from './../types'
-  import { npub, isRoutingUser } from './../store'
+  import { useNpub } from '@/stores/Npub'
+  import { useUser } from '@/stores/User'
 
   const props = defineProps<{
     event: EventExtended
     slice?: number
   }>()
   const router = useRouter()
+  const npubStore = useNpub()
+  const userStore = useUser()
 
   const contentParts = ref<EventTextPart[]>([])
   
@@ -104,8 +107,8 @@
 
   const handleClickMention = (mentionNpub: string | undefined) => {
     if (!mentionNpub) return
-    npub.update(mentionNpub)
-    isRoutingUser.update(true)
+    npubStore.updateNpub(mentionNpub)
+    userStore.updateRoutingStatus(true)
     router.push({ path: `/user/${mentionNpub}` })
   }
 </script>

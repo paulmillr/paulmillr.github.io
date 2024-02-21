@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref, onBeforeMount, onBeforeUpdate, computed, watch } from 'vue'
+  import { onMounted, ref, onBeforeMount, computed, watch } from 'vue'
   import {
     nip19,
     getPublicKey,
@@ -17,33 +17,39 @@
     injectDataToNotes
   } from './../utils'
   import type { Author, EventExtended } from './../types'
-  import {
-    userEvent,
-    userDetails,
-    cachedUrlNpub,
-    nsec,
-    isUserHasValidNip05,
-    isUsingFallbackSearch,
-    npub,
-    isRoutingUser,
-    gettingUserInfoId,
-    userNotesEvents,
-    userNotesEventsIds,
-    showImages,
-    currentRelay,
-    userPool
-  } from './../store'
+
+  import { gettingUserInfoId } from './../store'
+  import { useUserNotes } from '@/stores/UserNotes'
+  import { useNpub } from '@/stores/Npub'
+  import { useUser } from '@/stores/User'
+  import { useImages } from '@/stores/Images'
+  import { useNsec } from '@/stores/Nsec'
+  import { useRelay } from '@/stores/Relay'
+  import { usePool } from '@/stores/Pool'
+
   import UserEvent from './UserEvent.vue'
   import DownloadIcon from './../icons/DownloadIcon.vue'
   import EventView from './EventView.vue'
   import Pagination from "./Pagination.vue";
 
-  const pool = userPool.value
+  const poolStore = usePool()
+  const pool = poolStore.userPool
+
+  const npubStore = useNpub()
+  const userNotesStore = useUserNotes()
+  const userStore = useUser()
+  const imagesStore = useImages()
+  const nsecStore = useNsec()
+  const relayStore = useRelay()
 
   const props = defineProps<{
     handleRelayConnect: Function
   }>()
 
+  const userEvent = ref(<Event>{})
+  const userDetails = ref(<Author>{})
+  const isUserHasValidNip05 = ref(false)
+  const isUsingFallbackSearch = ref(false)
   const pubKeyError = ref('')
   const showNotFoundError = ref(false)
   const pubHex = ref('')
@@ -55,7 +61,7 @@
   const isEventSearch = ref(false)
 
   const currentPage = ref(1);
-  const pagesCount = computed(() => Math.ceil(userNotesEventsIds.value.length / DEFAULT_EVENTS_COUNT))
+  const pagesCount = computed(() => Math.ceil(userNotesStore.allNotesIds.length / DEFAULT_EVENTS_COUNT))
   const router = useRouter()
   const route = useRoute()
   
@@ -68,18 +74,18 @@
 
   onMounted(() => {
     // first mount when npub presented in url, run only once 
-    if (route.params?.id?.length && !currentRelay.value.status) {
-      npub.update(route.params.id as string)
-      cachedUrlNpub.update(npub.value)
-      if (!currentRelay.value.status) {
+    if (route.params?.id?.length && !relayStore.currentRelay.status) {
+      npubStore.updateNpub(route.params.id as string)
+      npubStore.updateCachedUrl(route.params.id as string)
+      if (!relayStore.currentRelay.status) {
         isAutoConnectOnSearch.value = true
       }
       return
     }
 
-    if (isRoutingUser.value && npub.value?.length) {
-      cachedUrlNpub.update(npub.value)
-      isRoutingUser.update(false)
+    if (userStore.isRoutingUser && npubStore.npub.length) {
+      npubStore.updateCachedUrl(npubStore.npub)
+      userStore.updateRoutingStatus(false)
       handleGetUserInfo()
       return
     }
@@ -87,28 +93,32 @@
 
   watch(
     () => route.params,
-    (newVal, prevVal) => {
-      console.log('watch user')
-      if (isRoutingUser.value && newVal.id !== prevVal.id) {
-        cachedUrlNpub.update(npub.value)
-        isRoutingUser.update(false)
+    () => {
+      if (userStore.isRoutingUser) {
+        npubStore.updateCachedUrl(npubStore.npub)
+        userStore.updateRoutingStatus(false)
         handleGetUserInfo()
-      } else if (newVal.id !== prevVal.id) { 
-        /* 
-          Redirect.
-          This is for case when pasing new url to the browser search field and type enter.
-          In the case application is not being recreated by scratch, 
-          so we handle updating of npub search field and clearing previous data by our own. 
-        */ 
-        npub.update(newVal.id as string)
-        cachedUrlNpub.update(npub.value)
-        flushData()
       }
-    },
+    }
+  )
+
+  /* 
+    Redirect.
+    This is for case when pasing new url to the browser search field and type enter.
+    In the case application is not being recreated by scratch, 
+    so we handle updating of npub search field and clearing previous data by our own. 
+  */
+  watch(
+    () => route.redirectedFrom,
+    () => {
+      npubStore.updateNpub(route.params.id as string)
+      npubStore.updateCachedUrl(route.params.id as string)
+      flushData()
+    }
   )
 
   onBeforeMount(() => {
-    if (userNotesEvents.value.length) {
+    if (userNotesStore.notes.length) {
       handleGetUserInfo()
     }
   })
@@ -119,14 +129,14 @@
   }
 
   const showUserPage = async (page: number) => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay) return
 
     const limit = DEFAULT_EVENTS_COUNT
     const start = (page - 1) * limit
     const end = start + limit
 
-    const idsToShow = userNotesEventsIds.value.slice(start, end) 
+    const idsToShow = userNotesStore.allNotesIds.slice(start, end) 
 
     const postsEvents = await relay.list([{ ids: idsToShow }]) as EventExtended[]
 
@@ -135,15 +145,15 @@
     const relaysUrls = [relay.url]
     await injectDataToNotes(posts, relaysUrls, pool as SimplePool)
 
-    userNotesEvents.update(posts as EventExtended[])
+    userNotesStore.updateNotes(posts as EventExtended[])
     currentPage.value = page
   }
 
   const flushData = () => {
-    userEvent.update({} as Event)
-    userDetails.update({} as Author)
-    userNotesEvents.update([] as EventExtended[])
-    userNotesEventsIds.update([])
+    userEvent.value = {} as Event
+    userDetails.value = {} as Author
+    userNotesStore.updateNotes([] as EventExtended[])
+    userNotesStore.updateIds([])
   }
 
   const handleGetUserInfo = async () => {
@@ -152,7 +162,7 @@
     gettingUserInfoId.update(gettingUserInfoId.value + 1)
     const currentOperationId = gettingUserInfoId.value
 
-    const searchVal = npub.value.trim()
+    const searchVal = npubStore.npub.trim()
     let isHexSearch = false
 
     if (!searchVal.length) {
@@ -182,7 +192,7 @@
     if (isAutoConnectOnSearch.value) {
       relay = await props.handleRelayConnect()
     } else {
-      relay = currentRelay.value
+      relay = relayStore.currentRelay
     }
     if (currentOperationId !== gettingUserInfoId.value) return
     
@@ -195,7 +205,7 @@
     isAutoConnectOnSearch.value = false
 
     flushData()
-    isUsingFallbackSearch.update(false)
+    isUsingFallbackSearch.value = false
 
     pubKeyError.value = ''
     showLoadingUser.value = true
@@ -210,7 +220,7 @@
       if (currentOperationId !== gettingUserInfoId.value) return
 
       if (notesEvents.length) {
-        userNotesEventsIds.update(notesEvents.map((event) => event.id))
+        userNotesStore.updateIds(notesEvents.map((event) => event.id))
         pubHex.value = notesEvents[0].pubkey
         isEventSearch.value = true
       }
@@ -231,11 +241,11 @@
     const authorContacts = await relay.get({ kinds: [3], limit: 1, authors: [pubHex.value] })
     if (currentOperationId !== gettingUserInfoId.value) return
     
-    userEvent.update(authorMeta)
-    userDetails.update(JSON.parse(authorMeta.content))
-    userDetails.updateFollowingCount(authorContacts?.tags.length || 0)
+    userEvent.value = authorMeta
+    userDetails.value = JSON.parse(authorMeta.content)
+    userDetails.value.followingCount = authorContacts?.tags.length || 0
 
-    isUserHasValidNip05.update(false)
+    isUserHasValidNip05.value = false
     showLoadingUser.value = false
     showNotFoundError.value = false
 
@@ -245,7 +255,7 @@
     } else {
       router.push({ path: `/user/${searchVal}` })
     }
-    cachedUrlNpub.update(searchVal)
+    npubStore.updateCachedUrl(searchVal)
 
     showLoadingTextNotes.value = true
 
@@ -266,7 +276,7 @@
         }
       })
       notesEvents = notesEvents.filter((event) => !repliesIds.has(event.id))
-      userNotesEventsIds.update(notesEvents.map((event) => event.id))
+      userNotesStore.updateIds(notesEvents.map((event) => event.id))
 
       const limit = DEFAULT_EVENTS_COUNT
       currentPage.value = 1
@@ -280,7 +290,7 @@
     await injectDataToNotes(notesEvents, relaysUrls, pool as SimplePool)
     if (currentOperationId !== gettingUserInfoId.value) return
 
-    userNotesEvents.update(notesEvents as EventExtended[])
+    userNotesStore.updateNotes(notesEvents as EventExtended[])
     showLoadingTextNotes.value = false
   }
 
@@ -300,7 +310,7 @@
       if (currentOperationId && currentOperationId !== gettingUserInfoId.value) {
         return
       }
-      isUserHasValidNip05.update(validNip)
+      isUserHasValidNip05.value = validNip
     } catch (e) {
       console.log('Failed to check nip05')
     }
@@ -320,7 +330,7 @@
 
   // WIP (not used yet)
   const getNip65Relays = async () => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     const events = await relay.list([{ kinds: [10002], authors: [pubHex.value], limit: 1 }])
     if (!events.length) return []
     const event = events[0]
@@ -328,7 +338,7 @@
   }
 
   const handleGeneratePublicFromPrivate = () => {
-    const nsecVal = nsec.value.trim()
+    const nsecVal = nsecStore.nsec.trim()
     if (!nsecVal.length) {
       pubKeyError.value = 'Please provide private key first.'
       return
@@ -339,7 +349,7 @@
     try {
       const privKeyHex = isHex ? nsecVal : nip19.decode(nsecVal).data.toString()
       const pubKey = getPublicKey(privKeyHex)
-      npub.update(nip19.npubEncode(pubKey))
+      npubStore.updateNpub(nip19.npubEncode(pubKey))
       pubKeyError.value = ''
     } catch (e) {
       pubKeyError.value = 'Private key is invalid. Please check it and try again.'
@@ -348,7 +358,7 @@
   }
 
   const handleSearchFallback = async () => {
-    const searchVal = npub.value.trim()
+    const searchVal = npubStore.npub.trim()
     let isHexSearch = false
 
     if (!searchVal.length) {
@@ -375,7 +385,7 @@
     }
 
     isLoadingFallback.value = true
-    userNotesEventsIds.update([])
+    userNotesStore.updateIds([])
 
     // in case of searching for one event, loading this event firstly to get user pubHex
     let notesEvents: EventExtended[] = []
@@ -399,16 +409,16 @@
 
     const authorContacts = await pool.get(fallbackRelays, { kinds: [3], limit: 1, authors: [pubHex.value] })
     
-    userEvent.update(authorMeta)
-    userDetails.update(JSON.parse(authorMeta.content))
-    userDetails.updateFollowingCount(authorContacts?.tags.length || 0)
+    userEvent.value = authorMeta
+    userDetails.value = JSON.parse(authorMeta.content)
+    userDetails.value.followingCount = authorContacts?.tags.length || 0
     
     notFoundFallbackError.value = ''
     isLoadingFallback.value = false
     showNotFoundError.value = false
 
-    isUsingFallbackSearch.update(true)
-    isUserHasValidNip05.update(false)
+    isUsingFallbackSearch.value = true
+    isUserHasValidNip05.value = false
 
     // routing
     if (isEventSearch.value) {
@@ -416,7 +426,7 @@
     } else {
       router.push({ path: `/user/${searchVal}` })
     }
-    cachedUrlNpub.update(searchVal)
+    npubStore.updateCachedUrl(searchVal)
 
     showLoadingTextNotes.value = true
 
@@ -438,27 +448,27 @@
     notesEvents = injectAuthorToUserNotes(notesEvents, userDetails.value)
     await injectDataToNotes(notesEvents, fallbackRelays, pool as SimplePool)
 
-    userNotesEvents.update(notesEvents)
+    userNotesStore.updateNotes(notesEvents)
     showLoadingTextNotes.value = false
   }
   
   const handleLoadUserFollowers = async () => {   
     const isFallback = isUsingFallbackSearch.value
-    const relays = isFallback ? fallbackRelays : [currentRelay.value.url]
+    const relays = isFallback ? fallbackRelays : [relayStore.currentRelay.url]
 
     const sub = await pool.sub(relays, [{ 
       "#p": [pubHex.value],
       kinds: [3], 
     }])
 
-    userDetails.updateFollowersCount(0)
+    userDetails.value.followersCount = 0
     sub.on('event', () => {
-      userDetails.updateFollowersCount(userDetails.value.followersCount + 1)
+      userDetails.value.followersCount = userDetails.value.followersCount + 1
     })
   }
 
   const handleToggleRawData = (eventId: string) => {
-    userNotesEvents.toggleRawData(eventId)
+    userNotesStore.toggleRawData(eventId)
   }
 </script>
 
@@ -466,10 +476,10 @@
   <div class="field">
     <label class="field-label" for="user_public_key">
       <strong>Profile's public key or event id</strong>
-      <button v-if="nsec.value.length" @click="handleGeneratePublicFromPrivate" class="random-key-btn">Use mine</button>
+      <button v-if="nsecStore.nsec.length" @click="handleGeneratePublicFromPrivate" class="random-key-btn">Use mine</button>
     </label>
     <div class="field-elements">
-      <input @input="handleInputNpub" v-model="npub.value" class="pubkey-input" id="user_public_key" type="text" placeholder="npub, note, hex of pubkey or note id..." />
+      <input @input="handleInputNpub" v-model="npubStore.npub" class="pubkey-input" id="user_public_key" type="text" placeholder="npub, note, hex of pubkey or note id..." />
       <button @click="handleGetUserInfo" class="get-user-btn">
         {{ isAutoConnectOnSearch ? 'Connect & Search' : 'Search' }}
       </button>
@@ -484,40 +494,38 @@
   </div>
 
   <UserEvent
-    v-if="userEvent.value.id"
-    :authorEvent="userEvent.value"
-    :author="userDetails.value"
+    :author="userDetails"
     :isUserProfile="true"
-    :event="(userEvent.value as EventExtended)"
-    :key="userEvent.value.id"
+    :event="(userEvent as EventExtended)"
+    :key="userEvent.id"
   >
     <div class="user">
-      <div v-if="showImages.value" class="user__avatar-wrapper">
-        <img class="user__avatar" :src="userDetails.value.picture">
+      <div v-if="imagesStore.showImages" class="user__avatar-wrapper">
+        <img class="user__avatar" :src="userDetails.picture">
       </div>
       <div class="user__info">
         <div>
           <div class="user__nickname">
-            {{ userDetails.value.nickname || userDetails.value.name }}
+            {{ userDetails.nickname || userDetails.name }}
           </div>
           <div class="user__name">
-            {{ userDetails.value.display_name || '' }}
+            {{ userDetails.display_name || '' }}
           </div>
           <div class="user__desc">
-            {{ userDetails.value.about || '' }}
+            {{ userDetails.about || '' }}
           </div>
-          <div v-if="isUserHasValidNip05.value" class="user__nip05">
-            <a target="_blank" :href="nip05toURL(userDetails.value.nip05)">
-              <strong>nip05</strong>: {{ userDetails.value.nip05 }}
+          <div v-if="isUserHasValidNip05" class="user__nip05">
+            <a target="_blank" :href="nip05toURL(userDetails.nip05)">
+              <strong>nip05</strong>: {{ userDetails.nip05 }}
             </a>
           </div>
-          <div v-if="userDetails.value.followingCount >= 0" class="user__contacts">
+          <div v-if="userDetails.followingCount >= 0" class="user__contacts">
             <span class="user__contacts-col user__following-cnt">
-              <b>{{ userDetails.value.followingCount }}</b> Following
+              <b>{{ userDetails.followingCount }}</b> Following
             </span>
             <span class="user__contacts-col user__followers-cnt">
-              <b v-if="userDetails.value.followersCount">
-                {{ userDetails.value.followersCount }}
+              <b v-if="userDetails.followersCount">
+                {{ userDetails.followersCount }}
               </b>
               <span v-else class="user__contacts-download-icon">
                 <DownloadIcon @click="handleLoadUserFollowers" />
@@ -533,12 +541,12 @@
   </UserEvent>
 
   <div v-if="showLoadingTextNotes">Loading notes...</div>
-  <h3 id="user-posts" v-if="userNotesEvents.value.length > 0 && !showLoadingTextNotes">
+  <h3 id="user-posts" v-if="userNotesStore.notes.length > 0 && !showLoadingTextNotes">
     <span v-if="isEventSearch">Event info</span>
     <span v-else>User notes</span>
   </h3>
 
-  <template :key="event.id" v-for="(event, i) in userNotesEvents.value">
+  <template :key="event.id" v-for="(event, i) in userNotesStore.notes">
     <EventView 
       :hasReplyBtn="true" 
       :showReplies="true" 
@@ -581,7 +589,7 @@
 <style scoped>
   .user {
     display: flex;
-    margin: 18px 0;
+    margin: 10px 0;
     flex-direction: column;
   }
 

@@ -9,48 +9,38 @@
     type Event,
     type Filter
   } from 'nostr-tools'
-
-  import type { EventExtended, LogContentPart } from './types'
+  import { useRouter, useRoute } from 'vue-router'
+  import type { EventExtended, LogContentPart, ShortPubkeyEvent } from './types'
   import { 
     isWsAvailable, 
     normalizeUrl,
     injectAuthorsToNotes,
     injectDataToNotes
   } from './utils'
-  
   import HeaderFields from './components/HeaderFields.vue'
-
   import { DEFAULT_EVENTS_COUNT } from './app'
-  import { 
-    cachedUrlNpub, 
-    isConnectingToRelay,
-    connectedRelayUrl,
-    connectedRelayUrls,
-    selectedRelay,
-    nsec,
-    isRememberedUser,
-    customRelayUrl,
-    currentRelay,
-    feedEvents,
-    pubkeyFromPrivate,
-    showNewEventsBadgeFeed,
-    newEventsBadgeImageUrlsFeed,
-    newEventsBadgeCountFeed,
-    newEventsFeed,
-    paginationEventsIdsFeed,
-    relaysFeedPool,
-    messageToBroadcastFeed,
-    additionalRelaysUrlsSignedEvent,
-    signedJsonFeed
-  } from './store'
+
+  import { useNpub } from '@/stores/Npub'
+  import { useNsec } from '@/stores/Nsec'
+  import { useRelay } from '@/stores/Relay'
+  import { useFeed } from '@/stores/Feed'
+  import { usePool } from '@/stores/Pool'
+
+  const router = useRouter()
+  const route = useRoute()
+  const npubStore = useNpub()
+  const nsecStore = useNsec()
+  const relayStore = useRelay()
+  const feedStore = useFeed()
+  const poolStore = usePool()
 
   let relaySub: Sub;
   let curInterval: number;
 
   const isRemembered = localStorage.getItem('rememberMe') === 'true'
-  isRememberedUser.update(isRemembered)
+  nsecStore.setRememberMe(isRemembered)
   const initialNsec = isRemembered ? localStorage.getItem('privkey') : ''
-  nsec.update(initialNsec || '')
+  nsecStore.updateNsec(initialNsec || '')
 
   // events in feed
   const events = ref<EventExtended[]>([])
@@ -59,7 +49,6 @@
 
   let newEvents = ref<{ id: string; pubkey: string; }[]>([]);
 
-  let showNewEventsBadge = ref(false)
   let newEventsBadgeCount = ref(0)
   let newAuthorImg1 = ref('');
   let newAuthorImg2 = ref('');
@@ -70,7 +59,7 @@
   const jsonErr = ref('')
   const isSendingMessage = ref(false)
 
-  const userTabLink = computed(() => cachedUrlNpub.value.length ? `/user/${cachedUrlNpub.value}` : '/user' )
+  const userTabLink = computed(() => npubStore.cachedUrlNpub.length ? `/user/${npubStore.cachedUrlNpub}` : '/user' )
 
   const logStr = (msg: string) => {
     const parts = [{ type: 'text', value: msg }]
@@ -82,10 +71,10 @@
   }
 
   const updateNewEventsElement = async () => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay) return;
     
-    const eventsToShow = newEventsFeed.value
+    const eventsToShow = feedStore.newEventsToShow
     if (eventsToShow.length < 2) return;
     
     const pub1 = eventsToShow[eventsToShow.length - 1].pubkey
@@ -101,13 +90,12 @@
 
     newAuthorImg1.value = JSON.parse(author1[0].content).picture
     newAuthorImg2.value = JSON.parse(author2[0].content).picture
-    newEventsBadgeImageUrlsFeed.update([newAuthorImg1.value, newAuthorImg2.value])
+    feedStore.setNewEventsBadgeImageUrls([newAuthorImg1.value, newAuthorImg2.value])
 
     newEventsBadgeCount.value = eventsToShow.length
-    newEventsBadgeCountFeed.update(eventsToShow.length)
+    feedStore.setNewEventsBadgeCount(eventsToShow.length)
 
-    showNewEventsBadge.value = true
-    showNewEventsBadgeFeed.update(true)
+    feedStore.setShowNewEventsBadge(true)
   }
 
   const timeout = (ms: number) => {
@@ -143,23 +131,23 @@
   }
 
   async function handleRelayConnect() {
-    if (isConnectingToRelay.value) return
+    if (relayStore.isConnectingToRelay) return
 
-    let relayUrl = selectedRelay.value
+    let relayUrl = relayStore.selectedRelay
     let isCustom = false
     if (relayUrl === 'custom') {
-      relayUrl = normalizeUrl(customRelayUrl.value)
+      relayUrl = normalizeUrl(relayStore.customRelayUrl)
       isCustom = true
     }
 
     if (!relayUrl.length) return;
 
     // unsubscribe from previous list of relays and clear interval
-    if (currentRelay.value.status) {
-      currentRelay.value.close();
+    if (relayStore.currentRelay.status) {
+      relayStore.currentRelay.close();
       logHtmlParts([
         { type: 'text', value: 'disconnected from ' },
-        { type: 'bold', value: currentRelay.value.url }
+        { type: 'bold', value: relayStore.currentRelay.url }
       ])
     }
     if (relaySub) {
@@ -172,7 +160,7 @@
 
     let relay: Relay;
     try {
-      isConnectingToRelay.update(true)
+      relayStore.setConnectionToRelayStatus(true)
       relay = relayInit(relayUrl)
       // two attempts to connect
       try {
@@ -190,11 +178,11 @@
         error += `Also check WebSocket address. Relay address should be a correct WebSocket URL. Or relay is unavailable or you are offline.`
       }
       wsError.value = error
-      isConnectingToRelay.update(false)
+      relayStore.setConnectionToRelayStatus(false)
       return;
     }
 
-    currentRelay.update(relay)
+    relayStore.updateCurrentRelay(relay)
 
     relay.on('connect', async () => {
       logHtmlParts([
@@ -203,10 +191,9 @@
       ])
 
       // hide new events element and clear it's values
-      showNewEventsBadge.value = false
-      showNewEventsBadgeFeed.update(false)
+      feedStore.setShowNewEventsBadge(false)
       newEvents.value = []
-      newEventsFeed.update([])
+      feedStore.updateNewEventsToShow([])
 
       const limit = DEFAULT_EVENTS_COUNT;
       const postsEvents = await listRootEvents(relay, [{ kinds: [1], limit }]) as Event[]
@@ -216,21 +203,21 @@
       let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
 
       const relaysUrls = [relay.url]
-      const pool = relaysFeedPool.value
+      const pool = poolStore.feedPool
       await injectDataToNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
 
       eventsIds.clear()
-      paginationEventsIdsFeed.update([])
+      feedStore.updatePaginationEventsIds([])
       posts.forEach((e: Event) => {
         eventsIds.add(e.id)
-        paginationEventsIdsFeed.push(e.id)
+        feedStore.pushToPaginationEventsIds(e.id)
       })
       events.value = posts as EventExtended[]
-      feedEvents.update(posts as EventExtended[])
+      feedStore.updateEvents(posts as EventExtended[])
 
-      connectedRelayUrl.update(isCustom ? 'custom' : relayUrl)
-      connectedRelayUrls.update([relayUrl]) // further it can be an array of a few relays
-      isConnectingToRelay.update(false)
+      relayStore.setConnectedRelayUrl(isCustom ? 'custom' : relayUrl)
+      relayStore.setConnectedRelayUrls([relayUrl]) // further it can be an array of a few relays
+      relayStore.setConnectionToRelayStatus(false)
 
       relaySub = relay.sub([{ kinds: [1], limit: 1 }])
       relaySub.on('event', (event: Event) => {
@@ -238,7 +225,7 @@
         const nip10Data = nip10.parse(event)
         if (nip10Data.reply || nip10Data.root) return;
         newEvents.value.push({ id: event.id, pubkey: event.pubkey })
-        newEventsFeed.push({ id: event.id, pubkey: event.pubkey })
+        feedStore.pushToNewEventsToShow({ id: event.id, pubkey: event.pubkey })
       })
       curInterval = setInterval(updateNewEventsElement, 3000)
     })
@@ -254,17 +241,19 @@
   }
 
   const loadNewRelayEvents = async () => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay) return
 
-    let eventsToShow = newEventsFeed.value;
-    newEventsFeed.update(newEventsFeed.value.filter(item => !eventsToShow.includes(item)))
+    router.push({ path: `${route.path}` })
 
-    const ids = eventsToShow.map(e => e.id)
+    let eventsToShow = feedStore.newEventsToShow
+    feedStore.updateNewEventsToShow(feedStore.newEventsToShow.filter((item: ShortPubkeyEvent) => !eventsToShow.includes(item)))
+
+    const ids = eventsToShow.map((e: ShortPubkeyEvent) => e.id)
     const limit = DEFAULT_EVENTS_COUNT;
 
-    paginationEventsIdsFeed.update(paginationEventsIdsFeed.value.concat(ids))
-    const firstPageIds = paginationEventsIdsFeed.value.slice(-limit)
+    feedStore.updatePaginationEventsIds(feedStore.paginationEventsIds.concat(ids))
+    const firstPageIds = feedStore.paginationEventsIds.slice(-limit)
 
     const postsEvents = await relay.list([{ ids: firstPageIds }]);
 
@@ -273,14 +262,14 @@
     let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
 
     const relaysUrls = [relay.url]
-    const pool = relaysFeedPool.value
+    const pool = poolStore.feedPool
     await injectDataToNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
 
     posts.forEach((e: Event) => eventsIds.add(e.id))
 
     // update view
-    feedEvents.update(posts as EventExtended[])
-    showNewEventsBadgeFeed.update(false)
+    feedStore.updateEvents(posts as EventExtended[])
+    feedStore.setShowNewEventsBadge(false)
 
     logHtmlParts([
       { type: 'text', value: `loaded ${eventsToShow.length}` },
@@ -290,7 +279,7 @@
   }
 
   const broadcastEvent = async (event: Event, type: string) => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay) return
     if (isSendingMessage.value) return
 
@@ -298,7 +287,7 @@
     
     clearInterval(curInterval)
 
-    const userNewEventOptions = [{ kinds: [1], authors: [pubkeyFromPrivate.value], limit: 1 }]
+    const userNewEventOptions = [{ kinds: [1], authors: [event.pubkey], limit: 1 }]
     const userSub = relay.sub(userNewEventOptions)
     const intervals: number[] = []
     userSub.on('event', (event: Event) => {
@@ -315,7 +304,7 @@
       intervals.push(interval)
     })
 
-    const rawAdditionalUrls = additionalRelaysUrlsSignedEvent.value
+    const rawAdditionalUrls = relayStore.additionalRelaysUrlsForSignedEvent
     const extraUrls = []
     if (type === 'json' && rawAdditionalUrls.length) {
       let error = "Can't connect to these relays: "
@@ -344,7 +333,7 @@
 
     const relayUrls = [relay.url, ...extraUrls]
 
-    const pool = relaysFeedPool.value
+    const pool = poolStore.feedPool
     const pub = pool.publish(relayUrls, event)
     let successCount = 0
     pub.on('ok', async function(relayUrl: string) {
@@ -356,8 +345,8 @@
       ])
       successCount++
       if (successCount === relayUrls.length) {
-        if (type === 'text') messageToBroadcastFeed.update('')
-        if (type === 'json') signedJsonFeed.update('')
+        if (type === 'text') feedStore.updateMessageToBroadcast('')
+        if (type === 'json') feedStore.updateSignedJson('')
       }
     })
     pub.on('failed', (relayUrl: string) => {
@@ -370,17 +359,16 @@
   }
 
   const handleRelayDisconnect = () => {
-    const relay = currentRelay.value
+    const relay = relayStore.currentRelay
     if (!relay) return
 
     clearInterval(curInterval)
-    showNewEventsBadge.value = false
-    showNewEventsBadgeFeed.update(false)
+    feedStore.setShowNewEventsBadge(false)
     newEvents.value = []
-    newEventsFeed.update([])
+    feedStore.updateNewEventsToShow([])
 
-    connectedRelayUrl.update('')
-    connectedRelayUrls.update([])
+    relayStore.setConnectedRelayUrl('')
+    relayStore.setConnectedRelayUrls([])
     relaySub.unsub()
     relay.close()
 

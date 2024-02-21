@@ -16,7 +16,11 @@
   import RawData from './RawData.vue'
   import EventActionsBar from './EventActionsBar.vue'
   import EventText from './EventText.vue'
-  import { nsec, isRoutingUser, npub, showImages } from './../store'
+  import { useNpub } from '@/stores/Npub'
+  import { useNsec } from '@/stores/Nsec'
+  import { useUser } from '@/stores/User'
+  import { useImages } from '@/stores/Images'
+
   import {
     injectAuthorsToNotes,
     injectDataToNotes
@@ -45,6 +49,10 @@
   }>()
 
   const router = useRouter()
+  const npubStore = useNpub()
+  const nsecStore = useNsec()
+  const userStore = useUser()
+  const imagesStore = useImages()
 
   const showReplyField = ref(false)
   const isPublishingReply = ref(false)
@@ -113,7 +121,7 @@
   const handleSendReply = () => {
     if (isPublishingReply.value) return
 
-    const nsecValue = nsec.value ? nsec.value.trim() : ''
+    const nsecValue = nsecStore.nsec ? nsecStore.nsec.trim() : ''
     if (!nsecValue.length) {
       msgErr.value = 'Please provide your private key or generate random key.'
       return;
@@ -272,8 +280,8 @@
   const handleUserClick = (e: any) => {
     e.preventDefault()
     const urlNpub = nip19.npubEncode(props.event.pubkey)
-    npub.update(urlNpub)
-    isRoutingUser.update(true)
+    npubStore.updateNpub(urlNpub)
+    userStore.updateRoutingStatus(true)
     router.push({ path: `/user/${urlNpub}` })
   }
 </script>
@@ -282,7 +290,7 @@
   <div class="event-card">
     <div :class="['event-card__content', {'flipped': event.showRawData }]">
       <div :class="['event-card__front', 'event__presentable-date', { 'event-card__front_custom': pubKey === event.pubkey }]">
-        <div v-if="showImages.value && event.author" class="event-img">
+        <div v-if="imagesStore.showImages && event.author" class="event-img">
           <img class="author-pic" :src="event.author.picture" alt="img" :title="`Avatar for ${event.author.name}`">
         </div>
         <div class="event-content">
