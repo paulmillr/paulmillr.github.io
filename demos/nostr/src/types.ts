@@ -5,7 +5,7 @@ export type Author = {
   display_name: string
   picture: string
   about: string
-  nickname: string
+  username: string
   nip05: string
   followingCount: number
   followersCount: number
@@ -18,8 +18,12 @@ export type EventExtended = Event & {
   rawDataActiveTab: number,
   likes: number,
   reposts: number,
+  replies: number,
   references: Array<Object>,
-  hasReplies: boolean,
+  replyingTo: { 
+    user: Author,
+    pubkey: string
+  }
 }
 
 export type EventTextPart = {

@@ -2,6 +2,7 @@ import type { EventExtended } from './types'
 import {
   SimplePool,
   parseReferences,
+  nip10,
   type Event
 } from 'nostr-tools'
 
@@ -13,11 +14,70 @@ export const normalizeUrl = (url: string) => {
   return norm
 }
 
-export const injectDataToNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+export const injectDataToRootNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   const likes = injectLikesToNotes(posts, relays, relaysPool)
   const reposts = injectRepostsToNotes(posts, relays, relaysPool)
   const references = injectReferencesToNotes(posts, relays, relaysPool)
-  return Promise.all([likes, reposts, references])
+  const replies = injectRootRepliesToNotes(posts, relays, relaysPool)
+  return Promise.all([likes, reposts, references, replies])
+}
+
+export const injectDataToReplyNotes = async (replyingToEvent: EventExtended, posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+  const likes = injectLikesToNotes(posts, relays, relaysPool)
+  const reposts = injectRepostsToNotes(posts, relays, relaysPool)
+  const references = injectReferencesToNotes(posts, relays, relaysPool)
+  const replies = injectNotRootRepliesToNotes(posts, relays, relaysPool)
+  injectReplyingToDataToNotes(replyingToEvent, posts)
+  return Promise.all([likes, reposts, references, replies])
+}
+
+const injectReplyingToDataToNotes = (replyingToEvent: EventExtended, postsEvents: EventExtended[]) => {
+  for (const event of postsEvents) {
+    event.replyingTo = { 
+      user: replyingToEvent.author,
+      pubkey: replyingToEvent.pubkey
+    }
+  }
+}
+
+// counting replies for root notes, because root notes and replies notes have different e tag type
+export const injectRootRepliesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+  if (!relays.length) return postsEvents
+
+  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  const postsIds = postsEvents.map((e: Event) => e.id)
+  const repliesEvents = await pool.list(relays, [{ kinds: [1], '#e': postsIds }])
+
+  for (const event of postsEvents) {
+    let replies = 0
+    for (const reply of repliesEvents) {
+      const nip10Data = nip10.parse(reply)
+      if (!nip10Data.reply && nip10Data?.root?.id === event.id) {
+        replies++
+      }
+    }
+    event.replies = replies
+  }
+}
+
+// counting replies for reply notes, because root notes and replies notes have different e tag type
+export const injectNotRootRepliesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+  if (!relays.length) return postsEvents
+
+  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  const postsIds = postsEvents.map((e: Event) => e.id)
+  const repliesEvents = await pool.list(relays, [{ kinds: [1], '#e': postsIds }])
+
+  for (const event of postsEvents) {
+    let replies = 0
+    for (const reply of repliesEvents) {
+      const nip10Data = nip10.parse(reply)
+      if (nip10Data?.reply?.id === event.id) {
+        replies++
+      }
+    }
+    event.replies = replies
+  }
 }
 
 export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: Event[]) => {

@@ -14,7 +14,7 @@
   import { fallbackRelays, DEFAULT_EVENTS_COUNT } from './../app'
   import { 
     isSHA256Hex,
-    injectDataToNotes
+    injectDataToRootNotes
   } from './../utils'
   import type { Author, EventExtended } from './../types'
 
@@ -143,7 +143,7 @@
     let posts = injectAuthorToUserNotes(postsEvents, userDetails.value)
 
     const relaysUrls = [relay.url]
-    await injectDataToNotes(posts, relaysUrls, pool as SimplePool)
+    await injectDataToRootNotes(posts, relaysUrls, pool as SimplePool)
 
     userNotesStore.updateNotes(posts as EventExtended[])
     currentPage.value = page
@@ -228,6 +228,11 @@
 
     // const authorMeta = await relayGet(relay, { kinds: [0], limit: 1, authors: [pubHex.value] }) as Event
     const authorMeta = await relay.get({ kinds: [0], limit: 1, authors: [pubHex.value] })
+
+    const authorMeta1 = await relay.get({ kinds: [10002], limit: 1, authors: [pubHex.value] })
+
+    console.log(authorMeta1)
+
     if (currentOperationId !== gettingUserInfoId.value) return
     if (!authorMeta) {
       showLoadingUser.value = false
@@ -287,7 +292,7 @@
     notesEvents = injectAuthorToUserNotes(notesEvents, userDetails.value)
     
     const relaysUrls = currentRelays.value
-    await injectDataToNotes(notesEvents, relaysUrls, pool as SimplePool)
+    await injectDataToRootNotes(notesEvents, relaysUrls, pool as SimplePool)
     if (currentOperationId !== gettingUserInfoId.value) return
 
     userNotesStore.updateNotes(notesEvents as EventExtended[])
@@ -446,7 +451,7 @@
     }
 
     notesEvents = injectAuthorToUserNotes(notesEvents, userDetails.value)
-    await injectDataToNotes(notesEvents, fallbackRelays, pool as SimplePool)
+    await injectDataToRootNotes(notesEvents, fallbackRelays, pool as SimplePool)
 
     userNotesStore.updateNotes(notesEvents)
     showLoadingTextNotes.value = false
@@ -495,7 +500,6 @@
 
   <UserEvent
     :author="userDetails"
-    :isUserProfile="true"
     :event="(userEvent as EventExtended)"
     :key="userEvent.id"
   >
@@ -506,7 +510,7 @@
       <div class="user__info">
         <div>
           <div class="user__nickname">
-            {{ userDetails.nickname || userDetails.name }}
+            {{ userDetails.username || userDetails.name }}
           </div>
           <div class="user__name">
             {{ userDetails.display_name || '' }}
@@ -548,8 +552,8 @@
 
   <template :key="event.id" v-for="(event, i) in userNotesStore.notes">
     <EventView 
-      :hasReplyBtn="true" 
-      :showReplies="true" 
+      :hasReplyBtn="!isEventSearch" 
+      :showReplies="!isEventSearch" 
       :currentRelays="currentRelays" 
       :index="i" 
       @toggleRawData="handleToggleRawData" 

@@ -7,7 +7,7 @@
   import RelayLog from './../components/RelayLog.vue';
   import {
     injectAuthorsToNotes,
-    injectDataToNotes
+    injectDataToRootNotes
   } from './../utils'
   import { DEFAULT_EVENTS_COUNT } from './../app'
   import type { EventExtended, LogContentPart } from './../types';
@@ -71,7 +71,7 @@
     let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
 
     const relaysUrls = [relay.url]
-    await injectDataToNotes(posts as EventExtended[], relaysUrls, poolStore.feedPool as SimplePool)
+    await injectDataToRootNotes(posts as EventExtended[], relaysUrls, poolStore.feedPool as SimplePool)
 
     feedStore.updateEvents(posts as EventExtended[])
     currentPage.value = page

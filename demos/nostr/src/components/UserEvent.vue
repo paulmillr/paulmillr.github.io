@@ -2,7 +2,6 @@
   import { ref, watchEffect, onMounted } from 'vue'
   import { nip19, verifySignature, type Event } from 'nostr-tools'
   import RawData from './RawData.vue'
-  import EventActionsBar from './EventActionsBar.vue'
   import type { Author, EventExtended } from './../types'
   import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
   import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
@@ -10,7 +9,6 @@
   const props = defineProps<{
     event: EventExtended
     author: Author
-    isUserProfile: boolean
     key: string
   }>()
 
@@ -22,9 +20,6 @@
   const sig = ref('')
   const pubkey = ref('')
   const created_at = ref(0)
-  const likes = ref(0)
-  const reposts = ref(0)
-  const isUserProfile = ref(false)
   const isSigVerified = ref(false)
 
   watchEffect(() => {
@@ -32,9 +27,6 @@
     sig.value = props.event.sig
     pubkey.value = props.event.pubkey
     created_at.value = props.event.created_at
-    likes.value = props.event.likes
-    reposts.value = props.event.reposts
-    isUserProfile.value = props.isUserProfile
   })
 
   onMounted(() => {
@@ -106,7 +98,6 @@
         </span>
       </div>
       <div>
-        <EventActionsBar v-if="!isUserProfile" :likes="likes" :reposts="reposts" />
         <span class="event-footer-code" @click="handleToggleRawData">{...}</span>
       </div>
     </div>

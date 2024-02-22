@@ -11,7 +11,7 @@
   } from 'nostr-tools'
   import {
     injectAuthorsToNotes,
-    injectDataToNotes
+    injectDataToReplyNotes
   } from './../utils'
 
   import { usePool } from '@/stores/Pool'
@@ -52,6 +52,7 @@
   const loadRepliesPreiew = async () => {
     const { event, currentRelays } = props
     if (!currentRelays) return
+
     let replies = await pool.list(currentRelays, [{ kinds: [1], '#e': [event.id] }])
 
     // filter first level replies
@@ -67,16 +68,13 @@
     let reply = replies[0] as EventExtended
 
     let tempReplies = [reply]
-    await injectDataToNotes(tempReplies as EventExtended[], currentRelays, pool as SimplePool)
+    await injectDataToReplyNotes(event, tempReplies as EventExtended[], currentRelays, pool as SimplePool)
 
     reply = tempReplies[0] as EventExtended
     const authorMeta = await pool.get(currentRelays, { kinds: [0], limit: 1, authors: [reply.pubkey] })
     if (authorMeta) {
       reply.author = JSON.parse(authorMeta.content)
     }
-
-    let deepReplies = await pool.list(currentRelays, [{ kinds: [1], limit: 1, '#e': [reply.id] }])
-    reply.hasReplies = deepReplies.length > 0
 
     replyEvent.value = reply
     isLoadingFirstReply.value = false
@@ -99,6 +97,7 @@
     isLoadingThread.value = true
     let replies = await pool.list(currentRelays, [{ kinds: [1], '#e': [event.id] }])
 
+    // filter first level replies
     replies = replies.filter((reply: Event) => {
       const nip10Data = nip10.parse(reply)
       return !nip10Data.reply && nip10Data?.root?.id === event.id
@@ -114,16 +113,11 @@
     const authorsEvents = await pool.list(currentRelays, [{ kinds: [0], authors: uniqueAuthors }])
     replies = injectAuthorsToNotes(replies, authorsEvents)
 
-    await injectDataToNotes(replies as EventExtended[], currentRelays, pool as SimplePool)
+    await injectDataToReplyNotes(event, replies as EventExtended[], currentRelays, pool as SimplePool)
 
     eventReplies.value = replies as EventExtended[]
     showAllReplies.value = true
     isLoadingThread.value = false
-
-    eventReplies.value.forEach(async (reply: any) => {
-      let deepReplies = await pool.list(currentRelays, [{ kinds: [1], limit: 1, '#e': [reply.id] }])
-      reply.hasReplies = deepReplies.length > 0
-    })
   }
 
   const handleSendReply = (event: EventExtended) => {
@@ -168,14 +162,16 @@
       @showReplyField="handleToggleReplyField"
       @toggleRawData="(eventId) => handleToggleRawData(eventId, true)"
       @resetSentStatus="resetSentStatus"
+      @loadMoreReplies="handleLoadMoreReplies"
       :event="(event as EventExtended)"
       :replyErr="replyErr"
-      :hasReplyBtn="hasReplyBtn"
       :pubKey="pubKey"
       :isReplySent="isReplySent"
       :sliceText="sliceText"
       :isRootEvent="true"
       :currentRelays="currentRelays"
+      :pool="(pool as SimplePool)"
+      :hasReplyBtn="hasReplyBtn"
     />
     <div v-if="isLoadingFirstReply">Loading replies...</div>
 

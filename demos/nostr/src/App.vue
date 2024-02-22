@@ -15,7 +15,7 @@
     isWsAvailable, 
     normalizeUrl,
     injectAuthorsToNotes,
-    injectDataToNotes
+    injectDataToRootNotes
   } from './utils'
   import HeaderFields from './components/HeaderFields.vue'
   import { DEFAULT_EVENTS_COUNT } from './app'
@@ -204,7 +204,7 @@
 
       const relaysUrls = [relay.url]
       const pool = poolStore.feedPool
-      await injectDataToNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
+      await injectDataToRootNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
 
       eventsIds.clear()
       feedStore.updatePaginationEventsIds([])
@@ -263,7 +263,7 @@
 
     const relaysUrls = [relay.url]
     const pool = poolStore.feedPool
-    await injectDataToNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
+    await injectDataToRootNotes(posts as EventExtended[], relaysUrls, pool as SimplePool)
 
     posts.forEach((e: Event) => eventsIds.add(e.id))
 

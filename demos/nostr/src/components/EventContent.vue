@@ -23,14 +23,20 @@
 
   import {
     injectAuthorsToNotes,
-    injectDataToNotes
+    injectDataToReplyNotes
   } from './../utils'
   import LinkIcon from './../icons/LinkIcon.vue'
   import CheckIcon from './../icons/CheckIcon.vue'
   import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
   import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
 
-  const emit = defineEmits(['toggleRawData', 'showReplyField', 'sendReply', 'resetSentStatus'])
+  const emit = defineEmits([
+    'toggleRawData', 
+    'showReplyField', 
+    'sendReply', 
+    'resetSentStatus',
+    'loadMoreReplies'
+  ])
   const replyText = ref('')
   const msgErr = ref('')
 
@@ -60,6 +66,7 @@
   const showReplies = ref(false)
   const isCopiedEventLink = ref(false)
   const isSigVerified = ref(false)
+  const isLoadingReplies = ref(false)
 
   const handleToggleRawData = (eventId: string) => {
     if (props.isRootEvent) {
@@ -75,6 +82,10 @@
       hour: 'numeric',
       minute: 'numeric'
     })
+  }
+
+  const getUserPath = (pubkey: string) => {
+    return `/user/${nip19.npubEncode(pubkey)}`
   }
 
   onMounted(() => {
@@ -101,10 +112,10 @@
 
   const displayName = (author: any, pubkey: string) => {
     if (author) {
-      if (author.nickname) {
-        return author.nickname
-      } else if (author.name) {
+      if (author.name) {
         return author.name
+      } else if (author.username) {
+        return author.username
       } else {
         return author.display_name
       }
@@ -196,6 +207,7 @@
     })
 
     // add author pubkey from event we are replying to
+    // https://github.com/nostr-protocol/nips/blob/master/10.md#the-p-tag
     const pTagsForReply = [...pTagsFromOurMsg, ...existedPTags]
     if (!existedPubKeys.includes(props.event.pubkey)) {
       pTagsForReply.push(['p', props.event.pubkey])
@@ -238,7 +250,15 @@
     const { event, currentRelays, pool } = props
     if (!currentRelays || !pool) return
 
-    // filter first level replies
+    if (!event.replies) return
+
+    if (props.isRootEvent) {
+      return emit('loadMoreReplies')
+    }
+
+    isLoadingReplies.value = true
+
+    // filter replies for particular event
     let replies = await pool.list(currentRelays, [{kinds: [1], '#e': [event.id]}])
     replies = replies.filter((reply) => {
       const nip10Data = nip10.parse(reply)
@@ -250,16 +270,11 @@
     const authorsEvents = await pool.list(currentRelays, [{ kinds: [0], authors: uniqueAuthors }])
     replies = injectAuthorsToNotes(replies, authorsEvents)
 
-    await injectDataToNotes(replies as EventExtended[], currentRelays, pool)
+    await injectDataToReplyNotes(event, replies as EventExtended[], currentRelays, pool)
 
     eventReplies.value = replies as EventExtended[]
-    event.hasReplies = true
     showReplies.value = true
-
-    eventReplies.value.forEach(async (reply: any) => {
-      let deepReplies = await pool.list(currentRelays, [{ kinds: [1], limit: 1, '#e': [reply.id] }])
-      reply.hasReplies = deepReplies.length > 0
-    })
+    isLoadingReplies.value = false
   }
 
   const handleHideReplies = () => {
@@ -277,12 +292,11 @@
     }, 2000)
   }
 
-  const handleUserClick = (e: any) => {
-    e.preventDefault()
-    const urlNpub = nip19.npubEncode(props.event.pubkey)
+  const handleUserClick = (pubkey: string) => {
+    const urlNpub = nip19.npubEncode(pubkey)
     npubStore.updateNpub(urlNpub)
     userStore.updateRoutingStatus(true)
-    router.push({ path: `/user/${urlNpub}` })
+    router.push({ path: getUserPath(pubkey) })
   }
 </script>
 
@@ -296,11 +310,17 @@
         <div class="event-content">
           <div class="event-header">
             <div>
-              <a class="event-username-link" @click="handleUserClick" href="#"><b>{{ displayName(event.author, event.pubkey) }}</b></a>
+              <a class="event-username-link" @click.prevent="() => handleUserClick(event.pubkey)" :href="getUserPath(event.pubkey)">
+                <b>{{ displayName(event.author, event.pubkey) }}</b>
+              </a>
             </div>
             <div>
               {{ formatedDate(event.created_at) }}
             </div>
+          </div>
+
+          <div v-if="event.replyingTo" class="event-replying-to">
+            Replying to <a @click.prevent="() => handleUserClick(event.replyingTo.pubkey)" :href="getUserPath(event.replyingTo.pubkey)" class="event-username-link">@{{ displayName(event.replyingTo.user, event.replyingTo.pubkey) }}</a>
           </div>
   
           <div class="event-body">
@@ -308,7 +328,15 @@
           </div>
   
           <div class="event-footer">
-            <EventActionsBar :hasReplyBtn="hasReplyBtn" @showReplyField="handleToggleReplyField" :likes="event.likes" :reposts="0" />
+            <EventActionsBar 
+              @showReplyField="handleToggleReplyField" 
+              @handleShowReplies="handleLoadReplies"
+              @handleHideReplies="handleHideReplies"
+              :hasReplyBtn="hasReplyBtn" 
+              :likes="event.likes" 
+              :reposts="event.reposts"
+              :replies="event.replies"
+            />
             <div class="event-footer__right-actions">
               <div class="event-footer__link-wrapper">
                 <CheckIcon v-if="isCopiedEventLink" class="event-footer-copy-icon event-footer-copy-icon_check" />
@@ -358,16 +386,13 @@
     </div>
   </div>
 
-  <a @click.prevent="handleLoadReplies" v-if="event.hasReplies && !showReplies" class="show-replies-link" href="#">
-    Show replies...
-  </a>
-  <a @click.prevent="handleHideReplies" v-if="showReplies" class="show-replies-link" href="#">
-    Hide replies...
-  </a>
+  <div v-if="isLoadingReplies" class="loading-replies">
+    Loading replies...
+  </div>
 
   <div v-if="showReplies && eventReplies.length" class="replies">
     <div class="reply" :key="reply.id" v-for="(reply, i) in eventReplies">
-      <div class="reply__vertical-line"></div>
+      <!-- <div class="reply__vertical-line"></div> -->
       <EventContent
         :sliceText="sliceText"
         @toggleRawData="() => handleToggleRawData(event.id)"
@@ -398,7 +423,7 @@
     top: -15px;
   }
 
-  .show-replies-link {
+  .loading-replies {
     display: inline-block;
     margin-top: 5px;
   }
@@ -485,6 +510,11 @@
     .event-header {
       flex-direction: row;
     }
+  }
+
+  .event-replying-to {
+    font-size: 15px;
+    margin-bottom: 3px;
   }
 
   .event-footer {
