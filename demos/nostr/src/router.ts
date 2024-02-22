@@ -1,12 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-
-const Feed = () => import('./views/Feed.vue');
-const MessageInput = () => import('./components/MessageInput.vue')
-const SignedEventInput = () => import('./components/SignedEventInput.vue')
-const Help = () => import('./components/Help.vue')
-
-// TODO: fix and replace with: const User = () => import('./components/User.vue')
-import User from './components/User.vue'
+import Feed from '@/views/Feed.vue'
+import MessageInput from '@/components/MessageInput.vue'
+import SignedEventInput from '@/components/SignedEventInput.vue'
+import Help from '@/components/Help.vue'
+import User from '@/components/User.vue'
 
 const routes = [
   { 
