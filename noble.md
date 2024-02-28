@@ -17,6 +17,7 @@ The idea was to: 1) improve knowledge of cryptography 2) improve supply chain se
 * **curves** ([github](https://github.com/paulmillr/noble-curves), [npm](https://www.npmjs.com/package/@noble/curves)): elliptic curve cryptography, including Weierstrass, Edwards, Montgomery curves, pairings, hash-to-curve, poseidon hash, schnorr, secp256k1, ed25519, ed448, p521, bn254, bls12-381 and others.
     * 4kb versions of _curves_ with even better auditability and rarer update schedule: secp256k1 ([github](https://github.com/paulmillr/noble-secp256k1), [npm](https://www.npmjs.com/package/@noble/secp256k1)) and ed25519 ([github](https://github.com/paulmillr/noble-ed25519), [npm](https://www.npmjs.com/package/@noble/ed25519))
 * **hashes** ([github](https://github.com/paulmillr/noble-hashes), [npm](https://www.npmjs.com/package/@noble/hashes)): hash functions, MACs & KDFs, including SHA, RIPEMD, BLAKE, HMAC, HKDF, PBKDF & Scrypt
+* **post-quantum** ([github](https://github.com/paulmillr/noble-post-quantum), [npm](https://www.npmjs.com/package/@noble/post-quantum)): post-quantum public key algorithms: ML-KEM, ML-DSA, SLH-DSA aka Kyber, Dilithium and SPHINCS+
 
 ### History
 
@@ -32,6 +33,7 @@ The idea was to: 1) improve knowledge of cryptography 2) improve supply chain se
 * Mar 2023: secp256k1 and ed25519 have been rewritten and became 4KB single-feature versions of curves
 * Jun 2023: ciphers have been [released](https://github.com/paulmillr/noble-ciphers/commit/f0e21ed3496a0d6082027effbc54d2e7f4db2027)
 * Sep 2023: curves have been [audited](https://github.com/paulmillr/noble-curves/blob/main/audit/2023-09-kudelski-audit-starknet.pdf) by Kudelski Security, funded by [starknet](https://www.starknet.io/en)
+* Feb 2024: post-quantum have been [released](https://github.com/paulmillr/noble-post-quantum/commit/2834e5c3409f70309edf9c30b2c4206cd449cd8e)
 
 ### scure
 
