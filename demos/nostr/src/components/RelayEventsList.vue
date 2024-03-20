@@ -5,7 +5,7 @@
   defineProps<{
     events: EventExtended[]
     pubKey: string
-    currentRelays: string[]
+    currentReadRelays: string[]
   }>()
 
   const emit = defineEmits(['toggleRawData'])
@@ -21,13 +21,13 @@
       <EventView 
         class="event"
         @toggleRawData="handleToggleRawData" 
+        :currentReadRelays="currentReadRelays"
         :event="event" 
         :pubKey="pubKey"
         :index="i" 
         :showReplies="true"
         :hasReplyBtn="true"
         :sliceText="150"
-        :currentRelays="currentRelays"
       />
     </template>
   </div>

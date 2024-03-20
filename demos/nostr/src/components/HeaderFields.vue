@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
-  import { nip19, generatePrivateKey } from 'nostr-tools'
+  import { nip19, generateSecretKey } from 'nostr-tools'
   import ShowImagesCheckbox from './ShowImagesCheckbox.vue'
   import { DEFAULT_RELAYS } from './../app'
   import { useRelay } from '@/stores/Relay'
@@ -34,10 +34,23 @@
     if (nsecStore.rememberMe) {
       localStorage.setItem('privkey', nsecStore.nsec as string)
     }
+    
+    // do not reconnect if the same key was presented
+    if (nsecStore.cachedNsec === nsecStore.nsec) {
+      return
+    }
+    
+    // reconnect to relay if nsec was updated
+    if (relayStore.isConnectedToRelay) {
+      const pubkey = nsecStore.getPubkey()
+      if (pubkey.length) {
+        emit('relayConnect')
+      }
+    }
   }
 
   const handleGenerateRandomPrivKey = () => {
-    const privKeyHex = generatePrivateKey()
+    const privKeyHex = generateSecretKey()
     nsecStore.updateNsec(nip19.nsecEncode(privKeyHex))
   }
 
@@ -94,7 +107,7 @@
         </div>
       </div>
       <div class="message-fields__field">
-        <label for="message">
+        <label for="priv_key">
           <strong>Private key (optional)</strong>
         </label>
         <div class="field-elements">

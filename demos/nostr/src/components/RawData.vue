@@ -12,12 +12,14 @@
   const showAuthorTab = ref(true)
 
   const clearEvent = ref<Event>()
-  const clearAuthorEvent = ref<Event>()
+  const clearAuthorEvent = ref<Event>({} as Event)
   
   onMounted(() => {
     const { event, authorEvent } = props
     clearEvent.value = sanitizeEvent(event)
-    clearAuthorEvent.value = sanitizeEvent(authorEvent)
+    if (authorEvent) {
+      clearAuthorEvent.value = sanitizeEvent(authorEvent)
+    }
 
     if (!props.authorEvent) return
     showAuthorTab.value = props.event.id !== props.authorEvent.id

@@ -4,6 +4,7 @@ import MessageInput from '@/components/MessageInput.vue'
 import SignedEventInput from '@/components/SignedEventInput.vue'
 import Help from '@/components/Help.vue'
 import User from '@/components/User.vue'
+import Settings from '@/views/Settings.vue'
 
 const routes = [
   { 
@@ -60,6 +61,10 @@ const routes = [
         next()
       }
     }
+  },
+  {
+    path: '/settings',
+    component: Settings
   }
 ]
 

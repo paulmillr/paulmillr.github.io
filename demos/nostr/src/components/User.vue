@@ -2,13 +2,12 @@
   import { onMounted, ref, onBeforeMount, computed, watch } from 'vue'
   import {
     nip19,
-    getPublicKey,
     nip05,
     nip10,
-    type SimplePool,
-    type Relay,
+    SimplePool,
     type Event,
   } from 'nostr-tools'
+  // @ts-ignore
   import { useRouter, useRoute } from 'vue-router'
 
   import { fallbackRelays, DEFAULT_EVENTS_COUNT } from './../app'
@@ -70,14 +69,14 @@
     return `https://${domain}/.well-known/nostr.json?name=${name}`
   }
 
-  const currentRelays = ref<string[]>([])
+  const currentReadRelays = ref<string[]>([])
 
   onMounted(() => {
     // first mount when npub presented in url, run only once 
-    if (route.params?.id?.length && !relayStore.currentRelay.status) {
+    if (route.params?.id?.length && !relayStore.currentRelay.connected) {
       npubStore.updateNpub(route.params.id as string)
       npubStore.updateCachedUrl(route.params.id as string)
-      if (!relayStore.currentRelay.status) {
+      if (!relayStore.currentRelay.connected) {
         isAutoConnectOnSearch.value = true
       }
       return
@@ -129,21 +128,18 @@
   }
 
   const showUserPage = async (page: number) => {
-    const relay = relayStore.currentRelay
-    if (!relay) return
+    const relays = relayStore.connectedReedRelayUrls
+    if (!relays.length) return
 
     const limit = DEFAULT_EVENTS_COUNT
     const start = (page - 1) * limit
     const end = start + limit
 
     const idsToShow = userNotesStore.allNotesIds.slice(start, end) 
-
-    const postsEvents = await relay.list([{ ids: idsToShow }]) as EventExtended[]
+    const postsEvents = await pool.querySync(relays, { ids: idsToShow }) as EventExtended[]
 
     let posts = injectAuthorToUserNotes(postsEvents, userDetails.value)
-
-    const relaysUrls = [relay.url]
-    await injectDataToRootNotes(posts, relaysUrls, pool as SimplePool)
+    await injectDataToRootNotes(posts, relays, pool as SimplePool)
 
     userNotesStore.updateNotes(posts as EventExtended[])
     currentPage.value = page
@@ -188,15 +184,14 @@
       }
     }
 
-    let relay: Relay
     if (isAutoConnectOnSearch.value) {
-      relay = await props.handleRelayConnect()
-    } else {
-      relay = relayStore.currentRelay
+      await props.handleRelayConnect()
     }
+    const relays = relayStore.connectedReedRelayUrls
+
     if (currentOperationId !== gettingUserInfoId.value) return
     
-    if (!relay || relay.status !== 1) {
+    if (!relays.length) {
       pubKeyError.value = isAutoConnectOnSearch.value
         ? 'Connection error, try to connect again or try to choose other relay.' 
         : 'Please connect to relay first.'
@@ -215,8 +210,7 @@
     if (isEventSearch.value || isHexSearch) {
       const eventId = pubHex.value
 
-      // notesEvents = await relayList(relay, [{ ids: [eventId] }]) as EventExtended[]
-      notesEvents = await relay.list([{ ids: [eventId] }]) as EventExtended[]
+      notesEvents = await pool.querySync(relays, { ids: [eventId] }) as EventExtended[]
       if (currentOperationId !== gettingUserInfoId.value) return
 
       if (notesEvents.length) {
@@ -226,12 +220,7 @@
       }
     }
 
-    // const authorMeta = await relayGet(relay, { kinds: [0], limit: 1, authors: [pubHex.value] }) as Event
-    const authorMeta = await relay.get({ kinds: [0], limit: 1, authors: [pubHex.value] })
-
-    const authorMeta1 = await relay.get({ kinds: [10002], limit: 1, authors: [pubHex.value] })
-
-    console.log(authorMeta1)
+    const authorMeta = await pool.get(relays, { kinds: [0], limit: 1, authors: [pubHex.value] })
 
     if (currentOperationId !== gettingUserInfoId.value) return
     if (!authorMeta) {
@@ -240,10 +229,9 @@
       return
     }
 
-    currentRelays.value = [relay.url]
+    currentReadRelays.value = relays
     
-    // const authorContacts = await relayGet(relay, { kinds: [3], limit: 1, authors: [pubHex.value] }) as Event
-    const authorContacts = await relay.get({ kinds: [3], limit: 1, authors: [pubHex.value] })
+    const authorContacts = await pool.get(relays, { kinds: [3], limit: 1, authors: [pubHex.value] })
     if (currentOperationId !== gettingUserInfoId.value) return
     
     userEvent.value = authorMeta
@@ -269,8 +257,7 @@
     // event was loaded before in case of searching for one event
     // filtering for replies only when searching for user, otherwise we show the post even if it is a reply
     if (!isEventSearch.value) {
-      // notesEvents = await relayList(relay, [{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
-      notesEvents = await relay.list([{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
+      notesEvents = await pool.querySync(relays, { kinds: [1], authors: [pubHex.value] }) as EventExtended[]
       if (currentOperationId !== gettingUserInfoId.value) return
 
       const repliesIds = new Set()
@@ -291,8 +278,7 @@
 
     notesEvents = injectAuthorToUserNotes(notesEvents, userDetails.value)
     
-    const relaysUrls = currentRelays.value
-    await injectDataToRootNotes(notesEvents, relaysUrls, pool as SimplePool)
+    await injectDataToRootNotes(notesEvents, relays, pool as SimplePool)
     if (currentOperationId !== gettingUserInfoId.value) return
 
     userNotesStore.updateNotes(notesEvents as EventExtended[])
@@ -333,15 +319,6 @@
     return profile.relays
   }
 
-  // WIP (not used yet)
-  const getNip65Relays = async () => {
-    const relay = relayStore.currentRelay
-    const events = await relay.list([{ kinds: [10002], authors: [pubHex.value], limit: 1 }])
-    if (!events.length) return []
-    const event = events[0]
-    // TDOD: extract relays from event
-  }
-
   const handleGeneratePublicFromPrivate = () => {
     const nsecVal = nsecStore.nsec.trim()
     if (!nsecVal.length) {
@@ -349,12 +326,13 @@
       return
     }
 
-    const isHex = nsecVal.indexOf('nsec') === -1
-
     try {
-      const privKeyHex = isHex ? nsecVal : nip19.decode(nsecVal).data.toString()
-      const pubKey = getPublicKey(privKeyHex)
-      npubStore.updateNpub(nip19.npubEncode(pubKey))
+      const pubkey = nsecStore.getPubkey()
+      if (!pubkey.length) {
+        throw new Error()
+      }
+
+      npubStore.updateNpub(nip19.npubEncode(pubkey))
       pubKeyError.value = ''
     } catch (e) {
       pubKeyError.value = 'Private key is invalid. Please check it and try again.'
@@ -396,7 +374,7 @@
     let notesEvents: EventExtended[] = []
     if (isEventSearch.value || isHexSearch) {
       const eventId = pubHex.value
-      notesEvents = await pool.list(fallbackRelays, [{ ids: [eventId] }]) as EventExtended[]
+      notesEvents = await pool.querySync(fallbackRelays, { ids: [eventId] }) as EventExtended[]
       if (notesEvents.length) {
         pubHex.value = notesEvents[0].pubkey
         isEventSearch.value = true
@@ -410,7 +388,7 @@
       return
     }
 
-    currentRelays.value = fallbackRelays
+    currentReadRelays.value = fallbackRelays
 
     const authorContacts = await pool.get(fallbackRelays, { kinds: [3], limit: 1, authors: [pubHex.value] })
     
@@ -438,7 +416,7 @@
     checkAndShowNip05()
 
     if (!isEventSearch.value) {
-      notesEvents = await pool.list(fallbackRelays, [{ kinds: [1], authors: [pubHex.value] }]) as EventExtended[]
+      notesEvents = await pool.querySync(fallbackRelays, { kinds: [1], authors: [pubHex.value] }) as EventExtended[]
 
       const repliesIds = new Set()
       notesEvents.forEach((event) => {
@@ -458,18 +436,19 @@
   }
   
   const handleLoadUserFollowers = async () => {   
-    const isFallback = isUsingFallbackSearch.value
-    const relays = isFallback ? fallbackRelays : [relayStore.currentRelay.url]
-
-    const sub = await pool.sub(relays, [{ 
-      "#p": [pubHex.value],
-      kinds: [3], 
-    }])
-
     userDetails.value.followersCount = 0
-    sub.on('event', () => {
-      userDetails.value.followersCount = userDetails.value.followersCount + 1
-    })
+    const sub = pool.subscribeMany(
+      currentReadRelays.value, 
+      [{ "#p": [pubHex.value], kinds: [3] }], 
+      {
+        onevent(event: Event) {
+          userDetails.value.followersCount = userDetails.value.followersCount + 1
+        },
+        oneose() {
+          sub.close()
+        }
+      }
+    )
   }
 
   const handleToggleRawData = (eventId: string) => {
@@ -499,6 +478,7 @@
   </div>
 
   <UserEvent
+    v-if="userEvent.id"
     :author="userDetails"
     :event="(userEvent as EventExtended)"
     :key="userEvent.id"
@@ -554,9 +534,9 @@
     <EventView 
       :hasReplyBtn="!isEventSearch" 
       :showReplies="!isEventSearch" 
-      :currentRelays="currentRelays" 
-      :index="i" 
-      @toggleRawData="handleToggleRawData" 
+      :currentReadRelays="currentReadRelays"
+      :index="i"
+      @toggleRawData="handleToggleRawData"
       :event="(event as EventExtended)" 
     />
   </template>

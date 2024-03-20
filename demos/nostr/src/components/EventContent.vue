@@ -3,13 +3,11 @@
   import { useRouter } from 'vue-router'
   import { 
     nip19, 
-    getPublicKey, 
-    getEventHash, 
-    signEvent, 
     parseReferences, 
     SimplePool, 
     nip10,
-    verifySignature,
+    finalizeEvent, 
+    verifyEvent,
     type Event
   } from 'nostr-tools'
   import type { EventExtended } from './../types'
@@ -20,10 +18,15 @@
   import { useNsec } from '@/stores/Nsec'
   import { useUser } from '@/stores/User'
   import { useImages } from '@/stores/Images'
+  import { usePubKey } from '@/stores/PubKey'
+  import { useRelay } from '@/stores/Relay'
 
   import {
     injectAuthorsToNotes,
-    injectDataToReplyNotes
+    injectDataToReplyNotes,
+    parseRelaysNip65,
+    publishEventToRelays,
+    formatedDate
   } from './../utils'
   import LinkIcon from './../icons/LinkIcon.vue'
   import CheckIcon from './../icons/CheckIcon.vue'
@@ -42,7 +45,7 @@
 
   const props = defineProps<{
     event: EventExtended
-    pool?: SimplePool
+    pool: SimplePool
     pubKey?: string
     index?: number
     hasReplyBtn?: boolean
@@ -51,7 +54,7 @@
     isReplySentError?: boolean
     sliceText?: number
     isRootEvent?: boolean
-    currentRelays?: string[]
+    currentReadRelays?: string[]
   }>()
 
   const router = useRouter()
@@ -59,6 +62,8 @@
   const nsecStore = useNsec()
   const userStore = useUser()
   const imagesStore = useImages()
+  const pubKeyStore = usePubKey()
+  const relayStore = useRelay()
 
   const showReplyField = ref(false)
   const isPublishingReply = ref(false)
@@ -75,21 +80,13 @@
     props.event.showRawData = !props.event.showRawData
   }
 
-  const formatedDate = (date: number) => {
-    return new Date(date * 1000).toLocaleString('default', {
-      day: 'numeric',
-      month: 'short',
-      hour: 'numeric',
-      minute: 'numeric'
-    })
-  }
-
   const getUserPath = (pubkey: string) => {
     return `/user/${nip19.npubEncode(pubkey)}`
   }
 
   onMounted(() => {
-    isSigVerified.value = verifySignature(props.event as Event)
+    if (Object.keys(props.event).length === 0) return
+    isSigVerified.value = verifyEvent(props.event as Event)
   })
 
   onBeforeUpdate(() => {
@@ -129,7 +126,7 @@
     emit('showReplyField')
   }
 
-  const handleSendReply = () => {
+  const handleSendReply = async () => {
     if (isPublishingReply.value) return
 
     const nsecValue = nsecStore.nsec ? nsecStore.nsec.trim() : ''
@@ -144,12 +141,18 @@
       return;
     }
 
-    let privKey: string;
-    let pubKey: string
+    let privkey: Uint8Array | null;
+    let pubkey: string
     try {
-      const { data } = nip19.decode(nsecValue)
-      privKey = data as string
-      pubKey = getPublicKey(privKey)
+      privkey = nsecStore.getPrivkeyBytes()
+      if (!privkey) {
+        throw new Error()
+      }
+      pubkey = nsecStore.getPubkey()
+      if (!pubkey.length) {
+        throw new Error()
+      }
+      pubKeyStore.updateKeyFromPrivate(pubkey)
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
       return;
@@ -157,7 +160,7 @@
 
     const event = {
       kind: 1,
-      pubkey: pubKey,
+      pubkey: pubkey,
       created_at: Math.floor(Date.now() / 1000),
       content: messageValue,
       tags: [],
@@ -215,42 +218,80 @@
 
     // gather all tags together and sign message
     event.tags = [...pTagsForReply, ...eTagsForReply] as never[]
-    event.id = getEventHash(event)
-    event.sig = signEvent(event, privKey)
+    const signedEvent = finalizeEvent(event, privkey)
 
     msgErr.value = ''
     isPublishingReply.value = true
 
+    // all mentions except author of the event
+    const pubkeysMentions = pTagsForReply
+      .filter((tag: any) => tag[1] !== pubkey)
+      .map((tag: any) => tag[1])
+    let additionalRelays: string[] = []
+
+    const { pool } = props
+    if (pubkeysMentions.length) {
+      const allRelays = [...relayStore.reedRelays, ...relayStore.writeRelays, relayStore.connectedRelayUrl]
+      let relays = [...new Set(allRelays)]; // make array values unique
+      const metaEvents = await pool.querySync(relays, { kinds: [10002], authors: pubkeysMentions })
+
+      const mentionsReadRelays = new Set<string>()
+      metaEvents.forEach((event: Event) => {
+        if (event.tags.length)  {
+          const { read } = parseRelaysNip65(event)
+          read.forEach((r: string) => {
+            if (relayStore.writeRelays.includes(r)) return
+            mentionsReadRelays.add(r)
+          })
+        }
+      })
+
+      additionalRelays = [...mentionsReadRelays]
+    }
+    
     if (props.isRootEvent) {
-      return emit('sendReply', event)
+      return emit('sendReply', signedEvent, additionalRelays)
     }
 
-    const { currentRelays, pool } = props
-    if (!currentRelays || !pool) {
-      msgErr.value = 'Please connect to relay to broadcast event'
+    const writeRelays = relayStore.writeRelays
+    if (!writeRelays.length) {
+      msgErr.value = 'Please provide your write relays to broadcast event'
       return
     }
 
-    const pub = pool.publish(currentRelays, event)
+    console.log('broadcasting event in REPLY handleSendReply')
+    console.log('event', event)
+    console.log('relays', writeRelays)
 
-    pub.on('ok', async () => {
-      isPublishingReply.value = false
-      showReplyField.value = false
-      replyText.value = ''
-      handleLoadReplies()
-    })
+    const result = await publishEventToRelays(writeRelays, pool, event)
+    const hasSuccess = result.some((data: any) => data.success)
 
-    pub.on('failed', (reason: string) => {
-      msgErr.value = 'Failed to broadcast event'
-      console.log('failed to broadcast event', reason)
-    })
+    if (!hasSuccess) {
+      msgErr.value = 'Failed to broadcast reply'
+      console.log('failed to broadcast reply')
+      return
+    }
+
+    console.log('additionalRelays', additionalRelays)
+
+    if (additionalRelays.length) {
+      try {
+        await pool.publish(additionalRelays, event)
+      } catch (e) {
+        console.error('Failed to broadcast reply to some additional relays')
+      }
+    }
+
+    isPublishingReply.value = false
+    showReplyField.value = false
+    replyText.value = ''
+    handleLoadReplies()
   }
 
   const handleLoadReplies = async () => {
-    const { event, currentRelays, pool } = props
-    if (!currentRelays || !pool) return
+    const { event, currentReadRelays, pool } = props
 
-    if (!event.replies) return
+    if (!currentReadRelays?.length || !pool) return
 
     if (props.isRootEvent) {
       return emit('loadMoreReplies')
@@ -259,7 +300,7 @@
     isLoadingReplies.value = true
 
     // filter replies for particular event
-    let replies = await pool.list(currentRelays, [{kinds: [1], '#e': [event.id]}])
+    let replies = await pool.querySync(currentReadRelays, {kinds: [1], '#e': [event.id]})
     replies = replies.filter((reply) => {
       const nip10Data = nip10.parse(reply)
       return nip10Data?.root?.id === event.id || nip10Data?.reply?.id === event.id
@@ -267,10 +308,10 @@
 
     const authors = replies.map((e: any) => e.pubkey)
     const uniqueAuthors = [...new Set(authors)]
-    const authorsEvents = await pool.list(currentRelays, [{ kinds: [0], authors: uniqueAuthors }])
+    const authorsEvents = await pool.querySync(currentReadRelays, { kinds: [0], authors: uniqueAuthors })
     replies = injectAuthorsToNotes(replies, authorsEvents)
 
-    await injectDataToReplyNotes(event, replies as EventExtended[], currentRelays, pool)
+    await injectDataToReplyNotes(event, replies as EventExtended[], currentReadRelays, pool)
 
     eventReplies.value = replies as EventExtended[]
     showReplies.value = true
@@ -311,7 +352,7 @@
           <div class="event-header">
             <div>
               <a class="event-username-link" @click.prevent="() => handleUserClick(event.pubkey)" :href="getUserPath(event.pubkey)">
-                <b>{{ displayName(event.author, event.pubkey) }}</b>
+                <b class="event-username-text">{{ displayName(event.author, event.pubkey) }}</b>
               </a>
             </div>
             <div>
@@ -320,7 +361,7 @@
           </div>
 
           <div v-if="event.replyingTo" class="event-replying-to">
-            Replying to <a @click.prevent="() => handleUserClick(event.replyingTo.pubkey)" :href="getUserPath(event.replyingTo.pubkey)" class="event-username-link">@{{ displayName(event.replyingTo.user, event.replyingTo.pubkey) }}</a>
+            Replying to <a @click.prevent="() => handleUserClick(event.replyingTo.pubkey)" :href="getUserPath(event.replyingTo.pubkey)" class="event-username-link event-username-text">@{{ displayName(event.replyingTo.user, event.replyingTo.pubkey) }}</a>
           </div>
   
           <div class="event-body">
@@ -380,7 +421,7 @@
     <textarea v-model="replyText" rows="4" class="reply-field__textarea" placeholder="Write a reply..."></textarea>
     <div class="reply-field__actions">
       <div class="reply-field__error">{{ msgErr }}</div>
-      <button @click="handleSendReply" class="reply-field__btn">
+      <button :disabled="isPublishingReply" @click="handleSendReply" class="reply-field__btn">
         {{ isPublishingReply ? 'Sending reply...' : 'Reply' }}
       </button>
     </div>
@@ -397,7 +438,7 @@
         :sliceText="sliceText"
         @toggleRawData="() => handleToggleRawData(event.id)"
         :event="(reply as EventExtended)"
-        :currentRelays="currentRelays"
+        :currentReadRelays="currentReadRelays"
         :pool="pool"
         :hasReplyBtn="hasReplyBtn"
       />
@@ -515,6 +556,10 @@
   .event-replying-to {
     font-size: 15px;
     margin-bottom: 3px;
+  }
+
+  .event-username-text {
+    line-break: anywhere;
   }
 
   .event-footer {

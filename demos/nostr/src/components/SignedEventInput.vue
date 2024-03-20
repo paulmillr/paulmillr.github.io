@@ -2,15 +2,19 @@
   import { ref, defineEmits } from 'vue'
   import { useRelay } from '@/stores/Relay'
   import { useFeed } from '@/stores/Feed'
-
+  import { useNsec } from '@/stores/Nsec'
+  import { usePubKey } from '@/stores/PubKey'
+  
   defineProps<{
     isSendingMessage: boolean
     broadcastError: ''
   }>()
-
+  
   const emit = defineEmits(['broadcastEvent'])
   const relayStore = useRelay()
   const feedStore = useFeed()
+  const nsecStore = useNsec()
+  const pubKeyStore = usePubKey()
   const jsonErr = ref('')
 
   const handleSendSignedEvent = () => {
@@ -28,9 +32,17 @@
     }
 
     const relay = relayStore.currentRelay
-    if (!relay || relay.status !== 1) {
+    if (!relay?.connected) {
       jsonErr.value = 'Please connect to relay first.'
       return;
+    }
+
+    // update pubkey to ensure that event will be higlighted in the feed if private key is presented 
+    if (nsecStore.isValidNsecPresented()) {
+      const pubkey = nsecStore.getPubkey()
+      if (pubkey?.length) {
+        pubKeyStore.updateKeyFromPrivate(pubkey)
+      }
     }
 
     jsonErr.value = ''
@@ -110,7 +122,7 @@
         {{ jsonErr }}
         {{ broadcastError }}
       </div>
-      <button class="send-btn send-btn_signed-json" @click="handleSendSignedEvent">
+      <button :disabled="isSendingMessage" class="send-btn send-btn_signed-json" @click="handleSendSignedEvent">
         {{ isSendingMessage ? 'Broadcasting...' : 'Broadcast' }}
       </button>
     </div>

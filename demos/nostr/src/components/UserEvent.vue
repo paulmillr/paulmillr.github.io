@@ -1,10 +1,11 @@
 <script setup lang="ts">
   import { ref, watchEffect, onMounted } from 'vue'
-  import { nip19, verifySignature, type Event } from 'nostr-tools'
+  import { verifyEvent, nip19, type Event } from 'nostr-tools'
   import RawData from './RawData.vue'
   import type { Author, EventExtended } from './../types'
   import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
   import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
+  import { formatedDate } from './../utils'
 
   const props = defineProps<{
     event: EventExtended
@@ -23,20 +24,19 @@
   const isSigVerified = ref(false)
 
   watchEffect(() => {
-    id.value = props.event.id
-    sig.value = props.event.sig
-    pubkey.value = props.event.pubkey
-    created_at.value = props.event.created_at
+    const { event } = props
+    id.value = event.id
+    sig.value = event.sig
+    pubkey.value = event.pubkey
+    created_at.value = event.created_at
   })
 
   onMounted(() => {
-    isSigVerified.value = verifySignature(props.event as Event)
+    if (Object.keys(props.event).length === 0) {
+      return
+    }
+    isSigVerified.value = verifyEvent(props.event as Event)
   })
-
-  const formatedDate = (timestamp: number) => {
-    const ms = timestamp * 1000
-    return new Date(ms).toLocaleString();
-  }
 
   const handleToggleRawData = () => {
     showRawData.value = !showRawData.value

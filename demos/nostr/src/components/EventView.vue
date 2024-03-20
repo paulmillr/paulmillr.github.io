@@ -1,20 +1,23 @@
 <script setup lang="ts">
   import {nextTick, onMounted, ref } from 'vue'
-  import type { EventExtended } from './../types'
-  import EventContent from './EventContent.vue'
-  import ExpandArrow from './../icons/ExpandArrow.vue'
-
   import {
     nip10,
     SimplePool,
     type Event
   } from 'nostr-tools'
+  import type { EventExtended } from './../types'
+  import { publishEventToRelays } from './../utils'
+  import EventContent from './EventContent.vue'
+  import ExpandArrow from './../icons/ExpandArrow.vue'
   import {
     injectAuthorsToNotes,
     injectDataToReplyNotes
   } from './../utils'
 
   import { usePool } from '@/stores/Pool'
+  import { useRelay } from '@/stores/Relay'
+
+  const relayStore = useRelay()
   const poolStore = usePool()
   const pool = poolStore.eventPool
 
@@ -25,11 +28,11 @@
     event: EventExtended
     pubKey?: string
     index?: number
-    currentRelays?: string[]
     sliceText?: number
     sliceTextReply?: number
     showReplies?: boolean,
-    hasReplyBtn?: boolean
+    hasReplyBtn?: boolean,
+    currentReadRelays: string[]
   }>()
 
   const showReplyField = ref(false)
@@ -50,10 +53,10 @@
   })
 
   const loadRepliesPreiew = async () => {
-    const { event, currentRelays } = props
-    if (!currentRelays) return
+    const { event, currentReadRelays } = props
+    if (!currentReadRelays.length) return
 
-    let replies = await pool.list(currentRelays, [{ kinds: [1], '#e': [event.id] }])
+    let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
 
     // filter first level replies
     replies = replies.filter((reply: Event) => {
@@ -68,10 +71,10 @@
     let reply = replies[0] as EventExtended
 
     let tempReplies = [reply]
-    await injectDataToReplyNotes(event, tempReplies as EventExtended[], currentRelays, pool as SimplePool)
+    await injectDataToReplyNotes(event, tempReplies as EventExtended[], currentReadRelays, pool as SimplePool)
 
     reply = tempReplies[0] as EventExtended
-    const authorMeta = await pool.get(currentRelays, { kinds: [0], limit: 1, authors: [reply.pubkey] })
+    const authorMeta = await pool.get(currentReadRelays, { kinds: [0], limit: 1, authors: [reply.pubkey] })
     if (authorMeta) {
       reply.author = JSON.parse(authorMeta.content)
     }
@@ -91,11 +94,11 @@
   }
 
   const handleLoadMoreReplies = async () => {
-    const { event, currentRelays } = props
-    if (!currentRelays) return
+    const { event, currentReadRelays } = props
+    if (!currentReadRelays.length) return
 
     isLoadingThread.value = true
-    let replies = await pool.list(currentRelays, [{ kinds: [1], '#e': [event.id] }])
+    let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
 
     // filter first level replies
     replies = replies.filter((reply: Event) => {
@@ -110,36 +113,60 @@
 
     const authors = replies.map((e: any) => e.pubkey)
     const uniqueAuthors = [...new Set(authors)]
-    const authorsEvents = await pool.list(currentRelays, [{ kinds: [0], authors: uniqueAuthors }])
+    const authorsEvents = await pool.querySync(currentReadRelays, { kinds: [0], authors: uniqueAuthors })
     replies = injectAuthorsToNotes(replies, authorsEvents)
 
-    await injectDataToReplyNotes(event, replies as EventExtended[], currentRelays, pool as SimplePool)
+    await injectDataToReplyNotes(event, replies as EventExtended[], currentReadRelays, pool as SimplePool)
 
     eventReplies.value = replies as EventExtended[]
     showAllReplies.value = true
     isLoadingThread.value = false
   }
 
-  const handleSendReply = (event: EventExtended) => {
-    const { currentRelays } = props
-    if (!currentRelays) {
-      showSendReplyError('Please connect to relay to broadcast event')
+  const handleSendReply = async (event: EventExtended, additionalRelays: string[] | null) => {
+    const writeRelays = relayStore.writeRelays
+    if (!writeRelays.length) {
+      showSendReplyError('Please provide your write relays to broadcast event')
       return
     }
 
-    const pub = pool.publish(currentRelays, event)
-    pub.on('ok', async () => {
-      replyErr.value = ''
-      await nextTick()
-      isReplySent.value = true
-      isReplySentError.value = false
-      showReplyField.value = false
-      loadRepliesPreiew()
-    })
-    pub.on('failed', (reason: string) => {
-      showSendReplyError('Failed to broadcast event')
-      console.log('failed to broadcast event', reason)
-    })
+    const result = await publishEventToRelays(writeRelays, pool, event)
+    const hasSuccess = result.some((data: any) => data.success)
+
+    // temp for debugging
+    // console.log('event view')
+    // result.forEach((data: any) => {
+    //   if (data.success) {
+    //     console.log('success:', data.relay)
+    //   } else {
+    //     console.log('failed:', data.relay);
+    //   }
+    // })
+
+    if (!hasSuccess) {
+      showSendReplyError('Failed to broadcast reply')
+      console.log('Failed to broadcast reply')
+      return
+    }
+
+    if (additionalRelays?.length) {
+      try {
+        await pool.publish(additionalRelays, event)
+      } catch (e) {
+        console.error('Failed to broadcast reply to some additional relays')
+      }
+    }
+
+    replyErr.value = ''
+    await nextTick()
+    isReplySent.value = true
+    isReplySentError.value = false
+    showReplyField.value = false
+    if (showAllReplies.value) {
+      await handleLoadMoreReplies()
+    } else {
+      await loadRepliesPreiew()
+    }
   }
 
   const showSendReplyError = (err: string) => {
@@ -169,7 +196,7 @@
       :isReplySent="isReplySent"
       :sliceText="sliceText"
       :isRootEvent="true"
-      :currentRelays="currentRelays"
+      :currentReadRelays="currentReadRelays"
       :pool="(pool as SimplePool)"
       :hasReplyBtn="hasReplyBtn"
     />
@@ -205,10 +232,11 @@
 
       <div v-if="!showAllReplies">
         <EventContent
+          @sendReply="handleSendReply"
           :key="replyEvent.id"
           :sliceText="sliceTextReply"
           :event="(replyEvent as EventExtended)"
-          :currentRelays="currentRelays"
+          :currentReadRelays="currentReadRelays"
           :pool="(pool as SimplePool)"
           :hasReplyBtn="hasReplyBtn"
         />
@@ -219,10 +247,11 @@
           <div class="replies__list-item-line-horizontal"></div>
           <div :class="['replies__list-item-line-vertical', { 'replies__list-item-line-vertical_short': i === (eventReplies.length - 1) }]"></div>
           <EventContent
+            @sendReply="handleSendReply"
             :key="reply.id"
             :sliceText="sliceTextReply"
             :event="(reply as EventExtended)"
-            :currentRelays="currentRelays"
+            :currentReadRelays="currentReadRelays"
             :pool="(pool as SimplePool)"
             :hasReplyBtn="hasReplyBtn"
           />

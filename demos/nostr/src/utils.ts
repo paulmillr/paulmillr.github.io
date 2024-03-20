@@ -1,18 +1,13 @@
-import type { EventExtended } from './types'
+import type { EventExtended, Nip65RelaysUrls } from './types'
 import {
   SimplePool,
   parseReferences,
   nip10,
-  type Event
+  Relay,
+  utils,
+  type Event,
+  type Filter
 } from 'nostr-tools'
-
-export const normalizeUrl = (url: string) => {
-  const norm = url.trim()
-  if (!norm.startsWith('ws://') && !norm.startsWith('wss://')) {
-    return `wss://${norm}`
-  }
-  return norm
-}
 
 export const injectDataToRootNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   const likes = injectLikesToNotes(posts, relays, relaysPool)
@@ -44,9 +39,9 @@ const injectReplyingToDataToNotes = (replyingToEvent: EventExtended, postsEvents
 export const injectRootRepliesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
 
-  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  const pool = relaysPool || new SimplePool()
   const postsIds = postsEvents.map((e: Event) => e.id)
-  const repliesEvents = await pool.list(relays, [{ kinds: [1], '#e': postsIds }])
+  const repliesEvents = await pool.querySync(relays, { kinds: [1], '#e': postsIds })
 
   for (const event of postsEvents) {
     let replies = 0
@@ -64,9 +59,9 @@ export const injectRootRepliesToNotes = async (postsEvents: EventExtended[], rel
 export const injectNotRootRepliesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
 
-  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  const pool = relaysPool || new SimplePool()
   const postsIds = postsEvents.map((e: Event) => e.id)
-  const repliesEvents = await pool.list(relays, [{ kinds: [1], '#e': postsIds }])
+  const repliesEvents = await pool.querySync(relays, { kinds: [1], '#e': postsIds })
 
   for (const event of postsEvents) {
     let replies = 0
@@ -85,18 +80,18 @@ export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: Event[
 
   const postsWithAuthor: Event[] = [];
   tempPostsEvents.forEach(pe => {
-    let isAuthoAddedToPost = false;
+    let isAuthorAddedToPost = false;
     authorsEvents.forEach(ae => {
-      if (pe.pubkey === ae.pubkey) {
+      if (!isAuthorAddedToPost && pe.pubkey === ae.pubkey) {
         const tempEventWithAuthor = pe as EventExtended
         tempEventWithAuthor.author = JSON.parse(ae.content)
         tempEventWithAuthor.authorEvent = ae
         postsWithAuthor.push(pe)
-        isAuthoAddedToPost = true
+        isAuthorAddedToPost = true
       }
     })
     // keep post in the list of posts even if author is not found
-    if (!isAuthoAddedToPost) {
+    if (!isAuthorAddedToPost) {
       postsWithAuthor.push(pe)
     }
   })
@@ -107,7 +102,7 @@ export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: Event[
 export const injectReferencesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
   
-  let pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  let pool = relaysPool || new SimplePool()
 
   for (const event of postsEvents) {
     if (!contentHasMentions(event.content)) {
@@ -117,16 +112,27 @@ export const injectReferencesToNotes = async (postsEvents: EventExtended[], rela
 
     let references = parseReferences(event)
 
-    const referencesToInject = []
+    const referencesRequests = []
+    for (let i = 0; i < references.length; i++) {
+      let { profile } = references[i]
+      if (!profile) continue
+      const request = pool.get(relays, { kinds: [0], limit: 1, authors: [profile.pubkey] })
+      referencesRequests.push(request)
+    }
+
+    const metas = await Promise.all(referencesRequests)
+    const referencesToInject: any[] = []
     for (let i = 0; i < references.length; i++) {
       let { profile } = references[i]
       if (!profile) continue
 
-      const meta = await pool.get(relays, { kinds: [0], limit: 1, authors: [profile.pubkey] })
-
-      const referencesWithProfile = references[i] as any
-      referencesWithProfile.profile_details = JSON.parse(meta?.content || '{}');
-      referencesToInject.push(referencesWithProfile)
+      metas.forEach((meta, i) => {
+        if (meta?.pubkey === profile?.pubkey) {
+          const referenceWithProfile = references[i] as any
+          referenceWithProfile.profile_details = JSON.parse(meta?.content || '{}')
+          referencesToInject.push(referenceWithProfile)
+        }
+      })
     }
 
     event.references = referencesToInject
@@ -137,9 +143,9 @@ export const injectLikesToNotes = async (postsEvents: EventExtended[], relays: s
   if (!relays.length) return postsEvents
 
   const postsIds = postsEvents.map((e: Event) => e.id)
-  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
+  const pool = relaysPool || new SimplePool()
 
-  const likeEvents = await pool.list(relays, [{ kinds: [7], "#e": postsIds }])
+  const likeEvents = await pool.querySync(relays, { kinds: [7], "#e": postsIds })
 
   postsEvents.forEach(postEvent => {
     let likes = 0
@@ -158,8 +164,8 @@ export const injectRepostsToNotes = async (postsEvents: EventExtended[], relays:
 
   const postsIds = postsEvents.map((e: Event) => e.id)
 
-  const pool = relaysPool || new SimplePool({ getTimeout: 5600 })
-  const repostEvents = await pool.list(relays, [{ kinds: [6], "#e": postsIds }])
+  const pool = relaysPool || new SimplePool()
+  const repostEvents = await pool.querySync(relays, { kinds: [6], "#e": postsIds })
 
   postsEvents.forEach(postEvent => {
     let reposts = 0
@@ -206,4 +212,91 @@ export const isWsAvailable = (url: string) => {
 
 export const isSHA256Hex = (hex:string) => {
   return /^[a-f0-9]{64}$/.test(hex);
+}
+
+export const relayGet = (relay: Relay, filters: Filter[], timeout: number) => {
+  const timout = new Promise(resolve => {
+    setTimeout(() => {
+      resolve(null);
+    }, timeout);
+  });
+
+  const connection = new Promise<Event>(resolve => {
+    const sub = relay.subscribe(filters, {
+      onevent(event) {
+        resolve(event)
+      },
+      oneose() {
+        sub.close()
+      }
+    })
+  })
+
+  return Promise.race([connection, timout])
+}
+
+export const poolList = (pool: SimplePool, relays: string[], filters: Filter[]): Promise<Event[]> => {
+  return new Promise (resolve => {
+    const events = <Event[]>[]
+    let h = pool.subscribeMany(
+      relays,
+      filters,
+      {
+        onevent(event) {
+          events.push(event)
+        },
+        oneose() {
+          resolve(events)           
+          h.close()
+        }
+      }
+    )
+  })
+}
+
+export const parseRelaysNip65 = (event: Event) => {
+  const { tags } = event
+  const relays: Nip65RelaysUrls = { read: [], write: [], all: []}
+  if (!tags.length) return relays
+
+  tags.forEach((tag: string[]) => {
+    const isRelay = tag[0] === 'r'
+    if (isRelay) {
+      const relayUrl = utils.normalizeURL(tag[1])
+      const relayType = tag[2] // read / write
+      if (!relayType) {
+        relays.read.push(relayUrl)
+        relays.write.push(relayUrl)
+      } else if (relayType === 'read') {
+        relays.read.push(relayUrl)
+      } else if (relayType === 'write') {
+        relays.write.push(relayUrl)
+      }
+      relays.all.push({ url: relayUrl, type: relayType || 'write' })
+    }
+  })
+
+  return relays
+}
+
+export const publishEventToRelays = async (relays: string[], pool: any, event: Event) => {
+  const promises = relays.map(async (relay: string) => {
+    const promises = await pool.publish([relay], event)
+    // @ts-ignore
+    const result = (await Promise.allSettled(promises))[0]
+    return {
+      relay,
+      success: result.status === 'fulfilled'
+    }
+  })
+  return await Promise.all(promises);
+}
+
+export const formatedDate = (date: number) => {
+  return new Date(date * 1000).toLocaleString('default', {
+    day: 'numeric',
+    month: 'short',
+    hour: 'numeric',
+    minute: 'numeric'
+  })
 }

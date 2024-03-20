@@ -1,20 +1,19 @@
 <script setup lang="ts">
   import { ref, defineEmits } from 'vue'
-  import { nip19, getPublicKey, getEventHash, signEvent } from 'nostr-tools'
+  import { finalizeEvent, nip19 } from 'nostr-tools'
   import { useNsec } from '@/stores/Nsec'
-  import { useRelay } from '@/stores/Relay'
   import { usePubKey } from '@/stores/PubKey'
   import { useFeed } from '@/stores/Feed'
 
   const props = defineProps<{
     sentEventIds: Set<string>,
     isSendingMessage: boolean,
+    broadcastNotice: string
   }>()
 
   const emit = defineEmits(['broadcastEvent'])
 
   const nsecStore = useNsec()
-  const relayStore = useRelay()
   const pubKeyStore = usePubKey()
   const feedStore = useFeed()
 
@@ -33,19 +32,19 @@
       return;
     }
 
-    let privKey: string;
+    let privkey: Uint8Array | null;
     try {
-      const { data } = nip19.decode(nsecValue)
-      privKey = data as string
-      pubKeyStore.updateKeyFromPrivate(getPublicKey(privKey))
+      privkey = nsecStore.getPrivkeyBytes()
+      if (!privkey) {
+        throw new Error()
+      }
+      const pubkey = nsecStore.getPubkey()
+      if (!pubkey.length) {
+        throw new Error()
+      }
+      pubKeyStore.updateKeyFromPrivate(pubkey)
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
-      return;
-    }
-
-    const relay = relayStore.currentRelay
-    if (!relay || relay.status !== 1) {
-      msgErr.value = 'Please connect to relay first.'
       return;
     }
 
@@ -58,17 +57,16 @@
       id: '',
       sig: ''
     }
-    event.id = getEventHash(event)
-    event.sig = signEvent(event, privKey)
+    const signedEvent = finalizeEvent(event, privkey)
 
-    if (props.sentEventIds.has(event.id)) {
+    if (props.sentEventIds.has(signedEvent.id)) {
       msgErr.value = 'The same event can\'t be sent twice (same id, signature).'
       return;
     }
 
     msgErr.value = ''
 
-    emit('broadcastEvent', event, 'text')
+    emit('broadcastEvent', signedEvent, 'text')
   }
 
   const handleInput = (event: any) => {
@@ -95,7 +93,7 @@
             placeholder='Test message 👋'></textarea>
         </div>
         <div class="send-btn-wrapper">
-          <button class="send-btn" @click="handleSendMessage">
+          <button :disabled="isSendingMessage" class="send-btn" @click="handleSendMessage">
             {{ isSendingMessage ? 'Broadcasting...' : 'Broadcast' }}
           </button>
         </div>
@@ -103,6 +101,9 @@
     </div>
     <div class="error">
       {{ msgErr }}
+    </div>
+    <div class="notice">
+      {{ broadcastNotice }}
     </div>
   </div>
 </template>
@@ -180,6 +181,11 @@
 
   .error {
     color:red;
+    font-size: 16px;
+    margin-top: 5px;
+  }
+
+  .notice {
     font-size: 16px;
     margin-top: 5px;
   }

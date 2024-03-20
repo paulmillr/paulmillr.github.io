@@ -13,6 +13,7 @@ export default defineConfig({
     }
   },
   build: {
+    sourcemap: true,
     assetsDir: 'assets',
     assetsInlineLimit: 0,
     rollupOptions: {

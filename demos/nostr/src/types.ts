@@ -41,3 +41,14 @@ export type ShortPubkeyEvent = {
   id: string,
   pubkey: string
 }
+
+export type TypedRelay = {
+  url: string, 
+  type: string
+}
+
+export type Nip65RelaysUrls = {
+  read: string[],
+  write: string[],
+  all: Array<TypedRelay>
+}

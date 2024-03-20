@@ -55,8 +55,9 @@
   })
 
   const showFeedPage = async (page: number) => {
-    const relay = relayStore.currentRelay
-    if (!relay) return
+    const pool = poolStore.feedPool
+    const relays = relayStore.connectedReedRelayUrls
+    if (!relays.length) return
 
     const limit = DEFAULT_EVENTS_COUNT
     const start = (page - 1) * limit
@@ -65,20 +66,20 @@
     const reversedIds = feedStore.paginationEventsIds.slice().reverse()
     const idsToShow = reversedIds.slice(start, end)
 
-    const postsEvents = await relay.list([{ ids: idsToShow }]);
+    const postsEvents = await pool.querySync(relays, { ids: idsToShow });
     const authors = postsEvents.map((e: Event) => e.pubkey)
-    const authorsEvents = await relay.list([{ kinds: [0], authors }])
+    const authorsEvents = await pool.querySync(relays, { kinds: [0], authors })
     let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
 
-    const relaysUrls = [relay.url]
-    await injectDataToRootNotes(posts as EventExtended[], relaysUrls, poolStore.feedPool as SimplePool)
+    await injectDataToRootNotes(posts as EventExtended[], relays, pool as SimplePool)
 
     feedStore.updateEvents(posts as EventExtended[])
     currentPage.value = page
   }
 
   const loadNewRelayEvents = async () => {
-    emit('loadNewRelayEvents')
+    await emit('loadNewRelayEvents')
+    currentPage.value = 1
   }
 </script>
 
@@ -103,8 +104,8 @@
           :events="feedStore.events"
           :pubKey="pubKeyStore.fromPrivate"
           :showImages="imagesStore.showImages"
+          :currentReadRelays="relayStore.connectedReedRelayUrls"
           @toggleRawData="feedStore.toggleEventRawData"
-          :currentRelays="relayStore.connectedRelayUrls"
         />
 
         <Pagination 
