@@ -61,9 +61,7 @@
 
   const handleRelayInput = (event: any, index: number) => {
     const value = event?.target?.value
-    if (value) {
-      relayStore.updateRelayAdditionalRelaysUrlsForSignedEvent(index, value)
-    }
+    relayStore.updateRelayAdditionalRelaysUrlsForSignedEvent(index, value)
   }
 </script>
 

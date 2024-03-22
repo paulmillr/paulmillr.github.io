@@ -177,6 +177,10 @@
       clearInterval(curInterval)
       curInterval = 0;
     }
+    if (!useProvidedRelaysList) {
+      relayStore.setReedRelays([])
+      relayStore.setWriteRelays([])
+    }
 
     let relay: Relay;
 
@@ -389,6 +393,7 @@
       }
 
       writeRelays = [relayStore.connectedRelayUrl, ...connectedJsonRelays]
+      writeRelays = [...new Set(writeRelays)] // make unique
     }
 
     if (isSendingMessage.value) return
@@ -461,6 +466,8 @@
     const relay = relayStore.currentRelay
     relayStore.setConnectedRelayUrl('')
     relayStore.setConnectedReedRelayUrls([])
+    relayStore.setReedRelays([])
+    relayStore.setWriteRelays([])
     relaysSub.close()
     relay.close()
 

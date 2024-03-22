@@ -104,7 +104,7 @@ export const useRelay = defineStore('relay', () => {
   function addUserRelay(relay: string) {
     const url = normalizeURL(relay)
     if (!url) return false
-    removeUserRelay(url) // prevent duplicates
+    if (allRelaysUrls.value.includes(url)) return false
     // new relays are always read relays, user can add write option manually
     reedRelays.value.push(url)
   }
@@ -132,7 +132,7 @@ export const useRelay = defineStore('relay', () => {
   }
 
   function updateRelayAdditionalRelaysUrlsForSignedEvent(index: number, value: string) {
-    additionalRelaysUrlsForSignedEvent.value[index] = normalizeURL(value)
+    additionalRelaysUrlsForSignedEvent.value[index] = value.length ? normalizeURL(value) : ''
   }
 
   return { 

@@ -2,7 +2,7 @@
   import { ref } from 'vue'
   import { useRelay } from '@/stores/Relay'
   import TrashIcon from '@/icons/TrashIcon.vue'
-  import { utils, nip19, finalizeEvent } from 'nostr-tools'
+  import { utils, finalizeEvent } from 'nostr-tools'
   import { usePool } from '@/stores/Pool'
   import { useNsec } from '@/stores/Nsec'
   import { usePubKey } from '@/stores/PubKey'
@@ -131,7 +131,7 @@
   </div>
   <ul class="relays">
     <li class="relay" v-for="(r, i) in relayStore.allRelays">
-      {{ r.url }} 
+      {{ r.url }}
       <div class="actions">
         <input 
           @change="(e) => handleWriteClick(e, r.url)" 
@@ -143,14 +143,19 @@
         />
         <label class="actions__label" :for="`write-${i}`"> publish to relay</label>
         <span class="actions__delimiter"> | </span>
-        <span @click="() => handleRemoveClick(r.url)"  class="actions__remove">
-          <TrashIcon class="trash-icon" /> 
+        <span @click="() => handleRemoveClick(r.url)" class="actions__remove">
+          <TrashIcon class="trash-icon" />
           <span class="actions__remove-label">remove</span>
         </span>
       </div>
     </li>
     <div v-if="!relayStore.allRelays.length">
-      The list with your relays {{ relayStore.connectedRelayUrl.length ? 'on' : '' }} <b>{{ relayStore.connectedRelayUrl }}</b> was not found.
+      <span v-if="relayStore.isConnectedToRelay">
+        The list with your relays on <b>{{ relayStore.connectedRelayUrl }}</b> was not found.
+      </span>
+      <span v-else>
+        Please connect to a relay to see the list of your relays.
+      </span>
     </div>
   </ul>
 
