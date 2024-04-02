@@ -22,7 +22,7 @@ The idea was to: 1) improve knowledge of cryptography 2) improve supply chain se
 ### History
 
 * Jun 2019: initial release of [secp256k1](https://github.com/paulmillr/noble-secp256k1/commit/d544593d752a3101414eb1b3c3bee0c0fec349db), [ed25519](https://github.com/paulmillr/noble-ed25519/commit/36ded8a5dcc83ed171d05bb1c66ba7791b2299eb) and [bls12-381](https://github.com/paulmillr/noble-bls12-381/commit/d25ed4d8f1e91fc7a9858ac81c8cb52179f29ee0)
-* Apr 2020: The [blog post](/posts/noble-secp256k1-fast-ecc/) went live
+* Apr 2020: the [blog post](/posts/noble-secp256k1-fast-ecc/) about ecc went live
 * Apr 2021: secp256k1 has been [audited](https://cure53.de/pentest-report_noble-lib.pdf) by Cure53, [crowdfunded](https://gitcoin.co/grants/2451/audit-of-noble-secp256k1-cryptographic-library) with help of [Umbra.cash](https://umbra.cash)
 * Oct 2021: hashes have been [released](https://github.com/paulmillr/noble-hashes/commit/54dfdfd9fc209814effbcbf20819336736be9273), funded by [Ethereum Foundation](https://ethereum.org/en/)
 * Nov 2021: received a grant from [Optimism](https://www.optimism.io)
@@ -83,7 +83,8 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
     * Polkadot: [polkadot.js](https://github.com/polkadot-js/common)
     * Monero: [moneroj](https://github.com/beritani/moneroj), [cs-monero](https://github.com/CoinSpace/cs-monero-wallet)
     * Trezor: [trezor-suite](https://github.com/trezor/trezor-suite/blob/f420619d60b3a88731865a3964857f6ba614ff6a/packages/connect/package.json#L53)
-    * [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client)
+    * [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client),
+      [celo](https://github.com/celo-org/developer-tooling/blob/38b26316d615e836e21bbfe2f44853f7e8220e03/packages/sdk/cryptographic-utils/package.json#L28)
     * HDkey ([scure-bip32](https://github.com/paulmillr/scure-bip32), [bip32](https://github.com/bitcoinjs/bip32))
 * Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app)
 * [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet with support for many different networks:
@@ -95,7 +96,7 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
     * [xmr](https://github.com/CoinSpace/cs-monero-wallet) - `@scure/bip32`, `@noble/hashes`, `@scure/base`
     * [ada](https://github.com/CoinSpace/cs-cardano-wallet) - `@noble/hashes` and `@scure/base`
 * [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
-* [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation
+* [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
 * [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
 * [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 
