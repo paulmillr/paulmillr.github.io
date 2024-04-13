@@ -1,11 +1,13 @@
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { nip19 } from 'nostr-tools'
   import { useRelay } from '@/stores/Relay'
   import TrashIcon from '@/icons/TrashIcon.vue'
   import { utils, finalizeEvent } from 'nostr-tools'
   import { usePool } from '@/stores/Pool'
   import { useNsec } from '@/stores/Nsec'
-  import { usePubKey } from '@/stores/PubKey'
+  import { useImages } from '@/stores/Images'
+  import ShowImagesCheckbox from '@/components/ShowImagesCheckbox.vue'
 
   const props = defineProps<{
     handleRelayConnect: Function
@@ -13,7 +15,7 @@
 
   const poolStore = usePool()
   const nsecStore = useNsec()
-  const pubKeyStore = usePubKey()
+  const imagesStore = useImages()
 
   const relayStore = useRelay()
   const newRelayUrl = ref('')
@@ -40,7 +42,6 @@
       if (!pubkey.length) {
         throw new Error()
       }
-      pubKeyStore.updateKeyFromPrivate(pubkey)
     } catch (e) {
       relaysError.value = `Invalid private key. Please check it and try again.`
       return;
@@ -122,9 +123,39 @@
       relaysError.value = UPDATING_RELAY_ERROR
     }
   }
+
+  const toggleImages = () => {
+    imagesStore.updateShowImages(!imagesStore.showImages)
+  }
+
+  const handleCopyPubkeyNpub = () => {
+    if (!nsecStore.isValidNsecPresented()) return
+    const pubkey = nsecStore.getPubkey()
+    navigator.clipboard.writeText(nip19.npubEncode(pubkey))
+  }
+  
+  const handleCopyPubkeyHex = () => {
+    if (!nsecStore.isValidNsecPresented()) return
+    navigator.clipboard.writeText(nsecStore.getPubkey())
+  }
+
+  const handleCopyPrivkeyNsec = () => {
+    if (!nsecStore.isValidNsecPresented()) return
+    navigator.clipboard.writeText(nsecStore.getPrivkey())
+  }
+
+  const handleCopyPrivkeyHex = () => {
+    if (!nsecStore.isValidNsecPresented()) return
+    navigator.clipboard.writeText(nsecStore.getPrivkeyHex())
+  }
 </script>
 
 <template>
+  <h4>Images:</h4>
+  <div class="show-images">
+    <ShowImagesCheckbox :showImages="imagesStore.showImages" @toggleImages="toggleImages" />
+  </div>
+
   <h4>Your relays:</h4>
   <div class="error">
     {{ relaysError }}
@@ -137,7 +168,7 @@
           @change="(e) => handleWriteClick(e, r.url)" 
           class="actions__checkbox" 
           type="checkbox" 
-          :id="`write-${i}`" 
+          :id="`write-${i}`"
           :name="`write-${i}`" 
           :checked="r.type === 'write'" 
         />
@@ -149,15 +180,15 @@
         </span>
       </div>
     </li>
-    <div v-if="!relayStore.allRelays.length">
-      <span v-if="relayStore.isConnectedToRelay">
-        The list with your relays on <b>{{ relayStore.connectedRelayUrl }}</b> was not found.
-      </span>
-      <span v-else>
-        Please connect to a relay to see the list of your relays.
-      </span>
-    </div>
   </ul>
+  <div v-if="!relayStore.allRelays.length">
+    <span v-if="relayStore.isConnectedToRelay">
+      The private key was not provided or the list with your relays was not found on <b>{{ relayStore.connectedRelayUrl }}</b>
+    </span>
+    <span v-else>
+      Please connect to a relay to see the list of your relays.
+    </span>
+  </div>
 
   <h4>Add relay:</h4>
   <div class="add-relay">
@@ -167,9 +198,88 @@
   <div class="error">
     {{ relayUrlError }}
   </div>
+
+  <h4>Your Keys:</h4>
+
+  <div class="keys">
+    <div class="key-block">
+      <div>
+        Public key:
+      </div>
+      <div class="key-block__desc">
+        <small>
+          Public key identifies your Nostr account. Feel free to share it with others.
+        </small>
+      </div>
+      <div>
+        🔑&nbsp;
+        <code v-if="nsecStore.isValidNsecPresented()" class="key-block__code">
+          {{ nip19.npubEncode(nsecStore.getPubkey()) }}
+        </code>
+        <span v-else>Please login to get the key.</span>
+      </div>
+      <div class="key-block__btns">
+        <button @click="handleCopyPubkeyNpub">
+          Copy pubkey
+        </button>
+        <button @click="handleCopyPubkeyHex">
+          Copy hex
+        </button>
+      </div>
+    </div>
+
+    <div class="key-block">
+      <div>
+        Private key:
+      </div>
+      <div class="key-block__desc">
+        <small>
+          Private key fully controls your Nostr account and used to cryptographically sign your messages.
+          <b>Do not share your private key with anyone and keep it secure.</b>
+        </small>
+      </div>
+      <div>
+        🔐&nbsp;
+        <code  v-if="nsecStore.isValidNsecPresented()" class="key-block__code">
+          ***************************************************************
+        </code>
+        <span v-else>Please login to get the key.</span>
+      </div>
+      <div class="key-block__btns">
+        <button @click="handleCopyPrivkeyNsec">
+          Copy privkey
+        </button>
+        <button @click="handleCopyPrivkeyHex">
+          Copy hex
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+  .key-block {
+    margin-bottom: 15px;
+  }
+
+  .key-block__code {
+    font-size: 15px;
+  }
+
+  .key-block__desc {
+    margin-bottom: 5px;
+  }
+
+  .key-block__btns {
+    margin-top: 5px;
+  }
+
+  button {
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+
   h4 {
     margin-bottom: 10px;
   }

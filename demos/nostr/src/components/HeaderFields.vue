@@ -1,10 +1,8 @@
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { nip19, generateSecretKey } from 'nostr-tools'
-  import ShowImagesCheckbox from './ShowImagesCheckbox.vue'
   import { DEFAULT_RELAYS } from './../app'
   import { useRelay } from '@/stores/Relay'
-  import { useImages } from '@/stores/Images'
   import { useNsec } from '@/stores/Nsec'
 
   const props = defineProps<{
@@ -14,8 +12,8 @@
   const emit = defineEmits(['relayConnect', 'relayDisconnect'])
 
   const relayStore = useRelay()
-  const imagesStore = useImages()
   const nsecStore = useNsec()
+  const isLoggedIn = ref(false)
   
   const showCustomRelayUrl = ref(false)
   const showConnectBtn = computed(() => {
@@ -30,28 +28,48 @@
     relayStore.setSelectedRelay(value)
   }
 
+  onMounted(() => {
+    if (nsecStore.isValidNsecPresented()) {
+      isLoggedIn.value = true
+    }
+  })
+
   const handleNsecInput = (event: any) => {
+    if (!nsecStore.isNsecValid()) {
+      isLoggedIn.value = false
+      return
+    }
+    isLoggedIn.value = true
+
     if (nsecStore.rememberMe) {
       localStorage.setItem('privkey', nsecStore.nsec as string)
     }
     
-    // do not reconnect if the same key was presented
-    if (nsecStore.cachedNsec === nsecStore.nsec) {
-      return
-    }
-    
     // reconnect to relay if nsec was updated
-    if (relayStore.isConnectedToRelay) {
-      const pubkey = nsecStore.getPubkey()
-      if (pubkey.length) {
-        emit('relayConnect')
-      }
+    if (relayStore.isConnectedToRelay && nsecStore.cachedNsec !== nsecStore.nsec) {
+      emit('relayConnect')
     }
   }
 
   const handleGenerateRandomPrivKey = () => {
     const privKeyHex = generateSecretKey()
     nsecStore.updateNsec(nip19.nsecEncode(privKeyHex))
+    isLoggedIn.value = true
+  }
+
+  const handleLogout = () => {
+    nsecStore.updateNsec('')
+    localStorage.removeItem('privkey')
+    isLoggedIn.value = false
+
+    // don't need to reconnect to relay if user was not connected or has no relays
+    if (!relayStore.isConnectedToRelay) return
+    if (!relayStore.allRelays.length) return
+
+    // disconnect from user relays
+    emit('relayDisconnect')
+    // connect to default relay
+    emit('relayConnect')
   }
 
   const handleRememberMe = () => {
@@ -61,10 +79,6 @@
     } else {
       localStorage.clear()
     }
-  }
-
-  const toggleImages = () => {
-    imagesStore.updateShowImages(!imagesStore.showImages)
   }
 
   const handleRelayConnect = () => {
@@ -99,12 +113,6 @@
             </button>
           </div>
         </div>
-        <div class="show-images">
-          <ShowImagesCheckbox 
-            :showImages="imagesStore.showImages" 
-            @toggleImages="toggleImages" 
-          />
-        </div>
       </div>
       <div class="message-fields__field">
         <label for="priv_key">
@@ -112,7 +120,8 @@
         </label>
         <div class="field-elements">
           <input @input="handleNsecInput" v-model="nsecStore.nsec" class="priv-key-input" id="priv_key" type="password" placeholder="nsec..." />
-          <button @click="handleGenerateRandomPrivKey" class="random-key-btn">Random</button>
+          <button v-if="!isLoggedIn" @click="handleGenerateRandomPrivKey" class="random-key-btn">Random</button>
+          <button v-if="isLoggedIn" @click="handleLogout" class="random-key-btn">Logout</button>
         </div>
         <div class="remember-me">
           <input @change="handleRememberMe" class="remember-me__input" type="checkbox" id="remember-me" v-model="nsecStore.rememberMe" />
@@ -200,17 +209,6 @@
   .select-relay__btn {
     font-size: 14px;
     cursor: pointer;
-  }
-
-  .show-images {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-
-  @media (min-width: 768px) {
-    .show-images {
-      margin-bottom: 0px;
-    }
   }
 
   .remember-me {

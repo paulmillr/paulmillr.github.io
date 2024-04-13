@@ -14,8 +14,8 @@
   import { useRelay } from '@/stores/Relay'
   import { useImages } from '@/stores/Images'
   import { useFeed } from '@/stores/Feed'
-  import { usePubKey } from '@/stores/PubKey'
   import { usePool } from '@/stores/Pool'
+  import { useNsec } from '@/stores/Nsec';
 
   defineProps<{
     eventsLog: LogContentPart[][]
@@ -24,7 +24,7 @@
   const relayStore = useRelay()
   const imagesStore = useImages()
   const feedStore = useFeed()
-  const pubKeyStore = usePubKey()
+  const nsecStore = useNsec()
   const poolStore = usePool()
 
   const emit = defineEmits(['loadNewRelayEvents'])
@@ -93,8 +93,8 @@
 
         <div @click="loadNewRelayEvents" v-if="feedStore.showNewEventsBadge" class="new-events">
           <div v-if="imagesStore.showImages" class="new-events__imgs">
-            <img class="new-events__img" :src="newAuthorImg1" alt="img">
-            <img class="new-events__img" :src="newAuthorImg2" alt="img">
+            <img class="new-events__img" :src="newAuthorImg1" alt="user's avatar">
+            <img class="new-events__img" :src="newAuthorImg2" alt="user's avatar">
           </div>
           <span class="new-events__text">{{ feedStore.newEventsBadgeCount }} new notes</span>
           <b class="new-events__arrow">↑</b>
@@ -102,7 +102,7 @@
 
         <RelayEventsList
           :events="feedStore.events"
-          :pubKey="pubKeyStore.fromPrivate"
+          :pubKey="nsecStore.getPubkey()"
           :showImages="imagesStore.showImages"
           :currentReadRelays="relayStore.connectedReedRelayUrls"
           @toggleRawData="feedStore.toggleEventRawData"

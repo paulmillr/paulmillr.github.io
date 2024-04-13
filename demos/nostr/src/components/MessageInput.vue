@@ -2,7 +2,6 @@
   import { ref, defineEmits } from 'vue'
   import { finalizeEvent, nip19 } from 'nostr-tools'
   import { useNsec } from '@/stores/Nsec'
-  import { usePubKey } from '@/stores/PubKey'
   import { useFeed } from '@/stores/Feed'
 
   const props = defineProps<{
@@ -14,7 +13,6 @@
   const emit = defineEmits(['broadcastEvent'])
 
   const nsecStore = useNsec()
-  const pubKeyStore = usePubKey()
   const feedStore = useFeed()
 
   const msgErr = ref('')
@@ -33,16 +31,16 @@
     }
 
     let privkey: Uint8Array | null;
+    let pubkey: string
     try {
       privkey = nsecStore.getPrivkeyBytes()
       if (!privkey) {
         throw new Error()
       }
-      const pubkey = nsecStore.getPubkey()
+      pubkey = nsecStore.getPubkey()
       if (!pubkey.length) {
         throw new Error()
       }
-      pubKeyStore.updateKeyFromPrivate(pubkey)
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
       return;
@@ -50,7 +48,7 @@
 
     const event = {
       kind: 1,
-      pubkey: pubKeyStore.fromPrivate,
+      pubkey: pubkey,
       created_at: Math.floor(Date.now() / 1000),
       content: messageValue,
       tags: [],

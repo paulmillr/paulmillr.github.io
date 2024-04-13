@@ -107,7 +107,7 @@
 
   const handleClickMention = (mentionNpub: string | undefined) => {
     if (!mentionNpub) return
-    npubStore.updateNpub(mentionNpub)
+    npubStore.updateNpubInput(mentionNpub)
     userStore.updateRoutingStatus(true)
     router.push({ path: `/user/${mentionNpub}` })
   }

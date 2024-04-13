@@ -6,7 +6,6 @@
     type Event
   } from 'nostr-tools'
   import type { EventExtended } from './../types'
-  import { publishEventToRelays } from './../utils'
   import EventContent from './EventContent.vue'
   import ExpandArrow from './../icons/ExpandArrow.vue'
   import {
@@ -15,14 +14,11 @@
   } from './../utils'
 
   import { usePool } from '@/stores/Pool'
-  import { useRelay } from '@/stores/Relay'
 
-  const relayStore = useRelay()
   const poolStore = usePool()
   const pool = poolStore.eventPool
 
   const emit = defineEmits(['toggleRawData'])
-  const replyErr = ref('')
 
   const props = defineProps<{
     event: EventExtended
@@ -40,8 +36,6 @@
   const showAllReplies = ref(false)
   const isLoadingThread = ref(false)
   const isLoadingFirstReply = ref(false)
-  const isReplySent = ref(false)
-  const isReplySentError = ref(false)
 
   const replyEvent = ref<EventExtended | null>(null)
   const eventReplies = ref<EventExtended[]>([])
@@ -123,44 +117,8 @@
     isLoadingThread.value = false
   }
 
-  const handleSendReply = async (event: EventExtended, additionalRelays: string[] | null) => {
-    const writeRelays = relayStore.writeRelays
-    if (!writeRelays.length) {
-      showSendReplyError('Please provide your write relays to broadcast event')
-      return
-    }
-
-    const result = await publishEventToRelays(writeRelays, pool, event)
-    const hasSuccess = result.some((data: any) => data.success)
-
-    // temp for debugging
-    // console.log('event view')
-    // result.forEach((data: any) => {
-    //   if (data.success) {
-    //     console.log('success:', data.relay)
-    //   } else {
-    //     console.log('failed:', data.relay);
-    //   }
-    // })
-
-    if (!hasSuccess) {
-      showSendReplyError('Failed to broadcast reply')
-      console.log('Failed to broadcast reply')
-      return
-    }
-
-    if (additionalRelays?.length) {
-      try {
-        await pool.publish(additionalRelays, event)
-      } catch (e) {
-        console.error('Failed to broadcast reply to some additional relays')
-      }
-    }
-
-    replyErr.value = ''
-    await nextTick()
-    isReplySent.value = true
-    isReplySentError.value = false
+  const loadRootReplies = async () => {
+    // await nextTick()
     showReplyField.value = false
     if (showAllReplies.value) {
       await handleLoadMoreReplies()
@@ -168,32 +126,18 @@
       await loadRepliesPreiew()
     }
   }
-
-  const showSendReplyError = (err: string) => {
-    isReplySent.value = false
-    isReplySentError.value = true
-    replyErr.value = err
-  }
-
-  const resetSentStatus = () => {
-    isReplySent.value = false
-    isReplySentError.value = false
-  }
 </script>
 
 <template>
   <div class="event">
     <EventContent
       :key="event.id"
-      @sendReply="handleSendReply"
+      @loadRootReplies="loadRootReplies"
       @showReplyField="handleToggleReplyField"
       @toggleRawData="(eventId) => handleToggleRawData(eventId, true)"
-      @resetSentStatus="resetSentStatus"
       @loadMoreReplies="handleLoadMoreReplies"
       :event="(event as EventExtended)"
-      :replyErr="replyErr"
       :pubKey="pubKey"
-      :isReplySent="isReplySent"
       :sliceText="sliceText"
       :isRootEvent="true"
       :currentReadRelays="currentReadRelays"
@@ -232,7 +176,6 @@
 
       <div v-if="!showAllReplies">
         <EventContent
-          @sendReply="handleSendReply"
           :key="replyEvent.id"
           :sliceText="sliceTextReply"
           :event="(replyEvent as EventExtended)"
@@ -247,7 +190,6 @@
           <div class="replies__list-item-line-horizontal"></div>
           <div :class="['replies__list-item-line-vertical', { 'replies__list-item-line-vertical_short': i === (eventReplies.length - 1) }]"></div>
           <EventContent
-            @sendReply="handleSendReply"
             :key="reply.id"
             :sliceText="sliceTextReply"
             :event="(reply as EventExtended)"

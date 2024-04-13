@@ -74,7 +74,7 @@
   onMounted(() => {
     // first mount when npub presented in url, run only once 
     if (route.params?.id?.length && !relayStore.currentRelay.connected) {
-      npubStore.updateNpub(route.params.id as string)
+      npubStore.updateNpubInput(route.params.id as string)
       npubStore.updateCachedUrl(route.params.id as string)
       if (!relayStore.currentRelay.connected) {
         isAutoConnectOnSearch.value = true
@@ -82,8 +82,8 @@
       return
     }
 
-    if (userStore.isRoutingUser && npubStore.npub.length) {
-      npubStore.updateCachedUrl(npubStore.npub)
+    if (userStore.isRoutingUser && npubStore.npubInput.length) {
+      npubStore.updateCachedUrl(npubStore.npubInput)
       userStore.updateRoutingStatus(false)
       handleGetUserInfo()
       return
@@ -94,7 +94,7 @@
     () => route.params,
     () => {
       if (userStore.isRoutingUser) {
-        npubStore.updateCachedUrl(npubStore.npub)
+        npubStore.updateCachedUrl(npubStore.npubInput)
         userStore.updateRoutingStatus(false)
         handleGetUserInfo()
       }
@@ -110,7 +110,7 @@
   watch(
     () => route.redirectedFrom,
     () => {
-      npubStore.updateNpub(route.params.id as string)
+      npubStore.updateNpubInput(route.params.id as string)
       npubStore.updateCachedUrl(route.params.id as string)
       flushData()
     }
@@ -158,7 +158,7 @@
     gettingUserInfoId.update(gettingUserInfoId.value + 1)
     const currentOperationId = gettingUserInfoId.value
 
-    const searchVal = npubStore.npub.trim()
+    const searchVal = npubStore.npubInput.trim()
     let isHexSearch = false
 
     if (!searchVal.length) {
@@ -332,7 +332,7 @@
         throw new Error()
       }
 
-      npubStore.updateNpub(nip19.npubEncode(pubkey))
+      npubStore.updateNpubInput(nip19.npubEncode(pubkey))
       pubKeyError.value = ''
     } catch (e) {
       pubKeyError.value = 'Private key is invalid. Please check it and try again.'
@@ -341,7 +341,7 @@
   }
 
   const handleSearchFallback = async () => {
-    const searchVal = npubStore.npub.trim()
+    const searchVal = npubStore.npubInput.trim()
     let isHexSearch = false
 
     if (!searchVal.length) {
@@ -463,7 +463,7 @@
       <button v-if="nsecStore.nsec.length" @click="handleGeneratePublicFromPrivate" class="random-key-btn">Use mine</button>
     </label>
     <div class="field-elements">
-      <input @input="handleInputNpub" v-model="npubStore.npub" class="pubkey-input" id="user_public_key" type="text" placeholder="npub, note, hex of pubkey or note id..." />
+      <input @input="handleInputNpub" v-model="npubStore.npubInput" class="pubkey-input" id="user_public_key" type="text" placeholder="npub, note, hex of pubkey or note id..." />
       <button @click="handleGetUserInfo" class="get-user-btn">
         {{ isAutoConnectOnSearch ? 'Connect & Search' : 'Search' }}
       </button>

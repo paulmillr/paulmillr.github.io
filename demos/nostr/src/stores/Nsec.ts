@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { nip19, getPublicKey } from 'nostr-tools'
-import { hexToBytes } from '@noble/hashes/utils'
+import { hexToBytes, bytesToHex } from '@noble/hashes/utils'
 
 export const useNsec = defineStore('nsec', () => {
   const nsec = ref('')
@@ -41,6 +41,27 @@ export const useNsec = defineStore('nsec', () => {
     }
   }
 
+  function getPrivkeyHex() {
+    const bytes = getPrivkeyBytes()
+    if (!bytes) {
+      return ''
+    }
+    try {
+      return bytesToHex(bytes)
+    } catch (e) {
+      return ''
+    }
+  }
+
+  function getPrivkey() {
+    try {
+      const isHex = nsec.value.indexOf('nsec') === -1
+      return isHex ? nip19.nsecEncode(hexToBytes(nsec.value)) : nsec.value
+    } catch (e) {
+      return ''
+    }
+  }
+
   function isValidNsecPresented() {
     return nsec.value.length > 0 && isNsecValid()
   }
@@ -65,6 +86,8 @@ export const useNsec = defineStore('nsec', () => {
     getPubkey,
     cachedNsec,
     updateCachedNsec,
-    getPrivkeyBytes
+    getPrivkeyBytes,
+    getPrivkeyHex,
+    getPrivkey
   }
 })

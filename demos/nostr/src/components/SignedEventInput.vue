@@ -2,8 +2,6 @@
   import { ref, defineEmits } from 'vue'
   import { useRelay } from '@/stores/Relay'
   import { useFeed } from '@/stores/Feed'
-  import { useNsec } from '@/stores/Nsec'
-  import { usePubKey } from '@/stores/PubKey'
   
   defineProps<{
     isSendingMessage: boolean
@@ -13,8 +11,6 @@
   const emit = defineEmits(['broadcastEvent'])
   const relayStore = useRelay()
   const feedStore = useFeed()
-  const nsecStore = useNsec()
-  const pubKeyStore = usePubKey()
   const jsonErr = ref('')
 
   const handleSendSignedEvent = () => {
@@ -35,14 +31,6 @@
     if (!relay?.connected) {
       jsonErr.value = 'Please connect to relay first.'
       return;
-    }
-
-    // update pubkey to ensure that event will be higlighted in the feed if private key is presented 
-    if (nsecStore.isValidNsecPresented()) {
-      const pubkey = nsecStore.getPubkey()
-      if (pubkey?.length) {
-        pubKeyStore.updateKeyFromPrivate(pubkey)
-      }
     }
 
     jsonErr.value = ''

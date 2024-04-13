@@ -18,7 +18,6 @@
   import { useNsec } from '@/stores/Nsec'
   import { useUser } from '@/stores/User'
   import { useImages } from '@/stores/Images'
-  import { usePubKey } from '@/stores/PubKey'
   import { useRelay } from '@/stores/Relay'
 
   import {
@@ -36,7 +35,7 @@
   const emit = defineEmits([
     'toggleRawData', 
     'showReplyField', 
-    'sendReply', 
+    'loadRootReplies',
     'resetSentStatus',
     'loadMoreReplies'
   ])
@@ -49,9 +48,6 @@
     pubKey?: string
     index?: number
     hasReplyBtn?: boolean
-    replyErr?: string
-    isReplySent?: boolean
-    isReplySentError?: boolean
     sliceText?: number
     isRootEvent?: boolean
     currentReadRelays?: string[]
@@ -62,7 +58,6 @@
   const nsecStore = useNsec()
   const userStore = useUser()
   const imagesStore = useImages()
-  const pubKeyStore = usePubKey()
   const relayStore = useRelay()
 
   const showReplyField = ref(false)
@@ -87,24 +82,6 @@
   onMounted(() => {
     if (Object.keys(props.event).length === 0) return
     isSigVerified.value = verifyEvent(props.event as Event)
-  })
-
-  onBeforeUpdate(() => {
-    if (props.isRootEvent) {
-      if (props.replyErr) {
-        msgErr.value = props.replyErr
-      }
-      if (props.isReplySent) {
-        isPublishingReply.value = false
-        showReplyField.value = false
-        replyText.value = ''
-        emit('resetSentStatus')
-      }
-      if (props.isReplySentError) {
-        isPublishingReply.value = false
-        emit('resetSentStatus')
-      }
-    }
   })
 
   const displayName = (author: any, pubkey: string) => {
@@ -152,7 +129,6 @@
       if (!pubkey.length) {
         throw new Error()
       }
-      pubKeyStore.updateKeyFromPrivate(pubkey)
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
       return;
@@ -249,30 +225,19 @@
       additionalRelays = [...mentionsReadRelays]
     }
     
-    if (props.isRootEvent) {
-      return emit('sendReply', signedEvent, additionalRelays)
-    }
-
     const writeRelays = relayStore.writeRelays
     if (!writeRelays.length) {
       msgErr.value = 'Please provide your write relays to broadcast event'
       return
     }
 
-    console.log('broadcasting event in REPLY handleSendReply')
-    console.log('event', event)
-    console.log('relays', writeRelays)
-
     const result = await publishEventToRelays(writeRelays, pool, event)
     const hasSuccess = result.some((data: any) => data.success)
 
     if (!hasSuccess) {
       msgErr.value = 'Failed to broadcast reply'
-      console.log('failed to broadcast reply')
       return
     }
-
-    console.log('additionalRelays', additionalRelays)
 
     if (additionalRelays.length) {
       try {
@@ -281,10 +246,15 @@
         console.error('Failed to broadcast reply to some additional relays')
       }
     }
-
+    
     isPublishingReply.value = false
     showReplyField.value = false
     replyText.value = ''
+
+    if (props.isRootEvent) {
+      return emit('loadRootReplies')
+    }
+
     handleLoadReplies()
   }
 
@@ -335,7 +305,7 @@
 
   const handleUserClick = (pubkey: string) => {
     const urlNpub = nip19.npubEncode(pubkey)
-    npubStore.updateNpub(urlNpub)
+    npubStore.updateNpubInput(urlNpub)
     userStore.updateRoutingStatus(true)
     router.push({ path: getUserPath(pubkey) })
   }
@@ -346,7 +316,7 @@
     <div :class="['event-card__content', {'flipped': event.showRawData }]">
       <div :class="['event-card__front', 'event__presentable-date', { 'event-card__front_custom': pubKey === event.pubkey }]">
         <div v-if="imagesStore.showImages && event.author" class="event-img">
-          <img class="author-pic" :src="event.author.picture" alt="img" :title="`Avatar for ${event.author.name}`">
+          <img class="author-pic" :src="event.author.picture" alt="user's avatar" :title="`Avatar for ${event.author.name}`">
         </div>
         <div class="event-content">
           <div class="event-header">
@@ -522,6 +492,7 @@
 
   .event-img {
     margin-right: 12px;
+    max-width: 50px;
   }
 
   .author-pic {

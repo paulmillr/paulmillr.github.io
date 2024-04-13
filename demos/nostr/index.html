@@ -19,5 +19,10 @@ description: 'Privacy-oriented nostr web client'
   .noscript p { margin: 0.5rem 0; }
 </style>
 
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("serviceworker.js");
+  }
+</script>
 <script type="module" src="dist/main.js"></script>
 
