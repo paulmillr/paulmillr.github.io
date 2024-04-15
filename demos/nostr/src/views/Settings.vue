@@ -264,6 +264,7 @@
 
   .key-block__code {
     font-size: 15px;
+    word-wrap: break-word;
   }
 
   .key-block__desc {

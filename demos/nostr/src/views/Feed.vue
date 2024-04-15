@@ -86,7 +86,7 @@
 <template>
   <div id="feed">
     <div class="columns">
-      <div :class="['events', { 'd-md-none': currPath === '/log' }]">
+      <div :class="['events', { 'events_hidden': currPath === '/log' }]">
         <div class="connecting-notice" v-if="relayStore.isConnectingToRelay">
           Loading {{ relayStore.currentRelay ? 'new' : '' }} relay feed...
         </div>
@@ -115,7 +115,7 @@
         />
       </div>
 
-      <div :class="['log-wrapper', { 'd-md-none': currPath !== '/log' }]">
+      <div :class="['log-wrapper', { 'log-wrapper_hidden': currPath !== '/log' }]">
         <RelayLog :eventsLog="eventsLog" />
       </div>
     </div>
@@ -123,38 +123,22 @@
 </template>
 
 <style scoped>
-  .d-md-none {
-    display: none;
-  }
-
-  @media (min-width: 768px) {
-    .d-md-none {
-      display: initial;
-    }
-  }
-
   .columns {
     display: flex;
-  }
-
-  .events {
-    width: 100%;
     position: relative;
   }
 
-  @media (min-width: 768px) {
-    .events {
-      width: 68%;
-      min-width: 68%;
-      margin-right: 2%;
-    }
+  .events {
+    position: relative;
   }
 
-   @media (min-width: 1024px) {
-    .events {
-      width: 685px;
-      min-width: 685px;
-      margin-right: 2%;
+  .events_hidden {
+    display: none;
+  }
+
+  @media (min-width: 1200px) {
+    .events_hidden {
+      display: initial;
     }
   }
 
@@ -202,5 +186,28 @@
 
   .log-wrapper {
     flex-grow: 1;
+  }
+
+  .log-wrapper_hidden {
+    display: none;
+  }
+
+  @media (min-width: 1200px) {
+    .log-wrapper {
+      position: absolute;
+      right: -255px;
+      width: 240px;
+    }
+
+    .log-wrapper_hidden {
+      display: initial;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .log-wrapper {
+      right: -265px;
+      width: 250px;
+    }
   }
 </style>

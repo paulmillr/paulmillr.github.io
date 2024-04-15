@@ -515,7 +515,6 @@
 </template>
 
 <style scoped>
-
   .tabs {
     margin-top: 15px;
     margin-bottom: 15px;
@@ -523,7 +522,14 @@
     flex-direction: column;
   }
 
-  @media (min-width: 576px) {
+  @media (min-width: 375px) {
+    .tabs {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  @media (min-width: 450px) {
     .tabs {
       display: block;
     }
@@ -531,10 +537,15 @@
 
   .tab-link {
     display: inline-block;
-    margin-right: 15px;
     color: #0092bf;
     text-decoration: none;
     cursor: pointer;
+  }
+
+  @media (min-width: 450px) {
+    .tab-link {
+      margin-right: 15px;
+    }
   }
   
   .tab-link:hover {

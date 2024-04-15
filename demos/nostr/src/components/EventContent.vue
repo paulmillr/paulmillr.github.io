@@ -48,7 +48,6 @@
     pubKey?: string
     index?: number
     hasReplyBtn?: boolean
-    sliceText?: number
     isRootEvent?: boolean
     currentReadRelays?: string[]
   }>()
@@ -335,7 +334,7 @@
           </div>
   
           <div class="event-body">
-            <EventText :event="event" :slice="sliceText" />
+            <EventText :event="event" />
           </div>
   
           <div class="event-footer">
@@ -405,7 +404,6 @@
     <div class="reply" :key="reply.id" v-for="(reply, i) in eventReplies">
       <!-- <div class="reply__vertical-line"></div> -->
       <EventContent
-        :sliceText="sliceText"
         @toggleRawData="() => handleToggleRawData(event.id)"
         :event="(reply as EventExtended)"
         :currentReadRelays="currentReadRelays"

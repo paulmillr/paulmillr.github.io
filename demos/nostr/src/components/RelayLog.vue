@@ -34,6 +34,7 @@
   }
 
   .log__list-item {
-    margin-bottom: 10px
+    margin-bottom: 10px;
+    word-wrap: break-word;
   }
 </style>

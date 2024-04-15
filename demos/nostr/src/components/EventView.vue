@@ -24,8 +24,6 @@
     event: EventExtended
     pubKey?: string
     index?: number
-    sliceText?: number
-    sliceTextReply?: number
     showReplies?: boolean,
     hasReplyBtn?: boolean,
     currentReadRelays: string[]
@@ -138,7 +136,6 @@
       @loadMoreReplies="handleLoadMoreReplies"
       :event="(event as EventExtended)"
       :pubKey="pubKey"
-      :sliceText="sliceText"
       :isRootEvent="true"
       :currentReadRelays="currentReadRelays"
       :pool="(pool as SimplePool)"
@@ -177,7 +174,6 @@
       <div v-if="!showAllReplies">
         <EventContent
           :key="replyEvent.id"
-          :sliceText="sliceTextReply"
           :event="(replyEvent as EventExtended)"
           :currentReadRelays="currentReadRelays"
           :pool="(pool as SimplePool)"
@@ -191,7 +187,6 @@
           <div :class="['replies__list-item-line-vertical', { 'replies__list-item-line-vertical_short': i === (eventReplies.length - 1) }]"></div>
           <EventContent
             :key="reply.id"
-            :sliceText="sliceTextReply"
             :event="(reply as EventExtended)"
             :currentReadRelays="currentReadRelays"
             :pool="(pool as SimplePool)"

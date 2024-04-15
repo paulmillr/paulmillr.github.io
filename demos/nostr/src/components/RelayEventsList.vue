@@ -27,7 +27,6 @@
         :index="i" 
         :showReplies="true"
         :hasReplyBtn="true"
-        :sliceText="150"
       />
     </template>
   </div>
