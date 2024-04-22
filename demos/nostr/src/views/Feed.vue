@@ -26,6 +26,8 @@
   const feedStore = useFeed()
   const nsecStore = useNsec()
   const poolStore = usePool()
+  
+  const pool = poolStore.pool
 
   const emit = defineEmits(['loadNewRelayEvents'])
 
@@ -55,7 +57,6 @@
   })
 
   const showFeedPage = async (page: number) => {
-    const pool = poolStore.feedPool
     const relays = relayStore.connectedReedRelayUrls
     if (!relays.length) return
 

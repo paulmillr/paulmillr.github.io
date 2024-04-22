@@ -20,9 +20,11 @@ export type EventExtended = Event & {
   reposts: number,
   replies: number,
   references: Array<Object>,
+  isRoot: boolean,
   replyingTo: { 
     user: Author,
-    pubkey: string
+    pubkey: string,
+    event: Event
   }
 }
 

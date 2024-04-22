@@ -16,7 +16,7 @@
   import { usePool } from '@/stores/Pool'
 
   const poolStore = usePool()
-  const pool = poolStore.eventPool
+  const pool = poolStore.pool
 
   const emit = defineEmits(['toggleRawData'])
 
@@ -26,7 +26,8 @@
     index?: number
     showReplies?: boolean,
     hasReplyBtn?: boolean,
-    currentReadRelays: string[]
+    showRootReplies?: boolean,
+    currentReadRelays: string[],
   }>()
 
   const showReplyField = ref(false)
@@ -50,11 +51,19 @@
 
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
 
-    // filter first level replies
-    replies = replies.filter((reply: Event) => {
-      const nip10Data = nip10.parse(reply)
-      return !nip10Data.reply && nip10Data?.root?.id === event.id
-    })
+    if (props.showRootReplies) {
+      // filter first level replies
+      replies = replies.filter((reply: Event) => {
+        const nip10Data = nip10.parse(reply)
+        return !nip10Data.reply && nip10Data?.root?.id === event.id
+      })
+    } else {
+      // filter replies for not root event
+      replies = replies.filter((reply: Event) => {
+        const nip10Data = nip10.parse(reply)
+        return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
+      })
+    }
 
     if (!replies.length) return
 
@@ -75,8 +84,8 @@
     isLoadingFirstReply.value = false
   }
 
-  const handleToggleRawData = (eventId: string, isRootEvent = false) => {
-    if (isRootEvent) {
+  const handleToggleRawData = (eventId: string, isMainEvent = false) => {
+    if (isMainEvent) {
       return emit('toggleRawData', eventId)
     }
   }
@@ -93,10 +102,17 @@
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
 
     // filter first level replies
-    replies = replies.filter((reply: Event) => {
-      const nip10Data = nip10.parse(reply)
-      return !nip10Data.reply && nip10Data?.root?.id === event.id
-    })
+    if (event.isRoot) { 
+      replies = replies.filter((reply: Event) => {
+        const nip10Data = nip10.parse(reply)
+        return !nip10Data.reply && nip10Data?.root?.id === event.id
+      })
+    } else {
+      replies = replies.filter((reply: Event) => {
+        const nip10Data = nip10.parse(reply)
+        return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
+      })
+    }
 
     if (!replies.length) {
       isLoadingThread.value = false
@@ -136,7 +152,7 @@
       @loadMoreReplies="handleLoadMoreReplies"
       :event="(event as EventExtended)"
       :pubKey="pubKey"
-      :isRootEvent="true"
+      :isMainEvent="true"
       :currentReadRelays="currentReadRelays"
       :pool="(pool as SimplePool)"
       :hasReplyBtn="hasReplyBtn"

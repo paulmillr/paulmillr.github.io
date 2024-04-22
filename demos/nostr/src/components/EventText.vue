@@ -51,6 +51,13 @@
     const rawContent = event.content
     const references = event.references
 
+    let parts = []
+
+    if (!references?.length) {
+      parts.push({ type: 'text', value: rawContent })
+      return parts
+    }
+
     const cachedIndexes: number[] = []
     references.forEach((ref: any) => {
       let index = rawContent.indexOf(ref.text)
@@ -71,7 +78,6 @@
       return a.textIndex - b.textIndex
     })
 
-    let parts = []
     let currentTextPart = rawContent
     references.forEach((ref: any) => {
       const currIndex = currentTextPart.indexOf(ref.text)

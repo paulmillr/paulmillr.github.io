@@ -13,7 +13,8 @@
   import { fallbackRelays, DEFAULT_EVENTS_COUNT } from './../app'
   import { 
     isSHA256Hex,
-    injectDataToRootNotes
+    injectDataToRootNotes,
+    injectDataToReplyNotes
   } from './../utils'
   import type { Author, EventExtended } from './../types'
 
@@ -28,11 +29,11 @@
 
   import UserEvent from './UserEvent.vue'
   import DownloadIcon from './../icons/DownloadIcon.vue'
-  import EventView from './EventView.vue'
+  import ParentEventView from './ParentEventView.vue'
   import Pagination from "./Pagination.vue";
 
   const poolStore = usePool()
-  const pool = poolStore.userPool
+  const pool = poolStore.pool
 
   const npubStore = useNpub()
   const userNotesStore = useUserNotes()
@@ -57,7 +58,10 @@
   const isLoadingFallback = ref(false)
   const showLoadingTextNotes = ref(false)
   const isAutoConnectOnSearch = ref(false)
+
+  // event search
   const isEventSearch = ref(false)
+  const isRootEventSearch = ref(true)
 
   const currentPage = ref(1);
   const pagesCount = computed(() => Math.ceil(userNotesStore.allNotesIds.length / DEFAULT_EVENTS_COUNT))
@@ -278,7 +282,29 @@
 
     notesEvents = injectAuthorToUserNotes(notesEvents, userDetails.value)
     
-    await injectDataToRootNotes(notesEvents, relays, pool as SimplePool)
+    if (isEventSearch.value) {
+      const event = notesEvents[0]
+      const nip10Data = nip10.parse(event)
+      const nip10ParentEvent = nip10Data.reply || nip10Data.root 
+      if (nip10ParentEvent) {
+        isRootEventSearch.value = false
+
+        let parentEvent = await pool.get(currentReadRelays.value, { kinds: [1], ids: [nip10ParentEvent.id] }) as EventExtended
+        if (parentEvent) {
+          const authorMeta = await pool.get(currentReadRelays.value, { kinds: [0], authors: [parentEvent.pubkey] })
+          if (authorMeta) {
+            parentEvent.author = JSON.parse(authorMeta.content)
+          }
+        }
+        // our event passed as a reply note here in a second parametr, so parent event data will be injected to it too
+        await injectDataToReplyNotes(parentEvent as EventExtended, notesEvents as EventExtended[], currentReadRelays.value, pool as SimplePool)
+      } else {
+        await injectDataToRootNotes(notesEvents, relays, pool as SimplePool)
+      }
+    } else {
+      await injectDataToRootNotes(notesEvents, relays, pool as SimplePool)
+    }
+
     if (currentOperationId !== gettingUserInfoId.value) return
 
     userNotesStore.updateNotes(notesEvents as EventExtended[])
@@ -531,9 +557,10 @@
   </h3>
 
   <template :key="event.id" v-for="(event, i) in userNotesStore.notes">
-    <EventView 
-      :hasReplyBtn="!isEventSearch" 
-      :showReplies="!isEventSearch" 
+    <ParentEventView 
+      :hasReplyBtn="true" 
+      :showReplies="true" 
+      :showRootReplies="isRootEventSearch"
       :currentReadRelays="currentReadRelays"
       :index="i"
       @toggleRawData="handleToggleRawData"

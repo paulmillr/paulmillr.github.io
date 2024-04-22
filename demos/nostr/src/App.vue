@@ -35,6 +35,7 @@
   const relayStore = useRelay()
   const feedStore = useFeed()
   const poolStore = usePool()
+  const pool = poolStore.pool
 
   let relaysSub: SubCloser;
   let curInterval: number;
@@ -74,7 +75,6 @@
   }
 
   const updateNewEventsElement = async () => {
-    const pool = poolStore.feedPool
     const relays = relayStore.connectedReedRelayUrls
     if (!relays.length) return;
     
@@ -144,11 +144,10 @@
   async function handleRelayConnect(useProvidedRelaysList: boolean = false) {
     if (relayStore.isConnectingToRelay) return
 
-    let relayUrl = relayStore.selectedRelay
-    let isCustom = false
+    let relayUrl = relayStore.selectInputRelayUrl
     if (relayUrl === 'custom') {
-      relayUrl = utils.normalizeURL(relayStore.customRelayUrl)
-      isCustom = true
+      const customUrl = relayStore.selectInputCustomRelayUrl
+      relayUrl = customUrl.length ? utils.normalizeURL(customUrl) : ''
     }
 
     if (!relayUrl.length) return;
@@ -240,8 +239,7 @@
     newEvents.value = []
     feedStore.updateNewEventsToShow([])
 
-    poolStore.feedPool = new SimplePool()
-    const pool = poolStore.feedPool
+    poolStore.resetPool()
 
     const userConnectedReadRelays = <string[]>[]
     if (relayStore.reedRelays.length) {
@@ -295,7 +293,6 @@
     events.value = posts as EventExtended[]
     feedStore.updateEvents(posts as EventExtended[])
 
-    relayStore.setConnectedRelayUrl(isCustom ? 'custom' : relayUrl)
     relayStore.setConnectedReedRelayUrls(readRelays)
     relayStore.setConnectionToRelayStatus(false)
 
@@ -316,7 +313,6 @@
   }
 
   const loadNewRelayEvents = async () => {
-    const pool = poolStore.feedPool
     const relays = relayStore.connectedReedRelayUrls
     if (!relays.length) return;
 
@@ -353,7 +349,6 @@
   }
 
   const broadcastEvent = async (event: Event, type: string) => {
-    const pool = poolStore.feedPool
     let writeRelays = relayStore.writeRelays
 
     // for debugging json events
@@ -379,12 +374,13 @@
           connectedJsonRelays.push(url)
         }
 
+        const connectedRelayUrl = relayStore.currentRelay.url
+        if (!await isWsAvailable(connectedRelayUrl)) {
+          isError = true
+          error += `${connectedRelayUrl}`
+        }
+
         if (isError) {
-          const connectedRelayUrl = relayStore.connectedRelayUrl
-          if (!await isWsAvailable(connectedRelayUrl)) {
-            error += `${connectedRelayUrl}, `
-          }
-          error = error.slice(0, -2);
           error += `. Relays are unavailable or you are offline.`
           jsonErr.value = error
           isSendingMessage.value = false
@@ -392,7 +388,7 @@
         }
       }
 
-      writeRelays = [relayStore.connectedRelayUrl, ...connectedJsonRelays]
+      writeRelays = [relayStore.currentRelay.url, ...connectedJsonRelays]
       writeRelays = [...new Set(writeRelays)] // make unique
     }
 
@@ -444,6 +440,7 @@
     
     const isError = result.some((r: any) => r.success === false)
     if (!isError) {
+      // @ts-ignore
       if (type === 'text') {
         feedStore.updateMessageToBroadcast('')
       }
@@ -464,12 +461,13 @@
     feedStore.updateNewEventsToShow([])
     
     const relay = relayStore.currentRelay
-    relayStore.setConnectedRelayUrl('')
+    relay.close()
+    relaysSub?.close()
+    // pool.close(relayStore.userReadWriteRelaysUrls)
+    
     relayStore.setConnectedReedRelayUrls([])
     relayStore.setReedRelays([])
     relayStore.setWriteRelays([])
-    relaysSub.close()
-    relay.close()
 
     logHtmlParts([
       { type: 'text', value: 'disconnected from ' },

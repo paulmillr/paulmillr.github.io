@@ -14,6 +14,7 @@ export const injectDataToRootNotes = async (posts: EventExtended[], relays: stri
   const reposts = injectRepostsToNotes(posts, relays, relaysPool)
   const references = injectReferencesToNotes(posts, relays, relaysPool)
   const replies = injectRootRepliesToNotes(posts, relays, relaysPool)
+  posts.forEach((post) => post.isRoot = true)
   return Promise.all([likes, reposts, references, replies])
 }
 
@@ -22,7 +23,10 @@ export const injectDataToReplyNotes = async (replyingToEvent: EventExtended, pos
   const reposts = injectRepostsToNotes(posts, relays, relaysPool)
   const references = injectReferencesToNotes(posts, relays, relaysPool)
   const replies = injectNotRootRepliesToNotes(posts, relays, relaysPool)
-  injectReplyingToDataToNotes(replyingToEvent, posts)
+  posts.forEach((post) => post.isRoot = false)
+  if (replyingToEvent) {
+    injectReplyingToDataToNotes(replyingToEvent, posts)
+  }
   return Promise.all([likes, reposts, references, replies])
 }
 
@@ -30,7 +34,8 @@ const injectReplyingToDataToNotes = (replyingToEvent: EventExtended, postsEvents
   for (const event of postsEvents) {
     event.replyingTo = { 
       user: replyingToEvent.author,
-      pubkey: replyingToEvent.pubkey
+      pubkey: replyingToEvent.pubkey,
+      event: replyingToEvent
     }
   }
 }

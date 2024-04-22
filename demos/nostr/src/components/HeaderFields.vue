@@ -17,7 +17,8 @@
   
   const showCustomRelayUrl = ref(false)
   const showConnectBtn = computed(() => {
-    return relayStore.selectedRelay !== relayStore.connectedRelayUrl
+    if (!relayStore.currentRelay.connected) return true
+    return relayStore.selectInputRelayUrl !== relayStore.currentRelay.url
   })
 
   relayStore.setSelectedRelay(DEFAULT_RELAYS[0])
@@ -64,7 +65,7 @@
 
     // don't need to reconnect to relay if user was not connected or has no relays
     if (!relayStore.isConnectedToRelay) return
-    if (!relayStore.allRelays.length) return
+    if (!relayStore.userReadWriteRelays.length) return
 
     // disconnect from user relays
     emit('relayDisconnect')
@@ -140,7 +141,7 @@
     </label>
     <div class="field-elements">
       <input 
-        v-model="relayStore.customRelayUrl" 
+        v-model="relayStore.selectInputCustomRelayUrl" 
         class="relay-input" 
         id="relay_url" 
         type="text" 

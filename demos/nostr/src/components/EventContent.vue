@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUpdate, ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { 
     nip19, 
@@ -22,6 +22,7 @@
 
   import {
     injectAuthorsToNotes,
+    injectDataToRootNotes,
     injectDataToReplyNotes,
     parseRelaysNip65,
     publishEventToRelays,
@@ -30,6 +31,8 @@
   import LinkIcon from './../icons/LinkIcon.vue'
   import CheckIcon from './../icons/CheckIcon.vue'
   import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
+  // @ts-ignore (seems to be TS bug here, error for no reason)
+  import ThreadIcon from './../icons/ThreadIcon.vue'
   import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
 
   const emit = defineEmits([
@@ -48,8 +51,9 @@
     pubKey?: string
     index?: number
     hasReplyBtn?: boolean
-    isRootEvent?: boolean
+    isMainEvent?: boolean
     currentReadRelays?: string[]
+    threadDescender?: Event
   }>()
 
   const router = useRouter()
@@ -66,9 +70,11 @@
   const isCopiedEventLink = ref(false)
   const isSigVerified = ref(false)
   const isLoadingReplies = ref(false)
+  const ancestorsEvents = ref<Event[]>([])
+  const isLoadingThread = ref(false)
 
   const handleToggleRawData = (eventId: string) => {
-    if (props.isRootEvent) {
+    if (props.isMainEvent) {
       return emit('toggleRawData', eventId)
     }
     props.event.showRawData = !props.event.showRawData
@@ -85,16 +91,19 @@
 
   const displayName = (author: any, pubkey: string) => {
     if (author) {
+      let name = ''
       if (author.name) {
-        return author.name
+        name = author.name
       } else if (author.username) {
-        return author.username
+        name = author.username
       } else {
-        return author.display_name
+        name = author.display_name
       }
-    } else {
-      return nip19.npubEncode(pubkey).slice(0, 15) + '...'
+      if (name.length) {
+        return name
+      }
     }
+    return nip19.npubEncode(pubkey).slice(0, 10) + '...'
   }
 
   const handleToggleReplyField = () => {
@@ -131,6 +140,12 @@
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
       return;
+    }
+
+    const writeRelays = relayStore.writeRelays
+    if (!writeRelays.length) {
+      msgErr.value = 'Please provide your write relays to broadcast event'
+      return
     }
 
     const event = {
@@ -206,8 +221,8 @@
 
     const { pool } = props
     if (pubkeysMentions.length) {
-      const allRelays = [...relayStore.reedRelays, ...relayStore.writeRelays, relayStore.connectedRelayUrl]
-      let relays = [...new Set(allRelays)]; // make array values unique
+      const allRelays = [...relayStore.reedRelays, ...relayStore.writeRelays, relayStore.currentRelay.url]
+      const relays = [...new Set(allRelays)]; // make array values unique
       const metaEvents = await pool.querySync(relays, { kinds: [10002], authors: pubkeysMentions })
 
       const mentionsReadRelays = new Set<string>()
@@ -222,12 +237,6 @@
       })
 
       additionalRelays = [...mentionsReadRelays]
-    }
-    
-    const writeRelays = relayStore.writeRelays
-    if (!writeRelays.length) {
-      msgErr.value = 'Please provide your write relays to broadcast event'
-      return
     }
 
     const result = await publishEventToRelays(writeRelays, pool, event)
@@ -250,7 +259,7 @@
     showReplyField.value = false
     replyText.value = ''
 
-    if (props.isRootEvent) {
+    if (props.isMainEvent) {
       return emit('loadRootReplies')
     }
 
@@ -262,7 +271,7 @@
 
     if (!currentReadRelays?.length || !pool) return
 
-    if (props.isRootEvent) {
+    if (props.isMainEvent) {
       return emit('loadMoreReplies')
     }
 
@@ -270,10 +279,24 @@
 
     // filter replies for particular event
     let replies = await pool.querySync(currentReadRelays, {kinds: [1], '#e': [event.id]})
-    replies = replies.filter((reply) => {
-      const nip10Data = nip10.parse(reply)
-      return nip10Data?.root?.id === event.id || nip10Data?.reply?.id === event.id
-    })
+    if (event.isRoot) {
+      replies = replies.filter((reply) => {
+        const nip10Data = nip10.parse(reply)
+        return !nip10Data.reply && nip10Data?.root?.id === event.id
+      })
+    } else {
+      replies = replies.filter((reply) => {
+        const nip10Data = nip10.parse(reply)
+        return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
+      })
+    }
+
+    // if we have thread and event has only one reply (descender), then it's already shown
+    const descender = props.threadDescender
+    if (replies.length == 1 && descender?.id === replies[0].id) {
+      isLoadingReplies.value = false
+      return
+    }
 
     const authors = replies.map((e: any) => e.pubkey)
     const uniqueAuthors = [...new Set(authors)]
@@ -308,9 +331,106 @@
     userStore.updateRoutingStatus(true)
     router.push({ path: getUserPath(pubkey) })
   }
+
+  const getAncestorsEventsChain = async (event: EventExtended): Promise<EventExtended[]> => {
+    const { currentReadRelays, pool } = props
+    if (!currentReadRelays?.length || !pool) return []
+    
+    const nip10Data = nip10.parse(event)
+    if (!nip10Data.root && !nip10Data.reply) return []
+
+    if (nip10Data.root && !nip10Data.reply) {
+      let rootEvent = await pool.get(currentReadRelays, { kinds: [1], ids: [nip10Data.root.id] })
+      if (!rootEvent) return []
+      const authorMeta = await pool.get(currentReadRelays, { kinds: [0], authors: [rootEvent.pubkey] })
+      if (authorMeta) {
+        await injectAuthorsToNotes([rootEvent], [authorMeta])
+      }
+      await injectDataToRootNotes([rootEvent] as EventExtended[], currentReadRelays, pool)
+      return [rootEvent] as EventExtended[]
+    }
+
+    if (nip10Data.reply) {
+      let parentEvent = await pool.get(currentReadRelays, { kinds: [1], ids: [nip10Data.reply.id] }) as EventExtended
+      if (!parentEvent) return []
+
+      const authorMeta = await pool.get(currentReadRelays, { kinds: [0], authors: [parentEvent.pubkey] })
+      if (authorMeta) {
+        await injectAuthorsToNotes([parentEvent], [authorMeta])
+      }
+
+      const nip10DataParentReplyingTo = nip10.parse(parentEvent)
+      const parentReplyingToId = nip10DataParentReplyingTo?.reply?.id || nip10DataParentReplyingTo?.root?.id
+      const parentReplyingToEvent = await pool.get(currentReadRelays, { kinds: [1], ids: [parentReplyingToId || ''] })
+      if (parentReplyingToEvent) {
+        const authorMeta = await pool.get(currentReadRelays, { kinds: [0], authors: [parentReplyingToEvent.pubkey] })
+        if (authorMeta) {
+          await injectAuthorsToNotes([parentReplyingToEvent], [authorMeta])
+        }
+      }
+
+      await injectDataToReplyNotes(parentReplyingToEvent as EventExtended, [parentEvent] as EventExtended[], currentReadRelays, pool)
+
+      const ancestors = await getAncestorsEventsChain(parentEvent)
+      return [parentEvent, ...ancestors]
+    }
+
+    return []
+  }
+
+  const loadEventThread = async () => {
+    const { event, pool, currentReadRelays } = props
+    if (!currentReadRelays?.length || !pool) return
+
+    if (isLoadingThread.value) return
+    isLoadingThread.value = true
+
+    // get data for first ancesotor (parent)
+    const parentEvent = event.replyingTo.event
+    const authorMeta = await pool.get(currentReadRelays, { kinds: [0], authors: [parentEvent.pubkey] })
+    if (authorMeta) {
+      await injectAuthorsToNotes([parentEvent], [authorMeta])
+    }
+    const nip10Data = nip10.parse(parentEvent)
+    if (!nip10Data.root && !nip10Data.reply) {
+      await injectDataToRootNotes([parentEvent] as EventExtended[], currentReadRelays, pool)
+    } else {
+      const parentReplyingToId = nip10Data?.reply?.id || nip10Data?.root?.id // order is important here, reply should be first
+      const parentReplyingToEvent = await pool.get(currentReadRelays, { kinds: [1], ids: [parentReplyingToId || ''] })
+      if (parentReplyingToEvent) {
+        const authorMeta = await pool.get(currentReadRelays, { kinds: [0], authors: [parentReplyingToEvent.pubkey] })
+        if (authorMeta) {
+          await injectAuthorsToNotes([parentReplyingToEvent], [authorMeta])
+        }
+      }
+      await injectDataToReplyNotes(parentReplyingToEvent as EventExtended, [parentEvent] as EventExtended[], currentReadRelays, pool)
+    }
+
+    // load further ancestors
+    const parentAncestors = await getAncestorsEventsChain(parentEvent as EventExtended)
+    const ancestors = [parentEvent, ...parentAncestors].reverse()
+
+    isLoadingThread.value = false
+    ancestorsEvents.value = ancestors
+  }
 </script>
 
 <template>
+  <div class="thread">
+    <div class="ancestor" :key="event.id" v-for="(aEvent, i) in ancestorsEvents">
+      <EventContent
+        @toggleRawData="() => handleToggleRawData(aEvent.id)"
+        :event="(aEvent as EventExtended)"
+        :currentReadRelays="currentReadRelays"
+        :pool="pool"
+        :hasReplyBtn="hasReplyBtn"
+        :threadDescender="ancestorsEvents[i + 1] ? ancestorsEvents[i + 1] : event"
+      />
+    </div>
+
+    <div v-if="isLoadingThread" class="loading-thread">Loading thread...</div>
+  </div>
+
   <div class="event-card">
     <div :class="['event-card__content', {'flipped': event.showRawData }]">
       <div :class="['event-card__front', 'event__presentable-date', { 'event-card__front_custom': pubKey === event.pubkey }]">
@@ -330,7 +450,15 @@
           </div>
 
           <div v-if="event.replyingTo" class="event-replying-to">
-            Replying to <a @click.prevent="() => handleUserClick(event.replyingTo.pubkey)" :href="getUserPath(event.replyingTo.pubkey)" class="event-username-link event-username-text">@{{ displayName(event.replyingTo.user, event.replyingTo.pubkey) }}</a>
+            <span @click="loadEventThread" v-if="isMainEvent" class="view-thread event-username-link event-username-text">
+              <ThreadIcon /> View thread
+            </span>
+            <span class="replying-to-separator" v-if="isMainEvent">
+              &nbsp;|&nbsp;
+            </span>
+            <span>
+              Replying to <a @click.prevent="() => handleUserClick(event.replyingTo.pubkey)" :href="getUserPath(event.replyingTo.pubkey)" class="event-username-link event-username-text">@{{ displayName(event.replyingTo.user, event.replyingTo.pubkey) }}</a>
+            </span>
           </div>
   
           <div class="event-body">
@@ -504,6 +632,7 @@
   .event-username-link {
     color: #0092bf;
     text-decoration: none;
+    cursor: pointer;
   }
 
   .event-content {
@@ -522,9 +651,34 @@
     }
   }
 
+  .view-thread {
+    display: inline-flex;
+    align-items: center;
+    min-width: 100px;
+  }
+  
   .event-replying-to {
+    display: flex;
+    align-items: start;
+    flex-direction: column;
     font-size: 15px;
+    margin-top: 3px;
     margin-bottom: 3px;
+  }
+
+  .replying-to-separator {
+    display: none
+  }
+
+  @media (min-width: 412px) {
+    .event-replying-to {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .replying-to-separator {
+      display: inline;
+    }
   }
 
   .event-username-text {
@@ -610,5 +764,13 @@
 
   .event-footer__signature_invalid {
     color: red;
+  }
+
+  .ancestor {
+    margin-bottom: 15px;
+  }
+
+  .loading-thread {
+    margin-bottom: 5px;
   }
 </style>

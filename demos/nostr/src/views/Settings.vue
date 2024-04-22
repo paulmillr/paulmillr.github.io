@@ -17,6 +17,8 @@
   const nsecStore = useNsec()
   const imagesStore = useImages()
 
+  const pool = poolStore.pool
+
   const relayStore = useRelay()
   const newRelayUrl = ref('')
   const relayUrlError = ref('')
@@ -69,10 +71,9 @@
 
     const tags = relayStore.nip65Tags
     const signedEvent = prepareNip65Event(tags)
-    const pool = poolStore.feedPool
     
     if (signedEvent) {
-      return await pool.publish(relayStore.allRelaysUrlsWithConnectedRelay, signedEvent)
+      return await pool.publish(relayStore.allRelaysUrlsWithSelectedRelay, signedEvent)
     }
     if (!relaysError.value.length) {
       relaysError.value = UPDATING_RELAY_ERROR
@@ -86,11 +87,10 @@
 
     const tags = relayStore.nip65Tags
     const signedEvent = prepareNip65Event(tags)
-    const pool = poolStore.feedPool
 
     // console.log('signedEvent', signedEvent)
     if (signedEvent) {
-      return await pool.publish(relayStore.allRelaysUrlsWithConnectedRelay, signedEvent)
+      return await pool.publish(relayStore.allRelaysUrlsWithSelectedRelay, signedEvent)
     }
     if (!relaysError.value.length) {
       relaysError.value = UPDATING_RELAY_ERROR
@@ -113,11 +113,10 @@
 
     const tags = relayStore.nip65Tags
     const signedEvent = prepareNip65Event(tags)
-    const pool = poolStore.feedPool
 
     // console.log('signedEvent', signedEvent)
     if (signedEvent) {
-      return await pool.publish(relayStore.allRelaysUrlsWithConnectedRelay, signedEvent)
+      return await pool.publish(relayStore.allRelaysUrlsWithSelectedRelay, signedEvent)
     }
     if (!relaysError.value.length) {
       relaysError.value = UPDATING_RELAY_ERROR
@@ -161,7 +160,7 @@
     {{ relaysError }}
   </div>
   <ul class="relays">
-    <li class="relay" v-for="(r, i) in relayStore.allRelays">
+    <li class="relay" v-for="(r, i) in relayStore.userReadWriteRelays">
       {{ r.url }}
       <div class="actions">
         <input 
@@ -181,9 +180,9 @@
       </div>
     </li>
   </ul>
-  <div v-if="!relayStore.allRelays.length">
+  <div v-if="!relayStore.userReadWriteRelays.length">
     <span v-if="relayStore.isConnectedToRelay">
-      The private key was not provided or the list with your relays was not found on <b>{{ relayStore.connectedRelayUrl }}</b>
+      The private key was not provided or the list with your relays was not found on <b>{{ relayStore.currentRelay.url }}</b>
     </span>
     <span v-else>
       Please connect to a relay to see the list of your relays.
