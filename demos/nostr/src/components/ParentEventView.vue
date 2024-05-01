@@ -10,7 +10,9 @@
   import ExpandArrow from './../icons/ExpandArrow.vue'
   import {
     injectAuthorsToNotes,
-    injectDataToReplyNotes
+    injectDataToReplyNotes,
+    filterRootEventReplies,
+    filterReplyEventReplies
   } from './../utils'
 
   import { usePool } from '@/stores/Pool'
@@ -103,15 +105,9 @@
 
     // filter first level replies
     if (event.isRoot) { 
-      replies = replies.filter((reply: Event) => {
-        const nip10Data = nip10.parse(reply)
-        return !nip10Data.reply && nip10Data?.root?.id === event.id
-      })
+      replies = filterRootEventReplies(event, replies)
     } else {
-      replies = replies.filter((reply: Event) => {
-        const nip10Data = nip10.parse(reply)
-        return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
-      })
+      replies = filterReplyEventReplies(event, replies)
     }
 
     if (!replies.length) {

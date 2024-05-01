@@ -88,7 +88,6 @@
     const tags = relayStore.nip65Tags
     const signedEvent = prepareNip65Event(tags)
 
-    // console.log('signedEvent', signedEvent)
     if (signedEvent) {
       return await pool.publish(relayStore.allRelaysUrlsWithSelectedRelay, signedEvent)
     }
@@ -114,7 +113,6 @@
     const tags = relayStore.nip65Tags
     const signedEvent = prepareNip65Event(tags)
 
-    // console.log('signedEvent', signedEvent)
     if (signedEvent) {
       return await pool.publish(relayStore.allRelaysUrlsWithSelectedRelay, signedEvent)
     }

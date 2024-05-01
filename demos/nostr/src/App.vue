@@ -46,7 +46,6 @@
   nsecStore.updateNsec(initialNsec || '')
 
   // events in feed
-  const events = ref<EventExtended[]>([])
   const eventsIds = new Set()
   const sentEventIds = new Set()
 
@@ -75,7 +74,7 @@
   }
 
   const updateNewEventsElement = async () => {
-    const relays = relayStore.connectedReedRelayUrls
+    const relays = relayStore.connectedFeedRelaysUrls
     if (!relays.length) return;
     
     const eventsToShow = feedStore.newEventsToShow
@@ -110,38 +109,43 @@
   const listRootEvents = (pool: SimplePool, relays: string[], filters: Filter[]) => {
     return new Promise(resolve => {
       const events: Event[] = []
-      let filtersLimit:number
+      let filtersLimit:number | undefined;
       let newFilters = filters
       if (filters && filters.length && filters[0].limit) {
         let { limit, ...restFilters } = filters[0]
         newFilters = [restFilters]
         filtersLimit = limit
       }
-
+      
+      let subClosed = false
       const sub = pool.subscribeMany(
         relays, 
         newFilters,
         {
           onevent(event: Event) {
+            if (subClosed) return
+
             const nip10Data = nip10.parse(event)
-            if (nip10Data.reply || nip10Data.root) {
-              return;
-            }
+            if (nip10Data.reply || nip10Data.root) return
+            
             events.push(event)
             if (filtersLimit && events.length >= filtersLimit) {
-              resolve(events.slice(0, filtersLimit))
               sub.close()
+              subClosed = true
+              resolve(events.slice(0, filtersLimit))
             }
           },
           oneose() {
             sub.close()
+            const result = filtersLimit ? events.slice(0, filtersLimit) : events
+            resolve(result)
           }
         },
       )
     })
   }
 
-  async function handleRelayConnect(useProvidedRelaysList: boolean = false) {
+  async function handleRelayConnect(useProvidedRelaysList: boolean = false, changeFeedSource: boolean = false) {
     if (relayStore.isConnectingToRelay) return
 
     let relayUrl = relayStore.selectInputRelayUrl
@@ -150,7 +154,7 @@
       relayUrl = customUrl.length ? utils.normalizeURL(customUrl) : ''
     }
 
-    if (!relayUrl.length) return;
+    if (!relayUrl.length) return
 
     if (nsecStore.isNotValidNsecPresented()) {
       wsError.value = 'Private key is invalid. Please check it and try again.'
@@ -186,6 +190,7 @@
     if (!useProvidedRelaysList) {
       try {
         relayStore.setConnectionToRelayStatus(true)
+        feedStore.setLoadingFeedSourceStatus(true)
         // two attempts to connect
         try {
           relay = await Relay.connect(relayUrl)
@@ -222,7 +227,6 @@
         const pubkey = nsecStore.getPubkey()
         const timeout = 3000
         const authorMeta = await relayGet(relay, [{ kinds: [10002], limit: 1, authors: [pubkey] }], timeout) as Event
-        // console.log('authorMeta', authorMeta)
         if (authorMeta && authorMeta.tags.length) {
           const { read, write } = parseRelaysNip65(authorMeta)
           relayStore.setReedRelays(read)
@@ -239,9 +243,11 @@
     newEvents.value = []
     feedStore.updateNewEventsToShow([])
 
-    poolStore.resetPool()
+    if (changeFeedSource || useProvidedRelaysList) {
+      feedStore.setLoadingFeedSourceStatus(true)
+    }
 
-    const userConnectedReadRelays = <string[]>[]
+    const userConnectedReadRelays: string[] = []
     if (relayStore.reedRelays.length) {
       const result = await Promise.all(
         relayStore.reedRelays.map(async (relay) => {
@@ -249,9 +255,10 @@
           return { url: relay, connected: isConnected }
         })
       )
-      
+
       result.forEach((r) => {
-        // TODO: reset pool relays somehow to avoid this check
+        // reset pool relays somehow to avoid this check
+        // it is for the case when new url added and the previous handleRelayConnect was not finished yet
         if (useProvidedRelaysList && !relayStore.reedRelays.includes(r.url)){
           return
         }
@@ -271,34 +278,146 @@
     }
 
     // if no user default relays from nsec, use current relay
-    const readRelays = userConnectedReadRelays.length ? userConnectedReadRelays : [relayUrl]
+    let feedRelays = userConnectedReadRelays.length ? userConnectedReadRelays : [relayUrl]
 
-    const limit = DEFAULT_EVENTS_COUNT;
-    // @ts-ignore
-    const postsEvents = await listRootEvents(pool, readRelays, [{ kinds: [1], limit }]) as Event[]
-    
-    const authors = postsEvents.map((e: Event) => e.pubkey)
-    const authorsEvents = await pool.querySync(readRelays, { kinds: [0], authors })
-    
-    let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
-    
-    await injectDataToRootNotes(posts as EventExtended[], readRelays, pool as SimplePool)
+    const pubkey = nsecStore.getPubkey()
+    const followsRelaysMap: Record<string, string[]> = {}
+    let followsPubkeys: string[] = [];
+    if (feedStore.isFollowsSource && nsecStore.isValidNsecPresented()) {
+      const follows = await pool.get(feedRelays, { kinds: [3], limit: 1, authors: [pubkey] })
 
+      if (follows && follows.tags.length) {
+        followsPubkeys = follows.tags.map(f => f[1])
+        const followsMeta = await pool.querySync(feedRelays, { kinds: [10002], authors: followsPubkeys })
+        const followsRelaysUrlsExceptUserRelays = new Set()
+
+        followsMeta.forEach((event: Event) => {
+          event.tags.forEach((tag) => {
+            if (tag[0] !== 'r') return
+            const relayUrl = utils.normalizeURL(tag[1])
+            if (feedRelays.includes(relayUrl)) return
+            followsRelaysUrlsExceptUserRelays.add(relayUrl)
+          })
+        })
+
+        const followsSortedRelays = await Promise.all(
+          Array.from(followsRelaysUrlsExceptUserRelays).map(async (relay: any) => {
+            const isConnected = await isWsAvailable(relay, 1000)
+            return { url: relay, connected: isConnected }
+          })
+        )
+
+        const isSuccess = followsSortedRelays.some((r: any) => r.connected)
+        if (isSuccess) {
+          logHtmlParts([
+            { type: 'text', value: 'Connected to follows relays' }
+          ])
+        } else {
+          logHtmlParts([
+            { type: 'text', value: 'Failed to connect to follows relays' }
+          ])
+        }
+
+        const followsConnectedRelaysUrls = followsSortedRelays
+          .filter(r => r.connected)
+          .map(r => r.url)
+
+        // creating map of relays for each follow (person whish user follow)
+        // map will be used further for loading metas of authors of posts and references inside posts
+        // because laoding from the whole bunch of all follows relays is too slow, 
+        // so we will load only from relays of the author of the post
+        followsMeta.forEach((event: Event) => {
+          const normalizedUrls: string[] = []
+          event.tags.forEach((tag) => {
+            if (tag[0] !== 'r') return
+            const relayUrl = utils.normalizeURL(tag[1])
+            if (followsConnectedRelaysUrls.includes(relayUrl) || feedRelays.includes(relayUrl)) {
+              normalizedUrls.push(relayUrl)
+            }
+          })
+          followsRelaysMap[event.pubkey] = normalizedUrls
+        })
+
+        feedRelays = [...new Set([...feedRelays, ...followsConnectedRelaysUrls])]
+      }
+    }
+
+    let postsFilter: Filter = { kinds: [1], limit: DEFAULT_EVENTS_COUNT }
+    // list follows pubkeys except own, to prevent loading own events in feed
+    followsPubkeys = followsPubkeys.filter(f => f !== pubkey)
+    if (followsPubkeys.length) {
+      postsFilter.authors = followsPubkeys
+    }
+
+    relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays)
+    relayStore.setConnectedFeedRelayUrls(feedRelays)
+    
+    const postsEvents = await listRootEvents(pool as SimplePool, feedRelays, [postsFilter]) as Event[]
+    const posts = postsEvents.sort((a, b) => b.created_at - a.created_at)
+
+    // collect promises for all posts
+    const postPromises = []
+    const metasPubkeys: string[] = []
+    const cachedMetas: { [key: string]: Event | null } = {}
+    for (const post of posts) {
+      const author = post.pubkey
+      const relays = feedStore.isFollowsSource && followsRelaysMap[author]?.length ? followsRelaysMap[author] : feedRelays
+
+      let authorPromise = null
+      // cache used later for already downloaded authors
+      if (!metasPubkeys.includes(author)) {
+        authorPromise = pool.get(relays, { kinds: [0], authors: [author] })
+        metasPubkeys.push(author)
+      }
+
+      const dataPromise = injectDataToRootNotes([post as EventExtended], relays, pool as SimplePool)
+      const postPromise = Promise.all([post, authorPromise, dataPromise])
+
+      postPromises.push(postPromise)
+    }
+    
     eventsIds.clear()
     feedStore.updatePaginationEventsIds([])
+    feedStore.updateEvents([])
+
+    for (const promise of postPromises) {
+      const result = await promise;
+      const post = result[0]
+      let meta = result[1]
+
+      if (!cachedMetas.hasOwnProperty(post.pubkey)) {
+        cachedMetas[post.pubkey] = meta
+      } else if (cachedMetas[post.pubkey]) {
+        meta = cachedMetas[post.pubkey]
+      }
+
+      injectAuthorsToNotes([post], [meta])
+      feedStore.pushToEvents(post as EventExtended)
+      
+      if (feedStore.isLoadingFeedSource) {
+        feedStore.setLoadingFeedSourceStatus(false)
+        feedStore.setLoadingMoreStatus(true)
+      }
+    }
+    feedStore.setLoadingMoreStatus(false)
+    
     posts.forEach((e: Event) => {
       eventsIds.add(e.id)
       feedStore.pushToPaginationEventsIds(e.id)
     })
-    events.value = posts as EventExtended[]
-    feedStore.updateEvents(posts as EventExtended[])
 
-    relayStore.setConnectedReedRelayUrls(readRelays)
     relayStore.setConnectionToRelayStatus(false)
+    // if (changeFeedSource) {
+    //   feedStore.setLoadingFeedSourceStatus(false)
+    // }
 
+    let subscribePostsFilter: Filter = { kinds: [1], limit: 1 }
+    if (followsPubkeys.length) {
+      subscribePostsFilter.authors = followsPubkeys
+    }
     relaysSub = pool.subscribeMany(
-      readRelays, 
-      [{ kinds: [1], limit: 1 }], 
+      feedRelays, 
+      [subscribePostsFilter], 
       {
         onevent(event: Event) {
           if (eventsIds.has(event.id)) return;
@@ -313,7 +432,10 @@
   }
 
   const loadNewRelayEvents = async () => {
-    const relays = relayStore.connectedReedRelayUrls
+    if (feedStore.isLoadingNewEvents) return
+    feedStore.setLoadingNewEventsStatus(true)
+
+    const relays = relayStore.connectedFeedRelaysUrls
     if (!relays.length) return;
 
     router.push({ path: `${route.path}` })
@@ -328,23 +450,32 @@
     const firstPageIds = feedStore.paginationEventsIds.slice(-limit)
 
     const postsEvents = await pool.querySync(relays, { ids: firstPageIds })
+    const authors = Array.from(new Set([...postsEvents.map((e: Event) => e.pubkey)]))
 
-    const authors = postsEvents.map((e: Event) => e.pubkey)
-    const authorsEvents = await pool.querySync(relays, { kinds: [0], authors })
+    const authorsAndData = await Promise.all([
+      Promise.all(
+        authors.map(async (author) => {
+          return pool.get(relays, { kinds: [0], authors: [author] })
+        })
+      ),
+      injectDataToRootNotes(postsEvents as EventExtended[], relays, pool as SimplePool)
+    ])
+
+    const authorsEvents = authorsAndData[0] as Event[]
     let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
 
-    await injectDataToRootNotes(posts as EventExtended[], relays, pool as SimplePool)
-
     posts.forEach((e: Event) => eventsIds.add(e.id))
+    posts = posts.sort((a, b) => b.created_at - a.created_at)
 
     // update view
     feedStore.updateEvents(posts as EventExtended[])
     feedStore.setShowNewEventsBadge(false)
+    feedStore.setLoadingNewEventsStatus(false)
 
     logHtmlParts([
       { type: 'text', value: `loaded ${eventsToShow.length}` },
       { type: 'text', value: ' new event(s) from ' },
-      { type: 'bold', value: relayStore.connectedRelaysPrettyStr }
+      { type: 'bold', value: relayStore.connectedFeedRelaysPrettyStr }
     ])
   }
 
@@ -395,7 +526,7 @@
     if (isSendingMessage.value) return
     isSendingMessage.value = true
 
-    const relaysToWatch = relayStore.connectedReedRelayUrls
+    const relaysToWatch = relayStore.connectedUserReadRelayUrls
     let userSub: SubCloser | null = null;
     if (relaysToWatch.length) {
       const userNewEventOptions = [{ kinds: [1], ids: [event.id], limit: 1 }]
@@ -465,7 +596,8 @@
     relaysSub?.close()
     // pool.close(relayStore.userReadWriteRelaysUrls)
     
-    relayStore.setConnectedReedRelayUrls([])
+    relayStore.setConnectedUserReadRelayUrls([])
+    relayStore.setConnectedFeedRelayUrls([])
     relayStore.setReedRelays([])
     relayStore.setWriteRelays([])
 
@@ -507,6 +639,7 @@
   ></router-view>
   <router-view 
     @loadNewRelayEvents="loadNewRelayEvents"
+    @handleRelayConnect="handleRelayConnect"
     :handleRelayConnect="handleRelayConnect"
     :eventsLog="eventsLog"
   ></router-view>

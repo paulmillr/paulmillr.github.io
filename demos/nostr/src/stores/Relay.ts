@@ -19,9 +19,12 @@ export const useRelay = defineStore('relay', () => {
   const additionalRelaysUrlsForSignedEvent = ref<string[]>([])
 
   // user relays from nip 65 (relay list metadata, kind:10002)
-  const connectedReedRelayUrls = ref<string[]>([])
+  const connectedUserReadRelayUrls = ref<string[]>([])
   const reedRelays = ref<string[]>([])
   const writeRelays = ref<string[]>([])
+
+  // user relays with follows relays, if ther existed
+  const connectedFeedRelaysUrls = ref<string[]>([])
 
   const userReadWriteRelays = computed(() => {
     const unique = new Set([...reedRelays.value, ...writeRelays.value])
@@ -63,8 +66,8 @@ export const useRelay = defineStore('relay', () => {
     return tags
   })
 
-  const connectedRelaysPrettyStr = computed(() => {
-    return connectedReedRelayUrls.value.map(r => r.replace('wss://', '').replace('/', '')).join(', ')
+  const connectedFeedRelaysPrettyStr = computed(() => {
+    return connectedFeedRelaysUrls.value.map(r => r.replace('wss://', '').replace('/', '')).join(', ')
   })
 
   const isConnectedToRelay = computed(() => {
@@ -79,8 +82,12 @@ export const useRelay = defineStore('relay', () => {
     isConnectingToRelay.value = value
   }
 
-  function setConnectedReedRelayUrls(value: string[]) {
-    connectedReedRelayUrls.value = value.map(r => normalizeURL(r))
+  function setConnectedUserReadRelayUrls(value: string[]) {
+    connectedUserReadRelayUrls.value = value.map(r => normalizeURL(r))
+  }
+
+  function setConnectedFeedRelayUrls(value: string[]) {
+    connectedFeedRelaysUrls.value = value.map(r => normalizeURL(r))
   }
 
   function setReedRelays(value: string[]) {
@@ -111,7 +118,7 @@ export const useRelay = defineStore('relay', () => {
   function removeUserRelay(value: string) {
     reedRelays.value = reedRelays.value.filter(r => r !== value)
     writeRelays.value = writeRelays.value.filter(r => r !== value)
-    connectedReedRelayUrls.value = connectedReedRelayUrls.value.filter(r => r !== value)
+    connectedUserReadRelayUrls.value = connectedUserReadRelayUrls.value.filter(r => r !== value)
   }
 
   function setSelectedRelay(value: string) {
@@ -129,8 +136,8 @@ export const useRelay = defineStore('relay', () => {
   return { 
     isConnectingToRelay, 
     setConnectionToRelayStatus, 
-    connectedReedRelayUrls, 
-    setConnectedReedRelayUrls,
+    connectedUserReadRelayUrls, 
+    setConnectedUserReadRelayUrls,
     selectInputRelayUrl,
     setSelectedRelay,
     selectInputCustomRelayUrl,
@@ -140,7 +147,7 @@ export const useRelay = defineStore('relay', () => {
     updateAdditionalRelaysCountForSignedEvent,
     additionalRelaysUrlsForSignedEvent,
     updateRelayAdditionalRelaysUrlsForSignedEvent,
-    connectedRelaysPrettyStr,
+    connectedFeedRelaysPrettyStr,
     reedRelays,
     writeRelays,
     setReedRelays,
@@ -153,7 +160,9 @@ export const useRelay = defineStore('relay', () => {
     addUserRelay,
     nip65Tags,
     userReadWriteRelaysUrls,
-    allRelaysUrlsWithSelectedRelay
+    allRelaysUrlsWithSelectedRelay,
+    connectedFeedRelaysUrls,
+    setConnectedFeedRelayUrls
   }
 })
 

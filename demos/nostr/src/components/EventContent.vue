@@ -26,7 +26,9 @@
     injectDataToReplyNotes,
     parseRelaysNip65,
     publishEventToRelays,
-    formatedDate
+    formatedDate,
+    filterRootEventReplies,
+    filterReplyEventReplies
   } from './../utils'
   import LinkIcon from './../icons/LinkIcon.vue'
   import CheckIcon from './../icons/CheckIcon.vue'
@@ -239,7 +241,7 @@
       additionalRelays = [...mentionsReadRelays]
     }
 
-    const result = await publishEventToRelays(writeRelays, pool, event)
+    const result = await publishEventToRelays(writeRelays, pool, signedEvent)
     const hasSuccess = result.some((data: any) => data.success)
 
     if (!hasSuccess) {
@@ -249,7 +251,7 @@
 
     if (additionalRelays.length) {
       try {
-        await pool.publish(additionalRelays, event)
+        await pool.publish(additionalRelays, signedEvent)
       } catch (e) {
         console.error('Failed to broadcast reply to some additional relays')
       }
@@ -280,15 +282,9 @@
     // filter replies for particular event
     let replies = await pool.querySync(currentReadRelays, {kinds: [1], '#e': [event.id]})
     if (event.isRoot) {
-      replies = replies.filter((reply) => {
-        const nip10Data = nip10.parse(reply)
-        return !nip10Data.reply && nip10Data?.root?.id === event.id
-      })
+      replies = filterRootEventReplies(event, replies)
     } else {
-      replies = replies.filter((reply) => {
-        const nip10Data = nip10.parse(reply)
-        return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
-      })
+      replies = filterReplyEventReplies(event, replies)
     }
 
     // if we have thread and event has only one reply (descender), then it's already shown

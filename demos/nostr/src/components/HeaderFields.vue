@@ -4,6 +4,7 @@
   import { DEFAULT_RELAYS } from './../app'
   import { useRelay } from '@/stores/Relay'
   import { useNsec } from '@/stores/Nsec'
+  import { useFeed } from '@/stores/Feed'
 
   const props = defineProps<{
     wsError: string
@@ -12,6 +13,7 @@
   const emit = defineEmits(['relayConnect', 'relayDisconnect'])
 
   const relayStore = useRelay()
+  const feedStore = useFeed()
   const nsecStore = useNsec()
   const isLoggedIn = ref(false)
   
@@ -47,7 +49,7 @@
     }
     
     // reconnect to relay if nsec was updated
-    if (relayStore.isConnectedToRelay && nsecStore.cachedNsec !== nsecStore.nsec) {
+    if (relayStore.isConnectedToRelay && (nsecStore.cachedNsec !== nsecStore.nsec || feedStore.selectedFeedSource === 'follows')) {
       emit('relayConnect')
     }
   }
@@ -67,6 +69,7 @@
     if (!relayStore.isConnectedToRelay) return
     if (!relayStore.userReadWriteRelays.length) return
 
+    feedStore.setSelectedFeedSource('network')
     // disconnect from user relays
     emit('relayDisconnect')
     // connect to default relay

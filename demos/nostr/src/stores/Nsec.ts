@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { nip19, getPublicKey } from 'nostr-tools'
 import { hexToBytes, bytesToHex } from '@noble/hashes/utils'
@@ -75,6 +75,10 @@ export const useNsec = defineStore('nsec', () => {
     return getPubkey().length > 0
   }
 
+  const isNsecValidTemp = computed(() =>{
+    return isNsecValid()
+  })
+
   return { 
     nsec, 
     updateNsec, 
@@ -88,6 +92,7 @@ export const useNsec = defineStore('nsec', () => {
     updateCachedNsec,
     getPrivkeyBytes,
     getPrivkeyHex,
-    getPrivkey
+    getPrivkey,
+    isNsecValidTemp
   }
 })

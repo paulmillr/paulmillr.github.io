@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref, defineEmits } from 'vue'
-  import { finalizeEvent, nip19 } from 'nostr-tools'
+  import { finalizeEvent } from 'nostr-tools'
   import { useNsec } from '@/stores/Nsec'
   import { useFeed } from '@/stores/Feed'
 

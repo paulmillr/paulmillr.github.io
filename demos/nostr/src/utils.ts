@@ -9,10 +9,10 @@ import {
   type Filter
 } from 'nostr-tools'
 
-export const injectDataToRootNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+export const injectDataToRootNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null, metaCache?: any) => {
   const likes = injectLikesToNotes(posts, relays, relaysPool)
   const reposts = injectRepostsToNotes(posts, relays, relaysPool)
-  const references = injectReferencesToNotes(posts, relays, relaysPool)
+  const references = injectReferencesToNotes(posts, relays, relaysPool, metaCache)
   const replies = injectRootRepliesToNotes(posts, relays, relaysPool)
   posts.forEach((post) => post.isRoot = true)
   return Promise.all([likes, reposts, references, replies])
@@ -80,18 +80,18 @@ export const injectNotRootRepliesToNotes = async (postsEvents: EventExtended[], 
   }
 }
 
-export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: Event[]) => {
+export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: (Event | null)[]) => {
   const tempPostsEvents = [...postsEvents] as EventExtended[]
 
   const postsWithAuthor: Event[] = [];
   tempPostsEvents.forEach(pe => {
     let isAuthorAddedToPost = false;
     authorsEvents.forEach(ae => {
-      if (!isAuthorAddedToPost && pe.pubkey === ae.pubkey) {
+      if (!isAuthorAddedToPost && pe.pubkey === ae?.pubkey) {
         const tempEventWithAuthor = pe as EventExtended
         tempEventWithAuthor.author = JSON.parse(ae.content)
         tempEventWithAuthor.authorEvent = ae
-        postsWithAuthor.push(pe)
+        postsWithAuthor.push(tempEventWithAuthor)
         isAuthorAddedToPost = true
       }
     })
@@ -104,42 +104,79 @@ export const injectAuthorsToNotes = (postsEvents: Event[], authorsEvents: Event[
   return postsWithAuthor;
 }
 
-export const injectReferencesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
+export const injectReferencesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null, metaCache?: any) => {
   if (!relays.length) return postsEvents
   
   let pool = relaysPool || new SimplePool()
 
+  const eventsReferences: { [key: string]: any } = {}
+
+  const allReferencesPubkeys: Set<string> = new Set()
   for (const event of postsEvents) {
     if (!contentHasMentions(event.content)) {
+      continue
+    }
+
+    const references = parseReferences(event)
+    for (let i = 0; i < references.length; i++) {
+      let { profile } = references[i]
+      if (!profile?.pubkey) continue
+      allReferencesPubkeys.add(profile.pubkey)
+    }
+
+    eventsReferences[event.id] = references
+  }
+
+  // if no references with pubkeys in posts, just exit
+  if (!allReferencesPubkeys.size) {
+    postsEvents.forEach((p) => p.references = [])
+    return
+  }
+
+  const cachedMetas = []
+  let pubkeysToDownload = []
+  if (metaCache) {
+    for (const pubkey of allReferencesPubkeys) {
+      const meta = metaCache[pubkey]?.event
+      if (meta) {
+        cachedMetas.push(meta)
+      } else {
+        pubkeysToDownload.push(pubkey)
+      }
+    }
+  } else {
+    pubkeysToDownload = [...allReferencesPubkeys]
+  }
+
+  const newMetas = await Promise.all(
+    pubkeysToDownload.map(async (pubkey) => {
+      // const authorRelays = relaysMap?.length && relaysMap[pubkey]?.length ? relaysMap[pubkey] : relays
+      return pool.get(relays, { kinds: [0], authors: [pubkey] })
+    })
+  ) as Event[]
+  
+  const metas = [...cachedMetas, ...newMetas]
+    .sort((a, b) => b.created_at - a.created_at)
+
+  for (const event of postsEvents) {
+    const references = eventsReferences[event.id]
+    if (!references) {
       event.references = []
       continue
     }
 
-    let references = parseReferences(event)
-
-    const referencesRequests = []
-    for (let i = 0; i < references.length; i++) {
-      let { profile } = references[i]
-      if (!profile) continue
-      const request = pool.get(relays, { kinds: [0], limit: 1, authors: [profile.pubkey] })
-      referencesRequests.push(request)
-    }
-
-    const metas = await Promise.all(referencesRequests)
     const referencesToInject: any[] = []
     for (let i = 0; i < references.length; i++) {
       let { profile } = references[i]
-      if (!profile) continue
-
-      metas.forEach((meta, i) => {
-        if (meta?.pubkey === profile?.pubkey) {
+      if (!profile?.pubkey) continue
+      metas.forEach((meta) => {
+        if (meta?.pubkey === profile.pubkey) {
           const referenceWithProfile = references[i] as any
           referenceWithProfile.profile_details = JSON.parse(meta?.content || '{}')
           referencesToInject.push(referenceWithProfile)
         }
       })
     }
-
     event.references = referencesToInject
   }
 }
@@ -184,6 +221,20 @@ export const injectRepostsToNotes = async (postsEvents: EventExtended[], relays:
   })
 }
 
+export const filterRootEventReplies = (event: Event, replies: Event[]) => {
+  return replies.filter((reply) => {
+    const nip10Data = nip10.parse(reply)
+    return !nip10Data.reply && nip10Data?.root?.id === event.id
+  })
+}
+
+export const filterReplyEventReplies = (event: Event, replies: Event[]) => {
+  return replies.filter((reply) => {
+    const nip10Data = nip10.parse(reply)
+    return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
+  })
+}
+
 export const contentHasMentions = (content: string) => {
   return content.indexOf('nostr:npub') !== -1 || content.indexOf('nostr:nprofile1') !== -1
 }
@@ -197,8 +248,9 @@ export const isLike = (content: string) => {
 
 export const isWsAvailable = (url: string, timeout: number = 3000) => {
   try {
-    const socket = new WebSocket(url);
     return new Promise((resolve) => {
+      const socket = new WebSocket(url)
+      
       const timer = setTimeout(() => {
         socket.close();
         resolve(false);

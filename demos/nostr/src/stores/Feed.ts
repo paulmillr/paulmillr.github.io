@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { EventExtended, ShortPubkeyEvent } from '@/types'
 
@@ -12,8 +12,20 @@ export const useFeed = defineStore('feed', () => {
   const messageToBroadcast = ref('')
   const signedJson = ref('')
 
+  const selectedFeedSource = ref('network')
+
+  const isFollowsSource = computed(() => selectedFeedSource.value === 'follows')
+  const isNetworkSource = computed(() => selectedFeedSource.value === 'network')
+  const isLoadingFeedSource = ref(false)
+  const isLoadingNewEvents = ref(false)
+  const isLoadingMore = ref(false)
+
   function updateEvents(value: EventExtended[]) {
     events.value = value
+  }
+
+  function pushToEvents(value: EventExtended) {
+    events.value.push(value)
   }
 
   function toggleEventRawData(id: string) {
@@ -59,7 +71,23 @@ export const useFeed = defineStore('feed', () => {
     signedJson.value = value
   }
 
-  return { 
+  function setLoadingFeedSourceStatus(value: boolean) {
+    isLoadingFeedSource.value = value
+  }
+
+  function setLoadingMoreStatus(value: boolean) {
+    isLoadingMore.value = value
+  }
+
+  function setLoadingNewEventsStatus(value: boolean) {
+    isLoadingNewEvents.value = value
+  }
+
+  function setSelectedFeedSource(value: string) {
+    selectedFeedSource.value = value === 'follows' ? value : 'network'
+  }
+
+  return {
     events, 
     updateEvents, 
     toggleEventRawData, 
@@ -78,6 +106,17 @@ export const useFeed = defineStore('feed', () => {
     messageToBroadcast,
     updateMessageToBroadcast,
     signedJson,
-    updateSignedJson
+    updateSignedJson,
+    selectedFeedSource,
+    setSelectedFeedSource,
+    isFollowsSource,
+    isNetworkSource,
+    isLoadingFeedSource,
+    setLoadingFeedSourceStatus,
+    setLoadingNewEventsStatus,
+    isLoadingNewEvents,
+    pushToEvents,
+    setLoadingMoreStatus,
+    isLoadingMore
   }
 })
