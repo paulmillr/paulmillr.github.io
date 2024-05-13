@@ -8,6 +8,7 @@ import {
   type Event,
   type Filter
 } from 'nostr-tools'
+import { EVENT_KIND } from './nostr'
 
 export const injectDataToRootNotes = async (posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null, metaCache?: any) => {
   const likes = injectLikesToNotes(posts, relays, relaysPool)
@@ -16,6 +17,34 @@ export const injectDataToRootNotes = async (posts: EventExtended[], relays: stri
   const replies = injectRootRepliesToNotes(posts, relays, relaysPool)
   posts.forEach((post) => post.isRoot = true)
   return Promise.all([likes, reposts, references, replies])
+}
+
+export const injectRootLikesRepostsRepliesCount = (post: Event, events: Event[] = []) => {
+  if (!events || !events.length) {
+    events = []
+  }
+
+  const likes = []
+  const reposts = []
+  const replies = []
+
+  for (const event of events) {
+    switch (event.kind) {
+      case EVENT_KIND.LIKE:
+        likes.push(event);
+        break;
+      case EVENT_KIND.REPOST:
+        reposts.push(event);
+        break;
+      case EVENT_KIND.REPLY:
+        replies.push(event);
+        break;
+    }
+  }
+
+  injectLikesToNote(post as EventExtended, likes)
+  injectRepostsToNote(post as EventExtended, reposts)
+  injectRootRepliesToNote(post as EventExtended, replies)
 }
 
 export const injectDataToReplyNotes = async (replyingToEvent: EventExtended, posts: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
@@ -58,6 +87,17 @@ export const injectRootRepliesToNotes = async (postsEvents: EventExtended[], rel
     }
     event.replies = replies
   }
+}
+
+export const injectRootRepliesToNote = async (postEvent: EventExtended, repliesEvents: Event[]) => {
+  let replies = 0
+  for (const reply of repliesEvents) {
+    const nip10Data = nip10.parse(reply)
+    if (!nip10Data.reply && nip10Data?.root?.id === postEvent.id) {
+      replies++
+    }
+  }
+  postEvent.replies = replies
 }
 
 // counting replies for reply notes, because root notes and replies notes have different e tag type
@@ -181,6 +221,64 @@ export const injectReferencesToNotes = async (postsEvents: EventExtended[], rela
   }
 }
 
+export const getNoteReferences = (postEvent: Event) =>{
+  if (!contentHasMentions(postEvent.content)) {
+    return []
+  }
+  
+  const allReferencesPubkeys: Set<string> = new Set()
+  const references = parseReferences(postEvent)
+  for (let i = 0; i < references.length; i++) {
+    let { profile } = references[i]
+    if (!profile?.pubkey) continue
+    allReferencesPubkeys.add(profile.pubkey)
+  }
+
+  // if no references with pubkeys in posts, just exit
+  if (!allReferencesPubkeys.size) {
+    return []
+  }
+
+  return [...allReferencesPubkeys]
+}
+
+export const injectReferencesToNote = async (postEvent: EventExtended, referencesMetas: (Event | null)[]) => {
+  if (!referencesMetas.length) {
+    postEvent.references = []
+    return
+  }
+
+  const references = parseReferences(postEvent)
+
+  const referencesToInject: any[] = []
+  for (let i = 0; i < references.length; i++) {
+    let { profile } = references[i]
+    if (!profile?.pubkey) continue
+    referencesMetas.forEach((meta) => {
+      if (meta?.pubkey === profile?.pubkey) {
+        const referenceWithProfile = references[i] as any
+        referenceWithProfile.profile_details = JSON.parse(meta?.content || '{}')
+        referencesToInject.push(referenceWithProfile)
+      }
+    })
+  }
+  postEvent.references = referencesToInject
+}
+
+// remove duplicates and sort by date
+export const filterMetas = (metas: Event[]) => {
+  const cache = new Set()
+  const filteredMetas: Event[] = []
+  const sortedMetas = metas.sort((a, b) => b.created_at - a.created_at)
+  sortedMetas.forEach((meta) => {
+    const { pubkey } = meta
+    if (cache.has(pubkey)) return
+    cache.add(pubkey)
+    filteredMetas.push(meta)
+  })
+  return filteredMetas
+}
+
 export const injectLikesToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
 
@@ -201,6 +299,17 @@ export const injectLikesToNotes = async (postsEvents: EventExtended[], relays: s
   })
 }
 
+export const injectLikesToNote = (postEvent: EventExtended, likesEvents: Event[]) => {
+  let likes = 0
+  likesEvents.forEach(likedEvent => {
+    const likedEventId = likedEvent.tags.reverse().find((tag: Array<string>) => tag[0] === 'e')?.[1]
+    if (likedEventId && likedEventId === postEvent.id && likedEvent.content && isLike(likedEvent.content)) {
+      likes++
+    }
+  })
+  postEvent.likes = likes
+}
+
 export const injectRepostsToNotes = async (postsEvents: EventExtended[], relays: string[] = [], relaysPool: SimplePool | null) => {
   if (!relays.length) return postsEvents
 
@@ -219,6 +328,17 @@ export const injectRepostsToNotes = async (postsEvents: EventExtended[], relays:
     })
     postEvent.reposts = reposts
   })
+}
+
+export const injectRepostsToNote = (postEvent: EventExtended, repostEvents: Event[]) => {
+  let reposts = 0
+  repostEvents.forEach(repostEvent => {
+    const repostEventId = repostEvent.tags.find((tag: Array<string>) => tag[0] === 'e')?.[1]
+    if (repostEventId && repostEventId === postEvent.id) {
+      reposts++
+    }
+  })
+  postEvent.reposts = reposts
 }
 
 export const filterRootEventReplies = (event: Event, replies: Event[]) => {

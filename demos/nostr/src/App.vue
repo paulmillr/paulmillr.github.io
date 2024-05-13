@@ -16,7 +16,11 @@
     injectAuthorsToNotes,
     injectDataToRootNotes,
     relayGet,
-    parseRelaysNip65
+    parseRelaysNip65,
+    injectRootLikesRepostsRepliesCount,
+    getNoteReferences,
+    injectReferencesToNote,
+    filterMetas
   } from './utils'
   import HeaderFields from './components/HeaderFields.vue'
   import { DEFAULT_EVENTS_COUNT } from './app'
@@ -357,22 +361,34 @@
 
     // collect promises for all posts
     const postPromises = []
-    const metasPubkeys: string[] = []
+    const cachedMetasPubkeys: string[] = []
     const cachedMetas: { [key: string]: Event | null } = {}
     for (const post of posts) {
       const author = post.pubkey
       const relays = feedStore.isFollowsSource && followsRelaysMap[author]?.length ? followsRelaysMap[author] : feedRelays
 
-      let authorPromise = null
-      // cache used later for already downloaded authors
-      if (!metasPubkeys.includes(author)) {
-        authorPromise = pool.get(relays, { kinds: [0], authors: [author] })
-        metasPubkeys.push(author)
+      let metasPromise = null
+
+      const allPubkeysToGet = getNoteReferences(post)
+      if (!allPubkeysToGet.includes(author)) {
+        allPubkeysToGet.push(author)
       }
-
-      const dataPromise = injectDataToRootNotes([post as EventExtended], relays, pool as SimplePool)
-      const postPromise = Promise.all([post, authorPromise, dataPromise])
-
+      
+      // cache used later for already downloaded authors
+      const pubkeysForRequest: string[] = []
+      allPubkeysToGet.forEach(pubkey => {
+        if (!cachedMetasPubkeys.includes(pubkey)) {
+          cachedMetasPubkeys.push(pubkey)
+          pubkeysForRequest.push(pubkey)
+        }
+      });
+      if (pubkeysForRequest.length) {
+        metasPromise = pool.querySync(relays, { kinds: [0], authors: pubkeysForRequest })
+      }
+      
+      const likesRepostsRepliesPromise = pool.querySync(relays, { kinds: [1, 6, 7], "#e": [post.id] })
+      const postPromise = Promise.all([post, metasPromise, likesRepostsRepliesPromise])
+      
       postPromises.push(postPromise)
     }
     
@@ -383,15 +399,41 @@
     for (const promise of postPromises) {
       const result = await promise;
       const post = result[0]
-      let meta = result[1]
+      const metas = result[1] || []
+      const likesRepostsReplies = result[2] || []
+      
+      const filteredMetas = filterMetas(metas)
+      
+      let authorMeta = null
+      const referencesMetas: (Event | null)[] = []
+      const refsPubkeys: string[] = []
+      filteredMetas.forEach((meta) => {
+        const ref: Event = meta
+        cachedMetas[meta.pubkey] = meta
+        referencesMetas.push(ref)
+        refsPubkeys.push(ref.pubkey)
+        if (meta.pubkey === post.pubkey) {
+          authorMeta = meta
+        }
+      })
 
-      if (!cachedMetas.hasOwnProperty(post.pubkey)) {
-        cachedMetas[post.pubkey] = meta
-      } else if (cachedMetas[post.pubkey]) {
-        meta = cachedMetas[post.pubkey]
-      }
+      cachedMetasPubkeys.forEach((pubkey) => {
+        if (refsPubkeys.includes(pubkey)) return
+        if (!cachedMetas.hasOwnProperty(pubkey)) {
+          cachedMetas[pubkey] = null
+        }
+        const ref = cachedMetas[pubkey]
+        referencesMetas.push(ref)
+        if (pubkey === post.pubkey) {
+          authorMeta = ref
+        }
+      })
 
-      injectAuthorsToNotes([post], [meta])
+      // inject references to notes here
+      injectReferencesToNote(post as EventExtended, referencesMetas)
+      injectAuthorsToNotes([post], [authorMeta])
+      injectRootLikesRepostsRepliesCount(post, likesRepostsReplies)
+
       feedStore.pushToEvents(post as EventExtended)
       
       if (feedStore.isLoadingFeedSource) {
