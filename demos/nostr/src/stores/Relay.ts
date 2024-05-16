@@ -49,6 +49,15 @@ export const useRelay = defineStore('relay', () => {
     return userRelays.includes(connected) ? userRelays : [connected, ...userRelays]
   })
 
+  const connectedUserReadRelayUrlsWithSelectedRelay = computed(() => {
+    const relays = connectedUserReadRelayUrls.value
+    const curRelay = currentRelay.value
+    if (curRelay.connected && !relays.includes(curRelay.url)) {
+      relays.push(curRelay.url)
+    }
+    return relays
+  })
+
   const nip65Tags = computed(() => {
     const read = reedRelays.value
     const write = writeRelays.value
@@ -162,7 +171,8 @@ export const useRelay = defineStore('relay', () => {
     userReadWriteRelaysUrls,
     allRelaysUrlsWithSelectedRelay,
     connectedFeedRelaysUrls,
-    setConnectedFeedRelayUrls
+    setConnectedFeedRelayUrls,
+    connectedUserReadRelayUrlsWithSelectedRelay
   }
 })
 

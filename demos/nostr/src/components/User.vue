@@ -132,7 +132,7 @@
   }
 
   const showUserPage = async (page: number) => {
-    const relays = relayStore.connectedUserReadRelayUrls
+    const relays = relayStore.connectedUserReadRelayUrlsWithSelectedRelay
     if (!relays.length) return
 
     const limit = DEFAULT_EVENTS_COUNT
@@ -191,7 +191,7 @@
     if (isAutoConnectOnSearch.value) {
       await props.handleRelayConnect()
     }
-    const relays = relayStore.connectedUserReadRelayUrls
+    const relays = relayStore.connectedUserReadRelayUrlsWithSelectedRelay
 
     if (currentOperationId !== gettingUserInfoId.value) return
     
