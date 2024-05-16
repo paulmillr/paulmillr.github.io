@@ -4,3 +4,5 @@ export const EVENT_KIND = {
   LIKE: 7,
   REPOST: 6,
 }
+
+export const PURPLEPAG_RELAY_URL = 'wss://purplepag.es/'

@@ -32,6 +32,8 @@
   import { useFeed } from '@/stores/Feed'
   import { usePool } from '@/stores/Pool'
 
+  import { PURPLEPAG_RELAY_URL } from '@/nostr'
+
   const router = useRouter()
   const route = useRoute()
   const npubStore = useNpub()
@@ -326,9 +328,9 @@
           .filter(r => r.connected)
           .map(r => r.url)
 
-        // creating map of relays for each follow (person whish user follow)
-        // map will be used further for loading metas of authors of posts and references inside posts
-        // because laoding from the whole bunch of all follows relays is too slow, 
+        // creating map of relays for each follow (person which user follow)
+        // this map will be used further for loading metas of authors of posts and references inside posts
+        // because laoding from the bunch of all follows relays is too slow,
         // so we will load only from relays of the author of the post
         followsMeta.forEach((event: Event) => {
           const normalizedUrls: string[] = []
@@ -363,17 +365,25 @@
     const postPromises = []
     const cachedMetasPubkeys: string[] = []
     const cachedMetas: { [key: string]: Event | null } = {}
+
     for (const post of posts) {
       const author = post.pubkey
       const relays = feedStore.isFollowsSource && followsRelaysMap[author]?.length ? followsRelaysMap[author] : feedRelays
 
+      let usePurple = feedStore.isFollowsSource && followsRelaysMap[author]?.length && relays.includes(PURPLEPAG_RELAY_URL)
       let metasPromise = null
+      let metaAuthorPromise = null
 
       const allPubkeysToGet = getNoteReferences(post)
-      if (!allPubkeysToGet.includes(author)) {
+      if (!usePurple && !allPubkeysToGet.includes(author)) {
         allPubkeysToGet.push(author)
       }
-      
+
+      if (usePurple && !cachedMetasPubkeys.includes(author)) {
+        cachedMetasPubkeys.push(author)
+        metaAuthorPromise = pool.get([PURPLEPAG_RELAY_URL], { kinds: [0], authors: [author] })
+      }
+
       // cache used later for already downloaded authors
       const pubkeysForRequest: string[] = []
       allPubkeysToGet.forEach(pubkey => {
@@ -381,14 +391,15 @@
           cachedMetasPubkeys.push(pubkey)
           pubkeysForRequest.push(pubkey)
         }
-      });
+      })
+
       if (pubkeysForRequest.length) {
         metasPromise = pool.querySync(relays, { kinds: [0], authors: pubkeysForRequest })
       }
-      
+
       const likesRepostsRepliesPromise = pool.querySync(relays, { kinds: [1, 6, 7], "#e": [post.id] })
-      const postPromise = Promise.all([post, metasPromise, likesRepostsRepliesPromise])
-      
+      const postPromise = Promise.all([post, metasPromise, likesRepostsRepliesPromise, metaAuthorPromise])
+
       postPromises.push(postPromise)
     }
     
@@ -401,12 +412,19 @@
       const post = result[0]
       const metas = result[1] || []
       const likesRepostsReplies = result[2] || []
-      
-      const filteredMetas = filterMetas(metas)
-      
-      let authorMeta = null
+      let authorMeta = result[3]
+
       const referencesMetas: (Event | null)[] = []
       const refsPubkeys: string[] = []
+
+      // cache author from purplepag too, if presented
+      if (authorMeta) {
+        cachedMetas[authorMeta.pubkey] = authorMeta
+        referencesMetas.push(authorMeta)
+        refsPubkeys.push(authorMeta.pubkey)
+      }
+
+      const filteredMetas = filterMetas(metas)
       filteredMetas.forEach((meta) => {
         const ref: Event = meta
         cachedMetas[meta.pubkey] = meta
@@ -441,6 +459,7 @@
         feedStore.setLoadingMoreStatus(true)
       }
     }
+
     feedStore.setLoadingMoreStatus(false)
     
     posts.forEach((e: Event) => {
