@@ -11,7 +11,9 @@ description: 'High-security, auditable set of contained cryptographic libraries 
 - Highly readable TypeScript / JS code
 - PGP-signed releases and transparent NPM builds
 
-The idea was to: 1) improve knowledge of cryptography 2) improve supply chain security of JS ecosystem 3) provide libraries that could be used for learning, because other libs are too low-level / unfriendly to beginners. Active projects:
+The idea was to: 1) improve knowledge of cryptography 2) improve supply chain security of JS ecosystem 3) provide libraries that could be used for learning, because other libs are too low-level / unfriendly to beginners.
+
+Active projects:
 
 - **ciphers** ([github](https://github.com/paulmillr/noble-ciphers), [npm](https://www.npmjs.com/package/@noble/ciphers)): cryptographic ciphers, including Salsa20, ChaCha, AES and FF1.
 - **curves** ([github](https://github.com/paulmillr/noble-curves), [npm](https://www.npmjs.com/package/@noble/curves)): elliptic curve cryptography, including Weierstrass, Edwards, Montgomery curves, pairings, hash-to-curve, poseidon hash, schnorr, secp256k1, ed25519, ed448, p521, bn254, bls12-381 and others.
