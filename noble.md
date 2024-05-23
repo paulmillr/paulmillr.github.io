@@ -25,11 +25,12 @@ The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and 
 
 ### History
 
-- Jun 2019: initial release of [secp256k1](https://github.com/paulmillr/noble-secp256k1/commit/d544593d752a3101414eb1b3c3bee0c0fec349db), [ed25519](https://github.com/paulmillr/noble-ed25519/commit/36ded8a5dcc83ed171d05bb1c66ba7791b2299eb) and [bls12-381](https://github.com/paulmillr/noble-bls12-381/commit/d25ed4d8f1e91fc7a9858ac81c8cb52179f29ee0)
+- Jun 2019: initial release of [secp256k1](https://github.com/paulmillr/noble-secp256k1/commit/d544593d752a3101414eb1b3c3bee0c0fec349db), [ed25519](https://github.com/paulmillr/noble-ed25519/commit/36ded8a5dcc83ed171d05bb1c66ba7791b2299eb) and then [bls12-381](https://github.com/paulmillr/noble-bls12-381/commit/d25ed4d8f1e91fc7a9858ac81c8cb52179f29ee0)
 - Apr 2020: the [blog post](/posts/noble-secp256k1-fast-ecc/) about ecc went live
-- Apr 2021: secp256k1 has been [audited](https://cure53.de/pentest-report_noble-lib.pdf) by Cure53, [crowdfunded](https://gitcoin.co/grants/2451/audit-of-noble-secp256k1-cryptographic-library) with help of [Umbra.cash](https://umbra.cash)
-- Oct 2021: hashes have been [released](https://github.com/paulmillr/noble-hashes/commit/54dfdfd9fc209814effbcbf20819336736be9273), funded by [Ethereum Foundation](https://ethereum.org/en/)
-- Nov 2021: received a grant from [Optimism](https://www.optimism.io)
+- 2021
+  - Apr: secp256k1 has been [audited](https://cure53.de/pentest-report_noble-lib.pdf) by Cure53, [crowdfunded](https://gitcoin.co/grants/2451/audit-of-noble-secp256k1-cryptographic-library) with help of [Umbra.cash](https://umbra.cash)
+  - Oct: hashes have been [released](https://github.com/paulmillr/noble-hashes/commit/54dfdfd9fc209814effbcbf20819336736be9273), funded by [Ethereum Foundation](https://ethereum.org/en/)
+  - Nov: received a grant from [Optimism](https://www.optimism.io)
 - 2022
   - Jan: hashes have been [audited](https://cure53.de/pentest-report_hashing-libs.pdf) by Cure53, funded by Ethereum Foundation with help of [Nomic Labs](https://nomiclabs.io)
   - Feb: ed25519 has been [audited](https://cure53.de/pentest-report_ed25519.pdf) by Cure53
@@ -39,7 +40,9 @@ The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and 
   - Mar: secp256k1 and ed25519 have been rewritten and became 4KB single-feature versions of curves
   - Jun: ciphers have been [released](https://github.com/paulmillr/noble-ciphers/commit/f0e21ed3496a0d6082027effbc54d2e7f4db2027)
   - Sep: curves have been [audited](https://github.com/paulmillr/noble-curves/blob/main/audit/2023-09-kudelski-audit-starknet.pdf) by Kudelski Security, funded by [starknet](https://www.starknet.io/en)
-- Feb 2024: post-quantum have been [released](https://github.com/paulmillr/noble-post-quantum/commit/2834e5c3409f70309edf9c30b2c4206cd449cd8e)
+- 2024
+  - Feb: post-quantum have been [released](https://github.com/paulmillr/noble-post-quantum/commit/2834e5c3409f70309edf9c30b2c4206cd449cd8e)
+  - May: received a grant from [Farcaster](https://www.farcaster.xyz)
 
 ### scure
 
