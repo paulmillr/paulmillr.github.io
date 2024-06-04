@@ -13,7 +13,8 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: true,
+    sourcemap: false,
+    minify: false,
     assetsDir: 'assets',
     assetsInlineLimit: 0,
     rollupOptions: {
@@ -22,14 +23,14 @@ export default defineConfig({
         entryFileNames: 'main.js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name) {
-            let extType = assetInfo.name.split('.').at(1);
-            if (extType === 'css') return `main.css`;
+            let extType = assetInfo.name.split('.').at(1)
+            if (extType === 'css') return `main.css`
           }
           return 'assets/[name]-[hash][extname]'
         }
       }
     },
     cssCodeSplit: false,
-    outDir: 'dist',
-  },
+    outDir: 'dist'
+  }
 })
