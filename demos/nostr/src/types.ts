@@ -1,4 +1,6 @@
-import type { Event } from 'nostr-tools';
+import type { Event, UnsignedEvent } from 'nostr-tools';
+
+export type Rumor = UnsignedEvent & {id: string}
 
 export type Author = {
   name: string
@@ -53,4 +55,24 @@ export type Nip65RelaysUrls = {
   read: string[],
   write: string[],
   all: Array<TypedRelay>
+}
+
+export type ChatMessage = {
+  event: Rumor,
+  isPublished: boolean,
+}
+
+export type Chat = {
+  id: string,
+  title: string,
+  created_at_last_message: number,
+  initialRoomTags?: Array<any>,
+  messages: Array<ChatMessage>,
+}
+
+export type RawChat = {
+  id?: string,
+  title?: string,
+  created_at_last_message?: number,
+  messages: Array<ChatMessage>,
 }

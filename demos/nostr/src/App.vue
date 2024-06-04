@@ -151,6 +151,7 @@
     })
   }
 
+  // TODO: create separate func handleRelayReconnect instead of using useProvidedRelaysList param
   async function handleRelayConnect(useProvidedRelaysList: boolean = false, changeFeedSource: boolean = false) {
     if (relayStore.isConnectingToRelay) return
 
@@ -192,6 +193,9 @@
     }
 
     let relay: Relay;
+
+    relayStore.setIsConnectingToReadWriteRelaysStatus(true)
+    relayStore.setIsConnectedToReadWriteRelaysStatus(false)
 
     if (!useProvidedRelaysList) {
       try {
@@ -253,12 +257,14 @@
       feedStore.setLoadingFeedSourceStatus(true)
     }
 
+    // return
     const userConnectedReadRelays: string[] = []
-    if (relayStore.reedRelays.length) {
+    const userConnectedWriteRelays: string[] = []
+    if (relayStore.userReadWriteRelays.length) {
       const result = await Promise.all(
-        relayStore.reedRelays.map(async (relay) => {
-          const isConnected = await isWsAvailable(relay)
-          return { url: relay, connected: isConnected }
+        relayStore.userReadWriteRelays.map(async (relay) => {
+          const isConnected = await isWsAvailable(relay.url)
+          return { url: relay.url, connected: isConnected, type: relay.type }
         })
       )
 
@@ -271,6 +277,9 @@
 
         if (r.connected) {
           userConnectedReadRelays.push(r.url)
+          if (r.type === 'write') {
+            userConnectedWriteRelays.push(r.url)
+          }
         }
 
         // do not show log for the same relay again
@@ -283,12 +292,17 @@
       })
     }
 
+    relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays)
+    relayStore.setConnectedUserWriteRelayUrls(userConnectedWriteRelays)
+    relayStore.setIsConnectingToReadWriteRelaysStatus(false)
+    relayStore.setIsConnectedToReadWriteRelaysStatus(true)
+
     // if no user default relays from nsec, use current relay
     let feedRelays = userConnectedReadRelays.length ? userConnectedReadRelays : [relayUrl]
 
     const pubkey = nsecStore.getPubkey()
     const followsRelaysMap: Record<string, string[]> = {}
-    let followsPubkeys: string[] = [];
+    let followsPubkeys: string[] = []
     if (feedStore.isFollowsSource && nsecStore.isValidNsecPresented()) {
       const follows = await pool.get(feedRelays, { kinds: [3], limit: 1, authors: [pubkey] })
 
@@ -355,7 +369,6 @@
       postsFilter.authors = followsPubkeys
     }
 
-    relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays)
     relayStore.setConnectedFeedRelayUrls(feedRelays)
     
     const postsEvents = await listRootEvents(pool as SimplePool, feedRelays, [postsFilter]) as Event[]
@@ -680,6 +693,7 @@
     <router-link class="tab-link" to="/feed">Feed</router-link>
     <router-link class="tab-link" :to="userTabLink">User</router-link>
     <router-link class="tab-link" to="/message">Message</router-link>
+    <router-link class="tab-link" to="/chat">Chat</router-link>
     <router-link class="tab-link" to="/help">Help</router-link>
     <router-link class="tab-link" to="/log">Log</router-link>
     <router-link class="tab-link" to="/settings">Settings</router-link>
@@ -714,14 +728,14 @@
     flex-direction: column;
   }
 
-  @media (min-width: 375px) {
+  @media (min-width: 412px) {
     .tabs {
       flex-direction: row;
       justify-content: space-between;
     }
   }
 
-  @media (min-width: 450px) {
+  @media (min-width: 510px) {
     .tabs {
       display: block;
     }
@@ -734,7 +748,7 @@
     cursor: pointer;
   }
 
-  @media (min-width: 450px) {
+  @media (min-width: 510px) {
     .tab-link {
       margin-right: 15px;
     }

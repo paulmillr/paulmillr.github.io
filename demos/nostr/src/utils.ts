@@ -484,3 +484,40 @@ export const formatedDate = (date: number) => {
     minute: 'numeric'
   })
 }
+
+export const formatedDateYear = (date: number) => {
+  return new Date(date * 1000).toLocaleString('default', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  })
+}
+
+export const racePromises = (promises: Promise<any>[], handleSuccess: (result: any) => void, handleError: (error: any) => void) => {
+  if (promises.length === 0) return
+
+  const wrappedPromises = promises.map(p => 
+    p.then(result => ({ result, isFulfilled: true, originalPromise: p }))
+    .catch(error => ({ result: error, isFulfilled: false, originalPromise: p }))
+  );
+
+  Promise.race(wrappedPromises).then(({ result, isFulfilled, originalPromise }) => {
+    if (isFulfilled) {
+      handleSuccess(result)
+    } else {
+      handleError(result)
+    }
+
+    // Remove the handled promise from the array
+    const remainingPromises = promises.filter(p => p !== originalPromise)
+
+    // Continue racing the remaining promises
+    racePromises(remainingPromises, handleSuccess, handleError)
+  })
+}
+
+function _delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

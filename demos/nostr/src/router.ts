@@ -5,6 +5,7 @@ import SignedEventInput from '@/components/SignedEventInput.vue'
 import Help from '@/components/Help.vue'
 import User from '@/components/User.vue'
 import Settings from '@/views/Settings.vue'
+import Chat from '@/views/Chat.vue'
 
 const routes = [
   { 
@@ -22,6 +23,11 @@ const routes = [
       default: Feed,
       signedEventInput: SignedEventInput
     },
+  },
+  { 
+    path: '/chat', 
+    name: 'Chat', 
+    component: Chat,
   },
   {
     path: '/log',
