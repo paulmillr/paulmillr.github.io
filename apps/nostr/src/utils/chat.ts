@@ -75,8 +75,14 @@ export const getNewChatRoomHash = (pubkeys: string[]) => {
 }
 
 export const getRumorFromWrap = (giftWrap: Event, privateKey: Uint8Array) => {
-  const seal = nip44Decrypt(giftWrap, privateKey) // kind 13
-  const rumor = nip44Decrypt(seal, privateKey) // kind 14
+  let seal, rumor
+
+  try {
+    seal = nip44Decrypt(giftWrap, privateKey) // kind 13
+    rumor = nip44Decrypt(seal, privateKey) // kind 14
+  } catch (e) {
+    return null
+  }
 
   // NIP-17 (https://github.com/nostr-protocol/nips/blob/master/17.md)
   // Clients MUST verify if pubkey of the kind:13 is the same pubkey on the kind:14, 

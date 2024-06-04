@@ -8333,7 +8333,7 @@ function output$2(out, instance) {
     throw new Error(`digestInto() expects output buffer of length at least ${min}`);
   }
 }
-const crypto$1 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
+const crypto$2 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
 /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
 const u8a$2 = (a) => a instanceof Uint8Array;
 const createView$2 = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
@@ -8379,8 +8379,8 @@ function wrapConstructor$2(hashCons) {
   return hashC;
 }
 function randomBytes$1(bytesLength = 32) {
-  if (crypto$1 && typeof crypto$1.getRandomValues === "function") {
-    return crypto$1.getRandomValues(new Uint8Array(bytesLength));
+  if (crypto$2 && typeof crypto$2.getRandomValues === "function") {
+    return crypto$2.getRandomValues(new Uint8Array(bytesLength));
   }
   throw new Error("crypto.getRandomValues must be defined");
 }
@@ -10253,7 +10253,7 @@ const schnorr = /* @__PURE__ */ (() => ({
     mod
   }
 }))();
-const crypto = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
+const crypto$1 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
 /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
 const u8a = (a) => a instanceof Uint8Array;
 const createView$1 = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
@@ -10326,8 +10326,8 @@ function wrapConstructor$1(hashCons) {
   return hashC;
 }
 function randomBytes(bytesLength = 32) {
-  if (crypto && typeof crypto.getRandomValues === "function") {
-    return crypto.getRandomValues(new Uint8Array(bytesLength));
+  if (crypto$1 && typeof crypto$1.getRandomValues === "function") {
+    return crypto$1.getRandomValues(new Uint8Array(bytesLength));
   }
   throw new Error("crypto.getRandomValues must be defined");
 }
@@ -17481,8 +17481,11 @@ const _sfc_main$9 = /* @__PURE__ */ defineComponent({
 const Settings_vue_vue_type_style_index_0_scoped_d5b9796a_lang = "";
 const Settings = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["__scopeId", "data-v-d5b9796a"]]);
 const TWO_DAYS = 2 * 24 * 60 * 60;
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (4294967295 + 1);
+};
 const now = () => Math.round(Date.now() / 1e3);
-const randomNow = () => Math.round(now() - Math.random() * TWO_DAYS);
+const randomNow = () => Math.round(now() - secureRandom() * TWO_DAYS);
 const nip44ConversationKey = (privateKey, publicKey) => nip44_exports.v2.utils.getConversationKey(bytesToHex(privateKey), publicKey);
 const nip44Encrypt = (data, privateKey, publicKey) => nip44_exports.v2.encrypt(JSON.stringify(data), nip44ConversationKey(privateKey, publicKey));
 const nip44Decrypt = (data, privateKey) => JSON.parse(nip44_exports.v2.decrypt(data.content, nip44ConversationKey(privateKey, data.pubkey)));
@@ -17828,8 +17831,13 @@ const getNewChatRoomHash = (pubkeys) => {
   return bytesToHex(sha256(strToHash));
 };
 const getRumorFromWrap = (giftWrap, privateKey) => {
-  const seal = nip44Decrypt(giftWrap, privateKey);
-  const rumor = nip44Decrypt(seal, privateKey);
+  let seal, rumor;
+  try {
+    seal = nip44Decrypt(giftWrap, privateKey);
+    rumor = nip44Decrypt(seal, privateKey);
+  } catch (e) {
+    return null;
+  }
   if (seal.pubkey !== rumor.pubkey) {
     return null;
   }

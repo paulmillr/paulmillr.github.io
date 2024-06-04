@@ -6,8 +6,12 @@ export type Rumor = UnsignedEvent & {id: string}
 
 export const TWO_DAYS = 2 * 24 * 60 * 60
 
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)
+}
+
 export const now = () => Math.round(Date.now() / 1000)
-const randomNow = () => Math.round(now() - (Math.random() * TWO_DAYS))
+const randomNow = () => Math.round(now() - (secureRandom() * TWO_DAYS))
 
 export const nip44ConversationKey = (privateKey: Uint8Array, publicKey: string) =>
   nip44.v2.utils.getConversationKey(bytesToHex(privateKey), publicKey)
