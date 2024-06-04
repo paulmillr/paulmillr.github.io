@@ -1,57 +1,71 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>{{ site.title }}{% if page.title != null %}&nbsp;&mdash; {{ page.title }}{% endif %}</title>
-  {% if page.title != null %}<meta property="og:title" content="{{ page.title }}" />
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>
+      {{ site.title }}{% if page.title != null %}&nbsp;&mdash; {{ page.title }}{% endif %}
+    </title>
+    {% if page.title != null %}
+    <meta property="og:title" content="{{ page.title }}" />
     <meta property="og:image" content="/assets/images/hy.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="{{ page.title }}" />
-    <meta name="twitter:site" content="@paulmillr" />{% endif %}
-  <meta name="description" content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}">
-  <meta property="og:description" content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}" />
-  <meta name="author" content="Paul Miller">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="alternate" type="application/rss+xml" title="Paul Miller" href="/feed.xml" />
-  <link rel="stylesheet" href="/assets/stylesheets/style.css?v=3">
-  {% if page.url == '/demos/nostr/' %}
-    <link rel="manifest" href="/demos/nostr/app.webmanifest">
-  {% endif %}
-</head>
-<body>
-  <nav>
-    <span class="breadcrumbs">
-      <a href="/" itemprop="person" itemscope>Paul Miller</a>
-      {% if page.title_short != null %}
+    <meta name="twitter:site" content="@paulmillr" />
+    {% endif %}
+    <meta
+      name="description"
+      content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}"
+    />
+    <meta
+      property="og:description"
+      content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}"
+    />
+    <meta name="author" content="Paul Miller" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="alternate" type="application/rss+xml" title="Paul Miller" href="/feed.xml" />
+    <link rel="stylesheet" href="/assets/stylesheets/style.css?v=3" />
+    {% if page.url == '/apps/nostr/' %}
+    <link rel="manifest" href="/apps/nostr/app.webmanifest" />
+    {% endif %}
+  </head>
+  <body>
+    <nav>
+      <span class="breadcrumbs">
+        <a href="/" itemprop="person" itemscope>Paul Miller</a>
+        {% if page.title_short != null %}
         <span>/</span>
         <span>projects</span>
         <span>/</span>
         <a href="{{ page.url }}">{{ page.title_short }}</a>
-      {% elsif page.tags != null %}
+        {% elsif page.tags != null %}
         <span>/</span>
         <span>writing</span>
         <span>/</span>
-        {{ page.date | date: "%b %Y" }}
-      {% elsif page.title != null %}
+        {{ page.date | date: "%b %Y" }} {% elsif page.title != null %}
         <span>/</span>
-        {{ page.title }}
-      {% endif %}
-    </span>
-    <span class="author-photo-img-wrap">
-      <a href="/"><img src="/assets/images/profile.jpg" width="125" height="125" alt="avatar" class="author-photo-img"></a>
-      <!-- <a href="/"><img src="/assets/images/hy.png" width="125" height="125" alt="avatar" class="author-photo-img"></a> -->
-    </span>
-  </nav>
-  <main>
-    {{ content }}
-  </main>
-  <footer>
-    <p>
-      This page does not track you.
-      All content is in <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</a>, check out the <a href="https://github.com/paulmillr/paulmillr.github.io">source code</a>.
-      An attribution would be nice though.
-    </p>
-  </footer>
-</body>
+        {{ page.title }} {% endif %}
+      </span>
+      <span class="author-photo-img-wrap">
+        <a href="/"
+          ><img
+            src="/assets/images/profile.jpg"
+            width="125"
+            height="125"
+            alt="avatar"
+            class="author-photo-img"
+        /></a>
+        <!-- <a href="/"><img src="/assets/images/hy.png" width="125" height="125" alt="avatar" class="author-photo-img"></a> -->
+      </span>
+    </nav>
+    <main>{{ content }}</main>
+    <footer>
+      <p>
+        This page does not track you. All content is in
+        <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</a>, check out
+        the <a href="https://github.com/paulmillr/paulmillr.github.io">source code</a>. An
+        attribution would be nice though.
+      </p>
+    </footer>
+  </body>
 </html>

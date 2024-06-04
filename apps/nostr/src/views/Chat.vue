@@ -3,10 +3,10 @@
   import { SimplePool, utils, type SubCloser, type Filter } from "nostr-tools"
   import { TWO_DAYS, now } from '@/utils/chat-crypto'
   import { racePromises } from '@/utils'
-  import { 
-    injectChatTitle, 
-    getChatRoomHash, 
-    getRumorFromWrap, 
+  import {
+    injectChatTitle,
+    getChatRoomHash,
+    getRumorFromWrap,
     getChatMessageFromRumor,
     getNewChatRoomHash,
     getNewChatTitle,
@@ -126,7 +126,7 @@
           }
         })
       })
-      
+
       if (dmRelaysUrlsSet.size) {
         relays = [...dmRelaysUrlsSet] as string[]
         relayStore.setUserDMRelaysUrls(relays) // save for future use (message posting)
@@ -189,7 +189,7 @@
       filter.since = since
     }
     chatSub = pool.subscribeMany(
-      relays, 
+      relays,
       [filter],
       {
         onevent(giftWrap) {
@@ -312,17 +312,17 @@
     <p>
       Chats use the new Nostr <a target="_blank" href="https://github.com/nostr-protocol/nips/blob/master/44.md">NIP-44</a> encryption standard.
       Make sure the person you are chatting with uses a Nostr client that supports this NIP.
-      <!-- <a href="/demos/nostr/#/help">More info</a> about messages and used relays. -->
+      <!-- <a href="/apps/nostr/#/help">More info</a> about messages and used relays. -->
     </p>
   </div>
 
   <div class="user-field-wrapper">
-    <ChatCreateRoomForm 
-      @startChat="startChat" 
+    <ChatCreateRoomForm
+      @startChat="startChat"
       :isLoadingProfile="isLoadingNewChatProfile"
     />
   </div>
-  
+
   <h3 class="chats-title">
     Chats
   </h3>
@@ -336,17 +336,17 @@
   </div>
 
   <div v-if="isConnectedLoggedInUser && !isChatsLoading" class="chats">
-    <ChatsList 
-      :chats="sortedChats" 
-      :currentChatId="currentChatId" 
+    <ChatsList
+      :chats="sortedChats"
+      :currentChatId="currentChatId"
       :handleSelectChat="handleSelectChat"
       :showChatsList="showChatsList"
     />
-    <ChatsConversation 
+    <ChatsConversation
       v-if="!chatsEmpty"
       @setMessageStatusToPublished="setMessageStatusToPublished"
       @handleDeselectChat="handleDeselectChat"
-      :chat="userChats[currentChatId]" 
+      :chat="userChats[currentChatId]"
       :userPubkey="userPubkey"
       :showChatsList="showChatsList"
     />
@@ -355,7 +355,7 @@
 
 <style scoped>
   .chats-title {
-    margin-top: 25px; 
+    margin-top: 25px;
     margin-bottom: 10px;
   }
 

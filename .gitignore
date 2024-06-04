@@ -3,4 +3,4 @@
 /_site/
 /Gemfile.lock
 /noble/demo-ecc/npm-shrinkwrap.json
-/demos/nostr/_site
+/apps/nostr/_site

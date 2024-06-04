@@ -4,8 +4,8 @@
   "short_name": "nostr.spa",
   "description": "The lightweight nostr client is built to showcase noble cryptography. Signing is done using noble-curves, while scure-base is used for bech32, nostr-tools are used for general nostr utilities and Vue.js is utilized for UI.",
   "display": "standalone",
-  "scope": "/demos/nostr",
-  "start_url": "/demos/nostr",
+  "scope": "/apps/nostr",
+  "start_url": "/apps/nostr",
   "background_color": "#100F0F",
   "theme_color": "#0092bf",
   "icons": [

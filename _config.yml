@@ -3,5 +3,14 @@ description: Paul Miller — entrepreneur. I make projects which help developers
 url: https://paulmillr.com
 permalink: /posts/:title/
 markdown: kramdown
-include: [".well-known"]
-exclude: ["demos/nostr/node_modules", "demos/nostr-2", "demos/qr/node_modules", "noble/demo-ecc", "Makefile", "README.md", "demos/noble/node_modules", "noble/node_modules"]
+include: ['.well-known']
+exclude:
+  [
+    'apps/nostr/node_modules',
+    'apps/qr/node_modules',
+    'noble/demo-ecc',
+    'Makefile',
+    'README.md',
+    'apps/noble/node_modules',
+    'noble/node_modules',
+  ]
