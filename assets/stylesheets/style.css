@@ -194,6 +194,9 @@ a:visited {
 .post-list > li {
   display: flex;
 }
+.post-list time {
+  flex-basis: 34pt;
+}
 time,
 .post-arrow,
 .about-author,
