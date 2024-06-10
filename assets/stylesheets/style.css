@@ -234,6 +234,16 @@ tr {
   .breadcrumbs a:visited {
     color: #cecdc3; /* f-200 */
   }
+  time,
+  .post-arrow,
+  .about-author,
+  footer,
+  .about-author a,
+  .about-author a:visited,
+  ol > li::marker,
+  ul > li::marker {
+    color: #7e7c78;
+  }
 }
 
 /* highlight.css stuff */
