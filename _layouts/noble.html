@@ -5,14 +5,7 @@ layout: base
 <article>
   <content>
     <h2>{{ page.title }}</h2>
-    {% if page.date != null %}
-      <time datetime="{{ page.date | date: "%Y-%m-%d" }}">{{ page.date | date: "%d %b %y" }}</time>
-    {% endif %}
     <section class="post-content">{{ content }}</section>
-    {% if page.twitter != null %}
-      <div class="page-comments"><a href="{{ page.twitter }}">Comment this post on X.com</a></div>
-    {% endif %}
-
     <div id="noble-demos"></div>
   </content>
 </article>

@@ -192,7 +192,8 @@ body {
   background-color: #fffcf0;
   color: #100f0f;
 }
-a {
+a,
+.breadcrumbs a:visited {
   color: #100f0f; /* f-black */
   /* text-decoration-skip: none; */
   text-underline-offset: 0.4rem;
@@ -200,19 +201,13 @@ a {
 a:visited {
   color: #797272;
 }
-.breadcrumbs a:visited {
-  color: #100f0f;
-}
 .post-date {
   display: inline-block;
   width: 33pt;
 }
-time,
-.post-arrow,
-.about-author,
-footer,
-.about-author a,
-.about-author a:visited,
+.dimmed,
+.dimmed a,
+.dimmed a:visited,
 ol > li::marker,
 ul > li::marker {
   color: #575653; /* f-700 */
@@ -225,24 +220,19 @@ tr {
     background-color: #100f0f; /* f-black */
     color: #cecdc3; /* f-200 */
   }
-  a {
+  a,
+  .breadcrumbs a:visited {
     color: #cecdc3; /* f-200 */
   }
   a:visited {
     color: #84847e;
   }
-  .breadcrumbs a:visited {
-    color: #cecdc3; /* f-200 */
-  }
-  time,
-  .post-arrow,
-  .about-author,
-  footer,
-  .about-author a,
-  .about-author a:visited,
+  .dimmed,
+  .dimmed a,
+  .dimmed a:visited,
   ol > li::marker,
   ul > li::marker {
-    color: #7e7c78;
+    color: #a09d98;
   }
 }
 
