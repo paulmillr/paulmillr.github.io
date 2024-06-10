@@ -106,49 +106,54 @@ summary {
 
 /* Custom CSS for paulmillr.com */
 /* base: 14pt, smaller: 11pt, small: 10pt */
+html {
+  font-size: 62.5%; /* Make the root font-size 10px by default: 1.8rem would become 18px. */
+}
 body {
-  line-height: 1.618;
-  margin-top: 1rem;
+  font-size: 1.9rem; /* 18px font size */
+  line-height: 1.618; /* Golden ratio for line-height */
+  max-width: 38em; /* 684px */
+  margin: 5rem auto 0 auto;
   padding-bottom: 20rem;
-  font-size: 14pt;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 nav,
 main,
 footer {
-  margin: 3rem auto 0 auto;
-  max-width: 660px;
+  /* margin: 3rem auto 0 auto; */
+  /* max-width: 38em; */
 }
 nav {
   align-items: center;
   display: flex;
 }
-nav .breadcrumbs {
+.breadcrumbs {
   flex-grow: 1;
+  font-size: 1.15em;
 }
 nav .author-photo-img-wrap {
   flex-shrink: 1;
 }
 nav .author-photo-img {
-  border-radius: 100px;
-  width: 4rem;
-  height: 4rem;
-  max-width: 4rem;
+  border-radius: 10rem;
+  width: 6rem;
+  height: 6rem;
+  max-width: 6rem;
   display: inline-flex;
 }
 footer {
   font-size: 10pt;
-  margin-top: 5rem;
+  margin-top: 8rem;
 }
 article h2 {
-  margin-top: 2rem;
+  margin-top: 4rem;
 }
 article img {
   max-width: 100%;
 }
 h2 {
-  font-size: 1.25rem;
+  /* font-size: 1.5em; */
   font-weight: 500;
 }
 ul,
@@ -157,7 +162,7 @@ ol {
 }
 ol > li,
 ul > li {
-  padding: 0.12rem 0;
+  /* padding: 0.2rem 0; */
 }
 table {
   border-collapse: collapse;
@@ -175,7 +180,7 @@ pre {
   overflow: scroll;
   padding: 1rem;
 }
-@media (max-width: 600px) {
+@media (max-width: 30em) {
   body {
     padding: 0 2rem;
   }
@@ -187,9 +192,16 @@ body {
   background-color: #fffcf0;
   color: #100f0f;
 }
-a,
-a:visited {
+a {
   color: #100f0f; /* f-black */
+  /* text-decoration-skip: none; */
+  text-underline-offset: 0.4rem;
+}
+a:visited {
+  color: #797272;
+}
+.breadcrumbs a:visited {
+  color: #100f0f;
 }
 .post-date {
   display: inline-block;
@@ -213,8 +225,13 @@ tr {
     background-color: #100f0f; /* f-black */
     color: #cecdc3; /* f-200 */
   }
-  a,
+  a {
+    color: #cecdc3; /* f-200 */
+  }
   a:visited {
+    color: #84847e;
+  }
+  .breadcrumbs a:visited {
     color: #cecdc3; /* f-200 */
   }
 }
