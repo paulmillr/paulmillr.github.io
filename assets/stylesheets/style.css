@@ -191,11 +191,9 @@ a,
 a:visited {
   color: #100f0f; /* f-black */
 }
-.post-list > li {
-  display: flex;
-}
-.post-list time {
-  flex-basis: 34pt;
+.post-date {
+  display: inline-block;
+  width: 33pt;
 }
 time,
 .post-arrow,
