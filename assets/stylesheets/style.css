@@ -1,64 +1,135 @@
 /*! modern-normalize v2.0.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
 html {
-  font-family: system-ui,'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji';
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
-  -moz-tab-size: 4;
+  -moz-tab-size: 2;
   tab-size: 2;
 }
-body { margin: 0; }
-hr { height: 0; color: inherit; }
-abbr[title] { text-decoration: underline dotted; }
-b, strong { font-weight: bolder; }
-code, kbd, samp, pre {
+body {
+  margin: 0;
+}
+hr {
+  height: 0;
+  color: inherit;
+}
+abbr[title] {
+  text-decoration: underline dotted;
+}
+b,
+strong {
+  font-weight: bolder;
+}
+code,
+kbd,
+samp,
+pre {
   font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 1em;
 }
-small { font-size: 80%; }
-sub, sup {
+small {
+  font-size: 80%;
+}
+sub,
+sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
   vertical-align: baseline;
 }
-sub { bottom: -0.25em; }
-sup { top: -0.5em; }
-table { text-indent: 0; border-color: inherit; }
-button, input, optgroup, select, textarea {
+sub {
+  bottom: -0.25em;
+}
+sup {
+  top: -0.5em;
+}
+table {
+  text-indent: 0;
+  border-color: inherit;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
   font-family: inherit;
   font-size: 100%;
   line-height: 1.15;
   margin: 0;
 }
-button, select { text-transform: none; }
-button, [type='button'], [type='reset'], [type='submit'] { -webkit-appearance: button; }
-::-moz-focus-inner { border-style: none; padding: 0; }
-:-moz-focusring { outline: 1px dotted ButtonText; }
-:-moz-ui-invalid { box-shadow: none; }
-legend { padding: 0; }
-progress { vertical-align: baseline; }
+button,
+select {
+  text-transform: none;
+}
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+  -webkit-appearance: button;
+}
+::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+legend {
+  padding: 0;
+}
+progress {
+  vertical-align: baseline;
+}
 ::-webkit-inner-spin-button,
-::-webkit-outer-spin-button { height: auto; }
-[type='search'] { -webkit-appearance: textfield; outline-offset: -2px; }
-::-webkit-search-decoration { -webkit-appearance: none; }
-::-webkit-file-upload-button { -webkit-appearance: button;  font: inherit;  }
-summary { display: list-item; }
+::-webkit-outer-spin-button {
+  height: auto;
+}
+[type='search'] {
+  -webkit-appearance: textfield;
+  outline-offset: -2px;
+}
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit;
+}
+summary {
+  display: list-item;
+}
 /* end of modern-normalize.css */
 
 /* Custom CSS for paulmillr.com */
 /* base: 14pt, smaller: 11pt, small: 10pt */
 body {
-  line-height: 1.5;
+  line-height: 1.618;
   margin-top: 1rem;
   padding-bottom: 20rem;
   font-size: 14pt;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
-nav, main, footer { margin: 3rem auto 0 auto; max-width: 660px; }
-nav { align-items: center; display: flex; }
-nav .breadcrumbs { flex-grow: 1; }
-nav .author-photo-img-wrap { flex-shrink: 1; }
+nav,
+main,
+footer {
+  margin: 3rem auto 0 auto;
+  max-width: 660px;
+}
+nav {
+  align-items: center;
+  display: flex;
+}
+nav .breadcrumbs {
+  flex-grow: 1;
+}
+nav .author-photo-img-wrap {
+  flex-shrink: 1;
+}
 nav .author-photo-img {
   border-radius: 100px;
   width: 4rem;
@@ -66,51 +137,102 @@ nav .author-photo-img {
   max-width: 4rem;
   display: inline-flex;
 }
-footer { font-size: 10pt; margin-top: 5rem; }
-article h2 { margin-top: 2rem; }
-article img { max-width: 100%; }
-h2 { font-size: 1.25rem; font-weight: 500; }
-ul, ol { padding-inline-start: 30px; }
-ol > li, ul > li { padding: 0.12rem 0; }
+footer {
+  font-size: 10pt;
+  margin-top: 5rem;
+}
+article h2 {
+  margin-top: 2rem;
+}
+article img {
+  max-width: 100%;
+}
+h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+ul,
+ol {
+  padding-inline-start: 30px;
+}
+ol > li,
+ul > li {
+  padding: 0.12rem 0;
+}
 table {
   border-collapse: collapse;
   font-size: 11pt;
   width: 100%;
 }
-th { text-align: left; }
-tr { border-bottom: 1px solid; }
-pre { font-size: 11pt; overflow: scroll; padding: 1rem; }
+th {
+  text-align: left;
+}
+tr {
+  border-bottom: 1px solid;
+}
+pre {
+  font-size: 11pt;
+  overflow: scroll;
+  padding: 1rem;
+}
 @media (max-width: 600px) {
-  body { padding: 0 2rem; }
+  body {
+    padding: 0 2rem;
+  }
 }
 
 /* All color-related stuff. Some colors from flexoki are utilized. */
 /*! flexoki | MIT License | Copyright (c) 2023 Steph Ango https://github.com/kepano/flexoki */
 body {
-  background-color: #FFFCF0;
-  color: #100F0F;
+  background-color: #fffcf0;
+  color: #100f0f;
 }
-a, a:visited { color: #100F0F; /* f-black */ }
-time, .post-arrow, .about-author, footer, .about-author a, .about-author a:visited,
-ol > li::marker, ul > li::marker {
+a,
+a:visited {
+  color: #100f0f; /* f-black */
+}
+.post-list > li {
+  display: flex;
+}
+time,
+.post-arrow,
+.about-author,
+footer,
+.about-author a,
+.about-author a:visited,
+ol > li::marker,
+ul > li::marker {
   color: #575653; /* f-700 */
 }
-tr { border-bottom-color: #CECDC3; /* f-200 */ }
+tr {
+  border-bottom-color: #cecdc3; /* f-200 */
+}
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #100F0F; /* f-black */
-    color: #CECDC3; /* f-200 */
+    background-color: #100f0f; /* f-black */
+    color: #cecdc3; /* f-200 */
   }
-  a, a:visited { color: #CECDC3; /* f-200 */ }
+  a,
+  a:visited {
+    color: #cecdc3; /* f-200 */
+  }
 }
 
 /* highlight.css stuff */
 pre {
-  background-color: #F2F0E5; /* f-50 */
+  background-color: #f2f0e5; /* f-50 */
   color: #343331; /* f-850 */
 }
-.highlight .c1 { color: #878580; /* f-500, comment */ }
-.highlight .kd { color: #205EA6; /* f-blue-600, keyword */ }
-.highlight .k { color: #66800B; /* f-green-600, constant */ }
-.highlight .mi { color: #24837B; /* f-cyan-600, number */ }
+.highlight .c1 {
+  color: #878580; /* f-500, comment */
+}
+.highlight .kd {
+  color: #205ea6; /* f-blue-600, keyword */
+}
+.highlight .k {
+  color: #66800b; /* f-green-600, constant */
+}
+.highlight .mi {
+  color: #24837b; /* f-cyan-600, number */
+}
 /* end of custom css for paulmillr.com */
