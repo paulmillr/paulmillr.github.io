@@ -48,7 +48,8 @@ function main() {
   window.addEventListener('unhandledrejection', (event) => error('Promise:', event.reason));
   // Decode (camera)
   // DOM elements
-  const controls = document.querySelector('#controls');
+  // const controls = document.querySelector('#controls');
+  const camSelContainer = document.querySelector('.camera-start-container');
   const player = document.querySelector('video');
   const overlay = document.querySelector('#overlay');
   const resultTxt = document.querySelector('#resultTxt');
@@ -93,7 +94,7 @@ function main() {
       option.text = label;
       select.appendChild(option);
     }
-    controls.appendChild(select);
+    camSelContainer.appendChild(select);
   };
 
   let camera;
