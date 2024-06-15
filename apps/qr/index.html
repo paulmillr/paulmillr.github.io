@@ -1,39 +1,53 @@
 ---
 layout: post
-title: "QR Code reader and generator"
+title: 'QR Code reader and generator'
 title_short: 'qr'
-description: "Minimal node.js & browser QR Code Pattern reader and generator."
+description: 'Minimal node.js & browser QR Code Pattern reader and generator.'
 ---
 
 <p>
-  Demo for minimal node.js & browser QR Code Pattern reader and generator.
-  Details and usage on
+  Demo for minimal node.js & browser QR Code Pattern reader and generator. Details and usage on
   <a href="https://github.com/paulmillr/qr" target="_blank">GitHub</a> or
-  <a href="https://www.npmjs.com/package/@paulmillr/qr" target="_blank">NPM</a
-  >.
+  <a href="https://www.npmjs.com/package/@paulmillr/qr" target="_blank">NPM</a>.
 </p>
 
-<h3>QR decoding</h3>
+<h3>QR decoding (camera)</h3>
 
 <p>
-  Click start and put some QR code in front of camera for decoding. See the
-  decoding log and decoded QR below.
+  Click start and put some QR code in front of camera for decoding. See the decoding log and decoded
+  QR below.
 </p>
 
 <script>
   window.exports = {};
 </script>
-<script src="./compiled.js"></script>
+<script src="./qrcode-examples.js"></script>
 
-<div class="controls" id="results">
+<div class="controls" id="controls">
   <button class="start-btn" id="startBtn">Start video capturing</button>
   <span class="controls-field">
     <input type="checkbox" id="isDrawQr" name="isDrawQr" checked />
-    <label for="isDrawQr">Draw QR</label>
+    <label for="isDrawQr">Draw result QR</label>
   </span>
   <span class="controls-field">
-    <input type="checkbox" id="isLogDecoded" name="isLogDecoded" checked />
+    <input type="checkbox" id="isLogDecoded" name="isLogDecoded" />
     <label for="isLogDecoded">Log decoded</label>
+  </span>
+  <span class="controls-field">
+    <input type="checkbox" id="isDrawBitmap" name="isDrawBitmap" />
+    <label for="isDrawBitmap">Draw Bitmap (what decoder see)</label>
+  </span>
+  <span class="controls-field">
+    <input type="checkbox" id="isCropToSquare" name="isCropToSquare" checked />
+    <label for="isCropToSquare">Crop to square</label>
+  </span>
+  <span class="controls-field">
+    <input type="checkbox" id="isFullVideo" name="isFullVideo" />
+    <label for="isFullVideo">Full video size</label>
+  </span>
+  <span class="fps">
+    FPS:
+    <span id="fps-counter"></span>
   </span>
 </div>
 
@@ -42,6 +56,7 @@ description: "Minimal node.js & browser QR Code Pattern reader and generator."
 <div class="results">
   <div id="results-container" class="results-col">
     <video id="qr-video" autoplay=""></video>
+    <canvas id="bitmap"></canvas>
     <canvas id="overlay"></canvas>
   </div>
 
@@ -58,10 +73,23 @@ description: "Minimal node.js & browser QR Code Pattern reader and generator."
 
 <div id="log"></div>
 
+<h3>QR decoding (image)</h3>
+<p>Select image with QR code for decoding</p>
+<p>
+  <input type="file" id="qr-decode-image" accept="image/*" />
+  <label for="qr-decode-image">Image <small>(jpg, png...)</small></label>
+</p>
+<span class="controls-field">
+  <input type="checkbox" id="qr-decode-debug" name="qr-decode-debug" />
+  <label for="qr-decode-debug">Debug</label>
+</span>
+<p>
+  <input type="submit" id="qr-decode-image-clear" value="Clear result" />
+</p>
+<div id="qr-decode-image-result"></div>
+
 <h3>QR encoding</h3>
-
 <p>Type some text or link to the text input for encoding.</p>
-
 <div class="input-field">
   <label class="input-label" for="input-encode">
     <strong>Text to encode</strong>
@@ -81,8 +109,17 @@ description: "Minimal node.js & browser QR Code Pattern reader and generator."
 
 <style>
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      'Open Sans',
+      'Helvetica Neue',
       sans-serif;
   }
 
@@ -108,13 +145,18 @@ description: "Minimal node.js & browser QR Code Pattern reader and generator."
     height: 200px;
   }
 
+  #qr-decode-image-result canvas {
+    width: 100%;
+  }
 
-  #results-container {
+  #results-container,
+  #qr-decode-image-result {
     position: relative;
     max-width: 500px;
   }
 
   #qr-video,
+  #bitmap,
   #overlay {
     top: 0;
     left: 0;
@@ -126,6 +168,12 @@ description: "Minimal node.js & browser QR Code Pattern reader and generator."
     position: relative;
     z-index: 1;
     display: none;
+  }
+
+  #bitmap {
+    position: absolute;
+    z-index: 500;
+    opacity: 1;
   }
 
   #overlay {
@@ -227,5 +275,8 @@ description: "Minimal node.js & browser QR Code Pattern reader and generator."
 
   .qr-ok {
     color: rgb(97, 228, 97);
+  }
+  canvas {
+    transform: translate3d(0, 0, 0); /* May or may not trigger GPU acceleration */
   }
 </style>

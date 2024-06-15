@@ -1,5 +1,5 @@
-import * as decode from '@paulmillr/qr/decode';
 import writeQR from '@paulmillr/qr';
+import { frontalCamera, QRCanvas, frameLoop, getSize } from '@paulmillr/qr/dom';
 
 let IS_STARTED_VIDEO = false;
 
@@ -21,164 +21,205 @@ const log = (...txt) => {
 const error = (...txt) => log('[<span class="qr-error">ERROR</span>]', ...txt);
 const ok = (...txt) => log('[<span class="qr-ok">OK</span>]', ...txt);
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const getSize = (img) => ({
-  width: +getComputedStyle(img).width.split('px')[0],
-  height: +getComputedStyle(img).height.split('px')[0],
-});
+function fpsCounter(elm, frameCount) {
+  const values = [];
+  let prevTs;
+  let cnt = 0;
+  return frameLoop((ts) => {
+    if (prevTs === undefined) prevTs = ts;
+    else {
+      const elapsed = ts - prevTs;
+      prevTs = ts;
+      values.push(elapsed);
+      if (values.length > frameCount) values.shift();
+      const avgFrameTime = values.reduce((a, b) => a + b, 0) / values.length;
+      const fps = 1000 / avgFrameTime;
+      // 10 is pretty random, just to make counter readable
+      if (cnt++ % 10 === 0) elm.innerText = `${fps.toFixed(2)} FPS`;
+    }
+  });
+}
 
 function main() {
-  const SLEEP_MS = 1; // ms to sleep between detection, to avoid 100% cpu usage
-  const TIMEOUT_MS = 500; // if there was no detection for timeout ms - clear overlay
-
-  let lastDetect = Date.now();
-  let ctx;
-  const canvas = document.createElement('canvas');
   ok('Started');
+  fpsCounter(document.querySelector('#fps-counter'), 60); // last 60 frames FPS
+  // Error handlers
+  window.onerror = (message) => error('Onerror:', message);
+  window.addEventListener('unhandledrejection', (event) => error('Promise:', event.reason));
+  // Decode (camera)
+  // DOM elements
+  const controls = document.querySelector('#controls');
   const player = document.querySelector('video');
   const overlay = document.querySelector('#overlay');
   const resultTxt = document.querySelector('#resultTxt');
   const resultTxtLabel = document.querySelector('#resultTxtLabel');
   const resultQr = document.querySelector('#resultQr');
-  const isDrawQr = document.querySelector('#isDrawQr');
-  const isLogDecoded = document.querySelector('#isLogDecoded');
+  const bitmapCanvas = document.querySelector('#bitmap');
   const imgEncodeQr = document.querySelector('#encResultQr');
   const inputEncode = document.querySelector('#input-encode');
   const resultsContainer = document.querySelector('#results-container');
+  let canvasQr;
+  // Checkboxes
+  const isDrawQr = document.querySelector('#isDrawQr');
+  const isDrawBitmap = document.querySelector('#isDrawBitmap');
+  const isCropToSquare = document.querySelector('#isCropToSquare');
+  const isLogDecoded = document.querySelector('#isLogDecoded');
+  const isFullVideo = document.querySelector('#isFullVideo');
+  // Main canvas setup
+  const setup = () => {
+    if (canvasQr) canvasQr.clear();
+    canvasQr = new QRCanvas(
+      {
+        overlay,
+        bitmap: isDrawBitmap.checked ? bitmapCanvas : undefined,
+        resultQR: isDrawQr.checked ? resultQr : undefined,
+      },
+      { cropToSquare: isCropToSquare.checked }
+    );
+  };
+  setup();
+  for (const c of [isDrawQr, isDrawBitmap, isCropToSquare]) c.addEventListener('change', setup);
 
-  const detectFn = (points) => {
-    //ok('DETECTED', JSON.stringify(points));
-    try {
-      lastDetect = Date.now();
-      const [tl, tr, br, bl] = points;
-      const ctx = overlay.getContext('2d');
-      ctx.clearRect(0, 0, overlay.width, overlay.height);
-      ctx.fillStyle = 'green';
-      ctx.beginPath();
-      ctx.moveTo(tl.x, tl.y);
-      ctx.lineTo(tr.x, tr.y);
-      ctx.lineTo(br.x, br.y);
-      ctx.lineTo(bl.x, bl.y);
-      ctx.fill();
-      ctx.fillStyle = 'blue';
-      for (const p of points) {
-        // Finder is is pixels
-        let x = p.x - 3 * p.moduleSize;
-        let y = p.y - 3 * p.moduleSize;
-        const size = 7 * p.moduleSize;
-        ctx.fillRect(x, y, size, size);
-      }
-    } catch (e) {
-      error('detectFn', e);
+  const addCameraSelect = (devices) => {
+    const select = document.createElement('select');
+    select.id = 'camera-select';
+    select.onchange = () => {
+      const deviceId = select.value;
+      if (camera) camera.setDevice(deviceId);
+    };
+    for (const { deviceId, label } of devices) {
+      const option = document.createElement('option');
+      option.value = deviceId;
+      option.text = label;
+      select.appendChild(option);
     }
+    controls.appendChild(select);
   };
 
-  const qrFn = (img) => {
-    try {
-      if (!isDrawQr.checked) return;
-      const { data, height, width } = img;
-      resultQr.width = width;
-      resultQr.height = height;
-      const ctx = resultQr.getContext('2d');
-      ctx.imageSmoothingEnabled = false;
-      //ok('qrFn', `data=${data.length} h=${height} w=${width}`);
-      const imgData = new ImageData(Uint8ClampedArray.from(data), width, height);
-      ctx.putImageData(imgData, 0, 0);
-      resultQr.style = `image-rendering: pixelated;width: ${8 * width}px; height: ${8 * height}px`;
-    } catch (e) {
-      error('qrFn', e);
-    }
-  };
-
-  const overlayLoop = async () => {
-    while (true) {
-      if (!ctx) {
-        await sleep(200);
-        continue;
-      }
-      const { context, width, height } = ctx;
-      let ts = Date.now();
-      context.drawImage(player, 0, 0, width, height);
-      const data = context.getImageData(0, 0, height, width);
-      try {
-        const res = decode.default(data, { detectFn, qrFn });
-        if (isLogDecoded.checked) ok('Decoded', `"${res}"`, `${Date.now() - ts} ms`);
+  let camera;
+  let cancelMainLoop;
+  const mainLoop = () =>
+    frameLoop((ts) => {
+      const res = camera.readFrame(canvasQr, isFullVideo.checked);
+      if (res !== undefined) {
         resultTxt.innerText = res;
         resultTxtLabel.style.display = 'inline';
-      } catch (e) {
-        if (Date.now() - lastDetect > TIMEOUT_MS) {
-          const ctx = overlay.getContext('2d');
-          ctx.clearRect(0, 0, overlay.width, overlay.height);
-        }
+        if (isLogDecoded.checked) ok('Decoded', `"${res}"`, `${performance.now() - ts} ms`);
       }
-      await sleep(SLEEP_MS);
-    }
-  };
+    });
 
   document.querySelector('video').addEventListener('play', () => {
     // We won't have correct size until video starts playing
     const { height, width } = getSize(player);
-    ok(`Got video feed h=${height} w=${width}`);
-    canvas.width = width;
-    canvas.height = height;
-    overlay.width = width;
-    overlay.height = height;
-    ctx = { context: canvas.getContext('2d'), height, width };
-    overlayLoop();
+    ok(
+      `Got video feed: element=${width}x${height}, video=${player.videoWidth}x${player.videoHeight}`
+    );
+    if (cancelMainLoop) cancelMainLoop(); // stop
+    cancelMainLoop = mainLoop();
   });
-
   document.querySelector('#startBtn').addEventListener('click', async (e) => {
+    // NOTE: there is race-condition which with await frontalCamera & stop.
+    // But not sure it is possible to trigger
     const btn = e.target;
     if (!IS_STARTED_VIDEO) {
       try {
-        player.setAttribute('autoplay', '');
-        player.setAttribute('muted', '');
-        player.setAttribute('playsinline', '');
-        const options = { video: true };
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        if (isIOS) {
-          // Force iOS to use front-facing camera
-          options.video = {
-            // Force bigger resolution
-            height: window.screen.height,
-            width: window.screen.width,
-            facingMode: {
-              exact: 'environment',
-            },
-          }
-        }
-        const stream = await navigator.mediaDevices.getUserMedia(options);
-        player.srcObject = stream;
         player.style.display = 'block';
         btn.innerText = 'Stop';
         IS_STARTED_VIDEO = true;
+        camera = await frontalCamera(player);
+        addCameraSelect(await camera.listDevices());
       } catch (e) {
         error('Media loop', e);
       }
     } else {
-      player.srcObject.getTracks().forEach((track) => track.stop());
+      if (camera) camera.stop();
+      if (cancelMainLoop) cancelMainLoop();
+      if (canvasQr) canvasQr.clear();
       btn.innerText = 'Start video capturing';
+      document.querySelector('#camera-select').remove();
       const { height, width } = getSize(player);
       resultsContainer.style.height = `${height}px`;
       resultsContainer.style.width = `${width}px`;
       IS_STARTED_VIDEO = false;
     }
   });
+  // Decode image
+  async function imageFromUrl(url) {
+    const image = new Image();
+    return new Promise((resolve) => {
+      image.src = url;
+      image.addEventListener('load', () => resolve(image));
+    });
+  }
+  async function readFileInput(element) {
+    return new Promise((resolve, reject) => {
+      const file = FileReader && element.files && element.files[0];
+      if (!file) return reject();
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        let res = reader.result;
+        if (!res) return reject(new Error('No file'));
+        resolve(URL.createObjectURL(new Blob([new Uint8Array(res)])));
+      });
+      reader.addEventListener('error', reject);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+  const qrImageFile = document.querySelector('#qr-decode-image');
+  const qrImageResult = document.querySelector('#qr-decode-image-result');
+  const qrImageClear = document.querySelector('#qr-decode-image-clear');
+  const qrImageDebug = document.querySelector('#qr-decode-debug');
+  function appendWithLabel(labelText, element) {
+    const label = document.createElement('p');
+    label.textContent = labelText;
+    qrImageResult.appendChild(label);
+    if (element) {
+      element.style = '';
+      qrImageResult.appendChild(element);
+    }
+  }
+  const clearQrImageResult = () => qrImageResult.replaceChildren();
+  qrImageClear.addEventListener('click', () => clearQrImageResult());
+  qrImageFile.addEventListener('change', async (ev) => {
+    clearQrImageResult();
+    const data = await readFileInput(ev.target);
+    const img = await imageFromUrl(data);
+    const overlayCanvas = document.createElement('canvas');
+    const bitmapCanvas = document.createElement('canvas');
+    const resultCanvas = document.createElement('canvas');
+    const qr = new QRCanvas(
+      {
+        overlay: overlayCanvas,
+        bitmap: bitmapCanvas,
+        resultQR: resultCanvas,
+      },
+      { cropToSquare: isCropToSquare.checked }
+    );
+    const decoded = qr.drawImage(img, img.height, img.width);
+    if (qrImageDebug.checked) {
+      appendWithLabel('Overlay', overlayCanvas);
+      appendWithLabel('Bitmap', bitmapCanvas);
+      appendWithLabel('Result QR', resultCanvas);
+    }
+    if (decoded !== undefined) {
+      appendWithLabel('Decoded');
+      appendWithLabel(decoded);
+    } else appendWithLabel('QR not found!');
+  });
 
+  // Encoding
   const qrGifDataUrl = (text) => {
     const gifBytes = writeQR(text, 'gif', {
       scale: 7,
     });
     const blob = new Blob([gifBytes], { type: 'image/gif' });
     return URL.createObjectURL(blob);
-  }
-
+  };
   inputEncode.addEventListener('input', (e) => {
     const text = e.target.value;
     imgEncodeQr.src = qrGifDataUrl(text);
   });
-  
+
   imgEncodeQr.src = qrGifDataUrl(inputEncode.value);
 }
 
