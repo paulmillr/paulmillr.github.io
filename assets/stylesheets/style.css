@@ -112,17 +112,11 @@ html {
 body {
   font-size: 1.9rem; /* 18px font size */
   line-height: 1.618; /* Golden ratio for line-height */
-  max-width: 38em; /* 684px */
+  max-width: 36em; /* 684px */
   margin: 5rem auto 0 auto;
   padding-bottom: 20rem;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-}
-nav,
-main,
-footer {
-  /* margin: 3rem auto 0 auto; */
-  /* max-width: 38em; */
 }
 nav {
   align-items: center;
