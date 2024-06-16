@@ -26,6 +26,10 @@ description: 'Minimal node.js & browser QR Code Pattern reader and generator.'
 
 <div class="camera-start-container">
   <button class="start-btn" id="startBtn">Start camera</button>
+  <span class="fps">
+    FPS:
+    <span id="fps-counter"></span>
+  </span>
 </div>
 
 <div class="controls" id="controls">
@@ -48,10 +52,6 @@ description: 'Minimal node.js & browser QR Code Pattern reader and generator.'
   <span class="controls-field">
     <input type="checkbox" id="isFullVideo" name="isFullVideo" />
     <label for="isFullVideo">High-res</label>
-  </span>
-  <span class="fps">
-    FPS:
-    <span id="fps-counter"></span>
   </span>
 </div>
 
