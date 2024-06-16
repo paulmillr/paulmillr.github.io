@@ -21,22 +21,15 @@ var paulmillrQr = (() => {
   // input.js
   var input_exports = {};
   __export(input_exports, {
-    decode: () => decode_exports,
-    dom: () => dom_exports,
-    encode: () => qr_exports
-  });
-
-  // ../index.js
-  var qr_exports = {};
-  __export(qr_exports, {
     Bitmap: () => Bitmap,
     ECMode: () => ECMode,
     Encoding: () => Encoding,
-    _tests: () => _tests,
-    default: () => encodeQR,
-    utf8ToBytes: () => utf8ToBytes,
-    utils: () => utils
+    decode: () => decodeQR,
+    dom: () => dom_exports,
+    encode: () => encodeQR
   });
+
+  // ../index.js
   function assertNumber(n) {
     if (!Number.isSafeInteger(n))
       throw new Error(`Wrong integer: ${n}`);
@@ -1043,22 +1036,8 @@ var paulmillrQr = (() => {
     validateVersion,
     zigzag
   };
-  var _tests = {
-    Bitmap,
-    info,
-    detectType,
-    encode,
-    drawQR,
-    penalty,
-    PATTERNS
-  };
 
   // ../decode.js
-  var decode_exports = {};
-  __export(decode_exports, {
-    _tests: () => _tests2,
-    default: () => decodeQR
-  });
   var { best: best2, bin: bin2, drawTemplate: drawTemplate2, fillArr: fillArr2, info: info2, interleave: interleave2, validateVersion: validateVersion2, zigzag: zigzag2 } = utils;
   var MAX_BITS_ERROR = 3;
   var GRAYSCALE_BLOCK_SIZE = 8;
@@ -1875,12 +1854,6 @@ var paulmillrQr = (() => {
       opts.imageOnResult(bits.toImage());
     return res;
   }
-  var _tests2 = {
-    toBitmap,
-    decodeBitmap,
-    findFinder,
-    detect
-  };
 
   // ../dom.js
   var dom_exports = {};

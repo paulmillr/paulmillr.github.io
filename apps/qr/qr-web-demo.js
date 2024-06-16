@@ -1,4 +1,4 @@
-const writeQR = paulmillrQr.encode.default;
+const writeQR = paulmillrQr.encode;
 const { frontalCamera, QRCanvas, frameLoop, getSize } = paulmillrQr.dom;
 
 let IS_STARTED_VIDEO = false;
