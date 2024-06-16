@@ -30,14 +30,6 @@ description: 'Minimal node.js & browser QR Code Pattern reader and generator.'
 
 <div class="controls" id="controls">
   <span class="controls-field">
-    <input type="checkbox" id="isDrawQr" name="isDrawQr" checked />
-    <label for="isDrawQr">Draw result QR</label>
-  </span>
-  <span class="controls-field">
-    <input type="checkbox" id="isLogDecoded" name="isLogDecoded" />
-    <label for="isLogDecoded">Log decoded</label>
-  </span>
-  <span class="controls-field">
     <input type="checkbox" id="isDrawBitmap" name="isDrawBitmap" checked />
     <label for="isDrawBitmap">Computer vision mode</label>
   </span>
@@ -46,8 +38,16 @@ description: 'Minimal node.js & browser QR Code Pattern reader and generator.'
     <label for="isCropToSquare">Crop to square</label>
   </span>
   <span class="controls-field">
+    <input type="checkbox" id="isDrawQr" name="isDrawQr" checked />
+    <label for="isDrawQr">Draw decoded</label>
+  </span>
+  <span class="controls-field">
+    <input type="checkbox" id="isLogDecoded" name="isLogDecoded" />
+    <label for="isLogDecoded">Log decoded</label>
+  </span>
+  <span class="controls-field">
     <input type="checkbox" id="isFullVideo" name="isFullVideo" />
-    <label for="isFullVideo">Increase video quality</label>
+    <label for="isFullVideo">High-res</label>
   </span>
   <span class="fps">
     FPS:
