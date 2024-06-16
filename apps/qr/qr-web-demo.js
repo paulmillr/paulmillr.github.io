@@ -1,5 +1,5 @@
-import writeQR from '@paulmillr/qr';
-import { frontalCamera, QRCanvas, frameLoop, getSize } from '@paulmillr/qr/dom';
+const writeQR = paulmillrQr.encode.default;
+const { frontalCamera, QRCanvas, frameLoop, getSize } = paulmillrQr.dom;
 
 let IS_STARTED_VIDEO = false;
 
