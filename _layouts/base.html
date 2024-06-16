@@ -33,11 +33,16 @@
     <nav>
       <span class="breadcrumbs">
         <a href="/" itemprop="person" itemscope>Paul Miller</a>
-        {% if page.title_short != null %}
+        {% if page.title_project != null %}
         <span>/</span>
         <span>projects</span>
         <span>/</span>
-        <a href="{{ page.url }}">{{ page.title_short }}</a>
+        <a href="{{ page.url }}">{{ page.title_project }}</a>
+        {% elsif page.title_app != null %}
+        <span>/</span>
+        <span>apps</span>
+        <span>/</span>
+        <a href="{{ page.url }}">{{ page.title_app }}</a>
         {% elsif page.tags != null %}
         <span>/</span>
         <span>writing</span>

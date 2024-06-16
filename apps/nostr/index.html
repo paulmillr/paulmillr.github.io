@@ -1,10 +1,11 @@
 ---
 layout: post
 title: 'nostr.spa - privacy-oriented nostr web client'
-title_short: 'nostr.spa'
+title_app: 'nostr.spa'
 description: 'Privacy-oriented nostr web client'
 ---
-<link rel="stylesheet" href="dist/main.css">
+
+<link rel="stylesheet" href="dist/main.css" />
 
 <div id="app">
   <noscript>
@@ -15,14 +16,17 @@ description: 'Privacy-oriented nostr web client'
   </noscript>
 </div>
 <style>
-  .noscript { text-align: center; }
-  .noscript p { margin: 0.5rem 0; }
+  .noscript {
+    text-align: center;
+  }
+  .noscript p {
+    margin: 0.5rem 0;
+  }
 </style>
 
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register("serviceworker.js");
+    navigator.serviceWorker.register('serviceworker.js')
   }
 </script>
 <script type="module" src="dist/main.js"></script>
-

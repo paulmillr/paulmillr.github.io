@@ -1,7 +1,7 @@
 ---
 layout: noble
 title: 'Noble cryptography'
-title_short: 'noble'
+title_project: 'noble'
 description: 'High-security, auditable set of contained cryptographic libraries and tools'
 ---
 

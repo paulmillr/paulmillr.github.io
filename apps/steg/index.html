@@ -1,42 +1,34 @@
 ---
 layout: post
 title: 'Steg - simple and secure steganography'
-title_short: 'steg'
+title_app: 'steg'
 description: 'LSB steganography library in TypeScript'
 ---
 
 <p>
-  This is demo of <strong>Steg</strong> (<a href="https://github.com/paulmillr/steg">GitHub</a
-  >, <a href="https://npmjs.com/package/steg">npm</a>), steganography library that allows to
-  encrypt and hide arbitrary data inside png images.
+  This is demo of <strong>Steg</strong> (<a href="https://github.com/paulmillr/steg">GitHub</a>,
+  <a href="https://npmjs.com/package/steg">npm</a>), steganography library that allows to encrypt
+  and hide arbitrary data inside png images.
 </p>
 <ul>
   <li>Encodes data using least significant bits of PNG pixels.</li>
   <li>
-    Only PNGs are supported, JPGs cannot be used - every time you save them, they can get
-    re-encoded and some data would be lost, which is a no-go for steganography
+    Only PNGs are supported, JPGs cannot be used - every time you save them, they can get re-encoded
+    and some data would be lost, which is a no-go for steganography
   </li>
-  <li>
-    However, you could feed JPG to the encryption form, and it would be converted to PNG
-  </li>
+  <li>However, you could feed JPG to the encryption form, and it would be converted to PNG</li>
   <li>
     Encrypts hidden data and its metadata with AES-GCM-256 + Scrypt. LSB bitsTaken are not
-    encrypted, so it is slightly easier to understand something is hidden inside .png,
-    however, since we are using encryption + padding, it's not trivial to understand what's
-    exactly is inside.
+    encrypted, so it is slightly easier to understand something is hidden inside .png, however,
+    since we are using encryption + padding, it's not trivial to understand what's exactly is
+    inside.
   </li>
   <li>Experimental. Use at your own risk.</li>
 </ul>
 
 <div class="steg-container">
   <div class="tabs">
-    <input
-      class="radiotab"
-      name="tabs"
-      type="radio"
-      id="tabone"
-      checked="checked"
-    />
+    <input class="radiotab" name="tabs" type="radio" id="tabone" checked="checked" />
     <label class="label" for="tabone">Encrypt & hide</label>
     <div class="panel">
       <h2>Encrypt file and hide it inside image</h2>
@@ -90,21 +82,14 @@ description: 'LSB steganography library in TypeScript'
       <form id="steg-decrypt">
         <p>
           <input type="file" id="steg-decrypt-file" accept="image/png" />
-          <label for="steg-decrypt-file"
-            >Image with hidden data <small>(only .png)</small></label
-          >
+          <label for="steg-decrypt-file">Image with hidden data <small>(only .png)</small></label>
         </p>
         <p>
           <input type="password" id="steg-decrypt-password" minlength="8" />
           <label for="steg-decrypt-password">Password <small></small></label>
         </p>
         <p>
-          <input
-            type="submit"
-            id="steg-decrypt-submit"
-            value="Reveal data from image"
-            disabled
-          />
+          <input type="submit" id="steg-decrypt-submit" value="Reveal data from image" disabled />
           <small id="steg-decrypt-status"></small>
         </p>
         <div id="steg-decrypt-output-container" hidden>
@@ -132,8 +117,7 @@ description: 'LSB steganography library in TypeScript'
               <li>C `bytes B..B+4` file size length, 4GB max</li>
               <li>D `bytes C..[C+file length]` file contents</li>
               <li>
-                E `bytes D..end` padding filled with zeros - zeros are okay, since we encrypt
-                them
+                E `bytes D..end` padding filled with zeros - zeros are okay, since we encrypt them
               </li>
             </ul>
           </li>
@@ -161,4 +145,7 @@ description: 'LSB steganography library in TypeScript'
 </div>
 
 <link rel="stylesheet" href="steg5k.css" />
-<script src="steg5k.js" integrity="sha384-tctGISn9w1nXuBveq31lLuX9vPNRG0VAIh2nmgL7UE7+mga0byGIRaOyMWyLw5rF"></script>
+<script
+  src="steg5k.js"
+  integrity="sha384-tctGISn9w1nXuBveq31lLuX9vPNRG0VAIh2nmgL7UE7+mga0byGIRaOyMWyLw5rF"
+></script>
