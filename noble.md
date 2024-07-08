@@ -68,7 +68,8 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
   - Monero: [moneroj](https://github.com/beritani/moneroj), [cs-monero](https://github.com/CoinSpace/cs-monero-wallet)
   - Trezor: [trezor-suite](https://github.com/trezor/trezor-suite/blob/f420619d60b3a88731865a3964857f6ba614ff6a/packages/connect/package.json#L53)
   - [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client),
-    [celo](https://github.com/celo-org/developer-tooling/blob/38b26316d615e836e21bbfe2f44853f7e8220e03/packages/sdk/cryptographic-utils/package.json#L28)
+    [celo](https://github.com/celo-org/developer-tooling/blob/38b26316d615e836e21bbfe2f44853f7e8220e03/packages/sdk/cryptographic-utils/package.json#L28),
+    [aptos-labs/aptos-ts-sdk](https://github.com/aptos-labs/aptos-ts-sdk/blob/62de7f532feaa653556846eea6b66e33f7dc29d6/package.json#L53)
   - HDkey ([scure-bip32](https://github.com/paulmillr/scure-bip32), [bip32](https://github.com/bitcoinjs/bip32))
   - [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet with support for many different networks:
     - [btc](https://github.com/CoinSpace/cs-bitcoin-wallet) - build with `@noble/curves`, `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@scure/btc-signer`
@@ -82,6 +83,8 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
 - [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
 - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
 - [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
+- [Keycloak](https://github.com/keycloak/keycloak/blob/5af30011225bf4fecec9d75f58ad35a4ea2c7211/js/libs/keycloak-js/package.json#L81): Open Source Identity and Access Management For Modern Applications and Services.
+
 
 ### Resources, articles, documentation
 
