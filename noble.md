@@ -65,22 +65,20 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
   - [avalanchejs](https://github.com/ava-labs/avalanchejs),  [near-api-js](https://github.com/near/near-api-js/blob/7c9142fed5a0ca10a710bd519f7d3543bd2a5a95/packages/crypto/package.json#L23), [polkadot.js](https://github.com/polkadot-js/common), [moneroj](https://github.com/beritani/moneroj), [cs-monero](https://github.com/CoinSpace/cs-monero-wallet),
   [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client),
     [celo](https://github.com/celo-org/developer-tooling/blob/38b26316d615e836e21bbfe2f44853f7e8220e03/packages/sdk/cryptographic-utils/package.json#L28),
-    [aptos-labs/aptos-ts-sdk](https://github.com/aptos-labs/aptos-ts-sdk/blob/62de7f532feaa653556846eea6b66e33f7dc29d6/package.json#L53)
+    [aptos-ts-sdk](https://github.com/aptos-labs/aptos-ts-sdk/blob/62de7f532feaa653556846eea6b66e33f7dc29d6/package.json#L53)
   - Trezor: [trezor-suite](https://github.com/trezor/trezor-suite/blob/f420619d60b3a88731865a3964857f6ba614ff6a/packages/connect/package.json#L53)
   - HDkey ([scure-bip32](https://github.com/paulmillr/scure-bip32), [bip32](https://github.com/bitcoinjs/bip32))
-  - [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet with support for many different networks:
-    - [btc](https://github.com/CoinSpace/cs-bitcoin-wallet) - build with `@noble/curves`, `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@scure/btc-signer`
-    - [evm](https://github.com/CoinSpace/cs-evm-wallet) - `@noble/hashes`, `@scure/bip32`, and `micro-eth-signer`
-    - [sol](https://github.com/CoinSpace/cs-solana-wallet) - `@noble/curves`, `@scure/base`, `ed25519-keygen`, and `micro-sol-signer`
-    - [eos](https://github.com/CoinSpace/cs-eos-wallet) - implemented on top of `@noble/curves`, `@noble/hashes`, and `@scure/base` only
-    - [tron](https://github.com/CoinSpace/cs-tron-wallet) - `@noble/hashes`, `@scure/base`, `@scure/bip32`, and `@noble/curves` through `tronlib`
-    - [xmr](https://github.com/CoinSpace/cs-monero-wallet) - `@scure/bip32`, `@noble/hashes`, `@scure/base`
-    - [ada](https://github.com/CoinSpace/cs-cardano-wallet) - `@noble/hashes` and `@scure/base`
+  - [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet was built purely with noble libraries:
+    - [btc](https://github.com/CoinSpace/cs-bitcoin-wallet), [evm](https://github.com/CoinSpace/cs-evm-wallet), [sol](https://github.com/CoinSpace/cs-solana-wallet),
+    [eos](https://github.com/CoinSpace/cs-eos-wallet),
+    [tron](https://github.com/CoinSpace/cs-tron-wallet),
+    [xmr](https://github.com/CoinSpace/cs-monero-wallet),
+    [ada](https://github.com/CoinSpace/cs-cardano-wallet)
 - [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
 - [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
 - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
 - [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
-
+- [Keycloak](https://github.com/keycloak/keycloak/blob/5af30011225bf4fecec9d75f58ad35a4ea2c7211/js/libs/keycloak-js/package.json#L81): Open Source Identity and Access Management For Modern Applications and Services.
 
 ### Resources, articles, documentation
 
