@@ -54,7 +54,7 @@ Noble's non-cryptographic sister project. Audited micro-libraries:
 
 ### Apps built with noble
 
-GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents), [curves](https://github.com/paulmillr/noble-curves/network/dependents), [hashes](https://github.com/paulmillr/noble-hashes/network/dependents). Below are selected apps and libraries. To add your own, [leave a comment](https://github.com/paulmillr/noble-curves/discussions/90).
+Below are some apps and libraries which use Noble. To add your own, [leave a comment](https://github.com/paulmillr/noble-curves/discussions/90).
 
 - Apps: [Protonmail](https://github.com/ProtonMail/WebClients), [Reflect](https://reflect.app),
   [Keycloak](https://github.com/keycloak/keycloak/blob/5af30011225bf4fecec9d75f58ad35a4ea2c7211/js/libs/keycloak-js/package.json#L81)
@@ -73,10 +73,17 @@ GitHub exposes a graph of dependents that use noble. Check it out: [ciphers](htt
   [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client),
     [celo](https://github.com/celo-org/developer-tooling/blob/38b26316d615e836e21bbfe2f44853f7e8220e03/packages/sdk/cryptographic-utils/package.json#L28),
     [aptos-ts-sdk](https://github.com/aptos-labs/aptos-ts-sdk/blob/62de7f532feaa653556846eea6b66e33f7dc29d6/package.json#L53)
-- [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
-- [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
-- [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
-- [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
+- Others:
+  - [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
+  - [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
+  - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
+  - BLS signatures: [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
+
+List of everything that uses noble, made with GitHub dependency graph:
+
+- [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents): 3.5K repos, 95 packages
+- [curves](https://github.com/paulmillr/noble-curves/network/dependents): 150K repos, 500 packages
+- [hashes](https://github.com/paulmillr/noble-hashes/network/dependents): 310K repos, 1100 packages
 
 ### Resources, articles, documentation
 
