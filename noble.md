@@ -44,6 +44,10 @@ The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and 
   - Feb: post-quantum have been [released](https://github.com/paulmillr/noble-post-quantum/commit/2834e5c3409f70309edf9c30b2c4206cd449cd8e)
   - May: received a grant from [Farcaster](https://www.farcaster.xyz)
 
+Currently active large sponsors include [manifold finance](https://manifoldfinance.com/
+), [vault12](https://vault12.com) and [ZionNFT](https://github.com/ZionNFT). You can
+fund the project using [github](https://github.com/sponsors/paulmillr).
+
 ### scure
 
 Noble's non-cryptographic sister project. Audited micro-libraries:
