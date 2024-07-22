@@ -45,7 +45,7 @@ The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and 
   - May: received a grant from [Farcaster](https://www.farcaster.xyz)
 
 Currently active large sponsors include [manifold finance](https://manifoldfinance.com/
-), [vault12](https://vault12.com) and [ZionNFT](https://github.com/ZionNFT). You can
+) and [vault12](https://vault12.com). You can
 fund the project using [github](https://github.com/sponsors/paulmillr).
 
 ### scure
