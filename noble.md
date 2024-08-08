@@ -62,7 +62,7 @@ Here is some software which uses Noble. You can [add new entry on github](https:
 
 - Apps: [Protonmail](https://github.com/ProtonMail/WebClients), [Reflect](https://reflect.app),
   [Keycloak](https://github.com/keycloak/keycloak/blob/5af30011225bf4fecec9d75f58ad35a4ea2c7211/js/libs/keycloak-js/package.json#L81)
-- Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app)
+- Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app), [Kraken](https://github.com/krakenfx/wallet/blob/e53708ec60890b1abcc955ef4954bba340000671/package.json#L27-L28)
 - Blockchain libraries:
   - Bitcoin: [scure-btc-signer](https://github.com/paulmillr/scure-btc-signer), [tapscript](https://github.com/cmdruid/tapscript)
   - Ethereum: [ethereum-cryptography](https://github.com/ethereum/js-ethereum-cryptography), [micro-eth-signer](https://github.com/paulmillr/micro-eth-signer), [ethers](https://github.com/ethers-io/ethers.js), [viem](https://viem.sh), [@ethereumjs](https://github.com/ethereumjs/ethereumjs-monorepo), [web3.js](https://github.com/web3/web3.js) [gridplus-lattice-sdk](https://github.com/GridPlus/lattice-eth2-utils),
