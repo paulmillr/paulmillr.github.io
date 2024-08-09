@@ -25,14 +25,14 @@ The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and 
 
 ### Audits
 
-At this point (aug 2024), various parts of noble had 5 audits. I'm looking for 2 things:
+At this point (aug 2024), various parts of noble had 5 audits. I'm looking for:
 
 1. Auditors, with good knowledge of cryptography and/or JS
     - Paid: whenever there is enough funding
     - Unpaid: whoever is willing to donate their time for the public good
 2. Funding, of paid auditors
 
-Contact me if you'll want to help with the effort.
+Contact me if you want to help with the effort.
 
 ### History
 
