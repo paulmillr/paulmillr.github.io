@@ -23,6 +23,17 @@ Active projects:
 
 The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and [codeberg](https://codeberg.org/paulmillr)
 
+### Audits
+
+At this point (aug 2024), various parts of noble had 5 audits.
+
+I'm looking for two things:
+
+1. Auditors, with good knowledge of cryptography and/or JS
+    - Paid: whenever there is enough funding
+    - Unpaid: whoever is willing to donate their time for the public good
+2. Funding, of paid auditors
+
 ### History
 
 - Jun 2019: initial release of [secp256k1](https://github.com/paulmillr/noble-secp256k1/commit/d544593d752a3101414eb1b3c3bee0c0fec349db), [ed25519](https://github.com/paulmillr/noble-ed25519/commit/36ded8a5dcc83ed171d05bb1c66ba7791b2299eb) and then [bls12-381](https://github.com/paulmillr/noble-bls12-381/commit/d25ed4d8f1e91fc7a9858ac81c8cb52179f29ee0)
