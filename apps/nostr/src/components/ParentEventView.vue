@@ -1,22 +1,21 @@
 <script setup lang="ts">
-  import {nextTick, onMounted, ref } from 'vue'
-  import {
-    nip10,
-    SimplePool,
-    type Event
-  } from 'nostr-tools'
+  import { onMounted, ref } from 'vue'
+  import type { SimplePool, Event } from 'nostr-tools'
   import type { EventExtended } from './../types'
   import EventContent from './EventContent.vue'
   import ExpandArrow from './../icons/ExpandArrow.vue'
   import {
-    injectAuthorsToNotes,
-    injectDataToReplyNotes,
     filterRootEventReplies,
-    filterReplyEventReplies
+    filterReplyEventReplies,
+    nip10IsFirstLevelReplyForEvent,
+    nip10IsReplyForEvent,
+    loadAndInjectDataToPosts,
   } from './../utils'
 
+  import { useMetasCache } from '@/stores/MetasCache'
   import { usePool } from '@/stores/Pool'
 
+  const metasCacheStore = useMetasCache()
   const poolStore = usePool()
   const pool = poolStore.pool
 
@@ -26,10 +25,9 @@
     event: EventExtended
     pubKey?: string
     index?: number
-    showReplies?: boolean,
-    hasReplyBtn?: boolean,
-    showRootReplies?: boolean,
-    currentReadRelays: string[],
+    hasReplyBtn?: boolean
+    showRootReplies?: boolean
+    currentReadRelays: string[]
   }>()
 
   const showReplyField = ref(false)
@@ -42,9 +40,7 @@
   const eventReplies = ref<EventExtended[]>([])
 
   onMounted(async () => {
-    if (props.showReplies) {
-      await loadRepliesPreiew()
-    }
+    await loadRepliesPreiew()
   })
 
   const loadRepliesPreiew = async () => {
@@ -52,38 +48,31 @@
     if (!currentReadRelays.length) return
 
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
-
     if (props.showRootReplies) {
-      // filter first level replies
-      replies = replies.filter((reply: Event) => {
-        const nip10Data = nip10.parse(reply)
-        return !nip10Data.reply && nip10Data?.root?.id === event.id
-      })
+      replies = replies.filter((reply: Event) => nip10IsFirstLevelReplyForEvent(event.id, reply))
     } else {
-      // filter replies for not root event
-      replies = replies.filter((reply: Event) => {
-        const nip10Data = nip10.parse(reply)
-        return nip10Data?.reply?.id === event.id || nip10Data?.root?.id === event.id
-      })
+      replies = replies.filter((reply: Event) => nip10IsReplyForEvent(event.id, reply))
     }
 
     if (!replies.length) return
-
     isLoadingFirstReply.value = true
     showMoreRepliesBtn.value = replies.length > 1
-    let reply = replies[0] as EventExtended
 
-    let tempReplies = [reply]
-    await injectDataToReplyNotes(event, tempReplies as EventExtended[], currentReadRelays, pool as SimplePool)
-
-    reply = tempReplies[0] as EventExtended
-    const authorMeta = await pool.get(currentReadRelays, { kinds: [0], limit: 1, authors: [reply.pubkey] })
-    if (authorMeta) {
-      reply.author = JSON.parse(authorMeta.content)
-    }
-
-    replyEvent.value = reply
-    isLoadingFirstReply.value = false
+    const reply = replies[0]
+    const isRootPosts = false
+    await loadAndInjectDataToPosts(
+      [reply],
+      event,
+      {},
+      currentReadRelays,
+      metasCacheStore,
+      pool as SimplePool,
+      isRootPosts,
+      (reply) => {
+        replyEvent.value = reply
+        isLoadingFirstReply.value = false
+      },
+    )
   }
 
   const handleToggleRawData = (eventId: string, isMainEvent = false) => {
@@ -104,7 +93,7 @@
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
 
     // filter first level replies
-    if (event.isRoot) { 
+    if (event.isRoot) {
       replies = filterRootEventReplies(event, replies)
     } else {
       replies = filterReplyEventReplies(event, replies)
@@ -115,12 +104,16 @@
       return
     }
 
-    const authors = replies.map((e: any) => e.pubkey)
-    const uniqueAuthors = [...new Set(authors)]
-    const authorsEvents = await pool.querySync(currentReadRelays, { kinds: [0], authors: uniqueAuthors })
-    replies = injectAuthorsToNotes(replies, authorsEvents)
-
-    await injectDataToReplyNotes(event, replies as EventExtended[], currentReadRelays, pool as SimplePool)
+    const isRootPosts = false
+    await loadAndInjectDataToPosts(
+      replies,
+      event,
+      {},
+      currentReadRelays,
+      metasCacheStore,
+      pool as SimplePool,
+      isRootPosts,
+    )
 
     eventReplies.value = replies as EventExtended[]
     showAllReplies.value = true
@@ -128,7 +121,6 @@
   }
 
   const loadRootReplies = async () => {
-    // await nextTick()
     showReplyField.value = false
     if (showAllReplies.value) {
       await handleLoadMoreReplies()
@@ -155,33 +147,37 @@
     />
     <div v-if="isLoadingFirstReply">Loading replies...</div>
 
-    <div v-if="showReplies && replyEvent" class="replies">
-      <div @click="handleLoadMoreReplies" v-if="!showAllReplies && showMoreRepliesBtn && !isLoadingThread" class="replies__other">
+    <div v-if="replyEvent" class="replies">
+      <div
+        @click="handleLoadMoreReplies"
+        v-if="!showAllReplies && showMoreRepliesBtn && !isLoadingThread"
+        class="replies__other"
+      >
         <span class="replies__other-link">
-          <span class="replies__other-text">
-            Show more replies
-          </span>
+          <span class="replies__other-text"> Show more replies </span>
           <ExpandArrow />
         </span>
       </div>
-      <div v-if="isLoadingThread" class="replies__other">
-        Loading replies...
-      </div>
+      <div v-if="isLoadingThread" class="replies__other">Loading replies...</div>
 
       <div v-if="showAllReplies && showMoreRepliesBtn" class="replies__other">
-        <span class="replies__other-text">
-          Loaded {{ eventReplies.length }} replies
-        </span>
+        <span class="replies__other-text"> Loaded {{ eventReplies.length }} replies </span>
       </div>
 
-      <div :class="[
-        'line-vertical', {
-          'line-vertical_long': showMoreRepliesBtn,
-          'line-vertical_reply-field': showReplyField && !showMoreRepliesBtn,
-          'line-vertical_reply-field_long': showReplyField && showMoreRepliesBtn
-        }]">
-      </div>
-      <div v-if="!showAllReplies" :class="['line-horizontal', { 'line-horizontal_height': showMoreRepliesBtn }]"></div>
+      <div
+        :class="[
+          'line-vertical',
+          {
+            'line-vertical_long': showMoreRepliesBtn,
+            'line-vertical_reply-field': showReplyField && !showMoreRepliesBtn,
+            'line-vertical_reply-field_long': showReplyField && showMoreRepliesBtn,
+          },
+        ]"
+      ></div>
+      <div
+        v-if="!showAllReplies"
+        :class="['line-horizontal', { 'line-horizontal_height': showMoreRepliesBtn }]"
+      ></div>
 
       <div v-if="!showAllReplies">
         <EventContent
@@ -196,7 +192,12 @@
       <div v-if="showAllReplies" class="replies__list">
         <div class="replies__list-item" v-for="(reply, i) in eventReplies">
           <div class="replies__list-item-line-horizontal"></div>
-          <div :class="['replies__list-item-line-vertical', { 'replies__list-item-line-vertical_short': i === (eventReplies.length - 1) }]"></div>
+          <div
+            :class="[
+              'replies__list-item-line-vertical',
+              { 'replies__list-item-line-vertical_short': i === eventReplies.length - 1 },
+            ]"
+          ></div>
           <EventContent
             :key="reply.id"
             :event="(reply as EventExtended)"
@@ -217,7 +218,7 @@
     top: -15px;
     width: 1px;
     height: 54px;
-    background-color: #878580;
+    background-color: #2a2f3b;
   }
 
   .line-vertical_long {
@@ -240,7 +241,7 @@
     top: 38px;
     height: 1px;
     width: 38px;
-    background-color: #878580;
+    background-color: #2a2f3b;
   }
 
   .line-horizontal_height {
@@ -291,7 +292,7 @@
     top: 38px;
     height: 1px;
     width: 38px;
-    background-color: #878580;
+    background-color: #2a2f3b;
   }
 
   .replies__list-item-line-vertical {
@@ -300,7 +301,7 @@
     top: 0;
     width: 1px;
     height: calc(100% + 30px);
-    background-color: #878580;
+    background-color: #2a2f3b;
   }
 
   .replies__list-item-line-vertical_short {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { defineEmits, watch } from 'vue'
   import { useRoute } from 'vue-router'
-  
+
   defineProps<{
     pagesCount: number
     currentPage: number
@@ -17,7 +17,7 @@
       query: {
         ...route.query,
         page: page,
-      }
+      },
     }
   }
 
@@ -32,9 +32,14 @@
 
 <template>
   <div v-if="pagesCount > 1" class="pagination">
-    Pages: 
+    Pages:
     <span v-if="pagesCount < 5">
-      <router-link :key="page" :class="['pagination__link', { 'pagination__link_active': currentPage == page }]" v-for="page in pagesCount" :to="paginate(page)">
+      <router-link
+        :key="page"
+        :class="['pagination__link', { pagination__link_active: currentPage == page }]"
+        v-for="page in pagesCount"
+        :to="paginate(page)"
+      >
         {{ page }}
       </router-link>
     </span>
@@ -45,20 +50,39 @@
 
       <span v-if="currentPage > 3">...</span>
 
-      <router-link v-if="currentPage != 1" :key="currentPage - 1" :class="['pagination__link']" :to="paginate(currentPage - 1)">
+      <router-link
+        v-if="currentPage != 1"
+        :key="currentPage - 1"
+        :class="['pagination__link']"
+        :to="paginate(currentPage - 1)"
+      >
         {{ currentPage - 1 }}
       </router-link>
 
-      <router-link :key="currentPage" :class="['pagination__link pagination__link_active']" :to="paginate(currentPage)">
+      <router-link
+        :key="currentPage"
+        :class="['pagination__link pagination__link_active']"
+        :to="paginate(currentPage)"
+      >
         {{ currentPage }}
       </router-link>
-      <router-link v-if="currentPage != pagesCount" :key="currentPage + 1" :class="['pagination__link']" :to="paginate(currentPage + 1)">
+      <router-link
+        v-if="currentPage != pagesCount"
+        :key="currentPage + 1"
+        :class="['pagination__link']"
+        :to="paginate(currentPage + 1)"
+      >
         {{ currentPage + 1 }}
       </router-link>
 
-      <span v-if="currentPage < (pagesCount - 2)">...</span>
+      <span v-if="currentPage < pagesCount - 2">...</span>
 
-      <router-link v-if="currentPage <= (pagesCount - 2)" :key="pagesCount" :class="['pagination__link']" :to="paginate(pagesCount)">
+      <router-link
+        v-if="currentPage <= pagesCount - 2"
+        :key="pagesCount"
+        :class="['pagination__link']"
+        :to="paginate(pagesCount)"
+      >
         {{ pagesCount }}
       </router-link>
     </span>
@@ -71,6 +95,6 @@
   }
 
   .pagination__link_active {
-    color:#3aa99f;
+    color: #3aa99f;
   }
 </style>

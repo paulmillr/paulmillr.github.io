@@ -10,7 +10,6 @@
   const props = defineProps<{
     event: EventExtended
     author: Author
-    key: string
   }>()
 
   const showRawData = ref(false)
@@ -47,7 +46,7 @@
   <div class="event">
     <div v-if="!showRawData" class="event__content">
       <slot>No content for event</slot>
-      <hr>
+      <hr />
 
       <div class="event__code-block">
         <div class="event__code-title">
@@ -65,7 +64,7 @@
 
       <div class="event__code-block">
         <div class="event__code-title">
-          <b>Event id: </b>
+          <b>Meta event id: </b>
           <button class="event__code-btn" @click="showHexId = !showHexId">
             {{ showHexId ? 'nevent' : 'hex' }}
           </button>
@@ -90,8 +89,11 @@
     <RawData v-if="showRawData" :isUserEvent="true" :event="event" :authorEvent="event" />
 
     <div class="event-footer" :class="{ 'event-footer_flex-end': !showRawData }">
-      <div v-if="showRawData" :class="['event-footer__signature', { 'event-footer__signature_invalid': !isSigVerified }]">
-        <CheckSquareIcon v-if="isSigVerified" /> 
+      <div
+        v-if="showRawData"
+        :class="['event-footer__signature', { 'event-footer__signature_invalid': !isSigVerified }]"
+      >
+        <CheckSquareIcon v-if="isSigVerified" />
         <InvalidSignatureIcon v-if="!isSigVerified" />
         <span class="event-footer__signature-text">
           {{ isSigVerified ? 'Signature is valid' : 'Invalid signature' }}
@@ -117,8 +119,23 @@
   }
 
   .event__code-btn {
-    font-size: 16px;
-    padding: 0 10px;
+    background: #2a2f3b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 3px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .event__code-btn:hover {
+    background: #323741;
+  }
+
+  .event__code-btn:active {
+    opacity: 0.9;
   }
 
   .event__code {
@@ -130,14 +147,15 @@
   }
 
   .content-col_code {
-    line-break: anywhere;
+    word-break: break-word;
   }
 
   .event {
-    border: 1px solid white;
+    border: 1px solid #2a2f3b;
     padding: 14px;
     padding-top: 0;
     margin-top: 25px;
+    border-radius: 5px;
   }
 
   /* common styles */
@@ -170,5 +188,9 @@
 
   .event-footer__signature_invalid {
     color: red;
+  }
+
+  hr {
+    border: 1px solid #2a2f3b;
   }
 </style>

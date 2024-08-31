@@ -1,61 +1,76 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Feed from '@/views/Feed.vue'
-import MessageInput from '@/components/MessageInput.vue'
-import SignedEventInput from '@/components/SignedEventInput.vue'
 import Help from '@/components/Help.vue'
-import User from '@/components/User.vue'
+import User from '@/views/User.vue'
 import Settings from '@/views/Settings.vue'
 import Chat from '@/views/Chat.vue'
+import Login from '@/views/Login.vue'
+import Header from '@/components/Header.vue'
 
 const routes = [
-  { 
-    path: '/feed', 
-    name: 'Feed', 
-    components: { 
-      default: Feed,
-      messageInput: MessageInput
-    },
-  },
-  { 
-    path: '/message', 
-    name: 'Message', 
+  {
+    path: '/feed',
+    name: 'Feed',
     components: {
       default: Feed,
-      signedEventInput: SignedEventInput
+      Header: Header,
     },
-  },
-  { 
-    path: '/chat', 
-    name: 'Chat', 
-    component: Chat,
   },
   {
-    path: '/log',
-    name: 'Log',
+    path: '/message',
+    name: 'Message',
     components: {
       default: Feed,
-      messageInput: MessageInput
+      Header: Header,
     },
   },
+  {
+    path: '/chat',
+    name: 'Chat',
+    components: {
+      default: Chat,
+      Header: Header,
+    },
+  },
+  // {
+  //   path: '/log',
+  //   name: 'Log',
+  //   components: {
+  //     default: Feed,
+  //     Header: Header,
+  //   },
+  // },
   {
     path: '/user',
     name: 'User',
-    component: User,
-    alias: ['/event']
+    alias: ['/event'],
+    components: {
+      default: User,
+      Header: Header,
+    },
   },
-  { 
-    path: '/user/:id', 
-    component: User,
-    alias: ['/event/:id']
+  {
+    path: '/user/:id',
+    alias: ['/event/:id'],
+    components: {
+      default: User,
+      Header: Header,
+    },
   },
   {
     path: '/help',
     name: 'Help',
-    component: Help
+    components: {
+      default: Help,
+      Header: Header,
+    },
   },
   {
     path: '/',
-    component: Help,
+    components: {
+      default: Help,
+      Header: Header,
+    },
     beforeEnter: (to: any, from: any, next: any) => {
       const userId = to.query.user
       const eventId = to.query.event
@@ -66,18 +81,25 @@ const routes = [
       } else {
         next()
       }
-    }
+    },
   },
   {
     path: '/settings',
-    component: Settings
-  }
+    components: {
+      default: Settings,
+      Header: Header,
+    },
+  },
+  {
+    path: '/login',
+    component: Login,
+  },
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
-  // @ts-ignore 
-  routes
+  // @ts-ignore
+  routes,
 })
 
 export default router

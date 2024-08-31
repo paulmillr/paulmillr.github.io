@@ -1,36 +1,54 @@
 <script setup lang="ts">
-  import { ref, defineEmits } from 'vue'
+  import { ref, defineEmits, watch } from 'vue'
   import { finalizeEvent } from 'nostr-tools'
   import { useNsec } from '@/stores/Nsec'
   import { useFeed } from '@/stores/Feed'
+  import { useRelay } from '@/stores/Relay'
 
   const props = defineProps<{
-    sentEventIds: Set<string>,
-    isSendingMessage: boolean,
-    broadcastNotice: string
+    sentEventIds: Set<string>
+    isSendingMessage: boolean
   }>()
 
-  const emit = defineEmits(['broadcastEvent'])
+  const emit = defineEmits(['broadcastEvent', 'toggleMessageType', 'clearBroadcastError'])
 
   const nsecStore = useNsec()
   const feedStore = useFeed()
+  const relayStore = useRelay()
 
   const msgErr = ref('')
+  const msgNotice = ref('')
+  const isFocused = ref(false)
+  const rows = ref(3)
+
+  watch(
+    () => msgErr.value,
+    (newValue) => {
+      if (newValue.length) {
+        setTimeout(() => {
+          msgErr.value = ''
+        }, 5000)
+      }
+    },
+  )
 
   const handleSendMessage = async () => {
-    const nsecValue = nsecStore.nsec ? nsecStore.nsec.trim() : ''
-    if (!nsecValue.length) {
-      msgErr.value = 'Please provide your private key or generate random key.'
-      return;
+    emit('clearBroadcastError')
+
+    msgNotice.value = ''
+
+    if (!nsecStore.isValidNsecPresented()) {
+      msgErr.value = 'Please login with your private key or generate random key in settings.'
+      return
     }
 
-    const messageValue = feedStore.messageToBroadcast.trim()
+    const messageValue = feedStore.messageToBroadcast
     if (!messageValue.length) {
       msgErr.value = 'Please provide message to broadcast.'
-      return;
+      return
     }
 
-    let privkey: Uint8Array | null;
+    let privkey: Uint8Array | null
     let pubkey: string
     try {
       privkey = nsecStore.getPrivkeyBytes()
@@ -43,7 +61,7 @@
       }
     } catch (e) {
       msgErr.value = `Invalid private key. Please check it and try again.`
-      return;
+      return
     }
 
     const event = {
@@ -53,13 +71,13 @@
       content: messageValue,
       tags: [],
       id: '',
-      sig: ''
+      sig: '',
     }
     const signedEvent = finalizeEvent(event, privkey)
 
     if (props.sentEventIds.has(signedEvent.id)) {
-      msgErr.value = 'The same event can\'t be sent twice (same id, signature).'
-      return;
+      msgErr.value = "The same event can't be sent twice (same id, signature)."
+      return
     }
 
     msgErr.value = ''
@@ -67,123 +85,167 @@
     emit('broadcastEvent', signedEvent, 'text')
   }
 
-  const handleInput = (event: any) => {
-    feedStore.updateMessageToBroadcast(event?.target?.value)
+  const handleInput = () => {
+    const text = feedStore.messageToBroadcast
+    if (!text.length) return
+    let lines = text.split('\n').length
+    if (lines < 3) lines = 3
+    rows.value = lines
+  }
+
+  const handleFocus = () => {
+    isFocused.value = true
+    if (!msgErr.value.length && !nsecStore.isValidNsecPresented()) {
+      msgNotice.value = 'Please login to broadcast the message. Or send a presigned message.'
+    }
+  }
+
+  const handleBlur = () => {
+    isFocused.value = false
+    msgNotice.value = ''
+  }
+
+  const toggleMessageType = () => {
+    emit('toggleMessageType')
   }
 </script>
 
 <template>
-  <div class="message-fields-wrapper">
-    <div class="message-fields">
-      <div class="message-fields__field">
-        <label for="message">
-          <strong>Message to broadcast</strong>
-        </label>
-        <div class="field-elements">
-          <textarea
-            class="message-input"
-            name="message"
-            id="message"
-            cols="30"
-            rows="3"
-            :value="feedStore.messageToBroadcast"
-            @input="handleInput"
-            placeholder='Test message 👋'></textarea>
-        </div>
-        <div class="send-btn-wrapper">
-          <button :disabled="isSendingMessage" class="send-btn" @click="handleSendMessage">
-            {{ isSendingMessage ? 'Broadcasting...' : 'Broadcast' }}
-          </button>
-        </div>
-      </div>
+  <div :class="['message-field', { active: isFocused }]">
+    <textarea
+      :disabled="!relayStore.isConnectedToRelay"
+      class="message-input"
+      name="message"
+      id="message"
+      :rows="rows"
+      v-model.trim="feedStore.messageToBroadcast"
+      @input="handleInput"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      placeholder="What do you want to say?"
+    ></textarea>
+    <div class="message-footer">
+      <button @click="toggleMessageType" class="send-presigned-btn">
+        <i class="bi bi-braces presigned-icon"></i>
+        <span>Send presigned message</span>
+      </button>
+      <button
+        :disabled="isSendingMessage || !relayStore.isConnectedToRelay"
+        :class="['send-btn', { disabled: isSendingMessage || !relayStore.isConnectedToRelay }]"
+        @click="handleSendMessage"
+      >
+        {{ isSendingMessage ? 'Posting...' : 'Post' }}
+      </button>
     </div>
-    <div class="error">
-      {{ msgErr }}
-    </div>
-    <div class="notice">
-      {{ broadcastNotice }}
-    </div>
+  </div>
+  <div class="error">
+    {{ msgErr }}
+  </div>
+  <div class="warning">
+    {{ msgNotice }}
   </div>
 </template>
 
 <style scoped>
-  .message-fields-wrapper {
-    margin-bottom: 20px;
+  .message-field {
+    border: 1px solid #2a2f3b;
+    border-radius: 5px;
   }
 
-  .message-fields {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-  }
-
-  @media (min-width: 768px) {
-    .message-fields {
-      flex-direction: row;
-    }
-  }
-
-  .message-fields__field {
-    flex-grow: 1;
-    margin-bottom: 10px
-  }
-
-  @media (min-width: 768px) {
-    .message-fields__field {
-      margin-bottom: 0;
-    }
-  }
-
-  .field-elements {
-    margin-top: 5px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (min-width: 768px) {
-    .field-elements {
-      flex-direction: row;
-      justify-content: space-between;
-    }
+  .message-field.active {
+    border: 1px solid #0092bf;
   }
 
   .message-input {
     font-size: 16px;
-    padding: 1px 3px;
+    padding: 10px 12px;
     width: 100%;
     box-sizing: border-box;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: inherit;
+    outline: none;
+    line-height: 1.3;
+    resize: none;
+    display: block;
+    border-bottom: none;
   }
 
-  @media (min-width: 768px) {
-    .message-input {
-      font-size: 15px;
-    }
+  .message-input:focus {
+    border-bottom: none;
   }
 
-  .send-btn-wrapper {
-    text-align: right;
+  .message-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #2a2f3b;
+    padding: 12px;
+  }
+
+  .send-presigned-btn {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #0092bf;
+    font-weight: bold;
+    padding: 0;
+  }
+
+  .send-presigned-btn .icon {
+    font-size: 16px;
+  }
+
+  .presigned-icon {
+    margin-right: 3px;
+  }
+
+  .post-icon {
+    margin-right: 5px;
   }
 
   .send-btn {
-    font-size: 14px;
-    width: 100%;
-    margin-top: 5px;
     cursor: pointer;
+    background: #0092bf;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: auto;
   }
 
-  @media (min-width: 768px) {
-    .send-btn {
-      width: auto;
-    }
+  .send-btn:hover {
+    background: #0077a3;
+  }
+
+  .send-btn:active {
+    opacity: 0.9;
+  }
+
+  .send-btn.disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .send-btn.disabled:hover {
+    background: #0092bf;
   }
 
   .error {
-    color:red;
+    color: #ff4040;
     font-size: 16px;
     margin-top: 5px;
   }
 
-  .notice {
+  .warning {
+    color: #ffda6a;
     font-size: 16px;
     margin-top: 5px;
   }

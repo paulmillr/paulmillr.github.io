@@ -26,7 +26,6 @@
         :pubKey="pubKey"
         :index="i" 
         :showRootReplies="true"
-        :showReplies="true"
         :hasReplyBtn="true"
       />
     </template>

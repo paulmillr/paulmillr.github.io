@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { computed, nextTick, onMounted, ref, watch } from 'vue'
-  import { SimplePool, utils, type SubCloser, type Filter } from "nostr-tools"
+  import { SimplePool, utils, type Filter } from 'nostr-tools'
+  import type { SubCloser } from 'nostr-tools/lib/types/abstract-pool'
   import { TWO_DAYS, now } from '@/utils/chat-crypto'
   import { racePromises } from '@/utils'
   import {
@@ -10,7 +11,7 @@
     getChatMessageFromRumor,
     getNewChatRoomHash,
     getNewChatTitle,
-    isGroupChat
+    isGroupChat,
   } from '@/utils/chat'
 
   import { usePool } from '@/stores/Pool'
@@ -27,7 +28,7 @@
   import { EVENT_KIND } from '@/nostr'
 
   const { normalizeURL } = utils
-  let chatSub: SubCloser;
+  let chatSub: SubCloser
 
   const relayStore = useRelay()
   const nsecStore = useNsec()
@@ -46,10 +47,14 @@
   const isChatsLoading = ref(false)
   const chatsEmpty = computed(() => Object.keys(userChats.value).length === 0)
 
-  const isConnectedLoggedInUser = computed(() => relayStore.isConnectedToReadWriteRelays && nsecStore.isNsecValidTemp)
+  const isConnectedLoggedInUser = computed(
+    () => relayStore.isConnectedToReadWriteRelays && nsecStore.isNsecValidTemp,
+  )
 
   const sortedChats = computed(() => {
-    return Object.entries(userChats.value).map(([key, value]) => value).sort((a, b) => b.created_at_last_message - a.created_at_last_message)
+    return Object.entries(userChats.value)
+      .map(([key, value]) => value)
+      .sort((a, b) => b.created_at_last_message - a.created_at_last_message)
   })
 
   const showChatsList = ref(true)
@@ -60,7 +65,7 @@
       if (!nsecStore.isNsecValidTemp) return
       userPubkey.value = nsecStore.getPubkey()
     },
-    { immediate: true }
+    { immediate: true },
   )
 
   watch(
@@ -69,7 +74,7 @@
       if (value) {
         isChatsLoading.value = true
       }
-    }
+    },
   )
 
   watch(
@@ -78,7 +83,7 @@
       if (value && nsecStore.isNsecValidTemp) {
         loadChats()
       }
-    }
+    },
   )
 
   onMounted(() => {
@@ -115,7 +120,10 @@
     chatSub?.close()
 
     // get relays for private messages if presented
-    const dmRelaysEvents = await pool.querySync(relays, { kinds: [EVENT_KIND.DM_RELAYS], authors: [hostPubkey] })
+    const dmRelaysEvents = await pool.querySync(relays, {
+      kinds: [EVENT_KIND.DM_RELAYS],
+      authors: [hostPubkey],
+    })
     if (dmRelaysEvents.length) {
       const dmRelaysUrlsSet = new Set()
 
@@ -133,13 +141,16 @@
       }
     }
 
-    const hostMessages = await pool.querySync(relays, { kinds: [EVENT_KIND.GIFT_WRAP], "#p": [hostPubkey] })
+    const hostMessages = await pool.querySync(relays, {
+      kinds: [EVENT_KIND.GIFT_WRAP],
+      '#p': [hostPubkey],
+    })
 
     const privateKey = nsecStore.getPrivkeyBytes() as Uint8Array
     let chats: Record<string, RawChat> = {}
     let lastMessageDate = 0
     const initialMessagesIds = new Set<string>()
-    hostMessages.forEach(giftWrap => {
+    hostMessages.forEach((giftWrap) => {
       initialMessagesIds.add(giftWrap.id)
       const rumor = getRumorFromWrap(giftWrap, privateKey)
       if (!rumor) return // skip invalid rumors
@@ -152,14 +163,14 @@
         chats[chatId].messages.push(message)
       } else {
         chats[chatId] = {
-          'messages': [message]
+          messages: [message],
         }
       }
 
       if (rumor.created_at > lastMessageDate) {
         lastMessageDate = rumor.created_at
       }
-    });
+    })
 
     const chatsPromises = []
     for (const id in chats) {
@@ -167,7 +178,12 @@
       chat.id = id
       chat.messages = chat.messages.sort((a, b) => a.event.created_at - b.event.created_at)
       chat.created_at_last_message = chat.messages[chat.messages.length - 1].event.created_at
-      const chatPromise = injectChatTitle(chat, hostPubkey, pool as SimplePool, relayStore.connectedUserReadWriteUrlsWithSelectedRelay)
+      const chatPromise = injectChatTitle(
+        chat,
+        hostPubkey,
+        pool as SimplePool,
+        relayStore.connectedUserReadWriteUrlsWithSelectedRelay,
+      )
       chatsPromises.push(chatPromise)
     }
 
@@ -181,39 +197,39 @@
     subscribeToMessages(relays, lastGiftWrapDate, initialMessagesIds)
   }
 
-  const subscribeToMessages = (relays: string[], since: number | null = null, eventsToSkip: Set<string> | null = null) => {
+  const subscribeToMessages = (
+    relays: string[],
+    since: number | null = null,
+    eventsToSkip: Set<string> | null = null,
+  ) => {
     const hostPubkey = nsecStore.getPubkey()
     const privateKey = nsecStore.getPrivkeyBytes() as Uint8Array
-    const filter: Filter = { kinds: [EVENT_KIND.GIFT_WRAP], "#p": [hostPubkey] }
+    const filter: Filter = { kinds: [EVENT_KIND.GIFT_WRAP], '#p': [hostPubkey] }
     if (since) {
       filter.since = since
     }
-    chatSub = pool.subscribeMany(
-      relays,
-      [filter],
-      {
-        onevent(giftWrap) {
-          if (eventsToSkip && eventsToSkip.has(giftWrap.id)) return
-          const rumor = getRumorFromWrap(giftWrap, privateKey)
-          if (!rumor) return // skip invalid rumors
-          if (isGroupChat(rumor)) return // skip group chats (not implemented yet)
+    chatSub = pool.subscribeMany(relays, [filter], {
+      onevent(giftWrap) {
+        if (eventsToSkip && eventsToSkip.has(giftWrap.id)) return
+        const rumor = getRumorFromWrap(giftWrap, privateKey)
+        if (!rumor) return // skip invalid rumors
+        if (isGroupChat(rumor)) return // skip group chats (not implemented yet)
 
-          const chatId = getChatRoomHash(rumor)
-          const message = getChatMessageFromRumor(rumor)
+        const chatId = getChatRoomHash(rumor)
+        const message = getChatMessageFromRumor(rumor)
 
-          if (userChats.value[chatId]) {
-            // skip messages from ourself which was sent from own client
-            if (chatStore.ownRumors.has(message.event.id)) return
-            userChats.value[chatId].messages.push(message)
-          } else {
-            if (!userChatsMessagesCache.value[chatId]) {
-              userChatsMessagesCache.value[chatId] = []
-            }
-            userChatsMessagesCache.value[chatId].push(message)
+        if (userChats.value[chatId]) {
+          // skip messages from ourself which was sent from own client
+          if (chatStore.ownRumors.has(message.event.id)) return
+          userChats.value[chatId].messages.push(message)
+        } else {
+          if (!userChatsMessagesCache.value[chatId]) {
+            userChatsMessagesCache.value[chatId] = []
           }
-        },
-      }
-    )
+          userChatsMessagesCache.value[chatId].push(message)
+        }
+      },
+    })
   }
 
   const handleSelectChat = (chatId: string) => {
@@ -227,7 +243,9 @@
   }
 
   const setMessageStatusToPublished = (chatId: string, rumorId: string) => {
-    const message = userChats.value[chatId].messages.find((m: ChatMessage) => m.event.id === rumorId)
+    const message = userChats.value[chatId].messages.find(
+      (m: ChatMessage) => m.event.id === rumorId,
+    )
     if (message) {
       message.isPublished = true
     }
@@ -242,15 +260,19 @@
     }
 
     isLoadingNewChatProfile.value = true
-    const title = await getNewChatTitle(pubkey, pool as SimplePool, relayStore.connectedUserReadWriteUrlsWithSelectedRelay)
+    const title = await getNewChatTitle(
+      pubkey,
+      pool as SimplePool,
+      relayStore.connectedUserReadWriteUrlsWithSelectedRelay,
+    )
     isLoadingNewChatProfile.value = false
 
     const newChat = {
       id: chatId,
       messages: [],
       title: title,
-      initialRoomTags: roomPubkeys.map(p => ['p', p]),
-      created_at_last_message: now()
+      initialRoomTags: roomPubkeys.map((p) => ['p', p]),
+      created_at_last_message: now(),
     }
 
     addChat(newChat)
@@ -310,30 +332,25 @@
 <template>
   <div class="chats-desc">
     <p>
-      Chats use the new Nostr <a target="_blank" href="https://github.com/nostr-protocol/nips/blob/master/44.md">NIP-44</a> encryption standard.
-      Make sure the person you are chatting with uses a Nostr client that supports this NIP.
+      Chats use the new Nostr
+      <a target="_blank" href="https://github.com/nostr-protocol/nips/blob/master/44.md">NIP-44</a>
+      encryption standard. Make sure the person you are chatting with uses a Nostr client that
+      supports this NIP.
       <!-- <a href="/apps/nostr/#/help">More info</a> about messages and used relays. -->
     </p>
   </div>
 
   <div class="user-field-wrapper">
-    <ChatCreateRoomForm
-      @startChat="startChat"
-      :isLoadingProfile="isLoadingNewChatProfile"
-    />
+    <ChatCreateRoomForm @startChat="startChat" :isLoadingProfile="isLoadingNewChatProfile" />
   </div>
 
-  <h3 class="chats-title">
-    Chats
-  </h3>
+  <h3 class="chats-title">Chats</h3>
 
   <div v-if="!isConnectedLoggedInUser && !isChatsLoading" class="no-chats">
     Please connect and login to see you chats.
   </div>
 
-  <div v-if="isChatsLoading">
-    Loading chats...
-  </div>
+  <div v-if="isChatsLoading">Loading chats...</div>
 
   <div v-if="isConnectedLoggedInUser && !isChatsLoading" class="chats">
     <ChatsList

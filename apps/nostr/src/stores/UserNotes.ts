@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import type { EventExtended } from '@/types'
 
 export const useUserNotes = defineStore('user-notes', () => {
-  const notes = ref<EventExtended[]>([])
+  const notes = ref<EventExtended[]>([])  // only shown in view, by default 20 notes
   const allNotesIds = ref<string[]>([])
  
   function updateNotes(events: EventExtended[]) {

@@ -1,22 +1,22 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue'
-  import { useRoute } from "vue-router";
-  import type { SimplePool, Event } from "nostr-tools";
+  import { useRouter, useRoute } from 'vue-router'
+  import { SimplePool, nip10, type Filter, type Event } from 'nostr-tools'
   import RelayEventsList from './../components/RelayEventsList.vue'
   import Pagination from './../components/Pagination.vue'
-  import RelayLog from './../components/RelayLog.vue'
-  import LoadFromFeedSelect from '@/components/LoadFromFeedSelect.vue';
-  import {
-    injectAuthorsToNotes,
-    injectDataToRootNotes
-  } from './../utils'
+  import MessageWrapper from '@/components/MessageWrapper.vue'
+  import FeedHeader from '@/components/FeedHeader.vue'
   import { DEFAULT_EVENTS_COUNT } from './../app'
-  import type { EventExtended, LogContentPart } from './../types';
+  import type { EventExtended, LogContentPart, ShortPubkeyEvent } from './../types'
   import { useRelay } from '@/stores/Relay'
   import { useImages } from '@/stores/Images'
   import { useFeed } from '@/stores/Feed'
   import { usePool } from '@/stores/Pool'
-  import { useNsec } from '@/stores/Nsec';
+  import { useNsec } from '@/stores/Nsec'
+  import { useMetasCache } from '@/stores/MetasCache'
+  import { getFollowsConnectedRelaysMap, closePoolSockets } from '@/utils/network'
+  import { loadAndInjectDataToPosts, listRootEvents } from '@/utils'
+  import { EVENT_KIND } from '@/nostr'
 
   defineProps<{
     eventsLog: LogContentPart[][]
@@ -27,44 +27,224 @@
   const feedStore = useFeed()
   const nsecStore = useNsec()
   const poolStore = usePool()
-  
-  const pool = poolStore.pool
-
-  const emit = defineEmits(['loadNewRelayEvents', 'handleRelayConnect'])
+  const metasCacheStore = useMetasCache()
 
   // loading new events
   const newAuthorImg1 = computed(() => feedStore.newEventsBadgeImageUrls[0])
   const newAuthorImg2 = computed(() => feedStore.newEventsBadgeImageUrls[1])
 
   // pagination
-  const currentPage = ref(1)
-  const pagesCount = computed(() => Math.ceil(feedStore.paginationEventsIds.length / DEFAULT_EVENTS_COUNT))
   const route = useRoute()
+  const router = useRouter()
+  const currentPage = ref(1)
+  const pagesCount = computed(() =>
+    Math.ceil(feedStore.paginationEventsIds.length / DEFAULT_EVENTS_COUNT),
+  )
   const currPath = computed(() => route.path)
+
+  // migrated from App.vue
+  // TODO: maybe get rid of this, used in broadcastEvent, store can be used instead
+  let newEvents = ref<{ id: string; pubkey: string }[]>([])
+
+  const pool = poolStore.pool
+  const isDisabledSourceSelect = ref(false)
 
   watch(
     () => route.path,
-    async () => {
+    () => {
       if (currentPage.value > 1) {
         showFeedPage(1)
       }
-    }
+    },
   )
 
   watch(
     () => feedStore.selectedFeedSource,
-    async (source) => {
+    async () => {
       if (relayStore.currentRelay.connected && nsecStore.isValidNsecPresented()) {
-        await emit('handleRelayConnect', true, true)
+        await changeFeedSource()
       }
-    }
+    },
+  )
+
+  watch(
+    () => feedStore.isMountAfterLogin,
+    () => {
+      if (!feedStore.isMountAfterLogin) return
+      feedStore.setMountAfterLogin(false)
+      mountFeed()
+    },
+    { immediate: true },
   )
 
   onMounted(() => {
+    // TODO: keep page and return to the page
+    // when switching between tabs, when come back to feed, we return to the first page
     if (pagesCount.value > 1) {
       showFeedPage(1)
     }
+
+    if (feedStore.toRemountFeed) {
+      feedStore.setToRemountFeed(false)
+      remountFeed()
+    }
   })
+
+  const changeFeedSource = async () => {
+    await remountFeed()
+  }
+
+  const remountFeed = async () => {
+    isDisabledSourceSelect.value = true
+
+    if (feedStore.newEventsBadgeUpdateInterval) {
+      feedStore.clearNewEventsBadgeUpdateInterval()
+    }
+
+    if (feedStore.pool) {
+      try {
+        await closePoolSockets(feedStore.pool)
+        feedStore.resetPool()
+      } catch (e) {
+        console.error('Error while closing websocket:', e)
+      }
+    }
+
+    feedStore.setShowNewEventsBadge(false)
+    feedStore.updateNewEventsToShow([])
+    feedStore.updatePaginationEventsIds([])
+    feedStore.updateEvents([])
+
+    await mountFeed()
+  }
+
+  /**
+   * This function is used only to mount feed from scratch
+   * For remounting feed use function remountFeed
+   */
+  async function mountFeed() {
+    isDisabledSourceSelect.value = true
+    feedStore.setLoadingFeedSourceStatus(true)
+
+    const pubkey = nsecStore.getPubkey()
+    let feedRelays = relayStore.connectedUserReadRelayUrls.length
+      ? relayStore.connectedUserReadRelayUrls
+      : [relayStore.currentRelay.url]
+
+    // get follows relays and pubkeys
+    let followsRelaysMap: Record<string, string[]> = {}
+    const folowsRelaysSet = new Set<string>()
+    let followsPubkeys: string[] = []
+    if (feedStore.isFollowsSource && pubkey.length) {
+      const follows = await pool.get(feedRelays, {
+        kinds: [EVENT_KIND.FOLLOW_LIST],
+        limit: 1,
+        authors: [pubkey],
+      })
+      if (follows) {
+        followsPubkeys = follows.tags.map((f) => f[1])
+        followsRelaysMap = await getFollowsConnectedRelaysMap(
+          follows,
+          feedRelays,
+          pool as SimplePool,
+        )
+        for (const relays of Object.values(followsRelaysMap)) {
+          relays.forEach((r) => folowsRelaysSet.add(r))
+        }
+      }
+    }
+
+    if (folowsRelaysSet.size) {
+      feedRelays = Array.from(folowsRelaysSet)
+    }
+    relayStore.setConnectedFeedRelayUrls(feedRelays)
+
+    // get posts
+    let postsFilter: Filter = { kinds: [1], limit: DEFAULT_EVENTS_COUNT }
+    if (followsPubkeys.length) {
+      postsFilter.authors = followsPubkeys
+    }
+    let posts = (await listRootEvents(pool as SimplePool, feedRelays, [postsFilter])) as Event[]
+    posts = posts.sort((a, b) => b.created_at - a.created_at)
+
+    // in callback we receive posts one by one with injected data as soon as they were loaded
+    // cache with metas also is being filled here inside
+    // (all data for all posts is loaded in parallel)
+    const isRootPosts = true
+    await loadAndInjectDataToPosts(
+      posts,
+      null,
+      followsRelaysMap,
+      feedRelays,
+      metasCacheStore,
+      pool as SimplePool,
+      isRootPosts,
+      (post) => {
+        feedStore.pushToEvents(post as EventExtended)
+        if (feedStore.isLoadingFeedSource) {
+          feedStore.setLoadingFeedSourceStatus(false)
+          feedStore.setLoadingMoreStatus(true)
+        }
+        feedStore.pushToPaginationEventsIds(post.id)
+      },
+    )
+    feedStore.setLoadingMoreStatus(false)
+
+    // subscribe to new events
+    let subscribePostsFilter: Filter = { kinds: [1], limit: 1 }
+    if (followsPubkeys.length) {
+      subscribePostsFilter.authors = followsPubkeys
+    }
+    await subscibeFeedForUpdates(feedRelays, subscribePostsFilter)
+    feedStore.newEventsBadgeUpdateInterval = setInterval(updateNewEventsElement, 3000)
+
+    isDisabledSourceSelect.value = false
+  }
+
+  async function subscibeFeedForUpdates(feedRelays: string[], subscribePostsFilter: Filter) {
+    // subPool is a global variable used later to close all connections
+    await feedStore.pool?.subscribeMany(feedRelays, [subscribePostsFilter], {
+      onevent(event: Event) {
+        if (feedStore.eventsId.includes(event.id)) return
+        const nip10Data = nip10.parse(event)
+        if (nip10Data.reply || nip10Data.root) return // filter non root events
+        newEvents.value.push({ id: event.id, pubkey: event.pubkey })
+        feedStore.pushToNewEventsToShow({ id: event.id, pubkey: event.pubkey })
+      },
+      onclose(r) {
+        console.warn('Subscription closed', r)
+      },
+    })
+  }
+
+  async function updateNewEventsElement() {
+    const relays = relayStore.connectedFeedRelaysUrls
+    if (!relays.length) return
+
+    const eventsToShow = feedStore.newEventsToShow
+    if (eventsToShow.length < 2) return
+    if (!feedStore.newEventsBadgeUpdateInterval) return
+
+    feedStore.setNewEventsBadgeCount(eventsToShow.length)
+    feedStore.setShowNewEventsBadge(true)
+
+    const pub1 = eventsToShow[eventsToShow.length - 1].pubkey
+    const pub2 = eventsToShow[eventsToShow.length - 2].pubkey
+
+    const eventsListOptions1 = { kinds: [0], authors: [pub1], limit: 1 }
+    const eventsListOptions2 = { kinds: [0], authors: [pub2], limit: 1 }
+
+    const author1 = await pool.querySync(relays, eventsListOptions1)
+    const author2 = await pool.querySync(relays, eventsListOptions2)
+
+    if (!feedStore.newEventsBadgeUpdateInterval) return
+    if (!author1[0]?.content || !author2[0]?.content) return
+
+    const authorImg1 = JSON.parse(author1[0].content).picture
+    const authorImg2 = JSON.parse(author2[0].content).picture
+
+    feedStore.setNewEventsBadgeImageUrls([authorImg1, authorImg2])
+  }
 
   const showFeedPage = async (page: number) => {
     if (feedStore.isLoadingNewEvents) return
@@ -80,22 +260,19 @@
     const reversedIds = feedStore.paginationEventsIds.slice().reverse()
     const idsToShow = reversedIds.slice(start, end)
 
-    const postsEvents = await pool.querySync(relays, { ids: idsToShow });
-    const authors = Array.from(new Set([...postsEvents.map((e: Event) => e.pubkey)]))
+    const postsEvents = await pool.querySync(relays, { ids: idsToShow })
+    let posts = postsEvents.sort((a, b) => b.created_at - a.created_at)
 
-    const authorsAndData = await Promise.all([
-      Promise.all(
-        authors.map(async (author) => {
-          return pool.get(relays, { kinds: [0], authors: [author] })
-        })
-      ),
-      injectDataToRootNotes(postsEvents as EventExtended[], relays, pool as SimplePool)
-    ])
-
-    const authorsEvents = authorsAndData[0] as Event[]
-    let posts = injectAuthorsToNotes(postsEvents, authorsEvents)
-
-    posts = posts.sort((a, b) => b.created_at - a.created_at)
+    const isRootPosts = true
+    await loadAndInjectDataToPosts(
+      posts,
+      null,
+      {},
+      relays,
+      metasCacheStore,
+      pool as SimplePool,
+      isRootPosts,
+    )
 
     feedStore.updateEvents(posts as EventExtended[])
     feedStore.setLoadingNewEventsStatus(false)
@@ -103,17 +280,63 @@
   }
 
   const loadNewRelayEvents = async () => {
-    await emit('loadNewRelayEvents')
+    if (feedStore.isLoadingNewEvents) return
+
+    feedStore.setLoadingNewEventsStatus(true)
+    feedStore.setShowNewEventsBadge(false)
+
+    const relays = relayStore.connectedFeedRelaysUrls
+    if (!relays.length) return
+
+    router.push({ path: `${route.path}` })
+
+    let eventsToShow = feedStore.newEventsToShow
+    feedStore.updateNewEventsToShow(
+      feedStore.newEventsToShow.filter((item: ShortPubkeyEvent) => !eventsToShow.includes(item)),
+    )
+
+    const ids = eventsToShow.map((e: ShortPubkeyEvent) => e.id)
+    const limit = DEFAULT_EVENTS_COUNT
+
+    feedStore.updatePaginationEventsIds(feedStore.paginationEventsIds.concat(ids))
+    const firstPageIds = feedStore.paginationEventsIds.slice(-limit)
+
+    const postsEvents = await pool.querySync(relays, { ids: firstPageIds })
+    let posts = postsEvents.sort((a, b) => b.created_at - a.created_at)
+
+    const isRootPosts = true
+    await loadAndInjectDataToPosts(
+      posts,
+      null,
+      {},
+      relays,
+      metasCacheStore,
+      pool as SimplePool,
+      isRootPosts,
+    )
+
+    // update view
+    feedStore.updateEvents(posts as EventExtended[])
+    feedStore.setLoadingNewEventsStatus(false)
+
+    // logHtmlParts([
+    //   { type: 'text', value: `loaded ${eventsToShow.length}` },
+    //   { type: 'text', value: ' new event(s) from ' },
+    //   { type: 'bold', value: relayStore.connectedFeedRelaysPrettyStr },
+    // ])
+
     currentPage.value = 1
   }
 </script>
 
 <template>
   <div id="feed">
-    <LoadFromFeedSelect />
+    <MessageWrapper @loadNewRelayEvents="loadNewRelayEvents" :newEvents="newEvents" />
+
+    <FeedHeader :isDisabledSourceSelect="isDisabledSourceSelect" />
 
     <div class="columns">
-      <div :class="['events', { 'events_hidden': currPath === '/log' }]">
+      <div :class="['events', { events_hidden: currPath === '/log' }]">
         <div v-if="feedStore.isLoadingFeedSource" class="connecting-notice">
           Loading feed from {{ feedStore.selectedFeedSource }}...
         </div>
@@ -122,14 +345,17 @@
           Loading new notes...
         </div>
 
-        <div 
-          v-if="feedStore.showNewEventsBadge" 
-          @click="loadNewRelayEvents" 
+        <div
+          v-if="feedStore.showNewEventsBadge"
+          @click="loadNewRelayEvents"
           :class="['new-events', { 'new-events_top-shifted': feedStore.isLoadingNewEvents }]"
         >
-          <div v-if="imagesStore.showImages" class="new-events__imgs">
-            <img class="new-events__img" :src="newAuthorImg1" alt="user's avatar">
-            <img class="new-events__img" :src="newAuthorImg2" alt="user's avatar">
+          <div
+            v-if="imagesStore.showImages && feedStore.newEventsBadgeImageUrls.length"
+            class="new-events__imgs"
+          >
+            <img class="new-events__img" :src="newAuthorImg1" alt="user's avatar" />
+            <img class="new-events__img" :src="newAuthorImg2" alt="user's avatar" />
           </div>
           <span class="new-events__text">{{ feedStore.newEventsBadgeCount }} new notes</span>
           <b class="new-events__arrow">↑</b>
@@ -143,20 +369,12 @@
           @toggleRawData="feedStore.toggleEventRawData"
         />
 
-        <div v-if="feedStore.isLoadingMore" class="loading-more">
-          Loading more posts...
-        </div>
+        <div v-if="feedStore.isLoadingMore" class="loading-more">Loading more posts...</div>
 
-        <Pagination 
-          :pagesCount="pagesCount"
-          :currentPage="currentPage"
-          @showPage="showFeedPage"
-        />
+        <Pagination :pagesCount="pagesCount" :currentPage="currentPage" @showPage="showFeedPage" />
       </div>
 
-      <div :class="['log-wrapper', { 'log-wrapper_hidden': currPath !== '/log' }]">
-        <RelayLog :eventsLog="eventsLog" />
-      </div>
+      <!-- <RelayLog :eventsLog="eventsLog" /> -->
     </div>
   </div>
 </template>
@@ -198,7 +416,7 @@
   }
 
   .new-events_top-shifted {
-    top: 60px
+    top: 60px;
   }
 
   @media (min-width: 768px) {
@@ -227,38 +445,11 @@
     margin-right: -10px;
   }
 
-  .log-wrapper {
-    flex-grow: 1;
-  }
-
-  .log-wrapper_hidden {
-    display: none;
-  }
-
-  @media (min-width: 1200px) {
-    .log-wrapper {
-      position: absolute;
-      right: -255px;
-      width: 240px;
-    }
-
-    .log-wrapper_hidden {
-      display: initial;
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .log-wrapper {
-      right: -265px;
-      width: 250px;
-    }
-  }
-
   .connecting-notice {
-    margin-top: 15px
+    margin-top: 15px;
   }
 
   .loading-more {
-    text-align: center
+    text-align: center;
   }
 </style>

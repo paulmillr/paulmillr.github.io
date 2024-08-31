@@ -35,7 +35,7 @@ export const useNsec = defineStore('nsec', () => {
   function getPrivkeyBytes() {
     try {
       const isHex = nsec.value.indexOf('nsec') === -1
-      return isHex ? hexToBytes(nsec.value) : nip19.decode(nsec.value).data as Uint8Array
+      return isHex ? hexToBytes(nsec.value) : (nip19.decode(nsec.value).data as Uint8Array)
     } catch (e) {
       return null
     }
@@ -75,24 +75,24 @@ export const useNsec = defineStore('nsec', () => {
     return getPubkey().length > 0
   }
 
-  const isNsecValidTemp = computed(() =>{
+  const isNsecValidTemp = computed(() => {
     return isNsecValid()
   })
 
-  return { 
-    nsec, 
-    updateNsec, 
-    rememberMe, 
-    setRememberMe, 
-    isNsecValid, 
-    isValidNsecPresented, 
-    isNotValidNsecPresented, 
+  return {
+    nsec,
+    updateNsec,
+    rememberMe,
+    setRememberMe,
+    isNsecValid,
+    isValidNsecPresented,
+    isNotValidNsecPresented,
     getPubkey,
     cachedNsec,
     updateCachedNsec,
     getPrivkeyBytes,
     getPrivkeyHex,
     getPrivkey,
-    isNsecValidTemp
+    isNsecValidTemp,
   }
 })

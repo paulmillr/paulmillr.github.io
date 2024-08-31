@@ -190,7 +190,7 @@
   }
 
   .error {
-    color: red;
+    color: #ff4040;
     font-size: 16px;
     margin-top: 5px;
   }

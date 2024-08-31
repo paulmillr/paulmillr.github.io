@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { isSHA256Hex } from '@/utils';
+  import { isSHA256Hex } from '@/utils'
   import { nip19 } from 'nostr-tools'
   import { useRelay } from '@/stores/Relay'
 
@@ -46,7 +46,7 @@
     }
 
     pubkeyError.value = ''
-    
+
     emit('startChat', pubkey)
   }
 </script>
@@ -57,13 +57,17 @@
       <strong>Profile's public key</strong>
     </label>
     <div class="user-field">
-      <input v-model.trim="userSearchQuery" class="find-user-input" id="start-chat-pubkey" type="text" placeholder="npub or hex of pubkey">
+      <input
+        v-model.trim="userSearchQuery"
+        class="find-user-input"
+        id="start-chat-pubkey"
+        type="text"
+        placeholder="npub or hex of pubkey"
+      />
       <button type="submit" class="start-chat-btn">Start chat</button>
     </div>
   </form>
-  <div v-if="isLoadingProfile" class="notice">
-    Loading profile info...
-  </div>
+  <div v-if="isLoadingProfile" class="notice">Loading profile info...</div>
   <div v-if="pubkeyError" class="error">
     {{ pubkeyError }}
   </div>
@@ -88,11 +92,11 @@
   }
 
   .error {
-    color: red;
+    color: #ff4040;
     font-size: 16px;
     margin-top: 5px;
   }
-  
+
   .notice {
     margin-top: 10px;
   }

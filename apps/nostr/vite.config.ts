@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -9,12 +8,13 @@ export default defineConfig({
   plugins: [vue(), vueJsx()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   },
   build: {
-    sourcemap: false,
-    minify: false,
+    // sourcemap: false,
+    // minify: false,
+    sourcemap: true,
     assetsDir: 'assets',
     assetsInlineLimit: 0,
     rollupOptions: {
@@ -23,14 +23,15 @@ export default defineConfig({
         entryFileNames: 'main.js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name) {
-            let extType = assetInfo.name.split('.').at(1)
+            const extType = assetInfo.name.split('.').at(1)
             if (extType === 'css') return `main.css`
           }
           return 'assets/[name]-[hash][extname]'
-        }
-      }
+        },
+      },
     },
     cssCodeSplit: false,
-    outDir: 'dist'
-  }
+    outDir: 'dist',
+  },
+  base: './',
 })

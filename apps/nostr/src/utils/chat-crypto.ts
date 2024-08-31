@@ -1,17 +1,23 @@
-import {bytesToHex} from "@noble/hashes/utils"
-import type {EventTemplate, UnsignedEvent, Event} from "nostr-tools"
-import {getPublicKey, getEventHash, nip44, finalizeEvent, generateSecretKey} from "nostr-tools"
+// @ts-nocheck
+/**
+ * TODO: Remove ts-nocheck after fixing the issue
+ * code was taken from https://github.com/nostr-protocol/nips/blob/master/59.md
+ * but fixed with secure random
+ */
+import { bytesToHex } from '@noble/hashes/utils'
+import type { EventTemplate, UnsignedEvent, Event } from 'nostr-tools'
+import { getPublicKey, getEventHash, nip44, finalizeEvent, generateSecretKey } from 'nostr-tools'
 
-export type Rumor = UnsignedEvent & {id: string}
+export type Rumor = UnsignedEvent & { id: string }
 
 export const TWO_DAYS = 2 * 24 * 60 * 60
 
 const secureRandom = () => {
-  return crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1)
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1)
 }
 
 export const now = () => Math.round(Date.now() / 1000)
-const randomNow = () => Math.round(now() - (secureRandom() * TWO_DAYS))
+const randomNow = () => Math.round(now() - secureRandom() * TWO_DAYS)
 
 export const nip44ConversationKey = (privateKey: Uint8Array, publicKey: string) =>
   nip44.v2.utils.getConversationKey(bytesToHex(privateKey), publicKey)
@@ -26,7 +32,7 @@ export const createRumor = (event: Partial<UnsignedEvent>, privateKey: Uint8Arra
   const rumor = {
     kind: 14,
     created_at: now(),
-    content: "",
+    content: '',
     tags: [],
     ...event,
     pubkey: getPublicKey(privateKey),
@@ -45,7 +51,7 @@ export const createSeal = (rumor: Rumor, privateKey: Uint8Array, recipientPublic
       created_at: randomNow(),
       tags: [],
     },
-    privateKey
+    privateKey,
   ) as Event
 }
 
@@ -57,8 +63,8 @@ export const createWrap = (event: Event, recipientPublicKey: string) => {
       kind: 1059,
       content: nip44Encrypt(event, randomPrivateKey, recipientPublicKey),
       created_at: randomNow(),
-      tags: [["p", recipientPublicKey]],
+      tags: [['p', recipientPublicKey]],
     },
-    randomPrivateKey
+    randomPrivateKey,
   ) as Event
 }

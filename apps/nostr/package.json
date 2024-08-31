@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@noble/hashes": "1.4.0",
-    "nostr-tools": "2.5.2",
+    "bootstrap-icons": "^1.11.3",
+    "nostr-tools": "^2.7.1",
     "pinia": "2.1.7",
     "vue": "3.4.19",
     "vue-router": "4.2.5"

@@ -1,9 +1,10 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { SimplePool } from 'nostr-tools'
 import type { EventExtended, ShortPubkeyEvent } from '@/types'
 
 export const useFeed = defineStore('feed', () => {
-  const events = ref<EventExtended[]>([])
+  const events = ref<EventExtended[]>([]) // which are shown on the page in feed (by default 20)
   const showNewEventsBadge = ref(false)
   const newEventsBadgeImageUrls = ref<string[]>([])
   const newEventsBadgeCount = ref(0)
@@ -12,13 +13,34 @@ export const useFeed = defineStore('feed', () => {
   const messageToBroadcast = ref('')
   const signedJson = ref('')
 
+  // created by setInterval, to update new events badge
+  const newEventsBadgeUpdateInterval = ref(0)
+
   const selectedFeedSource = ref('network')
 
+  const eventsId = computed(() => events.value.map((e) => e.id))
   const isFollowsSource = computed(() => selectedFeedSource.value === 'follows')
   const isNetworkSource = computed(() => selectedFeedSource.value === 'network')
   const isLoadingFeedSource = ref(false)
   const isLoadingNewEvents = ref(false)
   const isLoadingMore = ref(false)
+
+  const isMountAfterLogin = ref(false)
+  const toRemountFeed = ref(false)
+
+  const pool = ref(new SimplePool())
+
+  function clear() {
+    clearNewEventsBadgeUpdateInterval()
+    events.value = []
+    showNewEventsBadge.value = false
+    newEventsToShow.value = []
+    paginationEventsIds.value = []
+    selectedFeedSource.value = 'network'
+    isLoadingFeedSource.value = false
+    isLoadingNewEvents.value = false
+    isLoadingMore.value = false
+  }
 
   function updateEvents(value: EventExtended[]) {
     events.value = value
@@ -29,7 +51,7 @@ export const useFeed = defineStore('feed', () => {
   }
 
   function toggleEventRawData(id: string) {
-    const event = events.value.find(e => e.id === id)
+    const event = events.value.find((e) => e.id === id)
     if (event) {
       event.showRawData = !event.showRawData
     }
@@ -87,11 +109,28 @@ export const useFeed = defineStore('feed', () => {
     selectedFeedSource.value = value === 'follows' ? value : 'network'
   }
 
+  function setMountAfterLogin(value: boolean) {
+    isMountAfterLogin.value = value
+  }
+
+  function clearNewEventsBadgeUpdateInterval() {
+    clearInterval(newEventsBadgeUpdateInterval.value)
+    newEventsBadgeUpdateInterval.value = 0
+  }
+
+  function resetPool() {
+    pool.value = new SimplePool()
+  }
+
+  function setToRemountFeed(value: boolean) {
+    toRemountFeed.value = value
+  }
+
   return {
-    events, 
-    updateEvents, 
-    toggleEventRawData, 
-    showNewEventsBadge, 
+    events,
+    updateEvents,
+    toggleEventRawData,
+    showNewEventsBadge,
     setShowNewEventsBadge,
     newEventsBadgeImageUrls,
     setNewEventsBadgeImageUrls,
@@ -117,6 +156,16 @@ export const useFeed = defineStore('feed', () => {
     isLoadingNewEvents,
     pushToEvents,
     setLoadingMoreStatus,
-    isLoadingMore
+    isLoadingMore,
+    isMountAfterLogin,
+    setMountAfterLogin,
+    eventsId,
+    newEventsBadgeUpdateInterval,
+    clearNewEventsBadgeUpdateInterval,
+    clear,
+    pool,
+    resetPool,
+    toRemountFeed,
+    setToRemountFeed,
   }
 })
