@@ -19,10 +19,12 @@ export const useRelay = defineStore('relay', () => {
   const additionalRelaysUrlsForSignedEvent = ref<string[]>([])
 
   // user relays from nip 65 (relay list metadata, kind:10002)
+  // values are being changed on login and on settings pages
   const connectedUserReadRelayUrls = ref<string[]>([])
   const connectedUserWriteRelaysUrls = ref<string[]>([])
   const reedRelays = ref<string[]>([])
   const writeRelays = ref<string[]>([])
+
   const isConnectingToReadWriteRelays = ref(false)
   const isConnectedToReadWriteRelays = ref(false)
 

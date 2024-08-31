@@ -12,9 +12,9 @@ export default defineConfig({
     },
   },
   build: {
-    // sourcemap: false,
-    // minify: false,
-    sourcemap: true,
+    sourcemap: false,
+    minify: false,
+    // sourcemap: true,
     assetsDir: 'assets',
     assetsInlineLimit: 0,
     rollupOptions: {
@@ -26,7 +26,7 @@ export default defineConfig({
             const extType = assetInfo.name.split('.').at(1)
             if (extType === 'css') return `main.css`
           }
-          return 'assets/[name]-[hash][extname]'
+          return 'assets/[name][extname]'
         },
       },
     },

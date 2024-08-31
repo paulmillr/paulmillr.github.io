@@ -238,7 +238,7 @@ export const isLike = (content: string) => {
   return true
 }
 
-export const isWsAvailable = (url: string, timeout: number = 3000) => {
+export const isWsAvailable = (url: string, timeout: number = 5000) => {
   try {
     return new Promise((resolve) => {
       const socket = new WebSocket(url)

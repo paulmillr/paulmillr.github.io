@@ -18,7 +18,7 @@
   const poolStore = usePool()
   const pool = poolStore.pool
 
-  const isRemembered = localStorage.getItem('rememberMe') === 'true'
+  const isRemembered = !!localStorage.getItem('privkey')?.length
   nsecStore.setRememberMe(isRemembered)
   const initialNsec = isRemembered ? localStorage.getItem('privkey') : ''
   nsecStore.updateNsec(initialNsec || '')
@@ -34,7 +34,7 @@
     eventsLog.value.unshift(parts)
   }
 
-  const clearAppState = () => {
+  const clearAppState = (clearLocalStorage: boolean = true) => {
     if (relayStore.isConnectedToRelay) {
       relayStore.currentRelay?.close()
     }
@@ -49,11 +49,16 @@
       feedStore.resetPool()
     }
 
-    localStorage.removeItem('privkey')
-    nsecStore.updateNsec('')
     feedStore.clear()
     relayStore.clear()
     imagesStore.updateShowImages(false)
+
+    if (clearLocalStorage) {
+      localStorage.clear()
+      nsecStore.updateCachedNsec('')
+      nsecStore.updateNsec('')
+      nsecStore.setRememberMe(false)
+    }
 
     router.push('/login')
 

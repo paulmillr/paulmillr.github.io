@@ -86,6 +86,7 @@
     border-radius: 5px;
     display: flex;
     align-items: center;
+    color: inherit;
   }
 
   @media (min-width: 510px) {

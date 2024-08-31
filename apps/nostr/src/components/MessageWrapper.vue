@@ -7,12 +7,10 @@
   import { isWsAvailable, publishEventToRelays } from '@/utils'
 
   import { useRelay } from '@/stores/Relay'
-  import { useNsec } from '@/stores/Nsec'
   import { usePool } from '@/stores/Pool'
   import { useFeed } from '@/stores/Feed'
 
   const relayStore = useRelay()
-  const nsecStore = useNsec()
   const feedStore = useFeed()
   const poolStore = usePool()
   const pool = poolStore.pool

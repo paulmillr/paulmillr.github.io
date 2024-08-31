@@ -1,13 +1,14 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
-  import { connectToSelectedRelay } from '@/utils/network'
-  import Dropdown from '@/components/Dropdown.vue'
-  import { utils, Relay, type Event } from 'nostr-tools'
-  import { DEFAULT_RELAY, DEFAULT_RELAYS } from '@/app'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import { utils, Relay, type Event } from 'nostr-tools'
+  import { connectToSelectedRelay } from '@/utils/network'
+  import { DEFAULT_RELAY, DEFAULT_RELAYS } from '@/app'
   import { relayGet, parseRelaysNip65 } from '@/utils'
   import { getConnectedReadWriteRelays } from '@/utils/network'
   import { EVENT_KIND } from '@/nostr'
+  import Dropdown from '@/components/Dropdown.vue'
+  import Checkbox from '@/components/Checkbox.vue'
 
   import { useNsec } from '@/stores/Nsec'
   import { useRelay } from '@/stores/Relay'
@@ -28,7 +29,7 @@
 
   const selectedRelay = ref<string>(DEFAULT_RELAY)
   const showCustomRelayUrl = computed(() => selectedRelay.value === 'custom')
-  // const showRememberMe = computed(() => nsecStore.isValidNsecPresented())
+  const showRememberMe = computed(() => nsecStore.isValidNsecPresented())
   const loginError = ref('')
   const isConnectingToRelays = ref(false)
 
@@ -46,6 +47,21 @@
       redirectToUser = true
     }
   })
+
+  watch(
+    () => nsecStore.nsec,
+    () => {
+      if (!nsecStore.isValidNsecPresented()) {
+        localStorage.clear()
+        nsecStore.setRememberMe(false)
+        return
+      }
+
+      if (nsecStore.rememberMe) {
+        localStorage.setItem('privkey', nsecStore.nsec)
+      }
+    },
+  )
 
   const isRedirectedFromSearch = () => {
     return history.state && /^\/(user|event)\/[a-zA-Z0-9]+$/g.test(history.state.back)
@@ -167,6 +183,16 @@
     }
     router.push({ path: afterLoginPath })
   }
+
+  const handleRememberMe = () => {
+    if (nsecStore.rememberMe) {
+      nsecStore.setRememberMe(false)
+      localStorage.clear()
+    } else {
+      nsecStore.setRememberMe(true)
+      localStorage.setItem('privkey', nsecStore.nsec)
+    }
+  }
 </script>
 
 <template>
@@ -204,15 +230,14 @@
         />
       </div>
     </div>
-    <!-- <ShowImagesCheckbox
-      v-if="showRememberMe"
-      :showImages="false"
-      @toggleImages="
-        () => {
-          console.log('test')
-        }
-      "
-    /> -->
+    <div class="remember-me">
+      <Checkbox
+        v-if="showRememberMe"
+        @onChange="handleRememberMe"
+        :checked="nsecStore.rememberMe"
+        :label="'Remember me'"
+      />
+    </div>
 
     <div class="field">
       <button
@@ -313,5 +338,9 @@
     color: #ff4040;
     font-size: 16px;
     margin-top: 10px;
+  }
+
+  .remember-me {
+    margin-top: 5px;
   }
 </style>

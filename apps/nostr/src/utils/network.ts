@@ -100,7 +100,7 @@ export const getFollowsConnectedRelaysMap = async (
 
     const followsSortedRelays = await Promise.all(
       Array.from(followsRelaysUrlsExceptUserRelays).map(async (relayUrl: any) => {
-        const isConnected = await isWsAvailable(relayUrl, 1000)
+        const isConnected = await isWsAvailable(relayUrl)
         return { url: relayUrl, connected: isConnected }
       }),
     )

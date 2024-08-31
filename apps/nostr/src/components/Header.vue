@@ -35,7 +35,8 @@
   }
 
   const handleLoginClick = () => {
-    emit('clearAppState')
+    const clearLocalStorage = false
+    emit('clearAppState', clearLocalStorage)
   }
 </script>
 

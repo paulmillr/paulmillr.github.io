@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { onMounted, ref, computed, watch, onUnmounted } from 'vue'
-  import { nip19, nip05, nip10, SimplePool, type Event } from 'nostr-tools'
+  import { nip05, nip10, SimplePool, type Event } from 'nostr-tools'
   import { useRouter, useRoute } from 'vue-router'
 
   import { fallbackRelays, DEFAULT_EVENTS_COUNT } from '@/app'

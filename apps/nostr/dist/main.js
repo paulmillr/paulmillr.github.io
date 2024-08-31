@@ -1,42 +1,20053 @@
-var df=Object.defineProperty;var ff=(e,t,n)=>t in e?df(e,t,{enumerable:!0,configurable:!0,writable:!0,value:n}):e[t]=n;var ge=(e,t,n)=>(ff(e,typeof t!="symbol"?t+"":t,n),n);/**
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+/**
 * @vue/shared v3.4.19
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
-**/function hf(e,t){const n=new Set(e.split(","));return t?s=>n.has(s.toLowerCase()):s=>n.has(s)}const pf=()=>{},gf=Object.prototype.hasOwnProperty,no=(e,t)=>gf.call(e,t),gn=Array.isArray,Ys=e=>Bc(e)==="[object Map]",yf=e=>typeof e=="function",vf=e=>typeof e=="string",mo=e=>typeof e=="symbol",wo=e=>e!==null&&typeof e=="object",_f=Object.prototype.toString,Bc=e=>_f.call(e),mf=e=>Bc(e).slice(8,-1),ri=e=>vf(e)&&e!=="NaN"&&e[0]!=="-"&&""+parseInt(e,10)===e,is=(e,t)=>!Object.is(e,t),wf=(e,t,n)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,value:n})};/**
+**/
+function makeMap$2(str, expectsLowerCase) {
+  const set2 = new Set(str.split(","));
+  return expectsLowerCase ? (val) => set2.has(val.toLowerCase()) : (val) => set2.has(val);
+}
+const NOOP$1 = () => {
+};
+const hasOwnProperty$2 = Object.prototype.hasOwnProperty;
+const hasOwn$1 = (val, key) => hasOwnProperty$2.call(val, key);
+const isArray$3 = Array.isArray;
+const isMap$1 = (val) => toTypeString$1(val) === "[object Map]";
+const isFunction$2 = (val) => typeof val === "function";
+const isString$2 = (val) => typeof val === "string";
+const isSymbol$1 = (val) => typeof val === "symbol";
+const isObject$1 = (val) => val !== null && typeof val === "object";
+const objectToString$1 = Object.prototype.toString;
+const toTypeString$1 = (value) => objectToString$1.call(value);
+const toRawType = (value) => {
+  return toTypeString$1(value).slice(8, -1);
+};
+const isIntegerKey = (key) => isString$2(key) && key !== "NaN" && key[0] !== "-" && "" + parseInt(key, 10) === key;
+const hasChanged$1 = (value, oldValue) => !Object.is(value, oldValue);
+const def$1 = (obj, key, value) => {
+  Object.defineProperty(obj, key, {
+    configurable: true,
+    enumerable: false,
+    value
+  });
+};
+/**
 * @vue/reactivity v3.4.19
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
-**/let at;class Nc{constructor(t=!1){this.detached=t,this._active=!0,this.effects=[],this.cleanups=[],this.parent=at,!t&&at&&(this.index=(at.scopes||(at.scopes=[])).push(this)-1)}get active(){return this._active}run(t){if(this._active){const n=at;try{return at=this,t()}finally{at=n}}}on(){at=this}off(){at=this.parent}stop(t){if(this._active){let n,s;for(n=0,s=this.effects.length;n<s;n++)this.effects[n].stop();for(n=0,s=this.cleanups.length;n<s;n++)this.cleanups[n]();if(this.scopes)for(n=0,s=this.scopes.length;n<s;n++)this.scopes[n].stop(!0);if(!this.detached&&this.parent&&!t){const o=this.parent.scopes.pop();o&&o!==this&&(this.parent.scopes[this.index]=o,o.index=this.index)}this.parent=void 0,this._active=!1}}}function Mc(e){return new Nc(e)}function bf(e,t=at){t&&t.active&&t.effects.push(e)}function Oc(){return at}function Ef(e){at&&at.cleanups.push(e)}let Ln;class ii{constructor(t,n,s,o){this.fn=t,this.trigger=n,this.scheduler=s,this.active=!0,this.deps=[],this._dirtyLevel=4,this._trackId=0,this._runnings=0,this._shouldSchedule=!1,this._depsLength=0,bf(this,o)}get dirty(){if(this._dirtyLevel===2||this._dirtyLevel===3){this._dirtyLevel=1,Mn();for(let t=0;t<this._depsLength;t++){const n=this.deps[t];if(n.computed&&(Rf(n.computed),this._dirtyLevel>=4))break}this._dirtyLevel===1&&(this._dirtyLevel=0),On()}return this._dirtyLevel>=4}set dirty(t){this._dirtyLevel=t?4:0}run(){if(this._dirtyLevel=0,!this.active)return this.fn();let t=yn,n=Ln;try{return yn=!0,Ln=this,this._runnings++,oa(this),this.fn()}finally{ra(this),this._runnings--,Ln=n,yn=t}}stop(){var t;this.active&&(oa(this),ra(this),(t=this.onStop)==null||t.call(this),this.active=!1)}}function Rf(e){return e.value}function oa(e){e._trackId++,e._depsLength=0}function ra(e){if(e.deps.length>e._depsLength){for(let t=e._depsLength;t<e.deps.length;t++)Fc(e.deps[t],e);e.deps.length=e._depsLength}}function Fc(e,t){const n=e.get(t);n!==void 0&&t._trackId!==n&&(e.delete(t),e.size===0&&e.cleanup())}let yn=!0,Cr=0;const Hc=[];function Mn(){Hc.push(yn),yn=!1}function On(){const e=Hc.pop();yn=e===void 0?!0:e}function ai(){Cr++}function ci(){for(Cr--;!Cr&&$r.length;)$r.shift()()}function jc(e,t,n){if(t.get(e)!==e._trackId){t.set(e,e._trackId);const s=e.deps[e._depsLength];s!==t?(s&&Fc(s,e),e.deps[e._depsLength++]=t):e._depsLength++}}const $r=[];function Vc(e,t,n){ai();for(const s of e.keys()){let o;s._dirtyLevel<t&&(o??(o=e.get(s)===s._trackId))&&(s._shouldSchedule||(s._shouldSchedule=s._dirtyLevel===0),s._dirtyLevel=t),s._shouldSchedule&&(o??(o=e.get(s)===s._trackId))&&(s.trigger(),(!s._runnings||s.allowRecurse)&&s._dirtyLevel!==2&&(s._shouldSchedule=!1,s.scheduler&&$r.push(s.scheduler)))}ci()}const Dc=(e,t)=>{const n=new Map;return n.cleanup=e,n.computed=t,n},so=new WeakMap,Un=Symbol(""),Pr=Symbol("");function tt(e,t,n){if(yn&&Ln){let s=so.get(e);s||so.set(e,s=new Map);let o=s.get(n);o||s.set(n,o=Dc(()=>s.delete(n))),jc(Ln,o)}}function Wt(e,t,n,s,o,r){const i=so.get(e);if(!i)return;let a=[];if(t==="clear")a=[...i.values()];else if(n==="length"&&gn(e)){const c=Number(s);i.forEach((l,d)=>{(d==="length"||!mo(d)&&d>=c)&&a.push(l)})}else switch(n!==void 0&&a.push(i.get(n)),t){case"add":gn(e)?ri(n)&&a.push(i.get("length")):(a.push(i.get(Un)),Ys(e)&&a.push(i.get(Pr)));break;case"delete":gn(e)||(a.push(i.get(Un)),Ys(e)&&a.push(i.get(Pr)));break;case"set":Ys(e)&&a.push(i.get(Un));break}ai();for(const c of a)c&&Vc(c,4);ci()}function xf(e,t){var n;return(n=so.get(e))==null?void 0:n.get(t)}const Sf=hf("__proto__,__v_isRef,__isVue"),Wc=new Set(Object.getOwnPropertyNames(Symbol).filter(e=>e!=="arguments"&&e!=="caller").map(e=>Symbol[e]).filter(mo)),ia=kf();function kf(){const e={};return["includes","indexOf","lastIndexOf"].forEach(t=>{e[t]=function(...n){const s=xe(this);for(let r=0,i=this.length;r<i;r++)tt(s,"get",r+"");const o=s[t](...n);return o===-1||o===!1?s[t](...n.map(xe)):o}}),["push","pop","shift","unshift","splice"].forEach(t=>{e[t]=function(...n){Mn(),ai();const s=xe(this)[t].apply(this,n);return ci(),On(),s}}),e}function Cf(e){const t=xe(this);return tt(t,"has",e),t.hasOwnProperty(e)}class qc{constructor(t=!1,n=!1){this._isReadonly=t,this._shallow=n}get(t,n,s){const o=this._isReadonly,r=this._shallow;if(n==="__v_isReactive")return!o;if(n==="__v_isReadonly")return o;if(n==="__v_isShallow")return r;if(n==="__v_raw")return s===(o?r?Hf:Zc:r?Gc:zc).get(t)||Object.getPrototypeOf(t)===Object.getPrototypeOf(s)?t:void 0;const i=gn(t);if(!o){if(i&&no(ia,n))return Reflect.get(ia,n,s);if(n==="hasOwnProperty")return Cf}const a=Reflect.get(t,n,s);return(mo(n)?Wc.has(n):Sf(n))||(o||tt(t,"get",n),r)?a:He(a)?i&&ri(n)?a:a.value:wo(a)?o?Yc(a):as(a):a}}class Kc extends qc{constructor(t=!1){super(!1,t)}set(t,n,s,o){let r=t[n];if(!this._shallow){const c=Yn(r);if(!oo(s)&&!Yn(s)&&(r=xe(r),s=xe(s)),!gn(t)&&He(r)&&!He(s))return c?!1:(r.value=s,!0)}const i=gn(t)&&ri(n)?Number(n)<t.length:no(t,n),a=Reflect.set(t,n,s,o);return t===xe(o)&&(i?is(s,r)&&Wt(t,"set",n,s):Wt(t,"add",n,s)),a}deleteProperty(t,n){const s=no(t,n);t[n];const o=Reflect.deleteProperty(t,n);return o&&s&&Wt(t,"delete",n,void 0),o}has(t,n){const s=Reflect.has(t,n);return(!mo(n)||!Wc.has(n))&&tt(t,"has",n),s}ownKeys(t){return tt(t,"iterate",gn(t)?"length":Un),Reflect.ownKeys(t)}}class $f extends qc{constructor(t=!1){super(!0,t)}set(t,n){return!0}deleteProperty(t,n){return!0}}const Pf=new Kc,If=new $f,Af=new Kc(!0),li=e=>e,bo=e=>Reflect.getPrototypeOf(e);function Ds(e,t,n=!1,s=!1){e=e.__v_raw;const o=xe(e),r=xe(t);n||(is(t,r)&&tt(o,"get",t),tt(o,"get",r));const{has:i}=bo(o),a=s?li:n?fi:Ps;if(i.call(o,t))return a(e.get(t));if(i.call(o,r))return a(e.get(r));e!==o&&e.get(t)}function Ws(e,t=!1){const n=this.__v_raw,s=xe(n),o=xe(e);return t||(is(e,o)&&tt(s,"has",e),tt(s,"has",o)),e===o?n.has(e):n.has(e)||n.has(o)}function qs(e,t=!1){return e=e.__v_raw,!t&&tt(xe(e),"iterate",Un),Reflect.get(e,"size",e)}function aa(e){e=xe(e);const t=xe(this);return bo(t).has.call(t,e)||(t.add(e),Wt(t,"add",e,e)),this}function ca(e,t){t=xe(t);const n=xe(this),{has:s,get:o}=bo(n);let r=s.call(n,e);r||(e=xe(e),r=s.call(n,e));const i=o.call(n,e);return n.set(e,t),r?is(t,i)&&Wt(n,"set",e,t):Wt(n,"add",e,t),this}function la(e){const t=xe(this),{has:n,get:s}=bo(t);let o=n.call(t,e);o||(e=xe(e),o=n.call(t,e)),s&&s.call(t,e);const r=t.delete(e);return o&&Wt(t,"delete",e,void 0),r}function ua(){const e=xe(this),t=e.size!==0,n=e.clear();return t&&Wt(e,"clear",void 0,void 0),n}function Ks(e,t){return function(s,o){const r=this,i=r.__v_raw,a=xe(i),c=t?li:e?fi:Ps;return!e&&tt(a,"iterate",Un),i.forEach((l,d)=>s.call(o,c(l),c(d),r))}}function zs(e,t,n){return function(...s){const o=this.__v_raw,r=xe(o),i=Ys(r),a=e==="entries"||e===Symbol.iterator&&i,c=e==="keys"&&i,l=o[e](...s),d=n?li:t?fi:Ps;return!t&&tt(r,"iterate",c?Pr:Un),{next(){const{value:u,done:f}=l.next();return f?{value:u,done:f}:{value:a?[d(u[0]),d(u[1])]:d(u),done:f}},[Symbol.iterator](){return this}}}}function Xt(e){return function(...t){return e==="delete"?!1:e==="clear"?void 0:this}}function Tf(){const e={get(r){return Ds(this,r)},get size(){return qs(this)},has:Ws,add:aa,set:ca,delete:la,clear:ua,forEach:Ks(!1,!1)},t={get(r){return Ds(this,r,!1,!0)},get size(){return qs(this)},has:Ws,add:aa,set:ca,delete:la,clear:ua,forEach:Ks(!1,!0)},n={get(r){return Ds(this,r,!0)},get size(){return qs(this,!0)},has(r){return Ws.call(this,r,!0)},add:Xt("add"),set:Xt("set"),delete:Xt("delete"),clear:Xt("clear"),forEach:Ks(!0,!1)},s={get(r){return Ds(this,r,!0,!0)},get size(){return qs(this,!0)},has(r){return Ws.call(this,r,!0)},add:Xt("add"),set:Xt("set"),delete:Xt("delete"),clear:Xt("clear"),forEach:Ks(!0,!0)};return["keys","values","entries",Symbol.iterator].forEach(r=>{e[r]=zs(r,!1,!1),n[r]=zs(r,!0,!1),t[r]=zs(r,!1,!0),s[r]=zs(r,!0,!0)}),[e,n,t,s]}const[Lf,Uf,Bf,Nf]=Tf();function ui(e,t){const n=t?e?Nf:Bf:e?Uf:Lf;return(s,o,r)=>o==="__v_isReactive"?!e:o==="__v_isReadonly"?e:o==="__v_raw"?s:Reflect.get(no(n,o)&&o in s?n:s,o,r)}const Mf={get:ui(!1,!1)},Of={get:ui(!1,!0)},Ff={get:ui(!0,!1)},zc=new WeakMap,Gc=new WeakMap,Zc=new WeakMap,Hf=new WeakMap;function jf(e){switch(e){case"Object":case"Array":return 1;case"Map":case"Set":case"WeakMap":case"WeakSet":return 2;default:return 0}}function Vf(e){return e.__v_skip||!Object.isExtensible(e)?0:jf(mf(e))}function as(e){return Yn(e)?e:di(e,!1,Pf,Mf,zc)}function Jc(e){return di(e,!1,Af,Of,Gc)}function Yc(e){return di(e,!0,If,Ff,Zc)}function di(e,t,n,s,o){if(!wo(e)||e.__v_raw&&!(t&&e.__v_isReactive))return e;const r=o.get(e);if(r)return r;const i=Vf(e);if(i===0)return e;const a=new Proxy(e,i===2?s:n);return o.set(e,a),a}function vn(e){return Yn(e)?vn(e.__v_raw):!!(e&&e.__v_isReactive)}function Yn(e){return!!(e&&e.__v_isReadonly)}function oo(e){return!!(e&&e.__v_isShallow)}function Qc(e){return vn(e)||Yn(e)}function xe(e){const t=e&&e.__v_raw;return t?xe(t):e}function Eo(e){return Object.isExtensible(e)&&wf(e,"__v_skip",!0),e}const Ps=e=>wo(e)?as(e):e,fi=e=>wo(e)?Yc(e):e;class Xc{constructor(t,n,s,o){this._setter=n,this.dep=void 0,this.__v_isRef=!0,this.__v_isReadonly=!1,this.effect=new ii(()=>t(this._value),()=>Qs(this,this.effect._dirtyLevel===2?2:3)),this.effect.computed=this,this.effect.active=this._cacheable=!o,this.__v_isReadonly=s}get value(){const t=xe(this);return(!t._cacheable||t.effect.dirty)&&is(t._value,t._value=t.effect.run())&&Qs(t,4),el(t),t.effect._dirtyLevel>=2&&Qs(t,2),t._value}set value(t){this._setter(t)}get _dirty(){return this.effect.dirty}set _dirty(t){this.effect.dirty=t}}function Df(e,t,n=!1){let s,o;const r=yf(e);return r?(s=e,o=pf):(s=e.get,o=e.set),new Xc(s,o,r||!o,n)}function el(e){var t;yn&&Ln&&(e=xe(e),jc(Ln,(t=e.dep)!=null?t:e.dep=Dc(()=>e.dep=void 0,e instanceof Xc?e:void 0)))}function Qs(e,t=4,n){e=xe(e);const s=e.dep;s&&Vc(s,t)}function He(e){return!!(e&&e.__v_isRef===!0)}function L(e){return tl(e,!1)}function Wf(e){return tl(e,!0)}function tl(e,t){return He(e)?e:new qf(e,t)}class qf{constructor(t,n){this.__v_isShallow=n,this.dep=void 0,this.__v_isRef=!0,this._rawValue=n?t:xe(t),this._value=n?t:Ps(t)}get value(){return el(this),this._value}set value(t){const n=this.__v_isShallow||oo(t)||Yn(t);t=n?t:xe(t),is(t,this._rawValue)&&(this._rawValue=t,this._value=n?t:Ps(t),Qs(this,4))}}function Z(e){return He(e)?e.value:e}const Kf={get:(e,t,n)=>Z(Reflect.get(e,t,n)),set:(e,t,n,s)=>{const o=e[t];return He(o)&&!He(n)?(o.value=n,!0):Reflect.set(e,t,n,s)}};function nl(e){return vn(e)?e:new Proxy(e,Kf)}function zf(e){const t=gn(e)?new Array(e.length):{};for(const n in e)t[n]=Zf(e,n);return t}class Gf{constructor(t,n,s){this._object=t,this._key=n,this._defaultValue=s,this.__v_isRef=!0}get value(){const t=this._object[this._key];return t===void 0?this._defaultValue:t}set value(t){this._object[this._key]=t}get dep(){return xf(xe(this._object),this._key)}}function Zf(e,t,n){const s=e[t];return He(s)?s:new Gf(e,t,n)}/**
+**/
+let activeEffectScope;
+class EffectScope {
+  constructor(detached = false) {
+    this.detached = detached;
+    this._active = true;
+    this.effects = [];
+    this.cleanups = [];
+    this.parent = activeEffectScope;
+    if (!detached && activeEffectScope) {
+      this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(
+        this
+      ) - 1;
+    }
+  }
+  get active() {
+    return this._active;
+  }
+  run(fn) {
+    if (this._active) {
+      const currentEffectScope = activeEffectScope;
+      try {
+        activeEffectScope = this;
+        return fn();
+      } finally {
+        activeEffectScope = currentEffectScope;
+      }
+    }
+  }
+  /**
+   * This should only be called on non-detached scopes
+   * @internal
+   */
+  on() {
+    activeEffectScope = this;
+  }
+  /**
+   * This should only be called on non-detached scopes
+   * @internal
+   */
+  off() {
+    activeEffectScope = this.parent;
+  }
+  stop(fromParent) {
+    if (this._active) {
+      let i2, l;
+      for (i2 = 0, l = this.effects.length; i2 < l; i2++) {
+        this.effects[i2].stop();
+      }
+      for (i2 = 0, l = this.cleanups.length; i2 < l; i2++) {
+        this.cleanups[i2]();
+      }
+      if (this.scopes) {
+        for (i2 = 0, l = this.scopes.length; i2 < l; i2++) {
+          this.scopes[i2].stop(true);
+        }
+      }
+      if (!this.detached && this.parent && !fromParent) {
+        const last = this.parent.scopes.pop();
+        if (last && last !== this) {
+          this.parent.scopes[this.index] = last;
+          last.index = this.index;
+        }
+      }
+      this.parent = void 0;
+      this._active = false;
+    }
+  }
+}
+function effectScope(detached) {
+  return new EffectScope(detached);
+}
+function recordEffectScope(effect, scope = activeEffectScope) {
+  if (scope && scope.active) {
+    scope.effects.push(effect);
+  }
+}
+function getCurrentScope() {
+  return activeEffectScope;
+}
+function onScopeDispose(fn) {
+  if (activeEffectScope) {
+    activeEffectScope.cleanups.push(fn);
+  }
+}
+let activeEffect;
+class ReactiveEffect {
+  constructor(fn, trigger2, scheduler, scope) {
+    this.fn = fn;
+    this.trigger = trigger2;
+    this.scheduler = scheduler;
+    this.active = true;
+    this.deps = [];
+    this._dirtyLevel = 4;
+    this._trackId = 0;
+    this._runnings = 0;
+    this._shouldSchedule = false;
+    this._depsLength = 0;
+    recordEffectScope(this, scope);
+  }
+  get dirty() {
+    if (this._dirtyLevel === 2 || this._dirtyLevel === 3) {
+      this._dirtyLevel = 1;
+      pauseTracking();
+      for (let i2 = 0; i2 < this._depsLength; i2++) {
+        const dep = this.deps[i2];
+        if (dep.computed) {
+          triggerComputed(dep.computed);
+          if (this._dirtyLevel >= 4) {
+            break;
+          }
+        }
+      }
+      if (this._dirtyLevel === 1) {
+        this._dirtyLevel = 0;
+      }
+      resetTracking();
+    }
+    return this._dirtyLevel >= 4;
+  }
+  set dirty(v) {
+    this._dirtyLevel = v ? 4 : 0;
+  }
+  run() {
+    this._dirtyLevel = 0;
+    if (!this.active) {
+      return this.fn();
+    }
+    let lastShouldTrack = shouldTrack;
+    let lastEffect = activeEffect;
+    try {
+      shouldTrack = true;
+      activeEffect = this;
+      this._runnings++;
+      preCleanupEffect(this);
+      return this.fn();
+    } finally {
+      postCleanupEffect(this);
+      this._runnings--;
+      activeEffect = lastEffect;
+      shouldTrack = lastShouldTrack;
+    }
+  }
+  stop() {
+    var _a;
+    if (this.active) {
+      preCleanupEffect(this);
+      postCleanupEffect(this);
+      (_a = this.onStop) == null ? void 0 : _a.call(this);
+      this.active = false;
+    }
+  }
+}
+function triggerComputed(computed2) {
+  return computed2.value;
+}
+function preCleanupEffect(effect2) {
+  effect2._trackId++;
+  effect2._depsLength = 0;
+}
+function postCleanupEffect(effect2) {
+  if (effect2.deps.length > effect2._depsLength) {
+    for (let i2 = effect2._depsLength; i2 < effect2.deps.length; i2++) {
+      cleanupDepEffect(effect2.deps[i2], effect2);
+    }
+    effect2.deps.length = effect2._depsLength;
+  }
+}
+function cleanupDepEffect(dep, effect2) {
+  const trackId = dep.get(effect2);
+  if (trackId !== void 0 && effect2._trackId !== trackId) {
+    dep.delete(effect2);
+    if (dep.size === 0) {
+      dep.cleanup();
+    }
+  }
+}
+let shouldTrack = true;
+let pauseScheduleStack = 0;
+const trackStack = [];
+function pauseTracking() {
+  trackStack.push(shouldTrack);
+  shouldTrack = false;
+}
+function resetTracking() {
+  const last = trackStack.pop();
+  shouldTrack = last === void 0 ? true : last;
+}
+function pauseScheduling() {
+  pauseScheduleStack++;
+}
+function resetScheduling() {
+  pauseScheduleStack--;
+  while (!pauseScheduleStack && queueEffectSchedulers.length) {
+    queueEffectSchedulers.shift()();
+  }
+}
+function trackEffect(effect2, dep, debuggerEventExtraInfo) {
+  if (dep.get(effect2) !== effect2._trackId) {
+    dep.set(effect2, effect2._trackId);
+    const oldDep = effect2.deps[effect2._depsLength];
+    if (oldDep !== dep) {
+      if (oldDep) {
+        cleanupDepEffect(oldDep, effect2);
+      }
+      effect2.deps[effect2._depsLength++] = dep;
+    } else {
+      effect2._depsLength++;
+    }
+  }
+}
+const queueEffectSchedulers = [];
+function triggerEffects(dep, dirtyLevel, debuggerEventExtraInfo) {
+  pauseScheduling();
+  for (const effect2 of dep.keys()) {
+    let tracking;
+    if (effect2._dirtyLevel < dirtyLevel && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
+      effect2._shouldSchedule || (effect2._shouldSchedule = effect2._dirtyLevel === 0);
+      effect2._dirtyLevel = dirtyLevel;
+    }
+    if (effect2._shouldSchedule && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
+      effect2.trigger();
+      if ((!effect2._runnings || effect2.allowRecurse) && effect2._dirtyLevel !== 2) {
+        effect2._shouldSchedule = false;
+        if (effect2.scheduler) {
+          queueEffectSchedulers.push(effect2.scheduler);
+        }
+      }
+    }
+  }
+  resetScheduling();
+}
+const createDep = (cleanup, computed2) => {
+  const dep = /* @__PURE__ */ new Map();
+  dep.cleanup = cleanup;
+  dep.computed = computed2;
+  return dep;
+};
+const targetMap = /* @__PURE__ */ new WeakMap();
+const ITERATE_KEY = Symbol("");
+const MAP_KEY_ITERATE_KEY = Symbol("");
+function track(target, type, key) {
+  if (shouldTrack && activeEffect) {
+    let depsMap = targetMap.get(target);
+    if (!depsMap) {
+      targetMap.set(target, depsMap = /* @__PURE__ */ new Map());
+    }
+    let dep = depsMap.get(key);
+    if (!dep) {
+      depsMap.set(key, dep = createDep(() => depsMap.delete(key)));
+    }
+    trackEffect(
+      activeEffect,
+      dep
+    );
+  }
+}
+function trigger(target, type, key, newValue, oldValue, oldTarget) {
+  const depsMap = targetMap.get(target);
+  if (!depsMap) {
+    return;
+  }
+  let deps = [];
+  if (type === "clear") {
+    deps = [...depsMap.values()];
+  } else if (key === "length" && isArray$3(target)) {
+    const newLength = Number(newValue);
+    depsMap.forEach((dep, key2) => {
+      if (key2 === "length" || !isSymbol$1(key2) && key2 >= newLength) {
+        deps.push(dep);
+      }
+    });
+  } else {
+    if (key !== void 0) {
+      deps.push(depsMap.get(key));
+    }
+    switch (type) {
+      case "add":
+        if (!isArray$3(target)) {
+          deps.push(depsMap.get(ITERATE_KEY));
+          if (isMap$1(target)) {
+            deps.push(depsMap.get(MAP_KEY_ITERATE_KEY));
+          }
+        } else if (isIntegerKey(key)) {
+          deps.push(depsMap.get("length"));
+        }
+        break;
+      case "delete":
+        if (!isArray$3(target)) {
+          deps.push(depsMap.get(ITERATE_KEY));
+          if (isMap$1(target)) {
+            deps.push(depsMap.get(MAP_KEY_ITERATE_KEY));
+          }
+        }
+        break;
+      case "set":
+        if (isMap$1(target)) {
+          deps.push(depsMap.get(ITERATE_KEY));
+        }
+        break;
+    }
+  }
+  pauseScheduling();
+  for (const dep of deps) {
+    if (dep) {
+      triggerEffects(
+        dep,
+        4
+      );
+    }
+  }
+  resetScheduling();
+}
+function getDepFromReactive(object, key) {
+  var _a;
+  return (_a = targetMap.get(object)) == null ? void 0 : _a.get(key);
+}
+const isNonTrackableKeys = /* @__PURE__ */ makeMap$2(`__proto__,__v_isRef,__isVue`);
+const builtInSymbols = new Set(
+  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol$1)
+);
+const arrayInstrumentations = /* @__PURE__ */ createArrayInstrumentations();
+function createArrayInstrumentations() {
+  const instrumentations = {};
+  ["includes", "indexOf", "lastIndexOf"].forEach((key) => {
+    instrumentations[key] = function(...args) {
+      const arr = toRaw(this);
+      for (let i2 = 0, l = this.length; i2 < l; i2++) {
+        track(arr, "get", i2 + "");
+      }
+      const res = arr[key](...args);
+      if (res === -1 || res === false) {
+        return arr[key](...args.map(toRaw));
+      } else {
+        return res;
+      }
+    };
+  });
+  ["push", "pop", "shift", "unshift", "splice"].forEach((key) => {
+    instrumentations[key] = function(...args) {
+      pauseTracking();
+      pauseScheduling();
+      const res = toRaw(this)[key].apply(this, args);
+      resetScheduling();
+      resetTracking();
+      return res;
+    };
+  });
+  return instrumentations;
+}
+function hasOwnProperty$1(key) {
+  const obj = toRaw(this);
+  track(obj, "has", key);
+  return obj.hasOwnProperty(key);
+}
+class BaseReactiveHandler {
+  constructor(_isReadonly = false, _shallow = false) {
+    this._isReadonly = _isReadonly;
+    this._shallow = _shallow;
+  }
+  get(target, key, receiver) {
+    const isReadonly2 = this._isReadonly, shallow = this._shallow;
+    if (key === "__v_isReactive") {
+      return !isReadonly2;
+    } else if (key === "__v_isReadonly") {
+      return isReadonly2;
+    } else if (key === "__v_isShallow") {
+      return shallow;
+    } else if (key === "__v_raw") {
+      if (receiver === (isReadonly2 ? shallow ? shallowReadonlyMap : readonlyMap : shallow ? shallowReactiveMap : reactiveMap).get(target) || // receiver is not the reactive proxy, but has the same prototype
+      // this means the reciever is a user proxy of the reactive proxy
+      Object.getPrototypeOf(target) === Object.getPrototypeOf(receiver)) {
+        return target;
+      }
+      return;
+    }
+    const targetIsArray = isArray$3(target);
+    if (!isReadonly2) {
+      if (targetIsArray && hasOwn$1(arrayInstrumentations, key)) {
+        return Reflect.get(arrayInstrumentations, key, receiver);
+      }
+      if (key === "hasOwnProperty") {
+        return hasOwnProperty$1;
+      }
+    }
+    const res = Reflect.get(target, key, receiver);
+    if (isSymbol$1(key) ? builtInSymbols.has(key) : isNonTrackableKeys(key)) {
+      return res;
+    }
+    if (!isReadonly2) {
+      track(target, "get", key);
+    }
+    if (shallow) {
+      return res;
+    }
+    if (isRef(res)) {
+      return targetIsArray && isIntegerKey(key) ? res : res.value;
+    }
+    if (isObject$1(res)) {
+      return isReadonly2 ? readonly(res) : reactive(res);
+    }
+    return res;
+  }
+}
+class MutableReactiveHandler extends BaseReactiveHandler {
+  constructor(shallow = false) {
+    super(false, shallow);
+  }
+  set(target, key, value, receiver) {
+    let oldValue = target[key];
+    if (!this._shallow) {
+      const isOldValueReadonly = isReadonly(oldValue);
+      if (!isShallow(value) && !isReadonly(value)) {
+        oldValue = toRaw(oldValue);
+        value = toRaw(value);
+      }
+      if (!isArray$3(target) && isRef(oldValue) && !isRef(value)) {
+        if (isOldValueReadonly) {
+          return false;
+        } else {
+          oldValue.value = value;
+          return true;
+        }
+      }
+    }
+    const hadKey = isArray$3(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn$1(target, key);
+    const result = Reflect.set(target, key, value, receiver);
+    if (target === toRaw(receiver)) {
+      if (!hadKey) {
+        trigger(target, "add", key, value);
+      } else if (hasChanged$1(value, oldValue)) {
+        trigger(target, "set", key, value);
+      }
+    }
+    return result;
+  }
+  deleteProperty(target, key) {
+    const hadKey = hasOwn$1(target, key);
+    target[key];
+    const result = Reflect.deleteProperty(target, key);
+    if (result && hadKey) {
+      trigger(target, "delete", key, void 0);
+    }
+    return result;
+  }
+  has(target, key) {
+    const result = Reflect.has(target, key);
+    if (!isSymbol$1(key) || !builtInSymbols.has(key)) {
+      track(target, "has", key);
+    }
+    return result;
+  }
+  ownKeys(target) {
+    track(
+      target,
+      "iterate",
+      isArray$3(target) ? "length" : ITERATE_KEY
+    );
+    return Reflect.ownKeys(target);
+  }
+}
+class ReadonlyReactiveHandler extends BaseReactiveHandler {
+  constructor(shallow = false) {
+    super(true, shallow);
+  }
+  set(target, key) {
+    return true;
+  }
+  deleteProperty(target, key) {
+    return true;
+  }
+}
+const mutableHandlers = /* @__PURE__ */ new MutableReactiveHandler();
+const readonlyHandlers = /* @__PURE__ */ new ReadonlyReactiveHandler();
+const shallowReactiveHandlers = /* @__PURE__ */ new MutableReactiveHandler(
+  true
+);
+const toShallow = (value) => value;
+const getProto = (v) => Reflect.getPrototypeOf(v);
+function get(target, key, isReadonly2 = false, isShallow2 = false) {
+  target = target["__v_raw"];
+  const rawTarget = toRaw(target);
+  const rawKey = toRaw(key);
+  if (!isReadonly2) {
+    if (hasChanged$1(key, rawKey)) {
+      track(rawTarget, "get", key);
+    }
+    track(rawTarget, "get", rawKey);
+  }
+  const { has: has2 } = getProto(rawTarget);
+  const wrap = isShallow2 ? toShallow : isReadonly2 ? toReadonly : toReactive;
+  if (has2.call(rawTarget, key)) {
+    return wrap(target.get(key));
+  } else if (has2.call(rawTarget, rawKey)) {
+    return wrap(target.get(rawKey));
+  } else if (target !== rawTarget) {
+    target.get(key);
+  }
+}
+function has(key, isReadonly2 = false) {
+  const target = this["__v_raw"];
+  const rawTarget = toRaw(target);
+  const rawKey = toRaw(key);
+  if (!isReadonly2) {
+    if (hasChanged$1(key, rawKey)) {
+      track(rawTarget, "has", key);
+    }
+    track(rawTarget, "has", rawKey);
+  }
+  return key === rawKey ? target.has(key) : target.has(key) || target.has(rawKey);
+}
+function size(target, isReadonly2 = false) {
+  target = target["__v_raw"];
+  !isReadonly2 && track(toRaw(target), "iterate", ITERATE_KEY);
+  return Reflect.get(target, "size", target);
+}
+function add(value) {
+  value = toRaw(value);
+  const target = toRaw(this);
+  const proto = getProto(target);
+  const hadKey = proto.has.call(target, value);
+  if (!hadKey) {
+    target.add(value);
+    trigger(target, "add", value, value);
+  }
+  return this;
+}
+function set(key, value) {
+  value = toRaw(value);
+  const target = toRaw(this);
+  const { has: has2, get: get2 } = getProto(target);
+  let hadKey = has2.call(target, key);
+  if (!hadKey) {
+    key = toRaw(key);
+    hadKey = has2.call(target, key);
+  }
+  const oldValue = get2.call(target, key);
+  target.set(key, value);
+  if (!hadKey) {
+    trigger(target, "add", key, value);
+  } else if (hasChanged$1(value, oldValue)) {
+    trigger(target, "set", key, value);
+  }
+  return this;
+}
+function deleteEntry(key) {
+  const target = toRaw(this);
+  const { has: has2, get: get2 } = getProto(target);
+  let hadKey = has2.call(target, key);
+  if (!hadKey) {
+    key = toRaw(key);
+    hadKey = has2.call(target, key);
+  }
+  get2 ? get2.call(target, key) : void 0;
+  const result = target.delete(key);
+  if (hadKey) {
+    trigger(target, "delete", key, void 0);
+  }
+  return result;
+}
+function clear() {
+  const target = toRaw(this);
+  const hadItems = target.size !== 0;
+  const result = target.clear();
+  if (hadItems) {
+    trigger(target, "clear", void 0, void 0);
+  }
+  return result;
+}
+function createForEach(isReadonly2, isShallow2) {
+  return function forEach(callback, thisArg) {
+    const observed = this;
+    const target = observed["__v_raw"];
+    const rawTarget = toRaw(target);
+    const wrap = isShallow2 ? toShallow : isReadonly2 ? toReadonly : toReactive;
+    !isReadonly2 && track(rawTarget, "iterate", ITERATE_KEY);
+    return target.forEach((value, key) => {
+      return callback.call(thisArg, wrap(value), wrap(key), observed);
+    });
+  };
+}
+function createIterableMethod(method, isReadonly2, isShallow2) {
+  return function(...args) {
+    const target = this["__v_raw"];
+    const rawTarget = toRaw(target);
+    const targetIsMap = isMap$1(rawTarget);
+    const isPair = method === "entries" || method === Symbol.iterator && targetIsMap;
+    const isKeyOnly = method === "keys" && targetIsMap;
+    const innerIterator = target[method](...args);
+    const wrap = isShallow2 ? toShallow : isReadonly2 ? toReadonly : toReactive;
+    !isReadonly2 && track(
+      rawTarget,
+      "iterate",
+      isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY
+    );
+    return {
+      // iterator protocol
+      next() {
+        const { value, done } = innerIterator.next();
+        return done ? { value, done } : {
+          value: isPair ? [wrap(value[0]), wrap(value[1])] : wrap(value),
+          done
+        };
+      },
+      // iterable protocol
+      [Symbol.iterator]() {
+        return this;
+      }
+    };
+  };
+}
+function createReadonlyMethod(type) {
+  return function(...args) {
+    return type === "delete" ? false : type === "clear" ? void 0 : this;
+  };
+}
+function createInstrumentations() {
+  const mutableInstrumentations2 = {
+    get(key) {
+      return get(this, key);
+    },
+    get size() {
+      return size(this);
+    },
+    has,
+    add,
+    set,
+    delete: deleteEntry,
+    clear,
+    forEach: createForEach(false, false)
+  };
+  const shallowInstrumentations2 = {
+    get(key) {
+      return get(this, key, false, true);
+    },
+    get size() {
+      return size(this);
+    },
+    has,
+    add,
+    set,
+    delete: deleteEntry,
+    clear,
+    forEach: createForEach(false, true)
+  };
+  const readonlyInstrumentations2 = {
+    get(key) {
+      return get(this, key, true);
+    },
+    get size() {
+      return size(this, true);
+    },
+    has(key) {
+      return has.call(this, key, true);
+    },
+    add: createReadonlyMethod("add"),
+    set: createReadonlyMethod("set"),
+    delete: createReadonlyMethod("delete"),
+    clear: createReadonlyMethod("clear"),
+    forEach: createForEach(true, false)
+  };
+  const shallowReadonlyInstrumentations2 = {
+    get(key) {
+      return get(this, key, true, true);
+    },
+    get size() {
+      return size(this, true);
+    },
+    has(key) {
+      return has.call(this, key, true);
+    },
+    add: createReadonlyMethod("add"),
+    set: createReadonlyMethod("set"),
+    delete: createReadonlyMethod("delete"),
+    clear: createReadonlyMethod("clear"),
+    forEach: createForEach(true, true)
+  };
+  const iteratorMethods = ["keys", "values", "entries", Symbol.iterator];
+  iteratorMethods.forEach((method) => {
+    mutableInstrumentations2[method] = createIterableMethod(
+      method,
+      false,
+      false
+    );
+    readonlyInstrumentations2[method] = createIterableMethod(
+      method,
+      true,
+      false
+    );
+    shallowInstrumentations2[method] = createIterableMethod(
+      method,
+      false,
+      true
+    );
+    shallowReadonlyInstrumentations2[method] = createIterableMethod(
+      method,
+      true,
+      true
+    );
+  });
+  return [
+    mutableInstrumentations2,
+    readonlyInstrumentations2,
+    shallowInstrumentations2,
+    shallowReadonlyInstrumentations2
+  ];
+}
+const [
+  mutableInstrumentations,
+  readonlyInstrumentations,
+  shallowInstrumentations,
+  shallowReadonlyInstrumentations
+] = /* @__PURE__ */ createInstrumentations();
+function createInstrumentationGetter(isReadonly2, shallow) {
+  const instrumentations = shallow ? isReadonly2 ? shallowReadonlyInstrumentations : shallowInstrumentations : isReadonly2 ? readonlyInstrumentations : mutableInstrumentations;
+  return (target, key, receiver) => {
+    if (key === "__v_isReactive") {
+      return !isReadonly2;
+    } else if (key === "__v_isReadonly") {
+      return isReadonly2;
+    } else if (key === "__v_raw") {
+      return target;
+    }
+    return Reflect.get(
+      hasOwn$1(instrumentations, key) && key in target ? instrumentations : target,
+      key,
+      receiver
+    );
+  };
+}
+const mutableCollectionHandlers = {
+  get: /* @__PURE__ */ createInstrumentationGetter(false, false)
+};
+const shallowCollectionHandlers = {
+  get: /* @__PURE__ */ createInstrumentationGetter(false, true)
+};
+const readonlyCollectionHandlers = {
+  get: /* @__PURE__ */ createInstrumentationGetter(true, false)
+};
+const reactiveMap = /* @__PURE__ */ new WeakMap();
+const shallowReactiveMap = /* @__PURE__ */ new WeakMap();
+const readonlyMap = /* @__PURE__ */ new WeakMap();
+const shallowReadonlyMap = /* @__PURE__ */ new WeakMap();
+function targetTypeMap(rawType) {
+  switch (rawType) {
+    case "Object":
+    case "Array":
+      return 1;
+    case "Map":
+    case "Set":
+    case "WeakMap":
+    case "WeakSet":
+      return 2;
+    default:
+      return 0;
+  }
+}
+function getTargetType(value) {
+  return value["__v_skip"] || !Object.isExtensible(value) ? 0 : targetTypeMap(toRawType(value));
+}
+function reactive(target) {
+  if (isReadonly(target)) {
+    return target;
+  }
+  return createReactiveObject(
+    target,
+    false,
+    mutableHandlers,
+    mutableCollectionHandlers,
+    reactiveMap
+  );
+}
+function shallowReactive(target) {
+  return createReactiveObject(
+    target,
+    false,
+    shallowReactiveHandlers,
+    shallowCollectionHandlers,
+    shallowReactiveMap
+  );
+}
+function readonly(target) {
+  return createReactiveObject(
+    target,
+    true,
+    readonlyHandlers,
+    readonlyCollectionHandlers,
+    readonlyMap
+  );
+}
+function createReactiveObject(target, isReadonly2, baseHandlers, collectionHandlers, proxyMap) {
+  if (!isObject$1(target)) {
+    return target;
+  }
+  if (target["__v_raw"] && !(isReadonly2 && target["__v_isReactive"])) {
+    return target;
+  }
+  const existingProxy = proxyMap.get(target);
+  if (existingProxy) {
+    return existingProxy;
+  }
+  const targetType = getTargetType(target);
+  if (targetType === 0) {
+    return target;
+  }
+  const proxy = new Proxy(
+    target,
+    targetType === 2 ? collectionHandlers : baseHandlers
+  );
+  proxyMap.set(target, proxy);
+  return proxy;
+}
+function isReactive(value) {
+  if (isReadonly(value)) {
+    return isReactive(value["__v_raw"]);
+  }
+  return !!(value && value["__v_isReactive"]);
+}
+function isReadonly(value) {
+  return !!(value && value["__v_isReadonly"]);
+}
+function isShallow(value) {
+  return !!(value && value["__v_isShallow"]);
+}
+function isProxy(value) {
+  return isReactive(value) || isReadonly(value);
+}
+function toRaw(observed) {
+  const raw = observed && observed["__v_raw"];
+  return raw ? toRaw(raw) : observed;
+}
+function markRaw(value) {
+  if (Object.isExtensible(value)) {
+    def$1(value, "__v_skip", true);
+  }
+  return value;
+}
+const toReactive = (value) => isObject$1(value) ? reactive(value) : value;
+const toReadonly = (value) => isObject$1(value) ? readonly(value) : value;
+class ComputedRefImpl {
+  constructor(getter, _setter, isReadonly2, isSSR) {
+    this._setter = _setter;
+    this.dep = void 0;
+    this.__v_isRef = true;
+    this["__v_isReadonly"] = false;
+    this.effect = new ReactiveEffect(
+      () => getter(this._value),
+      () => triggerRefValue(
+        this,
+        this.effect._dirtyLevel === 2 ? 2 : 3
+      )
+    );
+    this.effect.computed = this;
+    this.effect.active = this._cacheable = !isSSR;
+    this["__v_isReadonly"] = isReadonly2;
+  }
+  get value() {
+    const self2 = toRaw(this);
+    if ((!self2._cacheable || self2.effect.dirty) && hasChanged$1(self2._value, self2._value = self2.effect.run())) {
+      triggerRefValue(self2, 4);
+    }
+    trackRefValue(self2);
+    if (self2.effect._dirtyLevel >= 2) {
+      triggerRefValue(self2, 2);
+    }
+    return self2._value;
+  }
+  set value(newValue) {
+    this._setter(newValue);
+  }
+  // #region polyfill _dirty for backward compatibility third party code for Vue <= 3.3.x
+  get _dirty() {
+    return this.effect.dirty;
+  }
+  set _dirty(v) {
+    this.effect.dirty = v;
+  }
+  // #endregion
+}
+function computed$1(getterOrOptions, debugOptions, isSSR = false) {
+  let getter;
+  let setter;
+  const onlyGetter = isFunction$2(getterOrOptions);
+  if (onlyGetter) {
+    getter = getterOrOptions;
+    setter = NOOP$1;
+  } else {
+    getter = getterOrOptions.get;
+    setter = getterOrOptions.set;
+  }
+  const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter, isSSR);
+  return cRef;
+}
+function trackRefValue(ref2) {
+  var _a;
+  if (shouldTrack && activeEffect) {
+    ref2 = toRaw(ref2);
+    trackEffect(
+      activeEffect,
+      (_a = ref2.dep) != null ? _a : ref2.dep = createDep(
+        () => ref2.dep = void 0,
+        ref2 instanceof ComputedRefImpl ? ref2 : void 0
+      )
+    );
+  }
+}
+function triggerRefValue(ref2, dirtyLevel = 4, newVal) {
+  ref2 = toRaw(ref2);
+  const dep = ref2.dep;
+  if (dep) {
+    triggerEffects(
+      dep,
+      dirtyLevel
+    );
+  }
+}
+function isRef(r) {
+  return !!(r && r.__v_isRef === true);
+}
+function ref(value) {
+  return createRef(value, false);
+}
+function shallowRef(value) {
+  return createRef(value, true);
+}
+function createRef(rawValue, shallow) {
+  if (isRef(rawValue)) {
+    return rawValue;
+  }
+  return new RefImpl(rawValue, shallow);
+}
+class RefImpl {
+  constructor(value, __v_isShallow) {
+    this.__v_isShallow = __v_isShallow;
+    this.dep = void 0;
+    this.__v_isRef = true;
+    this._rawValue = __v_isShallow ? value : toRaw(value);
+    this._value = __v_isShallow ? value : toReactive(value);
+  }
+  get value() {
+    trackRefValue(this);
+    return this._value;
+  }
+  set value(newVal) {
+    const useDirectValue = this.__v_isShallow || isShallow(newVal) || isReadonly(newVal);
+    newVal = useDirectValue ? newVal : toRaw(newVal);
+    if (hasChanged$1(newVal, this._rawValue)) {
+      this._rawValue = newVal;
+      this._value = useDirectValue ? newVal : toReactive(newVal);
+      triggerRefValue(this, 4);
+    }
+  }
+}
+function unref(ref2) {
+  return isRef(ref2) ? ref2.value : ref2;
+}
+const shallowUnwrapHandlers = {
+  get: (target, key, receiver) => unref(Reflect.get(target, key, receiver)),
+  set: (target, key, value, receiver) => {
+    const oldValue = target[key];
+    if (isRef(oldValue) && !isRef(value)) {
+      oldValue.value = value;
+      return true;
+    } else {
+      return Reflect.set(target, key, value, receiver);
+    }
+  }
+};
+function proxyRefs(objectWithRefs) {
+  return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
+}
+function toRefs(object) {
+  const ret = isArray$3(object) ? new Array(object.length) : {};
+  for (const key in object) {
+    ret[key] = propertyToRef(object, key);
+  }
+  return ret;
+}
+class ObjectRefImpl {
+  constructor(_object, _key, _defaultValue) {
+    this._object = _object;
+    this._key = _key;
+    this._defaultValue = _defaultValue;
+    this.__v_isRef = true;
+  }
+  get value() {
+    const val = this._object[this._key];
+    return val === void 0 ? this._defaultValue : val;
+  }
+  set value(newVal) {
+    this._object[this._key] = newVal;
+  }
+  get dep() {
+    return getDepFromReactive(toRaw(this._object), this._key);
+  }
+}
+function propertyToRef(source, key, defaultValue) {
+  const val = source[key];
+  return isRef(val) ? val : new ObjectRefImpl(source, key, defaultValue);
+}
+/**
 * @vue/shared v3.4.19
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
-**/function Jf(e,t){const n=new Set(e.split(","));return t?s=>n.has(s.toLowerCase()):s=>n.has(s)}const Le={},zn=[],gt=()=>{},Yf=()=>!1,hi=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),sl=e=>e.startsWith("onUpdate:"),Ze=Object.assign,pi=(e,t)=>{const n=e.indexOf(t);n>-1&&e.splice(n,1)},Qf=Object.prototype.hasOwnProperty,Pe=(e,t)=>Qf.call(e,t),be=Array.isArray,ol=e=>gi(e)==="[object Map]",rl=e=>gi(e)==="[object Set]",_e=e=>typeof e=="function",nt=e=>typeof e=="string",il=e=>typeof e=="symbol",Oe=e=>e!==null&&typeof e=="object",al=e=>(Oe(e)||_e(e))&&_e(e.then)&&_e(e.catch),cl=Object.prototype.toString,gi=e=>cl.call(e),ll=e=>gi(e)==="[object Object]",ws=Jf(",key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted"),Ro=e=>{const t=Object.create(null);return n=>t[n]||(t[n]=e(n))},Xf=/-(\w)/g,Ot=Ro(e=>e.replace(Xf,(t,n)=>n?n.toUpperCase():"")),eh=/\B([A-Z])/g,xo=Ro(e=>e.replace(eh,"-$1").toLowerCase()),yi=Ro(e=>e.charAt(0).toUpperCase()+e.slice(1)),sr=Ro(e=>e?`on${yi(e)}`:""),da=(e,t)=>!Object.is(e,t),or=(e,t)=>{for(let n=0;n<e.length;n++)e[n](t)},Ir=(e,t,n)=>{Object.defineProperty(e,t,{configurable:!0,enumerable:!1,value:n})},th=e=>{const t=parseFloat(e);return isNaN(t)?e:t};let fa;const ul=()=>fa||(fa=typeof globalThis<"u"?globalThis:typeof self<"u"?self:typeof window<"u"?window:typeof global<"u"?global:{});function vi(e){if(be(e)){const t={};for(let n=0;n<e.length;n++){const s=e[n],o=nt(s)?rh(s):vi(s);if(o)for(const r in o)t[r]=o[r]}return t}else if(nt(e)||Oe(e))return e}const nh=/;(?![^(]*\))/g,sh=/:([^]+)/,oh=/\/\*[^]*?\*\//g;function rh(e){const t={};return e.replace(oh,"").split(nh).forEach(n=>{if(n){const s=n.split(sh);s.length>1&&(t[s[0].trim()]=s[1].trim())}}),t}function ve(e){let t="";if(nt(e))t=e;else if(be(e))for(let n=0;n<e.length;n++){const s=ve(e[n]);s&&(t+=s+" ")}else if(Oe(e))for(const n in e)e[n]&&(t+=n+" ");return t.trim()}const se=e=>nt(e)?e:e==null?"":be(e)||Oe(e)&&(e.toString===cl||!_e(e.toString))?JSON.stringify(e,dl,2):String(e),dl=(e,t)=>t&&t.__v_isRef?dl(e,t.value):ol(t)?{[`Map(${t.size})`]:[...t.entries()].reduce((n,[s,o],r)=>(n[rr(s,r)+" =>"]=o,n),{})}:rl(t)?{[`Set(${t.size})`]:[...t.values()].map(n=>rr(n))}:il(t)?rr(t):Oe(t)&&!be(t)&&!ll(t)?String(t):t,rr=(e,t="")=>{var n;return il(e)?`Symbol(${(n=e.description)!=null?n:t})`:e};/**
+**/
+function makeMap$1(str, expectsLowerCase) {
+  const set2 = new Set(str.split(","));
+  return expectsLowerCase ? (val) => set2.has(val.toLowerCase()) : (val) => set2.has(val);
+}
+const EMPTY_OBJ = {};
+const EMPTY_ARR = [];
+const NOOP = () => {
+};
+const NO = () => false;
+const isOn$1 = (key) => key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110 && // uppercase letter
+(key.charCodeAt(2) > 122 || key.charCodeAt(2) < 97);
+const isModelListener$1 = (key) => key.startsWith("onUpdate:");
+const extend$1 = Object.assign;
+const remove = (arr, el) => {
+  const i2 = arr.indexOf(el);
+  if (i2 > -1) {
+    arr.splice(i2, 1);
+  }
+};
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+const hasOwn = (val, key) => hasOwnProperty.call(val, key);
+const isArray$2 = Array.isArray;
+const isMap = (val) => toTypeString(val) === "[object Map]";
+const isSet = (val) => toTypeString(val) === "[object Set]";
+const isFunction$1 = (val) => typeof val === "function";
+const isString$1 = (val) => typeof val === "string";
+const isSymbol = (val) => typeof val === "symbol";
+const isObject = (val) => val !== null && typeof val === "object";
+const isPromise = (val) => {
+  return (isObject(val) || isFunction$1(val)) && isFunction$1(val.then) && isFunction$1(val.catch);
+};
+const objectToString = Object.prototype.toString;
+const toTypeString = (value) => objectToString.call(value);
+const isPlainObject$1 = (val) => toTypeString(val) === "[object Object]";
+const isReservedProp = /* @__PURE__ */ makeMap$1(
+  // the leading comma is intentional so empty string "" is also included
+  ",key,ref,ref_for,ref_key,onVnodeBeforeMount,onVnodeMounted,onVnodeBeforeUpdate,onVnodeUpdated,onVnodeBeforeUnmount,onVnodeUnmounted"
+);
+const cacheStringFunction$1 = (fn) => {
+  const cache = /* @__PURE__ */ Object.create(null);
+  return (str) => {
+    const hit = cache[str];
+    return hit || (cache[str] = fn(str));
+  };
+};
+const camelizeRE = /-(\w)/g;
+const camelize = cacheStringFunction$1((str) => {
+  return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : "");
+});
+const hyphenateRE$1 = /\B([A-Z])/g;
+const hyphenate$1 = cacheStringFunction$1(
+  (str) => str.replace(hyphenateRE$1, "-$1").toLowerCase()
+);
+const capitalize$1 = cacheStringFunction$1((str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+});
+const toHandlerKey = cacheStringFunction$1((str) => {
+  const s = str ? `on${capitalize$1(str)}` : ``;
+  return s;
+});
+const hasChanged = (value, oldValue) => !Object.is(value, oldValue);
+const invokeArrayFns$1 = (fns, arg) => {
+  for (let i2 = 0; i2 < fns.length; i2++) {
+    fns[i2](arg);
+  }
+};
+const def = (obj, key, value) => {
+  Object.defineProperty(obj, key, {
+    configurable: true,
+    enumerable: false,
+    value
+  });
+};
+const looseToNumber$1 = (val) => {
+  const n = parseFloat(val);
+  return isNaN(n) ? val : n;
+};
+let _globalThis;
+const getGlobalThis = () => {
+  return _globalThis || (_globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
+};
+function normalizeStyle(value) {
+  if (isArray$2(value)) {
+    const res = {};
+    for (let i2 = 0; i2 < value.length; i2++) {
+      const item = value[i2];
+      const normalized = isString$1(item) ? parseStringStyle(item) : normalizeStyle(item);
+      if (normalized) {
+        for (const key in normalized) {
+          res[key] = normalized[key];
+        }
+      }
+    }
+    return res;
+  } else if (isString$1(value) || isObject(value)) {
+    return value;
+  }
+}
+const listDelimiterRE = /;(?![^(]*\))/g;
+const propertyDelimiterRE = /:([^]+)/;
+const styleCommentRE = /\/\*[^]*?\*\//g;
+function parseStringStyle(cssText) {
+  const ret = {};
+  cssText.replace(styleCommentRE, "").split(listDelimiterRE).forEach((item) => {
+    if (item) {
+      const tmp = item.split(propertyDelimiterRE);
+      tmp.length > 1 && (ret[tmp[0].trim()] = tmp[1].trim());
+    }
+  });
+  return ret;
+}
+function normalizeClass(value) {
+  let res = "";
+  if (isString$1(value)) {
+    res = value;
+  } else if (isArray$2(value)) {
+    for (let i2 = 0; i2 < value.length; i2++) {
+      const normalized = normalizeClass(value[i2]);
+      if (normalized) {
+        res += normalized + " ";
+      }
+    }
+  } else if (isObject(value)) {
+    for (const name in value) {
+      if (value[name]) {
+        res += name + " ";
+      }
+    }
+  }
+  return res.trim();
+}
+const toDisplayString = (val) => {
+  return isString$1(val) ? val : val == null ? "" : isArray$2(val) || isObject(val) && (val.toString === objectToString || !isFunction$1(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
+};
+const replacer = (_key, val) => {
+  if (val && val.__v_isRef) {
+    return replacer(_key, val.value);
+  } else if (isMap(val)) {
+    return {
+      [`Map(${val.size})`]: [...val.entries()].reduce(
+        (entries, [key, val2], i2) => {
+          entries[stringifySymbol(key, i2) + " =>"] = val2;
+          return entries;
+        },
+        {}
+      )
+    };
+  } else if (isSet(val)) {
+    return {
+      [`Set(${val.size})`]: [...val.values()].map((v) => stringifySymbol(v))
+    };
+  } else if (isSymbol(val)) {
+    return stringifySymbol(val);
+  } else if (isObject(val) && !isArray$2(val) && !isPlainObject$1(val)) {
+    return String(val);
+  }
+  return val;
+};
+const stringifySymbol = (v, i2 = "") => {
+  var _a;
+  return isSymbol(v) ? `Symbol(${(_a = v.description) != null ? _a : i2})` : v;
+};
+/**
 * @vue/runtime-core v3.4.19
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
-**/function _n(e,t,n,s){try{return s?e(...s):e()}catch(o){So(o,t,n)}}function Rt(e,t,n,s){if(_e(e)){const r=_n(e,t,n,s);return r&&al(r)&&r.catch(i=>{So(i,t,n)}),r}const o=[];for(let r=0;r<e.length;r++)o.push(Rt(e[r],t,n,s));return o}function So(e,t,n,s=!0){const o=t?t.vnode:null;if(t){let r=t.parent;const i=t.proxy,a=`https://vuejs.org/error-reference/#runtime-${n}`;for(;r;){const l=r.ec;if(l){for(let d=0;d<l.length;d++)if(l[d](e,i,a)===!1)return}r=r.parent}const c=t.appContext.config.errorHandler;if(c){_n(c,null,10,[e,i,a]);return}}ih(e,n,o,s)}function ih(e,t,n,s=!0){console.error(e)}let Is=!1,Ar=!1;const ze=[];let Lt=0;const Gn=[];let un=null,$n=0;const fl=Promise.resolve();let _i=null;function Qn(e){const t=_i||fl;return e?t.then(this?e.bind(this):e):t}function ah(e){let t=Lt+1,n=ze.length;for(;t<n;){const s=t+n>>>1,o=ze[s],r=As(o);r<e||r===e&&o.pre?t=s+1:n=s}return t}function mi(e){(!ze.length||!ze.includes(e,Is&&e.allowRecurse?Lt+1:Lt))&&(e.id==null?ze.push(e):ze.splice(ah(e.id),0,e),hl())}function hl(){!Is&&!Ar&&(Ar=!0,_i=fl.then(gl))}function ch(e){const t=ze.indexOf(e);t>Lt&&ze.splice(t,1)}function lh(e){be(e)?Gn.push(...e):(!un||!un.includes(e,e.allowRecurse?$n+1:$n))&&Gn.push(e),hl()}function ha(e,t,n=Is?Lt+1:0){for(;n<ze.length;n++){const s=ze[n];if(s&&s.pre){if(e&&s.id!==e.uid)continue;ze.splice(n,1),n--,s()}}}function pl(e){if(Gn.length){const t=[...new Set(Gn)].sort((n,s)=>As(n)-As(s));if(Gn.length=0,un){un.push(...t);return}for(un=t,$n=0;$n<un.length;$n++)un[$n]();un=null,$n=0}}const As=e=>e.id==null?1/0:e.id,uh=(e,t)=>{const n=As(e)-As(t);if(n===0){if(e.pre&&!t.pre)return-1;if(t.pre&&!e.pre)return 1}return n};function gl(e){Ar=!1,Is=!0,ze.sort(uh);const t=gt;try{for(Lt=0;Lt<ze.length;Lt++){const n=ze[Lt];n&&n.active!==!1&&_n(n,null,14)}}finally{Lt=0,ze.length=0,pl(),Is=!1,_i=null,(ze.length||Gn.length)&&gl()}}function dh(e,t,...n){if(e.isUnmounted)return;const s=e.vnode.props||Le;let o=n;const r=t.startsWith("update:"),i=r&&t.slice(7);if(i&&i in s){const d=`${i==="modelValue"?"model":i}Modifiers`,{number:u,trim:f}=s[d]||Le;f&&(o=n.map(h=>nt(h)?h.trim():h)),u&&(o=n.map(th))}let a,c=s[a=sr(t)]||s[a=sr(Ot(t))];!c&&r&&(c=s[a=sr(xo(t))]),c&&Rt(c,e,6,o);const l=s[a+"Once"];if(l){if(!e.emitted)e.emitted={};else if(e.emitted[a])return;e.emitted[a]=!0,Rt(l,e,6,o)}}function yl(e,t,n=!1){const s=t.emitsCache,o=s.get(e);if(o!==void 0)return o;const r=e.emits;let i={},a=!1;if(!_e(e)){const c=l=>{const d=yl(l,t,!0);d&&(a=!0,Ze(i,d))};!n&&t.mixins.length&&t.mixins.forEach(c),e.extends&&c(e.extends),e.mixins&&e.mixins.forEach(c)}return!r&&!a?(Oe(e)&&s.set(e,null),null):(be(r)?r.forEach(c=>i[c]=null):Ze(i,r),Oe(e)&&s.set(e,i),i)}function ko(e,t){return!e||!hi(t)?!1:(t=t.slice(2).replace(/Once$/,""),Pe(e,t[0].toLowerCase()+t.slice(1))||Pe(e,xo(t))||Pe(e,t))}let Fe=null,Co=null;function ro(e){const t=Fe;return Fe=e,Co=e&&e.type.__scopeId||null,t}function st(e){Co=e}function ot(){Co=null}function ct(e,t=Fe,n){if(!t||e._n)return e;const s=(...o)=>{s._d&&xa(-1);const r=ro(t);let i;try{i=e(...o)}finally{ro(r),s._d&&xa(1)}return i};return s._n=!0,s._c=!0,s._d=!0,s}function ir(e){const{type:t,vnode:n,proxy:s,withProxy:o,props:r,propsOptions:[i],slots:a,attrs:c,emit:l,render:d,renderCache:u,data:f,setupState:h,ctx:v,inheritAttrs:g}=e;let m,w;const x=ro(e);try{if(n.shapeFlag&4){const C=o||s,P=C;m=Tt(d.call(P,C,u,r,h,f,v)),w=c}else{const C=t;m=Tt(C.length>1?C(r,{attrs:c,slots:a,emit:l}):C(r,null)),w=t.props?c:fh(c)}}catch(C){Rs.length=0,So(C,e,1),m=fe(wn)}let b=m;if(w&&g!==!1){const C=Object.keys(w),{shapeFlag:P}=b;C.length&&P&7&&(i&&C.some(sl)&&(w=hh(w,i)),b=Xn(b,w))}return n.dirs&&(b=Xn(b),b.dirs=b.dirs?b.dirs.concat(n.dirs):n.dirs),n.transition&&(b.transition=n.transition),m=b,ro(x),m}const fh=e=>{let t;for(const n in e)(n==="class"||n==="style"||hi(n))&&((t||(t={}))[n]=e[n]);return t},hh=(e,t)=>{const n={};for(const s in e)(!sl(s)||!(s.slice(9)in t))&&(n[s]=e[s]);return n};function ph(e,t,n){const{props:s,children:o,component:r}=e,{props:i,children:a,patchFlag:c}=t,l=r.emitsOptions;if(t.dirs||t.transition)return!0;if(n&&c>=0){if(c&1024)return!0;if(c&16)return s?pa(s,i,l):!!i;if(c&8){const d=t.dynamicProps;for(let u=0;u<d.length;u++){const f=d[u];if(i[f]!==s[f]&&!ko(l,f))return!0}}}else return(o||a)&&(!a||!a.$stable)?!0:s===i?!1:s?i?pa(s,i,l):!0:!!i;return!1}function pa(e,t,n){const s=Object.keys(t);if(s.length!==Object.keys(e).length)return!0;for(let o=0;o<s.length;o++){const r=s[o];if(t[r]!==e[r]&&!ko(n,r))return!0}return!1}function gh({vnode:e,parent:t},n){for(;t;){const s=t.subTree;if(s.suspense&&s.suspense.activeBranch===e&&(s.el=e.el),s===e)(e=t.vnode).el=n,t=t.parent;else break}}const vl="components";function Ms(e,t){return vh(vl,e,!0,t)||e}const yh=Symbol.for("v-ndc");function vh(e,t,n=!0,s=!1){const o=Fe||We;if(o){const r=o.type;if(e===vl){const a=up(r,!1);if(a&&(a===t||a===Ot(t)||a===yi(Ot(t))))return r}const i=ga(o[e]||r[e],t)||ga(o.appContext[e],t);return!i&&s?r:i}}function ga(e,t){return e&&(e[t]||e[Ot(t)]||e[yi(Ot(t))])}const _h=e=>e.__isSuspense;function mh(e,t){t&&t.pendingBranch?be(e)?t.effects.push(...e):t.effects.push(e):lh(e)}const wh=Symbol.for("v-scx"),bh=()=>yt(wh);function Eh(e,t){return wi(e,null,t)}const Gs={};function qe(e,t,n){return wi(e,t,n)}function wi(e,t,{immediate:n,deep:s,flush:o,once:r,onTrack:i,onTrigger:a}=Le){if(t&&r){const k=t;t=(...D)=>{k(...D),P()}}const c=We,l=k=>s===!0?k:In(k,s===!1?1:void 0);let d,u=!1,f=!1;if(He(e)?(d=()=>e.value,u=oo(e)):vn(e)?(d=()=>l(e),u=!0):be(e)?(f=!0,u=e.some(k=>vn(k)||oo(k)),d=()=>e.map(k=>{if(He(k))return k.value;if(vn(k))return l(k);if(_e(k))return _n(k,c,2)})):_e(e)?t?d=()=>_n(e,c,2):d=()=>(h&&h(),Rt(e,c,3,[v])):d=gt,t&&s){const k=d;d=()=>In(k())}let h,v=k=>{h=b.onStop=()=>{_n(k,c,4),h=b.onStop=void 0}},g;if(Ao)if(v=gt,t?n&&Rt(t,c,3,[d(),f?[]:void 0,v]):d(),o==="sync"){const k=bh();g=k.__watcherHandles||(k.__watcherHandles=[])}else return gt;let m=f?new Array(e.length).fill(Gs):Gs;const w=()=>{if(!(!b.active||!b.dirty))if(t){const k=b.run();(s||u||(f?k.some((D,$)=>da(D,m[$])):da(k,m)))&&(h&&h(),Rt(t,c,3,[k,m===Gs?void 0:f&&m[0]===Gs?[]:m,v]),m=k)}else b.run()};w.allowRecurse=!!t;let x;o==="sync"?x=w:o==="post"?x=()=>Qe(w,c&&c.suspense):(w.pre=!0,c&&(w.id=c.uid),x=()=>mi(w));const b=new ii(d,gt,x),C=Oc(),P=()=>{b.stop(),C&&pi(C.effects,b)};return t?n?w():m=b.run():o==="post"?Qe(b.run.bind(b),c&&c.suspense):b.run(),g&&g.push(P),P}function Rh(e,t,n){const s=this.proxy,o=nt(e)?e.includes(".")?_l(s,e):()=>s[e]:e.bind(s,s);let r;_e(t)?r=t:(r=t.handler,n=t);const i=Os(this),a=wi(o,r.bind(s),n);return i(),a}function _l(e,t){const n=t.split(".");return()=>{let s=e;for(let o=0;o<n.length&&s;o++)s=s[n[o]];return s}}function In(e,t,n=0,s){if(!Oe(e)||e.__v_skip)return e;if(t&&t>0){if(n>=t)return e;n++}if(s=s||new Set,s.has(e))return e;if(s.add(e),He(e))In(e.value,t,n,s);else if(be(e))for(let o=0;o<e.length;o++)In(e[o],t,n,s);else if(rl(e)||ol(e))e.forEach(o=>{In(o,t,n,s)});else if(ll(e))for(const o in e)In(e[o],t,n,s);return e}function qt(e,t){if(Fe===null)return e;const n=To(Fe)||Fe.proxy,s=e.dirs||(e.dirs=[]);for(let o=0;o<t.length;o++){let[r,i,a,c=Le]=t[o];r&&(_e(r)&&(r={mounted:r,updated:r}),r.deep&&In(i),s.push({dir:r,instance:n,value:i,oldValue:void 0,arg:a,modifiers:c}))}return e}function Sn(e,t,n,s){const o=e.dirs,r=t&&t.dirs;for(let i=0;i<o.length;i++){const a=o[i];r&&(a.oldValue=r[i].value);let c=a.dir[s];c&&(Mn(),Rt(c,n,8,[e.el,a,e,t]),On())}}/*! #__NO_SIDE_EFFECTS__ */function Se(e,t){return _e(e)?(()=>Ze({name:e.name},t,{setup:e}))():e}const bs=e=>!!e.type.__asyncLoader,ml=e=>e.type.__isKeepAlive;function xh(e,t){wl(e,"a",t)}function Sh(e,t){wl(e,"da",t)}function wl(e,t,n=We){const s=e.__wdc||(e.__wdc=()=>{let o=n;for(;o;){if(o.isDeactivated)return;o=o.parent}return e()});if($o(t,s,n),n){let o=n.parent;for(;o&&o.parent;)ml(o.parent.vnode)&&kh(s,t,n,o),o=o.parent}}function kh(e,t,n,s){const o=$o(t,e,s,!0);Ei(()=>{pi(s[t],o)},n)}function $o(e,t,n=We,s=!1){if(n){const o=n[e]||(n[e]=[]),r=t.__weh||(t.__weh=(...i)=>{if(n.isUnmounted)return;Mn();const a=Os(n),c=Rt(t,n,e,i);return a(),On(),c});return s?o.unshift(r):o.push(r),r}}const Zt=e=>(t,n=We)=>(!Ao||e==="sp")&&$o(e,(...s)=>t(...s),n),Ch=Zt("bm"),vt=Zt("m"),bi=Zt("bu"),bl=Zt("u"),$h=Zt("bum"),Ei=Zt("um"),Ph=Zt("sp"),Ih=Zt("rtg"),Ah=Zt("rtc");function Th(e,t=We){$o("ec",e,t)}function ut(e,t,n,s){let o;const r=n&&n[s];if(be(e)||nt(e)){o=new Array(e.length);for(let i=0,a=e.length;i<a;i++)o[i]=t(e[i],i,void 0,r&&r[i])}else if(typeof e=="number"){o=new Array(e);for(let i=0;i<e;i++)o[i]=t(i+1,i,void 0,r&&r[i])}else if(Oe(e))if(e[Symbol.iterator])o=Array.from(e,(i,a)=>t(i,a,void 0,r&&r[a]));else{const i=Object.keys(e);o=new Array(i.length);for(let a=0,c=i.length;a<c;a++){const l=i[a];o[a]=t(e[l],l,a,r&&r[a])}}else o=[];return n&&(n[s]=o),o}function Lh(e,t,n={},s,o){if(Fe.isCE||Fe.parent&&bs(Fe.parent)&&Fe.parent.isCE)return t!=="default"&&(n.name=t),fe("slot",n,s&&s());let r=e[t];r&&r._c&&(r._d=!1),S();const i=r&&El(r(n)),a=Ie(Ee,{key:n.key||i&&i.key||`_${t}`},i||(s?s():[]),i&&e._===1?64:-2);return!o&&a.scopeId&&(a.slotScopeIds=[a.scopeId+"-s"]),r&&r._c&&(r._d=!0),a}function El(e){return e.some(t=>ao(t)?!(t.type===wn||t.type===Ee&&!El(t.children)):!0)?e:null}const Tr=e=>e?Ul(e)?To(e)||e.proxy:Tr(e.parent):null,Es=Ze(Object.create(null),{$:e=>e,$el:e=>e.vnode.el,$data:e=>e.data,$props:e=>e.props,$attrs:e=>e.attrs,$slots:e=>e.slots,$refs:e=>e.refs,$parent:e=>Tr(e.parent),$root:e=>Tr(e.root),$emit:e=>e.emit,$options:e=>Ri(e),$forceUpdate:e=>e.f||(e.f=()=>{e.effect.dirty=!0,mi(e.update)}),$nextTick:e=>e.n||(e.n=Qn.bind(e.proxy)),$watch:e=>Rh.bind(e)}),ar=(e,t)=>e!==Le&&!e.__isScriptSetup&&Pe(e,t),Uh={get({_:e},t){const{ctx:n,setupState:s,data:o,props:r,accessCache:i,type:a,appContext:c}=e;let l;if(t[0]!=="$"){const h=i[t];if(h!==void 0)switch(h){case 1:return s[t];case 2:return o[t];case 4:return n[t];case 3:return r[t]}else{if(ar(s,t))return i[t]=1,s[t];if(o!==Le&&Pe(o,t))return i[t]=2,o[t];if((l=e.propsOptions[0])&&Pe(l,t))return i[t]=3,r[t];if(n!==Le&&Pe(n,t))return i[t]=4,n[t];Lr&&(i[t]=0)}}const d=Es[t];let u,f;if(d)return t==="$attrs"&&tt(e,"get",t),d(e);if((u=a.__cssModules)&&(u=u[t]))return u;if(n!==Le&&Pe(n,t))return i[t]=4,n[t];if(f=c.config.globalProperties,Pe(f,t))return f[t]},set({_:e},t,n){const{data:s,setupState:o,ctx:r}=e;return ar(o,t)?(o[t]=n,!0):s!==Le&&Pe(s,t)?(s[t]=n,!0):Pe(e.props,t)||t[0]==="$"&&t.slice(1)in e?!1:(r[t]=n,!0)},has({_:{data:e,setupState:t,accessCache:n,ctx:s,appContext:o,propsOptions:r}},i){let a;return!!n[i]||e!==Le&&Pe(e,i)||ar(t,i)||(a=r[0])&&Pe(a,i)||Pe(s,i)||Pe(Es,i)||Pe(o.config.globalProperties,i)},defineProperty(e,t,n){return n.get!=null?e._.accessCache[t]=0:Pe(n,"value")&&this.set(e,t,n.value,null),Reflect.defineProperty(e,t,n)}};function ya(e){return be(e)?e.reduce((t,n)=>(t[n]=null,t),{}):e}let Lr=!0;function Bh(e){const t=Ri(e),n=e.proxy,s=e.ctx;Lr=!1,t.beforeCreate&&va(t.beforeCreate,e,"bc");const{data:o,computed:r,methods:i,watch:a,provide:c,inject:l,created:d,beforeMount:u,mounted:f,beforeUpdate:h,updated:v,activated:g,deactivated:m,beforeDestroy:w,beforeUnmount:x,destroyed:b,unmounted:C,render:P,renderTracked:k,renderTriggered:D,errorCaptured:$,serverPrefetch:T,expose:I,inheritAttrs:V,components:z,directives:J,filters:X}=t;if(l&&Nh(l,s,null),i)for(const A in i){const F=i[A];_e(F)&&(s[A]=F.bind(n))}if(o){const A=o.call(n,n);Oe(A)&&(e.data=as(A))}if(Lr=!0,r)for(const A in r){const F=r[A],W=_e(F)?F.bind(n,n):_e(F.get)?F.get.bind(n,n):gt,ee=!_e(F)&&_e(F.set)?F.set.bind(n):gt,oe=ye({get:W,set:ee});Object.defineProperty(s,A,{enumerable:!0,configurable:!0,get:()=>oe.value,set:re=>oe.value=re})}if(a)for(const A in a)Rl(a[A],s,n,A);if(c){const A=_e(c)?c.call(n):c;Reflect.ownKeys(A).forEach(F=>{Xs(F,A[F])})}d&&va(d,e,"c");function R(A,F){be(F)?F.forEach(W=>A(W.bind(n))):F&&A(F.bind(n))}if(R(Ch,u),R(vt,f),R(bi,h),R(bl,v),R(xh,g),R(Sh,m),R(Th,$),R(Ah,k),R(Ih,D),R($h,x),R(Ei,C),R(Ph,T),be(I))if(I.length){const A=e.exposed||(e.exposed={});I.forEach(F=>{Object.defineProperty(A,F,{get:()=>n[F],set:W=>n[F]=W})})}else e.exposed||(e.exposed={});P&&e.render===gt&&(e.render=P),V!=null&&(e.inheritAttrs=V),z&&(e.components=z),J&&(e.directives=J)}function Nh(e,t,n=gt){be(e)&&(e=Ur(e));for(const s in e){const o=e[s];let r;Oe(o)?"default"in o?r=yt(o.from||s,o.default,!0):r=yt(o.from||s):r=yt(o),He(r)?Object.defineProperty(t,s,{enumerable:!0,configurable:!0,get:()=>r.value,set:i=>r.value=i}):t[s]=r}}function va(e,t,n){Rt(be(e)?e.map(s=>s.bind(t.proxy)):e.bind(t.proxy),t,n)}function Rl(e,t,n,s){const o=s.includes(".")?_l(n,s):()=>n[s];if(nt(e)){const r=t[e];_e(r)&&qe(o,r)}else if(_e(e))qe(o,e.bind(n));else if(Oe(e))if(be(e))e.forEach(r=>Rl(r,t,n,s));else{const r=_e(e.handler)?e.handler.bind(n):t[e.handler];_e(r)&&qe(o,r,e)}}function Ri(e){const t=e.type,{mixins:n,extends:s}=t,{mixins:o,optionsCache:r,config:{optionMergeStrategies:i}}=e.appContext,a=r.get(t);let c;return a?c=a:!o.length&&!n&&!s?c=t:(c={},o.length&&o.forEach(l=>io(c,l,i,!0)),io(c,t,i)),Oe(t)&&r.set(t,c),c}function io(e,t,n,s=!1){const{mixins:o,extends:r}=t;r&&io(e,r,n,!0),o&&o.forEach(i=>io(e,i,n,!0));for(const i in t)if(!(s&&i==="expose")){const a=Mh[i]||n&&n[i];e[i]=a?a(e[i],t[i]):t[i]}return e}const Mh={data:_a,props:ma,emits:ma,methods:ms,computed:ms,beforeCreate:Je,created:Je,beforeMount:Je,mounted:Je,beforeUpdate:Je,updated:Je,beforeDestroy:Je,beforeUnmount:Je,destroyed:Je,unmounted:Je,activated:Je,deactivated:Je,errorCaptured:Je,serverPrefetch:Je,components:ms,directives:ms,watch:Fh,provide:_a,inject:Oh};function _a(e,t){return t?e?function(){return Ze(_e(e)?e.call(this,this):e,_e(t)?t.call(this,this):t)}:t:e}function Oh(e,t){return ms(Ur(e),Ur(t))}function Ur(e){if(be(e)){const t={};for(let n=0;n<e.length;n++)t[e[n]]=e[n];return t}return e}function Je(e,t){return e?[...new Set([].concat(e,t))]:t}function ms(e,t){return e?Ze(Object.create(null),e,t):t}function ma(e,t){return e?be(e)&&be(t)?[...new Set([...e,...t])]:Ze(Object.create(null),ya(e),ya(t??{})):t}function Fh(e,t){if(!e)return t;if(!t)return e;const n=Ze(Object.create(null),e);for(const s in t)n[s]=Je(e[s],t[s]);return n}function xl(){return{app:null,config:{isNativeTag:Yf,performance:!1,globalProperties:{},optionMergeStrategies:{},errorHandler:void 0,warnHandler:void 0,compilerOptions:{}},mixins:[],components:{},directives:{},provides:Object.create(null),optionsCache:new WeakMap,propsCache:new WeakMap,emitsCache:new WeakMap}}let Hh=0;function jh(e,t){return function(s,o=null){_e(s)||(s=Ze({},s)),o!=null&&!Oe(o)&&(o=null);const r=xl(),i=new WeakSet;let a=!1;const c=r.app={_uid:Hh++,_component:s,_props:o,_container:null,_context:r,_instance:null,version:fp,get config(){return r.config},set config(l){},use(l,...d){return i.has(l)||(l&&_e(l.install)?(i.add(l),l.install(c,...d)):_e(l)&&(i.add(l),l(c,...d))),c},mixin(l){return r.mixins.includes(l)||r.mixins.push(l),c},component(l,d){return d?(r.components[l]=d,c):r.components[l]},directive(l,d){return d?(r.directives[l]=d,c):r.directives[l]},mount(l,d,u){if(!a){const f=fe(s,o);return f.appContext=r,u===!0?u="svg":u===!1&&(u=void 0),d&&t?t(f,l):e(f,l,u),a=!0,c._container=l,l.__vue_app__=c,To(f.component)||f.component.proxy}},unmount(){a&&(e(null,c._container),delete c._container.__vue_app__)},provide(l,d){return r.provides[l]=d,c},runWithContext(l){const d=Zn;Zn=c;try{return l()}finally{Zn=d}}};return c}}let Zn=null;function Xs(e,t){if(We){let n=We.provides;const s=We.parent&&We.parent.provides;s===n&&(n=We.provides=Object.create(s)),n[e]=t}}function yt(e,t,n=!1){const s=We||Fe;if(s||Zn){const o=s?s.parent==null?s.vnode.appContext&&s.vnode.appContext.provides:s.parent.provides:Zn._context.provides;if(o&&e in o)return o[e];if(arguments.length>1)return n&&_e(t)?t.call(s&&s.proxy):t}}function Vh(){return!!(We||Fe||Zn)}function Dh(e,t,n,s=!1){const o={},r={};Ir(r,Io,1),e.propsDefaults=Object.create(null),Sl(e,t,o,r);for(const i in e.propsOptions[0])i in o||(o[i]=void 0);n?e.props=s?o:Jc(o):e.type.props?e.props=o:e.props=r,e.attrs=r}function Wh(e,t,n,s){const{props:o,attrs:r,vnode:{patchFlag:i}}=e,a=xe(o),[c]=e.propsOptions;let l=!1;if((s||i>0)&&!(i&16)){if(i&8){const d=e.vnode.dynamicProps;for(let u=0;u<d.length;u++){let f=d[u];if(ko(e.emitsOptions,f))continue;const h=t[f];if(c)if(Pe(r,f))h!==r[f]&&(r[f]=h,l=!0);else{const v=Ot(f);o[v]=Br(c,a,v,h,e,!1)}else h!==r[f]&&(r[f]=h,l=!0)}}}else{Sl(e,t,o,r)&&(l=!0);let d;for(const u in a)(!t||!Pe(t,u)&&((d=xo(u))===u||!Pe(t,d)))&&(c?n&&(n[u]!==void 0||n[d]!==void 0)&&(o[u]=Br(c,a,u,void 0,e,!0)):delete o[u]);if(r!==a)for(const u in r)(!t||!Pe(t,u))&&(delete r[u],l=!0)}l&&Wt(e,"set","$attrs")}function Sl(e,t,n,s){const[o,r]=e.propsOptions;let i=!1,a;if(t)for(let c in t){if(ws(c))continue;const l=t[c];let d;o&&Pe(o,d=Ot(c))?!r||!r.includes(d)?n[d]=l:(a||(a={}))[d]=l:ko(e.emitsOptions,c)||(!(c in s)||l!==s[c])&&(s[c]=l,i=!0)}if(r){const c=xe(n),l=a||Le;for(let d=0;d<r.length;d++){const u=r[d];n[u]=Br(o,c,u,l[u],e,!Pe(l,u))}}return i}function Br(e,t,n,s,o,r){const i=e[n];if(i!=null){const a=Pe(i,"default");if(a&&s===void 0){const c=i.default;if(i.type!==Function&&!i.skipFactory&&_e(c)){const{propsDefaults:l}=o;if(n in l)s=l[n];else{const d=Os(o);s=l[n]=c.call(null,t),d()}}else s=c}i[0]&&(r&&!a?s=!1:i[1]&&(s===""||s===xo(n))&&(s=!0))}return s}function kl(e,t,n=!1){const s=t.propsCache,o=s.get(e);if(o)return o;const r=e.props,i={},a=[];let c=!1;if(!_e(e)){const d=u=>{c=!0;const[f,h]=kl(u,t,!0);Ze(i,f),h&&a.push(...h)};!n&&t.mixins.length&&t.mixins.forEach(d),e.extends&&d(e.extends),e.mixins&&e.mixins.forEach(d)}if(!r&&!c)return Oe(e)&&s.set(e,zn),zn;if(be(r))for(let d=0;d<r.length;d++){const u=Ot(r[d]);wa(u)&&(i[u]=Le)}else if(r)for(const d in r){const u=Ot(d);if(wa(u)){const f=r[d],h=i[u]=be(f)||_e(f)?{type:f}:Ze({},f);if(h){const v=Ra(Boolean,h.type),g=Ra(String,h.type);h[0]=v>-1,h[1]=g<0||v<g,(v>-1||Pe(h,"default"))&&a.push(u)}}}const l=[i,a];return Oe(e)&&s.set(e,l),l}function wa(e){return e[0]!=="$"&&!ws(e)}function ba(e){return e===null?"null":typeof e=="function"?e.name||"":typeof e=="object"&&e.constructor&&e.constructor.name||""}function Ea(e,t){return ba(e)===ba(t)}function Ra(e,t){return be(t)?t.findIndex(n=>Ea(n,e)):_e(t)&&Ea(t,e)?0:-1}const Cl=e=>e[0]==="_"||e==="$stable",xi=e=>be(e)?e.map(Tt):[Tt(e)],qh=(e,t,n)=>{if(t._n)return t;const s=ct((...o)=>xi(t(...o)),n);return s._c=!1,s},$l=(e,t,n)=>{const s=e._ctx;for(const o in e){if(Cl(o))continue;const r=e[o];if(_e(r))t[o]=qh(o,r,s);else if(r!=null){const i=xi(r);t[o]=()=>i}}},Pl=(e,t)=>{const n=xi(t);e.slots.default=()=>n},Kh=(e,t)=>{if(e.vnode.shapeFlag&32){const n=t._;n?(e.slots=xe(t),Ir(t,"_",n)):$l(t,e.slots={})}else e.slots={},t&&Pl(e,t);Ir(e.slots,Io,1)},zh=(e,t,n)=>{const{vnode:s,slots:o}=e;let r=!0,i=Le;if(s.shapeFlag&32){const a=t._;a?n&&a===1?r=!1:(Ze(o,t),!n&&a===1&&delete o._):(r=!t.$stable,$l(t,o)),i=t}else t&&(Pl(e,t),i={default:1});if(r)for(const a in o)!Cl(a)&&i[a]==null&&delete o[a]};function Nr(e,t,n,s,o=!1){if(be(e)){e.forEach((f,h)=>Nr(f,t&&(be(t)?t[h]:t),n,s,o));return}if(bs(s)&&!o)return;const r=s.shapeFlag&4?To(s.component)||s.component.proxy:s.el,i=o?null:r,{i:a,r:c}=e,l=t&&t.r,d=a.refs===Le?a.refs={}:a.refs,u=a.setupState;if(l!=null&&l!==c&&(nt(l)?(d[l]=null,Pe(u,l)&&(u[l]=null)):He(l)&&(l.value=null)),_e(c))_n(c,a,12,[i,d]);else{const f=nt(c),h=He(c);if(f||h){const v=()=>{if(e.f){const g=f?Pe(u,c)?u[c]:d[c]:c.value;o?be(g)&&pi(g,r):be(g)?g.includes(r)||g.push(r):f?(d[c]=[r],Pe(u,c)&&(u[c]=d[c])):(c.value=[r],e.k&&(d[e.k]=c.value))}else f?(d[c]=i,Pe(u,c)&&(u[c]=i)):h&&(c.value=i,e.k&&(d[e.k]=i))};i?(v.id=-1,Qe(v,n)):v()}}}const Qe=mh;function Gh(e){return Zh(e)}function Zh(e,t){const n=ul();n.__VUE__=!0;const{insert:s,remove:o,patchProp:r,createElement:i,createText:a,createComment:c,setText:l,setElementText:d,parentNode:u,nextSibling:f,setScopeId:h=gt,insertStaticContent:v}=e,g=(p,y,E,M=null,O=null,q=null,Y=void 0,G=null,Q=!!y.dynamicChildren)=>{if(p===y)return;p&&!gs(p,y)&&(M=j(p),re(p,O,q,!0),p=null),y.patchFlag===-2&&(Q=!1,y.dynamicChildren=null);const{type:K,ref:ie,shapeFlag:ae}=y;switch(K){case Po:m(p,y,E,M);break;case wn:w(p,y,E,M);break;case eo:p==null&&x(y,E,M,Y);break;case Ee:z(p,y,E,M,O,q,Y,G,Q);break;default:ae&1?P(p,y,E,M,O,q,Y,G,Q):ae&6?J(p,y,E,M,O,q,Y,G,Q):(ae&64||ae&128)&&K.process(p,y,E,M,O,q,Y,G,Q,ne)}ie!=null&&O&&Nr(ie,p&&p.ref,q,y||p,!y)},m=(p,y,E,M)=>{if(p==null)s(y.el=a(y.children),E,M);else{const O=y.el=p.el;y.children!==p.children&&l(O,y.children)}},w=(p,y,E,M)=>{p==null?s(y.el=c(y.children||""),E,M):y.el=p.el},x=(p,y,E,M)=>{[p.el,p.anchor]=v(p.children,y,E,M,p.el,p.anchor)},b=({el:p,anchor:y},E,M)=>{let O;for(;p&&p!==y;)O=f(p),s(p,E,M),p=O;s(y,E,M)},C=({el:p,anchor:y})=>{let E;for(;p&&p!==y;)E=f(p),o(p),p=E;o(y)},P=(p,y,E,M,O,q,Y,G,Q)=>{y.type==="svg"?Y="svg":y.type==="math"&&(Y="mathml"),p==null?k(y,E,M,O,q,Y,G,Q):T(p,y,O,q,Y,G,Q)},k=(p,y,E,M,O,q,Y,G)=>{let Q,K;const{props:ie,shapeFlag:ae,transition:ce,dirs:pe}=p;if(Q=p.el=i(p.type,q,ie&&ie.is,ie),ae&8?d(Q,p.children):ae&16&&$(p.children,Q,null,M,O,cr(p,q),Y,G),pe&&Sn(p,null,M,"created"),D(Q,p,p.scopeId,Y,M),ie){for(const Ae in ie)Ae!=="value"&&!ws(Ae)&&r(Q,Ae,null,ie[Ae],q,p.children,M,O,ke);"value"in ie&&r(Q,"value",null,ie.value,q),(K=ie.onVnodeBeforeMount)&&$t(K,M,p)}pe&&Sn(p,null,M,"beforeMount");const we=Jh(O,ce);we&&ce.beforeEnter(Q),s(Q,y,E),((K=ie&&ie.onVnodeMounted)||we||pe)&&Qe(()=>{K&&$t(K,M,p),we&&ce.enter(Q),pe&&Sn(p,null,M,"mounted")},O)},D=(p,y,E,M,O)=>{if(E&&h(p,E),M)for(let q=0;q<M.length;q++)h(p,M[q]);if(O){let q=O.subTree;if(y===q){const Y=O.vnode;D(p,Y,Y.scopeId,Y.slotScopeIds,O.parent)}}},$=(p,y,E,M,O,q,Y,G,Q=0)=>{for(let K=Q;K<p.length;K++){const ie=p[K]=G?dn(p[K]):Tt(p[K]);g(null,ie,y,E,M,O,q,Y,G)}},T=(p,y,E,M,O,q,Y)=>{const G=y.el=p.el;let{patchFlag:Q,dynamicChildren:K,dirs:ie}=y;Q|=p.patchFlag&16;const ae=p.props||Le,ce=y.props||Le;let pe;if(E&&kn(E,!1),(pe=ce.onVnodeBeforeUpdate)&&$t(pe,E,y,p),ie&&Sn(y,p,E,"beforeUpdate"),E&&kn(E,!0),K?I(p.dynamicChildren,K,G,E,M,cr(y,O),q):Y||F(p,y,G,null,E,M,cr(y,O),q,!1),Q>0){if(Q&16)V(G,y,ae,ce,E,M,O);else if(Q&2&&ae.class!==ce.class&&r(G,"class",null,ce.class,O),Q&4&&r(G,"style",ae.style,ce.style,O),Q&8){const we=y.dynamicProps;for(let Ae=0;Ae<we.length;Ae++){const Ue=we[Ae],je=ae[Ue],wt=ce[Ue];(wt!==je||Ue==="value")&&r(G,Ue,je,wt,O,p.children,E,M,ke)}}Q&1&&p.children!==y.children&&d(G,y.children)}else!Y&&K==null&&V(G,y,ae,ce,E,M,O);((pe=ce.onVnodeUpdated)||ie)&&Qe(()=>{pe&&$t(pe,E,y,p),ie&&Sn(y,p,E,"updated")},M)},I=(p,y,E,M,O,q,Y)=>{for(let G=0;G<y.length;G++){const Q=p[G],K=y[G],ie=Q.el&&(Q.type===Ee||!gs(Q,K)||Q.shapeFlag&70)?u(Q.el):E;g(Q,K,ie,null,M,O,q,Y,!0)}},V=(p,y,E,M,O,q,Y)=>{if(E!==M){if(E!==Le)for(const G in E)!ws(G)&&!(G in M)&&r(p,G,E[G],null,Y,y.children,O,q,ke);for(const G in M){if(ws(G))continue;const Q=M[G],K=E[G];Q!==K&&G!=="value"&&r(p,G,K,Q,Y,y.children,O,q,ke)}"value"in M&&r(p,"value",E.value,M.value,Y)}},z=(p,y,E,M,O,q,Y,G,Q)=>{const K=y.el=p?p.el:a(""),ie=y.anchor=p?p.anchor:a("");let{patchFlag:ae,dynamicChildren:ce,slotScopeIds:pe}=y;pe&&(G=G?G.concat(pe):pe),p==null?(s(K,E,M),s(ie,E,M),$(y.children||[],E,ie,O,q,Y,G,Q)):ae>0&&ae&64&&ce&&p.dynamicChildren?(I(p.dynamicChildren,ce,E,O,q,Y,G),(y.key!=null||O&&y===O.subTree)&&Il(p,y,!0)):F(p,y,E,ie,O,q,Y,G,Q)},J=(p,y,E,M,O,q,Y,G,Q)=>{y.slotScopeIds=G,p==null?y.shapeFlag&512?O.ctx.activate(y,E,M,Y,Q):X(y,E,M,O,q,Y,Q):H(p,y,Q)},X=(p,y,E,M,O,q,Y)=>{const G=p.component=rp(p,M,O);if(ml(p)&&(G.ctx.renderer=ne),ip(G),G.asyncDep){if(O&&O.registerDep(G,R),!p.el){const Q=G.subTree=fe(wn);w(null,Q,y,E)}}else R(G,p,y,E,O,q,Y)},H=(p,y,E)=>{const M=y.component=p.component;if(ph(p,y,E))if(M.asyncDep&&!M.asyncResolved){A(M,y,E);return}else M.next=y,ch(M.update),M.effect.dirty=!0,M.update();else y.el=p.el,M.vnode=y},R=(p,y,E,M,O,q,Y)=>{const G=()=>{if(p.isMounted){let{next:ie,bu:ae,u:ce,parent:pe,vnode:we}=p;{const Hn=Al(p);if(Hn){ie&&(ie.el=we.el,A(p,ie,Y)),Hn.asyncDep.then(()=>{p.isUnmounted||G()});return}}let Ae=ie,Ue;kn(p,!1),ie?(ie.el=we.el,A(p,ie,Y)):ie=we,ae&&or(ae),(Ue=ie.props&&ie.props.onVnodeBeforeUpdate)&&$t(Ue,pe,ie,we),kn(p,!0);const je=ir(p),wt=p.subTree;p.subTree=je,g(wt,je,u(wt.el),j(wt),p,O,q),ie.el=je.el,Ae===null&&gh(p,je.el),ce&&Qe(ce,O),(Ue=ie.props&&ie.props.onVnodeUpdated)&&Qe(()=>$t(Ue,pe,ie,we),O)}else{let ie;const{el:ae,props:ce}=y,{bm:pe,m:we,parent:Ae}=p,Ue=bs(y);if(kn(p,!1),pe&&or(pe),!Ue&&(ie=ce&&ce.onVnodeBeforeMount)&&$t(ie,Ae,y),kn(p,!0),ae&&he){const je=()=>{p.subTree=ir(p),he(ae,p.subTree,p,O,null)};Ue?y.type.__asyncLoader().then(()=>!p.isUnmounted&&je()):je()}else{const je=p.subTree=ir(p);g(null,je,E,M,p,O,q),y.el=je.el}if(we&&Qe(we,O),!Ue&&(ie=ce&&ce.onVnodeMounted)){const je=y;Qe(()=>$t(ie,Ae,je),O)}(y.shapeFlag&256||Ae&&bs(Ae.vnode)&&Ae.vnode.shapeFlag&256)&&p.a&&Qe(p.a,O),p.isMounted=!0,y=E=M=null}},Q=p.effect=new ii(G,gt,()=>mi(K),p.scope),K=p.update=()=>{Q.dirty&&Q.run()};K.id=p.uid,kn(p,!0),K()},A=(p,y,E)=>{y.component=p;const M=p.vnode.props;p.vnode=y,p.next=null,Wh(p,y.props,M,E),zh(p,y.children,E),Mn(),ha(p),On()},F=(p,y,E,M,O,q,Y,G,Q=!1)=>{const K=p&&p.children,ie=p?p.shapeFlag:0,ae=y.children,{patchFlag:ce,shapeFlag:pe}=y;if(ce>0){if(ce&128){ee(K,ae,E,M,O,q,Y,G,Q);return}else if(ce&256){W(K,ae,E,M,O,q,Y,G,Q);return}}pe&8?(ie&16&&ke(K,O,q),ae!==K&&d(E,ae)):ie&16?pe&16?ee(K,ae,E,M,O,q,Y,G,Q):ke(K,O,q,!0):(ie&8&&d(E,""),pe&16&&$(ae,E,M,O,q,Y,G,Q))},W=(p,y,E,M,O,q,Y,G,Q)=>{p=p||zn,y=y||zn;const K=p.length,ie=y.length,ae=Math.min(K,ie);let ce;for(ce=0;ce<ae;ce++){const pe=y[ce]=Q?dn(y[ce]):Tt(y[ce]);g(p[ce],pe,E,null,O,q,Y,G,Q)}K>ie?ke(p,O,q,!0,!1,ae):$(y,E,M,O,q,Y,G,Q,ae)},ee=(p,y,E,M,O,q,Y,G,Q)=>{let K=0;const ie=y.length;let ae=p.length-1,ce=ie-1;for(;K<=ae&&K<=ce;){const pe=p[K],we=y[K]=Q?dn(y[K]):Tt(y[K]);if(gs(pe,we))g(pe,we,E,null,O,q,Y,G,Q);else break;K++}for(;K<=ae&&K<=ce;){const pe=p[ae],we=y[ce]=Q?dn(y[ce]):Tt(y[ce]);if(gs(pe,we))g(pe,we,E,null,O,q,Y,G,Q);else break;ae--,ce--}if(K>ae){if(K<=ce){const pe=ce+1,we=pe<ie?y[pe].el:M;for(;K<=ce;)g(null,y[K]=Q?dn(y[K]):Tt(y[K]),E,we,O,q,Y,G,Q),K++}}else if(K>ce)for(;K<=ae;)re(p[K],O,q,!0),K++;else{const pe=K,we=K,Ae=new Map;for(K=we;K<=ce;K++){const it=y[K]=Q?dn(y[K]):Tt(y[K]);it.key!=null&&Ae.set(it.key,K)}let Ue,je=0;const wt=ce-we+1;let Hn=!1,ta=0;const ps=new Array(wt);for(K=0;K<wt;K++)ps[K]=0;for(K=pe;K<=ae;K++){const it=p[K];if(je>=wt){re(it,O,q,!0);continue}let Ct;if(it.key!=null)Ct=Ae.get(it.key);else for(Ue=we;Ue<=ce;Ue++)if(ps[Ue-we]===0&&gs(it,y[Ue])){Ct=Ue;break}Ct===void 0?re(it,O,q,!0):(ps[Ct-we]=K+1,Ct>=ta?ta=Ct:Hn=!0,g(it,y[Ct],E,null,O,q,Y,G,Q),je++)}const na=Hn?Yh(ps):zn;for(Ue=na.length-1,K=wt-1;K>=0;K--){const it=we+K,Ct=y[it],sa=it+1<ie?y[it+1].el:M;ps[K]===0?g(null,Ct,E,sa,O,q,Y,G,Q):Hn&&(Ue<0||K!==na[Ue]?oe(Ct,E,sa,2):Ue--)}}},oe=(p,y,E,M,O=null)=>{const{el:q,type:Y,transition:G,children:Q,shapeFlag:K}=p;if(K&6){oe(p.component.subTree,y,E,M);return}if(K&128){p.suspense.move(y,E,M);return}if(K&64){Y.move(p,y,E,ne);return}if(Y===Ee){s(q,y,E);for(let ae=0;ae<Q.length;ae++)oe(Q[ae],y,E,M);s(p.anchor,y,E);return}if(Y===eo){b(p,y,E);return}if(M!==2&&K&1&&G)if(M===0)G.beforeEnter(q),s(q,y,E),Qe(()=>G.enter(q),O);else{const{leave:ae,delayLeave:ce,afterLeave:pe}=G,we=()=>s(q,y,E),Ae=()=>{ae(q,()=>{we(),pe&&pe()})};ce?ce(q,we,Ae):Ae()}else s(q,y,E)},re=(p,y,E,M=!1,O=!1)=>{const{type:q,props:Y,ref:G,children:Q,dynamicChildren:K,shapeFlag:ie,patchFlag:ae,dirs:ce}=p;if(G!=null&&Nr(G,null,E,p,!0),ie&256){y.ctx.deactivate(p);return}const pe=ie&1&&ce,we=!bs(p);let Ae;if(we&&(Ae=Y&&Y.onVnodeBeforeUnmount)&&$t(Ae,y,p),ie&6)Te(p.component,E,M);else{if(ie&128){p.suspense.unmount(E,M);return}pe&&Sn(p,null,y,"beforeUnmount"),ie&64?p.type.remove(p,y,E,O,ne,M):K&&(q!==Ee||ae>0&&ae&64)?ke(K,y,E,!1,!0):(q===Ee&&ae&384||!O&&ie&16)&&ke(Q,y,E),M&&de(p)}(we&&(Ae=Y&&Y.onVnodeUnmounted)||pe)&&Qe(()=>{Ae&&$t(Ae,y,p),pe&&Sn(p,null,y,"unmounted")},E)},de=p=>{const{type:y,el:E,anchor:M,transition:O}=p;if(y===Ee){le(E,M);return}if(y===eo){C(p);return}const q=()=>{o(E),O&&!O.persisted&&O.afterLeave&&O.afterLeave()};if(p.shapeFlag&1&&O&&!O.persisted){const{leave:Y,delayLeave:G}=O,Q=()=>Y(E,q);G?G(p.el,q,Q):Q()}else q()},le=(p,y)=>{let E;for(;p!==y;)E=f(p),o(p),p=E;o(y)},Te=(p,y,E)=>{const{bum:M,scope:O,update:q,subTree:Y,um:G}=p;M&&or(M),O.stop(),q&&(q.active=!1,re(Y,p,y,E)),G&&Qe(G,y),Qe(()=>{p.isUnmounted=!0},y),y&&y.pendingBranch&&!y.isUnmounted&&p.asyncDep&&!p.asyncResolved&&p.suspenseId===y.pendingId&&(y.deps--,y.deps===0&&y.resolve())},ke=(p,y,E,M=!1,O=!1,q=0)=>{for(let Y=q;Y<p.length;Y++)re(p[Y],y,E,M,O)},j=p=>p.shapeFlag&6?j(p.component.subTree):p.shapeFlag&128?p.suspense.next():f(p.anchor||p.el);let B=!1;const N=(p,y,E)=>{p==null?y._vnode&&re(y._vnode,null,null,!0):g(y._vnode||null,p,y,null,null,null,E),B||(B=!0,ha(),pl(),B=!1),y._vnode=p},ne={p:g,um:re,m:oe,r:de,mt:X,mc:$,pc:F,pbc:I,n:j,o:e};let ue,he;return t&&([ue,he]=t(ne)),{render:N,hydrate:ue,createApp:jh(N,ue)}}function cr({type:e,props:t},n){return n==="svg"&&e==="foreignObject"||n==="mathml"&&e==="annotation-xml"&&t&&t.encoding&&t.encoding.includes("html")?void 0:n}function kn({effect:e,update:t},n){e.allowRecurse=t.allowRecurse=n}function Jh(e,t){return(!e||e&&!e.pendingBranch)&&t&&!t.persisted}function Il(e,t,n=!1){const s=e.children,o=t.children;if(be(s)&&be(o))for(let r=0;r<s.length;r++){const i=s[r];let a=o[r];a.shapeFlag&1&&!a.dynamicChildren&&((a.patchFlag<=0||a.patchFlag===32)&&(a=o[r]=dn(o[r]),a.el=i.el),n||Il(i,a)),a.type===Po&&(a.el=i.el)}}function Yh(e){const t=e.slice(),n=[0];let s,o,r,i,a;const c=e.length;for(s=0;s<c;s++){const l=e[s];if(l!==0){if(o=n[n.length-1],e[o]<l){t[s]=o,n.push(s);continue}for(r=0,i=n.length-1;r<i;)a=r+i>>1,e[n[a]]<l?r=a+1:i=a;l<e[n[r]]&&(r>0&&(t[s]=n[r-1]),n[r]=s)}}for(r=n.length,i=n[r-1];r-- >0;)n[r]=i,i=t[i];return n}function Al(e){const t=e.subTree.component;if(t)return t.asyncDep&&!t.asyncResolved?t:Al(t)}const Qh=e=>e.__isTeleport,Ee=Symbol.for("v-fgt"),Po=Symbol.for("v-txt"),wn=Symbol.for("v-cmt"),eo=Symbol.for("v-stc"),Rs=[];let Et=null;function S(e=!1){Rs.push(Et=e?null:[])}function Xh(){Rs.pop(),Et=Rs[Rs.length-1]||null}let Ts=1;function xa(e){Ts+=e}function Tl(e){return e.dynamicChildren=Ts>0?Et||zn:null,Xh(),Ts>0&&Et&&Et.push(e),e}function U(e,t,n,s,o,r){return Tl(_(e,t,n,s,o,r,!0))}function Ie(e,t,n,s,o){return Tl(fe(e,t,n,s,o,!0))}function ao(e){return e?e.__v_isVNode===!0:!1}function gs(e,t){return e.type===t.type&&e.key===t.key}const Io="__vInternal",Ll=({key:e})=>e??null,to=({ref:e,ref_key:t,ref_for:n})=>(typeof e=="number"&&(e=""+e),e!=null?nt(e)||He(e)||_e(e)?{i:Fe,r:e,k:t,f:!!n}:e:null);function _(e,t=null,n=null,s=0,o=null,r=e===Ee?0:1,i=!1,a=!1){const c={__v_isVNode:!0,__v_skip:!0,type:e,props:t,key:t&&Ll(t),ref:t&&to(t),scopeId:Co,slotScopeIds:null,children:n,component:null,suspense:null,ssContent:null,ssFallback:null,dirs:null,transition:null,el:null,anchor:null,target:null,targetAnchor:null,staticCount:0,shapeFlag:r,patchFlag:s,dynamicProps:o,dynamicChildren:null,appContext:null,ctx:Fe};return a?(ki(c,n),r&128&&e.normalize(c)):n&&(c.shapeFlag|=nt(n)?8:16),Ts>0&&!i&&Et&&(c.patchFlag>0||r&6)&&c.patchFlag!==32&&Et.push(c),c}const fe=ep;function ep(e,t=null,n=null,s=0,o=null,r=!1){if((!e||e===yh)&&(e=wn),ao(e)){const a=Xn(e,t,!0);return n&&ki(a,n),Ts>0&&!r&&Et&&(a.shapeFlag&6?Et[Et.indexOf(e)]=a:Et.push(a)),a.patchFlag|=-2,a}if(dp(e)&&(e=e.__vccOpts),t){t=tp(t);let{class:a,style:c}=t;a&&!nt(a)&&(t.class=ve(a)),Oe(c)&&(Qc(c)&&!be(c)&&(c=Ze({},c)),t.style=vi(c))}const i=nt(e)?1:_h(e)?128:Qh(e)?64:Oe(e)?4:_e(e)?2:0;return _(e,t,n,s,o,i,r,!0)}function tp(e){return e?Qc(e)||Io in e?Ze({},e):e:null}function Xn(e,t,n=!1){const{props:s,ref:o,patchFlag:r,children:i}=e,a=t?np(s||{},t):s;return{__v_isVNode:!0,__v_skip:!0,type:e.type,props:a,key:a&&Ll(a),ref:t&&t.ref?n&&o?be(o)?o.concat(to(t)):[o,to(t)]:to(t):o,scopeId:e.scopeId,slotScopeIds:e.slotScopeIds,children:i,target:e.target,targetAnchor:e.targetAnchor,staticCount:e.staticCount,shapeFlag:e.shapeFlag,patchFlag:t&&e.type!==Ee?r===-1?16:r|16:r,dynamicProps:e.dynamicProps,dynamicChildren:e.dynamicChildren,appContext:e.appContext,dirs:e.dirs,transition:e.transition,component:e.component,suspense:e.suspense,ssContent:e.ssContent&&Xn(e.ssContent),ssFallback:e.ssFallback&&Xn(e.ssFallback),el:e.el,anchor:e.anchor,ctx:e.ctx,ce:e.ce}}function Re(e=" ",t=0){return fe(Po,null,e,t)}function Si(e,t){const n=fe(eo,null,e);return n.staticCount=t,n}function te(e="",t=!1){return t?(S(),Ie(wn,null,e)):fe(wn,null,e)}function Tt(e){return e==null||typeof e=="boolean"?fe(wn):be(e)?fe(Ee,null,e.slice()):typeof e=="object"?dn(e):fe(Po,null,String(e))}function dn(e){return e.el===null&&e.patchFlag!==-1||e.memo?e:Xn(e)}function ki(e,t){let n=0;const{shapeFlag:s}=e;if(t==null)t=null;else if(be(t))n=16;else if(typeof t=="object")if(s&65){const o=t.default;o&&(o._c&&(o._d=!1),ki(e,o()),o._c&&(o._d=!0));return}else{n=32;const o=t._;!o&&!(Io in t)?t._ctx=Fe:o===3&&Fe&&(Fe.slots._===1?t._=1:(t._=2,e.patchFlag|=1024))}else _e(t)?(t={default:t,_ctx:Fe},n=32):(t=String(t),s&64?(n=16,t=[Re(t)]):n=8);e.children=t,e.shapeFlag|=n}function np(...e){const t={};for(let n=0;n<e.length;n++){const s=e[n];for(const o in s)if(o==="class")t.class!==s.class&&(t.class=ve([t.class,s.class]));else if(o==="style")t.style=vi([t.style,s.style]);else if(hi(o)){const r=t[o],i=s[o];i&&r!==i&&!(be(r)&&r.includes(i))&&(t[o]=r?[].concat(r,i):i)}else o!==""&&(t[o]=s[o])}return t}function $t(e,t,n,s=null){Rt(e,t,7,[n,s])}const sp=xl();let op=0;function rp(e,t,n){const s=e.type,o=(t?t.appContext:e.appContext)||sp,r={uid:op++,vnode:e,type:s,parent:t,appContext:o,root:null,next:null,subTree:null,effect:null,update:null,scope:new Nc(!0),render:null,proxy:null,exposed:null,exposeProxy:null,withProxy:null,provides:t?t.provides:Object.create(o.provides),accessCache:null,renderCache:[],components:null,directives:null,propsOptions:kl(s,o),emitsOptions:yl(s,o),emit:null,emitted:null,propsDefaults:Le,inheritAttrs:s.inheritAttrs,ctx:Le,data:Le,props:Le,attrs:Le,slots:Le,refs:Le,setupState:Le,setupContext:null,attrsProxy:null,slotsProxy:null,suspense:n,suspenseId:n?n.pendingId:0,asyncDep:null,asyncResolved:!1,isMounted:!1,isUnmounted:!1,isDeactivated:!1,bc:null,c:null,bm:null,m:null,bu:null,u:null,um:null,bum:null,da:null,a:null,rtg:null,rtc:null,ec:null,sp:null};return r.ctx={_:r},r.root=t?t.root:r,r.emit=dh.bind(null,r),e.ce&&e.ce(r),r}let We=null,co,Mr;{const e=ul(),t=(n,s)=>{let o;return(o=e[n])||(o=e[n]=[]),o.push(s),r=>{o.length>1?o.forEach(i=>i(r)):o[0](r)}};co=t("__VUE_INSTANCE_SETTERS__",n=>We=n),Mr=t("__VUE_SSR_SETTERS__",n=>Ao=n)}const Os=e=>{const t=We;return co(e),e.scope.on(),()=>{e.scope.off(),co(t)}},Sa=()=>{We&&We.scope.off(),co(null)};function Ul(e){return e.vnode.shapeFlag&4}let Ao=!1;function ip(e,t=!1){t&&Mr(t);const{props:n,children:s}=e.vnode,o=Ul(e);Dh(e,n,o,t),Kh(e,s);const r=o?ap(e,t):void 0;return t&&Mr(!1),r}function ap(e,t){const n=e.type;e.accessCache=Object.create(null),e.proxy=Eo(new Proxy(e.ctx,Uh));const{setup:s}=n;if(s){const o=e.setupContext=s.length>1?lp(e):null,r=Os(e);Mn();const i=_n(s,e,0,[e.props,o]);if(On(),r(),al(i)){if(i.then(Sa,Sa),t)return i.then(a=>{ka(e,a,t)}).catch(a=>{So(a,e,0)});e.asyncDep=i}else ka(e,i,t)}else Bl(e,t)}function ka(e,t,n){_e(t)?e.type.__ssrInlineRender?e.ssrRender=t:e.render=t:Oe(t)&&(e.setupState=nl(t)),Bl(e,n)}let Ca;function Bl(e,t,n){const s=e.type;if(!e.render){if(!t&&Ca&&!s.render){const o=s.template||Ri(e).template;if(o){const{isCustomElement:r,compilerOptions:i}=e.appContext.config,{delimiters:a,compilerOptions:c}=s,l=Ze(Ze({isCustomElement:r,delimiters:a},i),c);s.render=Ca(o,l)}}e.render=s.render||gt}{const o=Os(e);Mn();try{Bh(e)}finally{On(),o()}}}function cp(e){return e.attrsProxy||(e.attrsProxy=new Proxy(e.attrs,{get(t,n){return tt(e,"get","$attrs"),t[n]}}))}function lp(e){const t=n=>{e.exposed=n||{}};return{get attrs(){return cp(e)},slots:e.slots,emit:e.emit,expose:t}}function To(e){if(e.exposed)return e.exposeProxy||(e.exposeProxy=new Proxy(nl(Eo(e.exposed)),{get(t,n){if(n in t)return t[n];if(n in Es)return Es[n](e)},has(t,n){return n in t||n in Es}}))}function up(e,t=!0){return _e(e)?e.displayName||e.name:e.name||t&&e.__name}function dp(e){return _e(e)&&"__vccOpts"in e}const ye=(e,t)=>Df(e,t,Ao);function Nl(e,t,n){const s=arguments.length;return s===2?Oe(t)&&!be(t)?ao(t)?fe(e,null,[t]):fe(e,t):fe(e,null,t):(s>3?n=Array.prototype.slice.call(arguments,2):s===3&&ao(n)&&(n=[n]),fe(e,t,n))}const fp="3.4.19";/**
+**/
+const stack = [];
+function warn$1(msg, ...args) {
+  pauseTracking();
+  const instance = stack.length ? stack[stack.length - 1].component : null;
+  const appWarnHandler = instance && instance.appContext.config.warnHandler;
+  const trace = getComponentTrace();
+  if (appWarnHandler) {
+    callWithErrorHandling(
+      appWarnHandler,
+      instance,
+      11,
+      [
+        msg + args.join(""),
+        instance && instance.proxy,
+        trace.map(
+          ({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`
+        ).join("\n"),
+        trace
+      ]
+    );
+  } else {
+    const warnArgs = [`[Vue warn]: ${msg}`, ...args];
+    if (trace.length && // avoid spamming console during tests
+    true) {
+      warnArgs.push(`
+`, ...formatTrace(trace));
+    }
+    console.warn(...warnArgs);
+  }
+  resetTracking();
+}
+function getComponentTrace() {
+  let currentVNode = stack[stack.length - 1];
+  if (!currentVNode) {
+    return [];
+  }
+  const normalizedStack = [];
+  while (currentVNode) {
+    const last = normalizedStack[0];
+    if (last && last.vnode === currentVNode) {
+      last.recurseCount++;
+    } else {
+      normalizedStack.push({
+        vnode: currentVNode,
+        recurseCount: 0
+      });
+    }
+    const parentInstance = currentVNode.component && currentVNode.component.parent;
+    currentVNode = parentInstance && parentInstance.vnode;
+  }
+  return normalizedStack;
+}
+function formatTrace(trace) {
+  const logs = [];
+  trace.forEach((entry, i2) => {
+    logs.push(...i2 === 0 ? [] : [`
+`], ...formatTraceEntry(entry));
+  });
+  return logs;
+}
+function formatTraceEntry({ vnode, recurseCount }) {
+  const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
+  const isRoot = vnode.component ? vnode.component.parent == null : false;
+  const open = ` at <${formatComponentName(
+    vnode.component,
+    vnode.type,
+    isRoot
+  )}`;
+  const close = `>` + postfix;
+  return vnode.props ? [open, ...formatProps(vnode.props), close] : [open + close];
+}
+function formatProps(props) {
+  const res = [];
+  const keys = Object.keys(props);
+  keys.slice(0, 3).forEach((key) => {
+    res.push(...formatProp(key, props[key]));
+  });
+  if (keys.length > 3) {
+    res.push(` ...`);
+  }
+  return res;
+}
+function formatProp(key, value, raw) {
+  if (isString$1(value)) {
+    value = JSON.stringify(value);
+    return raw ? value : [`${key}=${value}`];
+  } else if (typeof value === "number" || typeof value === "boolean" || value == null) {
+    return raw ? value : [`${key}=${value}`];
+  } else if (isRef(value)) {
+    value = formatProp(key, toRaw(value.value), true);
+    return raw ? value : [`${key}=Ref<`, value, `>`];
+  } else if (isFunction$1(value)) {
+    return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
+  } else {
+    value = toRaw(value);
+    return raw ? value : [`${key}=`, value];
+  }
+}
+function callWithErrorHandling(fn, instance, type, args) {
+  try {
+    return args ? fn(...args) : fn();
+  } catch (err) {
+    handleError(err, instance, type);
+  }
+}
+function callWithAsyncErrorHandling(fn, instance, type, args) {
+  if (isFunction$1(fn)) {
+    const res = callWithErrorHandling(fn, instance, type, args);
+    if (res && isPromise(res)) {
+      res.catch((err) => {
+        handleError(err, instance, type);
+      });
+    }
+    return res;
+  }
+  const values = [];
+  for (let i2 = 0; i2 < fn.length; i2++) {
+    values.push(callWithAsyncErrorHandling(fn[i2], instance, type, args));
+  }
+  return values;
+}
+function handleError(err, instance, type, throwInDev = true) {
+  const contextVNode = instance ? instance.vnode : null;
+  if (instance) {
+    let cur = instance.parent;
+    const exposedInstance = instance.proxy;
+    const errorInfo = `https://vuejs.org/error-reference/#runtime-${type}`;
+    while (cur) {
+      const errorCapturedHooks = cur.ec;
+      if (errorCapturedHooks) {
+        for (let i2 = 0; i2 < errorCapturedHooks.length; i2++) {
+          if (errorCapturedHooks[i2](err, exposedInstance, errorInfo) === false) {
+            return;
+          }
+        }
+      }
+      cur = cur.parent;
+    }
+    const appErrorHandler = instance.appContext.config.errorHandler;
+    if (appErrorHandler) {
+      callWithErrorHandling(
+        appErrorHandler,
+        null,
+        10,
+        [err, exposedInstance, errorInfo]
+      );
+      return;
+    }
+  }
+  logError(err, type, contextVNode, throwInDev);
+}
+function logError(err, type, contextVNode, throwInDev = true) {
+  {
+    console.error(err);
+  }
+}
+let isFlushing = false;
+let isFlushPending = false;
+const queue = [];
+let flushIndex = 0;
+const pendingPostFlushCbs = [];
+let activePostFlushCbs = null;
+let postFlushIndex = 0;
+const resolvedPromise = /* @__PURE__ */ Promise.resolve();
+let currentFlushPromise = null;
+function nextTick(fn) {
+  const p2 = currentFlushPromise || resolvedPromise;
+  return fn ? p2.then(this ? fn.bind(this) : fn) : p2;
+}
+function findInsertionIndex(id) {
+  let start = flushIndex + 1;
+  let end = queue.length;
+  while (start < end) {
+    const middle = start + end >>> 1;
+    const middleJob = queue[middle];
+    const middleJobId = getId(middleJob);
+    if (middleJobId < id || middleJobId === id && middleJob.pre) {
+      start = middle + 1;
+    } else {
+      end = middle;
+    }
+  }
+  return start;
+}
+function queueJob(job) {
+  if (!queue.length || !queue.includes(
+    job,
+    isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex
+  )) {
+    if (job.id == null) {
+      queue.push(job);
+    } else {
+      queue.splice(findInsertionIndex(job.id), 0, job);
+    }
+    queueFlush();
+  }
+}
+function queueFlush() {
+  if (!isFlushing && !isFlushPending) {
+    isFlushPending = true;
+    currentFlushPromise = resolvedPromise.then(flushJobs);
+  }
+}
+function invalidateJob(job) {
+  const i2 = queue.indexOf(job);
+  if (i2 > flushIndex) {
+    queue.splice(i2, 1);
+  }
+}
+function queuePostFlushCb(cb) {
+  if (!isArray$2(cb)) {
+    if (!activePostFlushCbs || !activePostFlushCbs.includes(
+      cb,
+      cb.allowRecurse ? postFlushIndex + 1 : postFlushIndex
+    )) {
+      pendingPostFlushCbs.push(cb);
+    }
+  } else {
+    pendingPostFlushCbs.push(...cb);
+  }
+  queueFlush();
+}
+function flushPreFlushCbs(instance, seen, i2 = isFlushing ? flushIndex + 1 : 0) {
+  for (; i2 < queue.length; i2++) {
+    const cb = queue[i2];
+    if (cb && cb.pre) {
+      if (instance && cb.id !== instance.uid) {
+        continue;
+      }
+      queue.splice(i2, 1);
+      i2--;
+      cb();
+    }
+  }
+}
+function flushPostFlushCbs(seen) {
+  if (pendingPostFlushCbs.length) {
+    const deduped = [...new Set(pendingPostFlushCbs)].sort(
+      (a, b) => getId(a) - getId(b)
+    );
+    pendingPostFlushCbs.length = 0;
+    if (activePostFlushCbs) {
+      activePostFlushCbs.push(...deduped);
+      return;
+    }
+    activePostFlushCbs = deduped;
+    for (postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++) {
+      activePostFlushCbs[postFlushIndex]();
+    }
+    activePostFlushCbs = null;
+    postFlushIndex = 0;
+  }
+}
+const getId = (job) => job.id == null ? Infinity : job.id;
+const comparator = (a, b) => {
+  const diff = getId(a) - getId(b);
+  if (diff === 0) {
+    if (a.pre && !b.pre)
+      return -1;
+    if (b.pre && !a.pre)
+      return 1;
+  }
+  return diff;
+};
+function flushJobs(seen) {
+  isFlushPending = false;
+  isFlushing = true;
+  queue.sort(comparator);
+  const check = NOOP;
+  try {
+    for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+      const job = queue[flushIndex];
+      if (job && job.active !== false) {
+        if (false)
+          ;
+        callWithErrorHandling(job, null, 14);
+      }
+    }
+  } finally {
+    flushIndex = 0;
+    queue.length = 0;
+    flushPostFlushCbs();
+    isFlushing = false;
+    currentFlushPromise = null;
+    if (queue.length || pendingPostFlushCbs.length) {
+      flushJobs();
+    }
+  }
+}
+function emit(instance, event, ...rawArgs) {
+  if (instance.isUnmounted)
+    return;
+  const props = instance.vnode.props || EMPTY_OBJ;
+  let args = rawArgs;
+  const isModelListener2 = event.startsWith("update:");
+  const modelArg = isModelListener2 && event.slice(7);
+  if (modelArg && modelArg in props) {
+    const modifiersKey = `${modelArg === "modelValue" ? "model" : modelArg}Modifiers`;
+    const { number: number2, trim } = props[modifiersKey] || EMPTY_OBJ;
+    if (trim) {
+      args = rawArgs.map((a) => isString$1(a) ? a.trim() : a);
+    }
+    if (number2) {
+      args = rawArgs.map(looseToNumber$1);
+    }
+  }
+  let handlerName;
+  let handler = props[handlerName = toHandlerKey(event)] || // also try camelCase event handler (#2249)
+  props[handlerName = toHandlerKey(camelize(event))];
+  if (!handler && isModelListener2) {
+    handler = props[handlerName = toHandlerKey(hyphenate$1(event))];
+  }
+  if (handler) {
+    callWithAsyncErrorHandling(
+      handler,
+      instance,
+      6,
+      args
+    );
+  }
+  const onceHandler = props[handlerName + `Once`];
+  if (onceHandler) {
+    if (!instance.emitted) {
+      instance.emitted = {};
+    } else if (instance.emitted[handlerName]) {
+      return;
+    }
+    instance.emitted[handlerName] = true;
+    callWithAsyncErrorHandling(
+      onceHandler,
+      instance,
+      6,
+      args
+    );
+  }
+}
+function normalizeEmitsOptions(comp, appContext, asMixin = false) {
+  const cache = appContext.emitsCache;
+  const cached = cache.get(comp);
+  if (cached !== void 0) {
+    return cached;
+  }
+  const raw = comp.emits;
+  let normalized = {};
+  let hasExtends = false;
+  if (!isFunction$1(comp)) {
+    const extendEmits = (raw2) => {
+      const normalizedFromExtend = normalizeEmitsOptions(raw2, appContext, true);
+      if (normalizedFromExtend) {
+        hasExtends = true;
+        extend$1(normalized, normalizedFromExtend);
+      }
+    };
+    if (!asMixin && appContext.mixins.length) {
+      appContext.mixins.forEach(extendEmits);
+    }
+    if (comp.extends) {
+      extendEmits(comp.extends);
+    }
+    if (comp.mixins) {
+      comp.mixins.forEach(extendEmits);
+    }
+  }
+  if (!raw && !hasExtends) {
+    if (isObject(comp)) {
+      cache.set(comp, null);
+    }
+    return null;
+  }
+  if (isArray$2(raw)) {
+    raw.forEach((key) => normalized[key] = null);
+  } else {
+    extend$1(normalized, raw);
+  }
+  if (isObject(comp)) {
+    cache.set(comp, normalized);
+  }
+  return normalized;
+}
+function isEmitListener(options, key) {
+  if (!options || !isOn$1(key)) {
+    return false;
+  }
+  key = key.slice(2).replace(/Once$/, "");
+  return hasOwn(options, key[0].toLowerCase() + key.slice(1)) || hasOwn(options, hyphenate$1(key)) || hasOwn(options, key);
+}
+let currentRenderingInstance = null;
+let currentScopeId = null;
+function setCurrentRenderingInstance(instance) {
+  const prev = currentRenderingInstance;
+  currentRenderingInstance = instance;
+  currentScopeId = instance && instance.type.__scopeId || null;
+  return prev;
+}
+function pushScopeId(id) {
+  currentScopeId = id;
+}
+function popScopeId() {
+  currentScopeId = null;
+}
+function withCtx(fn, ctx = currentRenderingInstance, isNonScopedSlot) {
+  if (!ctx)
+    return fn;
+  if (fn._n) {
+    return fn;
+  }
+  const renderFnWithContext = (...args) => {
+    if (renderFnWithContext._d) {
+      setBlockTracking(-1);
+    }
+    const prevInstance = setCurrentRenderingInstance(ctx);
+    let res;
+    try {
+      res = fn(...args);
+    } finally {
+      setCurrentRenderingInstance(prevInstance);
+      if (renderFnWithContext._d) {
+        setBlockTracking(1);
+      }
+    }
+    return res;
+  };
+  renderFnWithContext._n = true;
+  renderFnWithContext._c = true;
+  renderFnWithContext._d = true;
+  return renderFnWithContext;
+}
+function markAttrsAccessed() {
+}
+function renderComponentRoot(instance) {
+  const {
+    type: Component,
+    vnode,
+    proxy,
+    withProxy,
+    props,
+    propsOptions: [propsOptions],
+    slots,
+    attrs,
+    emit: emit2,
+    render,
+    renderCache,
+    data,
+    setupState,
+    ctx,
+    inheritAttrs
+  } = instance;
+  let result;
+  let fallthroughAttrs;
+  const prev = setCurrentRenderingInstance(instance);
+  try {
+    if (vnode.shapeFlag & 4) {
+      const proxyToUse = withProxy || proxy;
+      const thisProxy = false ? new Proxy(proxyToUse, {
+        get(target, key, receiver) {
+          warn$1(
+            `Property '${String(
+              key
+            )}' was accessed via 'this'. Avoid using 'this' in templates.`
+          );
+          return Reflect.get(target, key, receiver);
+        }
+      }) : proxyToUse;
+      result = normalizeVNode(
+        render.call(
+          thisProxy,
+          proxyToUse,
+          renderCache,
+          props,
+          setupState,
+          data,
+          ctx
+        )
+      );
+      fallthroughAttrs = attrs;
+    } else {
+      const render2 = Component;
+      if (false)
+        ;
+      result = normalizeVNode(
+        render2.length > 1 ? render2(
+          props,
+          false ? {
+            get attrs() {
+              markAttrsAccessed();
+              return attrs;
+            },
+            slots,
+            emit: emit2
+          } : { attrs, slots, emit: emit2 }
+        ) : render2(
+          props,
+          null
+          /* we know it doesn't need it */
+        )
+      );
+      fallthroughAttrs = Component.props ? attrs : getFunctionalFallthrough(attrs);
+    }
+  } catch (err) {
+    blockStack.length = 0;
+    handleError(err, instance, 1);
+    result = createVNode(Comment);
+  }
+  let root = result;
+  if (fallthroughAttrs && inheritAttrs !== false) {
+    const keys = Object.keys(fallthroughAttrs);
+    const { shapeFlag } = root;
+    if (keys.length) {
+      if (shapeFlag & (1 | 6)) {
+        if (propsOptions && keys.some(isModelListener$1)) {
+          fallthroughAttrs = filterModelListeners(
+            fallthroughAttrs,
+            propsOptions
+          );
+        }
+        root = cloneVNode(root, fallthroughAttrs);
+      }
+    }
+  }
+  if (vnode.dirs) {
+    root = cloneVNode(root);
+    root.dirs = root.dirs ? root.dirs.concat(vnode.dirs) : vnode.dirs;
+  }
+  if (vnode.transition) {
+    root.transition = vnode.transition;
+  }
+  {
+    result = root;
+  }
+  setCurrentRenderingInstance(prev);
+  return result;
+}
+const getFunctionalFallthrough = (attrs) => {
+  let res;
+  for (const key in attrs) {
+    if (key === "class" || key === "style" || isOn$1(key)) {
+      (res || (res = {}))[key] = attrs[key];
+    }
+  }
+  return res;
+};
+const filterModelListeners = (attrs, props) => {
+  const res = {};
+  for (const key in attrs) {
+    if (!isModelListener$1(key) || !(key.slice(9) in props)) {
+      res[key] = attrs[key];
+    }
+  }
+  return res;
+};
+function shouldUpdateComponent(prevVNode, nextVNode, optimized) {
+  const { props: prevProps, children: prevChildren, component } = prevVNode;
+  const { props: nextProps, children: nextChildren, patchFlag } = nextVNode;
+  const emits = component.emitsOptions;
+  if (nextVNode.dirs || nextVNode.transition) {
+    return true;
+  }
+  if (optimized && patchFlag >= 0) {
+    if (patchFlag & 1024) {
+      return true;
+    }
+    if (patchFlag & 16) {
+      if (!prevProps) {
+        return !!nextProps;
+      }
+      return hasPropsChanged(prevProps, nextProps, emits);
+    } else if (patchFlag & 8) {
+      const dynamicProps = nextVNode.dynamicProps;
+      for (let i2 = 0; i2 < dynamicProps.length; i2++) {
+        const key = dynamicProps[i2];
+        if (nextProps[key] !== prevProps[key] && !isEmitListener(emits, key)) {
+          return true;
+        }
+      }
+    }
+  } else {
+    if (prevChildren || nextChildren) {
+      if (!nextChildren || !nextChildren.$stable) {
+        return true;
+      }
+    }
+    if (prevProps === nextProps) {
+      return false;
+    }
+    if (!prevProps) {
+      return !!nextProps;
+    }
+    if (!nextProps) {
+      return true;
+    }
+    return hasPropsChanged(prevProps, nextProps, emits);
+  }
+  return false;
+}
+function hasPropsChanged(prevProps, nextProps, emitsOptions) {
+  const nextKeys = Object.keys(nextProps);
+  if (nextKeys.length !== Object.keys(prevProps).length) {
+    return true;
+  }
+  for (let i2 = 0; i2 < nextKeys.length; i2++) {
+    const key = nextKeys[i2];
+    if (nextProps[key] !== prevProps[key] && !isEmitListener(emitsOptions, key)) {
+      return true;
+    }
+  }
+  return false;
+}
+function updateHOCHostEl({ vnode, parent }, el) {
+  while (parent) {
+    const root = parent.subTree;
+    if (root.suspense && root.suspense.activeBranch === vnode) {
+      root.el = vnode.el;
+    }
+    if (root === vnode) {
+      (vnode = parent.vnode).el = el;
+      parent = parent.parent;
+    } else {
+      break;
+    }
+  }
+}
+const COMPONENTS = "components";
+function resolveComponent(name, maybeSelfReference) {
+  return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
+}
+const NULL_DYNAMIC_COMPONENT = Symbol.for("v-ndc");
+function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
+  const instance = currentRenderingInstance || currentInstance;
+  if (instance) {
+    const Component = instance.type;
+    if (type === COMPONENTS) {
+      const selfName = getComponentName(
+        Component,
+        false
+      );
+      if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize$1(camelize(name)))) {
+        return Component;
+      }
+    }
+    const res = (
+      // local registration
+      // check instance[type] first which is resolved for options API
+      resolve(instance[type] || Component[type], name) || // global registration
+      resolve(instance.appContext[type], name)
+    );
+    if (!res && maybeSelfReference) {
+      return Component;
+    }
+    return res;
+  }
+}
+function resolve(registry, name) {
+  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize$1(camelize(name))]);
+}
+const isSuspense = (type) => type.__isSuspense;
+function queueEffectWithSuspense(fn, suspense) {
+  if (suspense && suspense.pendingBranch) {
+    if (isArray$2(fn)) {
+      suspense.effects.push(...fn);
+    } else {
+      suspense.effects.push(fn);
+    }
+  } else {
+    queuePostFlushCb(fn);
+  }
+}
+const ssrContextKey = Symbol.for("v-scx");
+const useSSRContext = () => {
+  {
+    const ctx = inject(ssrContextKey);
+    return ctx;
+  }
+};
+function watchEffect(effect, options) {
+  return doWatch(effect, null, options);
+}
+const INITIAL_WATCHER_VALUE = {};
+function watch(source, cb, options) {
+  return doWatch(source, cb, options);
+}
+function doWatch(source, cb, {
+  immediate,
+  deep,
+  flush,
+  once,
+  onTrack,
+  onTrigger
+} = EMPTY_OBJ) {
+  if (cb && once) {
+    const _cb = cb;
+    cb = (...args) => {
+      _cb(...args);
+      unwatch();
+    };
+  }
+  const instance = currentInstance;
+  const reactiveGetter = (source2) => deep === true ? source2 : (
+    // for deep: false, only traverse root-level properties
+    traverse(source2, deep === false ? 1 : void 0)
+  );
+  let getter;
+  let forceTrigger = false;
+  let isMultiSource = false;
+  if (isRef(source)) {
+    getter = () => source.value;
+    forceTrigger = isShallow(source);
+  } else if (isReactive(source)) {
+    getter = () => reactiveGetter(source);
+    forceTrigger = true;
+  } else if (isArray$2(source)) {
+    isMultiSource = true;
+    forceTrigger = source.some((s) => isReactive(s) || isShallow(s));
+    getter = () => source.map((s) => {
+      if (isRef(s)) {
+        return s.value;
+      } else if (isReactive(s)) {
+        return reactiveGetter(s);
+      } else if (isFunction$1(s)) {
+        return callWithErrorHandling(s, instance, 2);
+      } else
+        ;
+    });
+  } else if (isFunction$1(source)) {
+    if (cb) {
+      getter = () => callWithErrorHandling(source, instance, 2);
+    } else {
+      getter = () => {
+        if (cleanup) {
+          cleanup();
+        }
+        return callWithAsyncErrorHandling(
+          source,
+          instance,
+          3,
+          [onCleanup]
+        );
+      };
+    }
+  } else {
+    getter = NOOP;
+  }
+  if (cb && deep) {
+    const baseGetter = getter;
+    getter = () => traverse(baseGetter());
+  }
+  let cleanup;
+  let onCleanup = (fn) => {
+    cleanup = effect.onStop = () => {
+      callWithErrorHandling(fn, instance, 4);
+      cleanup = effect.onStop = void 0;
+    };
+  };
+  let ssrCleanup;
+  if (isInSSRComponentSetup) {
+    onCleanup = NOOP;
+    if (!cb) {
+      getter();
+    } else if (immediate) {
+      callWithAsyncErrorHandling(cb, instance, 3, [
+        getter(),
+        isMultiSource ? [] : void 0,
+        onCleanup
+      ]);
+    }
+    if (flush === "sync") {
+      const ctx = useSSRContext();
+      ssrCleanup = ctx.__watcherHandles || (ctx.__watcherHandles = []);
+    } else {
+      return NOOP;
+    }
+  }
+  let oldValue = isMultiSource ? new Array(source.length).fill(INITIAL_WATCHER_VALUE) : INITIAL_WATCHER_VALUE;
+  const job = () => {
+    if (!effect.active || !effect.dirty) {
+      return;
+    }
+    if (cb) {
+      const newValue = effect.run();
+      if (deep || forceTrigger || (isMultiSource ? newValue.some((v, i2) => hasChanged(v, oldValue[i2])) : hasChanged(newValue, oldValue)) || false) {
+        if (cleanup) {
+          cleanup();
+        }
+        callWithAsyncErrorHandling(cb, instance, 3, [
+          newValue,
+          // pass undefined as the old value when it's changed for the first time
+          oldValue === INITIAL_WATCHER_VALUE ? void 0 : isMultiSource && oldValue[0] === INITIAL_WATCHER_VALUE ? [] : oldValue,
+          onCleanup
+        ]);
+        oldValue = newValue;
+      }
+    } else {
+      effect.run();
+    }
+  };
+  job.allowRecurse = !!cb;
+  let scheduler;
+  if (flush === "sync") {
+    scheduler = job;
+  } else if (flush === "post") {
+    scheduler = () => queuePostRenderEffect(job, instance && instance.suspense);
+  } else {
+    job.pre = true;
+    if (instance)
+      job.id = instance.uid;
+    scheduler = () => queueJob(job);
+  }
+  const effect = new ReactiveEffect(getter, NOOP, scheduler);
+  const scope = getCurrentScope();
+  const unwatch = () => {
+    effect.stop();
+    if (scope) {
+      remove(scope.effects, effect);
+    }
+  };
+  if (cb) {
+    if (immediate) {
+      job();
+    } else {
+      oldValue = effect.run();
+    }
+  } else if (flush === "post") {
+    queuePostRenderEffect(
+      effect.run.bind(effect),
+      instance && instance.suspense
+    );
+  } else {
+    effect.run();
+  }
+  if (ssrCleanup)
+    ssrCleanup.push(unwatch);
+  return unwatch;
+}
+function instanceWatch(source, value, options) {
+  const publicThis = this.proxy;
+  const getter = isString$1(source) ? source.includes(".") ? createPathGetter(publicThis, source) : () => publicThis[source] : source.bind(publicThis, publicThis);
+  let cb;
+  if (isFunction$1(value)) {
+    cb = value;
+  } else {
+    cb = value.handler;
+    options = value;
+  }
+  const reset = setCurrentInstance(this);
+  const res = doWatch(getter, cb.bind(publicThis), options);
+  reset();
+  return res;
+}
+function createPathGetter(ctx, path) {
+  const segments = path.split(".");
+  return () => {
+    let cur = ctx;
+    for (let i2 = 0; i2 < segments.length && cur; i2++) {
+      cur = cur[segments[i2]];
+    }
+    return cur;
+  };
+}
+function traverse(value, depth, currentDepth = 0, seen) {
+  if (!isObject(value) || value["__v_skip"]) {
+    return value;
+  }
+  if (depth && depth > 0) {
+    if (currentDepth >= depth) {
+      return value;
+    }
+    currentDepth++;
+  }
+  seen = seen || /* @__PURE__ */ new Set();
+  if (seen.has(value)) {
+    return value;
+  }
+  seen.add(value);
+  if (isRef(value)) {
+    traverse(value.value, depth, currentDepth, seen);
+  } else if (isArray$2(value)) {
+    for (let i2 = 0; i2 < value.length; i2++) {
+      traverse(value[i2], depth, currentDepth, seen);
+    }
+  } else if (isSet(value) || isMap(value)) {
+    value.forEach((v) => {
+      traverse(v, depth, currentDepth, seen);
+    });
+  } else if (isPlainObject$1(value)) {
+    for (const key in value) {
+      traverse(value[key], depth, currentDepth, seen);
+    }
+  }
+  return value;
+}
+function withDirectives(vnode, directives) {
+  if (currentRenderingInstance === null) {
+    return vnode;
+  }
+  const instance = getExposeProxy(currentRenderingInstance) || currentRenderingInstance.proxy;
+  const bindings = vnode.dirs || (vnode.dirs = []);
+  for (let i2 = 0; i2 < directives.length; i2++) {
+    let [dir, value, arg, modifiers = EMPTY_OBJ] = directives[i2];
+    if (dir) {
+      if (isFunction$1(dir)) {
+        dir = {
+          mounted: dir,
+          updated: dir
+        };
+      }
+      if (dir.deep) {
+        traverse(value);
+      }
+      bindings.push({
+        dir,
+        instance,
+        value,
+        oldValue: void 0,
+        arg,
+        modifiers
+      });
+    }
+  }
+  return vnode;
+}
+function invokeDirectiveHook(vnode, prevVNode, instance, name) {
+  const bindings = vnode.dirs;
+  const oldBindings = prevVNode && prevVNode.dirs;
+  for (let i2 = 0; i2 < bindings.length; i2++) {
+    const binding = bindings[i2];
+    if (oldBindings) {
+      binding.oldValue = oldBindings[i2].value;
+    }
+    let hook = binding.dir[name];
+    if (hook) {
+      pauseTracking();
+      callWithAsyncErrorHandling(hook, instance, 8, [
+        vnode.el,
+        binding,
+        vnode,
+        prevVNode
+      ]);
+      resetTracking();
+    }
+  }
+}
+/*! #__NO_SIDE_EFFECTS__ */
+// @__NO_SIDE_EFFECTS__
+function defineComponent(options, extraOptions) {
+  return isFunction$1(options) ? (
+    // #8326: extend call and options.name access are considered side-effects
+    // by Rollup, so we have to wrap it in a pure-annotated IIFE.
+    /* @__PURE__ */ (() => extend$1({ name: options.name }, extraOptions, { setup: options }))()
+  ) : options;
+}
+const isAsyncWrapper = (i2) => !!i2.type.__asyncLoader;
+const isKeepAlive = (vnode) => vnode.type.__isKeepAlive;
+function onActivated(hook, target) {
+  registerKeepAliveHook(hook, "a", target);
+}
+function onDeactivated(hook, target) {
+  registerKeepAliveHook(hook, "da", target);
+}
+function registerKeepAliveHook(hook, type, target = currentInstance) {
+  const wrappedHook = hook.__wdc || (hook.__wdc = () => {
+    let current = target;
+    while (current) {
+      if (current.isDeactivated) {
+        return;
+      }
+      current = current.parent;
+    }
+    return hook();
+  });
+  injectHook(type, wrappedHook, target);
+  if (target) {
+    let current = target.parent;
+    while (current && current.parent) {
+      if (isKeepAlive(current.parent.vnode)) {
+        injectToKeepAliveRoot(wrappedHook, type, target, current);
+      }
+      current = current.parent;
+    }
+  }
+}
+function injectToKeepAliveRoot(hook, type, target, keepAliveRoot) {
+  const injected = injectHook(
+    type,
+    hook,
+    keepAliveRoot,
+    true
+    /* prepend */
+  );
+  onUnmounted(() => {
+    remove(keepAliveRoot[type], injected);
+  }, target);
+}
+function injectHook(type, hook, target = currentInstance, prepend = false) {
+  if (target) {
+    const hooks = target[type] || (target[type] = []);
+    const wrappedHook = hook.__weh || (hook.__weh = (...args) => {
+      if (target.isUnmounted) {
+        return;
+      }
+      pauseTracking();
+      const reset = setCurrentInstance(target);
+      const res = callWithAsyncErrorHandling(hook, target, type, args);
+      reset();
+      resetTracking();
+      return res;
+    });
+    if (prepend) {
+      hooks.unshift(wrappedHook);
+    } else {
+      hooks.push(wrappedHook);
+    }
+    return wrappedHook;
+  }
+}
+const createHook = (lifecycle) => (hook, target = currentInstance) => (
+  // post-create lifecycle registrations are noops during SSR (except for serverPrefetch)
+  (!isInSSRComponentSetup || lifecycle === "sp") && injectHook(lifecycle, (...args) => hook(...args), target)
+);
+const onBeforeMount = createHook("bm");
+const onMounted = createHook("m");
+const onBeforeUpdate = createHook("bu");
+const onUpdated = createHook("u");
+const onBeforeUnmount = createHook("bum");
+const onUnmounted = createHook("um");
+const onServerPrefetch = createHook("sp");
+const onRenderTriggered = createHook(
+  "rtg"
+);
+const onRenderTracked = createHook(
+  "rtc"
+);
+function onErrorCaptured(hook, target = currentInstance) {
+  injectHook("ec", hook, target);
+}
+function renderList(source, renderItem, cache, index) {
+  let ret;
+  const cached = cache && cache[index];
+  if (isArray$2(source) || isString$1(source)) {
+    ret = new Array(source.length);
+    for (let i2 = 0, l = source.length; i2 < l; i2++) {
+      ret[i2] = renderItem(source[i2], i2, void 0, cached && cached[i2]);
+    }
+  } else if (typeof source === "number") {
+    ret = new Array(source);
+    for (let i2 = 0; i2 < source; i2++) {
+      ret[i2] = renderItem(i2 + 1, i2, void 0, cached && cached[i2]);
+    }
+  } else if (isObject(source)) {
+    if (source[Symbol.iterator]) {
+      ret = Array.from(
+        source,
+        (item, i2) => renderItem(item, i2, void 0, cached && cached[i2])
+      );
+    } else {
+      const keys = Object.keys(source);
+      ret = new Array(keys.length);
+      for (let i2 = 0, l = keys.length; i2 < l; i2++) {
+        const key = keys[i2];
+        ret[i2] = renderItem(source[key], key, i2, cached && cached[i2]);
+      }
+    }
+  } else {
+    ret = [];
+  }
+  if (cache) {
+    cache[index] = ret;
+  }
+  return ret;
+}
+function renderSlot(slots, name, props = {}, fallback, noSlotted) {
+  if (currentRenderingInstance.isCE || currentRenderingInstance.parent && isAsyncWrapper(currentRenderingInstance.parent) && currentRenderingInstance.parent.isCE) {
+    if (name !== "default")
+      props.name = name;
+    return createVNode("slot", props, fallback && fallback());
+  }
+  let slot = slots[name];
+  if (slot && slot._c) {
+    slot._d = false;
+  }
+  openBlock();
+  const validSlotContent = slot && ensureValidVNode(slot(props));
+  const rendered = createBlock(
+    Fragment,
+    {
+      key: props.key || // slot content array of a dynamic conditional slot may have a branch
+      // key attached in the `createSlots` helper, respect that
+      validSlotContent && validSlotContent.key || `_${name}`
+    },
+    validSlotContent || (fallback ? fallback() : []),
+    validSlotContent && slots._ === 1 ? 64 : -2
+  );
+  if (!noSlotted && rendered.scopeId) {
+    rendered.slotScopeIds = [rendered.scopeId + "-s"];
+  }
+  if (slot && slot._c) {
+    slot._d = true;
+  }
+  return rendered;
+}
+function ensureValidVNode(vnodes) {
+  return vnodes.some((child) => {
+    if (!isVNode(child))
+      return true;
+    if (child.type === Comment)
+      return false;
+    if (child.type === Fragment && !ensureValidVNode(child.children))
+      return false;
+    return true;
+  }) ? vnodes : null;
+}
+const getPublicInstance = (i2) => {
+  if (!i2)
+    return null;
+  if (isStatefulComponent(i2))
+    return getExposeProxy(i2) || i2.proxy;
+  return getPublicInstance(i2.parent);
+};
+const publicPropertiesMap = (
+  // Move PURE marker to new line to workaround compiler discarding it
+  // due to type annotation
+  /* @__PURE__ */ extend$1(/* @__PURE__ */ Object.create(null), {
+    $: (i2) => i2,
+    $el: (i2) => i2.vnode.el,
+    $data: (i2) => i2.data,
+    $props: (i2) => i2.props,
+    $attrs: (i2) => i2.attrs,
+    $slots: (i2) => i2.slots,
+    $refs: (i2) => i2.refs,
+    $parent: (i2) => getPublicInstance(i2.parent),
+    $root: (i2) => getPublicInstance(i2.root),
+    $emit: (i2) => i2.emit,
+    $options: (i2) => resolveMergedOptions(i2),
+    $forceUpdate: (i2) => i2.f || (i2.f = () => {
+      i2.effect.dirty = true;
+      queueJob(i2.update);
+    }),
+    $nextTick: (i2) => i2.n || (i2.n = nextTick.bind(i2.proxy)),
+    $watch: (i2) => instanceWatch.bind(i2)
+  })
+);
+const hasSetupBinding = (state, key) => state !== EMPTY_OBJ && !state.__isScriptSetup && hasOwn(state, key);
+const PublicInstanceProxyHandlers = {
+  get({ _: instance }, key) {
+    const { ctx, setupState, data, props, accessCache, type, appContext } = instance;
+    let normalizedProps;
+    if (key[0] !== "$") {
+      const n = accessCache[key];
+      if (n !== void 0) {
+        switch (n) {
+          case 1:
+            return setupState[key];
+          case 2:
+            return data[key];
+          case 4:
+            return ctx[key];
+          case 3:
+            return props[key];
+        }
+      } else if (hasSetupBinding(setupState, key)) {
+        accessCache[key] = 1;
+        return setupState[key];
+      } else if (data !== EMPTY_OBJ && hasOwn(data, key)) {
+        accessCache[key] = 2;
+        return data[key];
+      } else if (
+        // only cache other properties when instance has declared (thus stable)
+        // props
+        (normalizedProps = instance.propsOptions[0]) && hasOwn(normalizedProps, key)
+      ) {
+        accessCache[key] = 3;
+        return props[key];
+      } else if (ctx !== EMPTY_OBJ && hasOwn(ctx, key)) {
+        accessCache[key] = 4;
+        return ctx[key];
+      } else if (shouldCacheAccess) {
+        accessCache[key] = 0;
+      }
+    }
+    const publicGetter = publicPropertiesMap[key];
+    let cssModule, globalProperties;
+    if (publicGetter) {
+      if (key === "$attrs") {
+        track(instance, "get", key);
+      }
+      return publicGetter(instance);
+    } else if (
+      // css module (injected by vue-loader)
+      (cssModule = type.__cssModules) && (cssModule = cssModule[key])
+    ) {
+      return cssModule;
+    } else if (ctx !== EMPTY_OBJ && hasOwn(ctx, key)) {
+      accessCache[key] = 4;
+      return ctx[key];
+    } else if (
+      // global properties
+      globalProperties = appContext.config.globalProperties, hasOwn(globalProperties, key)
+    ) {
+      {
+        return globalProperties[key];
+      }
+    } else
+      ;
+  },
+  set({ _: instance }, key, value) {
+    const { data, setupState, ctx } = instance;
+    if (hasSetupBinding(setupState, key)) {
+      setupState[key] = value;
+      return true;
+    } else if (data !== EMPTY_OBJ && hasOwn(data, key)) {
+      data[key] = value;
+      return true;
+    } else if (hasOwn(instance.props, key)) {
+      return false;
+    }
+    if (key[0] === "$" && key.slice(1) in instance) {
+      return false;
+    } else {
+      {
+        ctx[key] = value;
+      }
+    }
+    return true;
+  },
+  has({
+    _: { data, setupState, accessCache, ctx, appContext, propsOptions }
+  }, key) {
+    let normalizedProps;
+    return !!accessCache[key] || data !== EMPTY_OBJ && hasOwn(data, key) || hasSetupBinding(setupState, key) || (normalizedProps = propsOptions[0]) && hasOwn(normalizedProps, key) || hasOwn(ctx, key) || hasOwn(publicPropertiesMap, key) || hasOwn(appContext.config.globalProperties, key);
+  },
+  defineProperty(target, key, descriptor) {
+    if (descriptor.get != null) {
+      target._.accessCache[key] = 0;
+    } else if (hasOwn(descriptor, "value")) {
+      this.set(target, key, descriptor.value, null);
+    }
+    return Reflect.defineProperty(target, key, descriptor);
+  }
+};
+function normalizePropsOrEmits(props) {
+  return isArray$2(props) ? props.reduce(
+    (normalized, p2) => (normalized[p2] = null, normalized),
+    {}
+  ) : props;
+}
+let shouldCacheAccess = true;
+function applyOptions(instance) {
+  const options = resolveMergedOptions(instance);
+  const publicThis = instance.proxy;
+  const ctx = instance.ctx;
+  shouldCacheAccess = false;
+  if (options.beforeCreate) {
+    callHook(options.beforeCreate, instance, "bc");
+  }
+  const {
+    // state
+    data: dataOptions,
+    computed: computedOptions,
+    methods,
+    watch: watchOptions,
+    provide: provideOptions,
+    inject: injectOptions,
+    // lifecycle
+    created,
+    beforeMount,
+    mounted,
+    beforeUpdate,
+    updated,
+    activated,
+    deactivated,
+    beforeDestroy,
+    beforeUnmount,
+    destroyed,
+    unmounted,
+    render,
+    renderTracked,
+    renderTriggered,
+    errorCaptured,
+    serverPrefetch,
+    // public API
+    expose,
+    inheritAttrs,
+    // assets
+    components,
+    directives,
+    filters
+  } = options;
+  const checkDuplicateProperties = null;
+  if (injectOptions) {
+    resolveInjections(injectOptions, ctx, checkDuplicateProperties);
+  }
+  if (methods) {
+    for (const key in methods) {
+      const methodHandler = methods[key];
+      if (isFunction$1(methodHandler)) {
+        {
+          ctx[key] = methodHandler.bind(publicThis);
+        }
+      }
+    }
+  }
+  if (dataOptions) {
+    const data = dataOptions.call(publicThis, publicThis);
+    if (!isObject(data))
+      ;
+    else {
+      instance.data = reactive(data);
+    }
+  }
+  shouldCacheAccess = true;
+  if (computedOptions) {
+    for (const key in computedOptions) {
+      const opt = computedOptions[key];
+      const get2 = isFunction$1(opt) ? opt.bind(publicThis, publicThis) : isFunction$1(opt.get) ? opt.get.bind(publicThis, publicThis) : NOOP;
+      const set2 = !isFunction$1(opt) && isFunction$1(opt.set) ? opt.set.bind(publicThis) : NOOP;
+      const c = computed({
+        get: get2,
+        set: set2
+      });
+      Object.defineProperty(ctx, key, {
+        enumerable: true,
+        configurable: true,
+        get: () => c.value,
+        set: (v) => c.value = v
+      });
+    }
+  }
+  if (watchOptions) {
+    for (const key in watchOptions) {
+      createWatcher(watchOptions[key], ctx, publicThis, key);
+    }
+  }
+  if (provideOptions) {
+    const provides = isFunction$1(provideOptions) ? provideOptions.call(publicThis) : provideOptions;
+    Reflect.ownKeys(provides).forEach((key) => {
+      provide(key, provides[key]);
+    });
+  }
+  if (created) {
+    callHook(created, instance, "c");
+  }
+  function registerLifecycleHook(register, hook) {
+    if (isArray$2(hook)) {
+      hook.forEach((_hook) => register(_hook.bind(publicThis)));
+    } else if (hook) {
+      register(hook.bind(publicThis));
+    }
+  }
+  registerLifecycleHook(onBeforeMount, beforeMount);
+  registerLifecycleHook(onMounted, mounted);
+  registerLifecycleHook(onBeforeUpdate, beforeUpdate);
+  registerLifecycleHook(onUpdated, updated);
+  registerLifecycleHook(onActivated, activated);
+  registerLifecycleHook(onDeactivated, deactivated);
+  registerLifecycleHook(onErrorCaptured, errorCaptured);
+  registerLifecycleHook(onRenderTracked, renderTracked);
+  registerLifecycleHook(onRenderTriggered, renderTriggered);
+  registerLifecycleHook(onBeforeUnmount, beforeUnmount);
+  registerLifecycleHook(onUnmounted, unmounted);
+  registerLifecycleHook(onServerPrefetch, serverPrefetch);
+  if (isArray$2(expose)) {
+    if (expose.length) {
+      const exposed = instance.exposed || (instance.exposed = {});
+      expose.forEach((key) => {
+        Object.defineProperty(exposed, key, {
+          get: () => publicThis[key],
+          set: (val) => publicThis[key] = val
+        });
+      });
+    } else if (!instance.exposed) {
+      instance.exposed = {};
+    }
+  }
+  if (render && instance.render === NOOP) {
+    instance.render = render;
+  }
+  if (inheritAttrs != null) {
+    instance.inheritAttrs = inheritAttrs;
+  }
+  if (components)
+    instance.components = components;
+  if (directives)
+    instance.directives = directives;
+}
+function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) {
+  if (isArray$2(injectOptions)) {
+    injectOptions = normalizeInject(injectOptions);
+  }
+  for (const key in injectOptions) {
+    const opt = injectOptions[key];
+    let injected;
+    if (isObject(opt)) {
+      if ("default" in opt) {
+        injected = inject(
+          opt.from || key,
+          opt.default,
+          true
+        );
+      } else {
+        injected = inject(opt.from || key);
+      }
+    } else {
+      injected = inject(opt);
+    }
+    if (isRef(injected)) {
+      Object.defineProperty(ctx, key, {
+        enumerable: true,
+        configurable: true,
+        get: () => injected.value,
+        set: (v) => injected.value = v
+      });
+    } else {
+      ctx[key] = injected;
+    }
+  }
+}
+function callHook(hook, instance, type) {
+  callWithAsyncErrorHandling(
+    isArray$2(hook) ? hook.map((h2) => h2.bind(instance.proxy)) : hook.bind(instance.proxy),
+    instance,
+    type
+  );
+}
+function createWatcher(raw, ctx, publicThis, key) {
+  const getter = key.includes(".") ? createPathGetter(publicThis, key) : () => publicThis[key];
+  if (isString$1(raw)) {
+    const handler = ctx[raw];
+    if (isFunction$1(handler)) {
+      watch(getter, handler);
+    }
+  } else if (isFunction$1(raw)) {
+    watch(getter, raw.bind(publicThis));
+  } else if (isObject(raw)) {
+    if (isArray$2(raw)) {
+      raw.forEach((r) => createWatcher(r, ctx, publicThis, key));
+    } else {
+      const handler = isFunction$1(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
+      if (isFunction$1(handler)) {
+        watch(getter, handler, raw);
+      }
+    }
+  } else
+    ;
+}
+function resolveMergedOptions(instance) {
+  const base = instance.type;
+  const { mixins, extends: extendsOptions } = base;
+  const {
+    mixins: globalMixins,
+    optionsCache: cache,
+    config: { optionMergeStrategies }
+  } = instance.appContext;
+  const cached = cache.get(base);
+  let resolved;
+  if (cached) {
+    resolved = cached;
+  } else if (!globalMixins.length && !mixins && !extendsOptions) {
+    {
+      resolved = base;
+    }
+  } else {
+    resolved = {};
+    if (globalMixins.length) {
+      globalMixins.forEach(
+        (m) => mergeOptions$1(resolved, m, optionMergeStrategies, true)
+      );
+    }
+    mergeOptions$1(resolved, base, optionMergeStrategies);
+  }
+  if (isObject(base)) {
+    cache.set(base, resolved);
+  }
+  return resolved;
+}
+function mergeOptions$1(to, from, strats, asMixin = false) {
+  const { mixins, extends: extendsOptions } = from;
+  if (extendsOptions) {
+    mergeOptions$1(to, extendsOptions, strats, true);
+  }
+  if (mixins) {
+    mixins.forEach(
+      (m) => mergeOptions$1(to, m, strats, true)
+    );
+  }
+  for (const key in from) {
+    if (asMixin && key === "expose")
+      ;
+    else {
+      const strat = internalOptionMergeStrats[key] || strats && strats[key];
+      to[key] = strat ? strat(to[key], from[key]) : from[key];
+    }
+  }
+  return to;
+}
+const internalOptionMergeStrats = {
+  data: mergeDataFn,
+  props: mergeEmitsOrPropsOptions,
+  emits: mergeEmitsOrPropsOptions,
+  // objects
+  methods: mergeObjectOptions,
+  computed: mergeObjectOptions,
+  // lifecycle
+  beforeCreate: mergeAsArray,
+  created: mergeAsArray,
+  beforeMount: mergeAsArray,
+  mounted: mergeAsArray,
+  beforeUpdate: mergeAsArray,
+  updated: mergeAsArray,
+  beforeDestroy: mergeAsArray,
+  beforeUnmount: mergeAsArray,
+  destroyed: mergeAsArray,
+  unmounted: mergeAsArray,
+  activated: mergeAsArray,
+  deactivated: mergeAsArray,
+  errorCaptured: mergeAsArray,
+  serverPrefetch: mergeAsArray,
+  // assets
+  components: mergeObjectOptions,
+  directives: mergeObjectOptions,
+  // watch
+  watch: mergeWatchOptions,
+  // provide / inject
+  provide: mergeDataFn,
+  inject: mergeInject
+};
+function mergeDataFn(to, from) {
+  if (!from) {
+    return to;
+  }
+  if (!to) {
+    return from;
+  }
+  return function mergedDataFn() {
+    return extend$1(
+      isFunction$1(to) ? to.call(this, this) : to,
+      isFunction$1(from) ? from.call(this, this) : from
+    );
+  };
+}
+function mergeInject(to, from) {
+  return mergeObjectOptions(normalizeInject(to), normalizeInject(from));
+}
+function normalizeInject(raw) {
+  if (isArray$2(raw)) {
+    const res = {};
+    for (let i2 = 0; i2 < raw.length; i2++) {
+      res[raw[i2]] = raw[i2];
+    }
+    return res;
+  }
+  return raw;
+}
+function mergeAsArray(to, from) {
+  return to ? [...new Set([].concat(to, from))] : from;
+}
+function mergeObjectOptions(to, from) {
+  return to ? extend$1(/* @__PURE__ */ Object.create(null), to, from) : from;
+}
+function mergeEmitsOrPropsOptions(to, from) {
+  if (to) {
+    if (isArray$2(to) && isArray$2(from)) {
+      return [.../* @__PURE__ */ new Set([...to, ...from])];
+    }
+    return extend$1(
+      /* @__PURE__ */ Object.create(null),
+      normalizePropsOrEmits(to),
+      normalizePropsOrEmits(from != null ? from : {})
+    );
+  } else {
+    return from;
+  }
+}
+function mergeWatchOptions(to, from) {
+  if (!to)
+    return from;
+  if (!from)
+    return to;
+  const merged = extend$1(/* @__PURE__ */ Object.create(null), to);
+  for (const key in from) {
+    merged[key] = mergeAsArray(to[key], from[key]);
+  }
+  return merged;
+}
+function createAppContext() {
+  return {
+    app: null,
+    config: {
+      isNativeTag: NO,
+      performance: false,
+      globalProperties: {},
+      optionMergeStrategies: {},
+      errorHandler: void 0,
+      warnHandler: void 0,
+      compilerOptions: {}
+    },
+    mixins: [],
+    components: {},
+    directives: {},
+    provides: /* @__PURE__ */ Object.create(null),
+    optionsCache: /* @__PURE__ */ new WeakMap(),
+    propsCache: /* @__PURE__ */ new WeakMap(),
+    emitsCache: /* @__PURE__ */ new WeakMap()
+  };
+}
+let uid$1 = 0;
+function createAppAPI(render, hydrate) {
+  return function createApp2(rootComponent, rootProps = null) {
+    if (!isFunction$1(rootComponent)) {
+      rootComponent = extend$1({}, rootComponent);
+    }
+    if (rootProps != null && !isObject(rootProps)) {
+      rootProps = null;
+    }
+    const context = createAppContext();
+    const installedPlugins = /* @__PURE__ */ new WeakSet();
+    let isMounted = false;
+    const app2 = context.app = {
+      _uid: uid$1++,
+      _component: rootComponent,
+      _props: rootProps,
+      _container: null,
+      _context: context,
+      _instance: null,
+      version,
+      get config() {
+        return context.config;
+      },
+      set config(v) {
+      },
+      use(plugin, ...options) {
+        if (installedPlugins.has(plugin))
+          ;
+        else if (plugin && isFunction$1(plugin.install)) {
+          installedPlugins.add(plugin);
+          plugin.install(app2, ...options);
+        } else if (isFunction$1(plugin)) {
+          installedPlugins.add(plugin);
+          plugin(app2, ...options);
+        } else
+          ;
+        return app2;
+      },
+      mixin(mixin) {
+        {
+          if (!context.mixins.includes(mixin)) {
+            context.mixins.push(mixin);
+          }
+        }
+        return app2;
+      },
+      component(name, component) {
+        if (!component) {
+          return context.components[name];
+        }
+        context.components[name] = component;
+        return app2;
+      },
+      directive(name, directive) {
+        if (!directive) {
+          return context.directives[name];
+        }
+        context.directives[name] = directive;
+        return app2;
+      },
+      mount(rootContainer, isHydrate, namespace) {
+        if (!isMounted) {
+          const vnode = createVNode(rootComponent, rootProps);
+          vnode.appContext = context;
+          if (namespace === true) {
+            namespace = "svg";
+          } else if (namespace === false) {
+            namespace = void 0;
+          }
+          if (isHydrate && hydrate) {
+            hydrate(vnode, rootContainer);
+          } else {
+            render(vnode, rootContainer, namespace);
+          }
+          isMounted = true;
+          app2._container = rootContainer;
+          rootContainer.__vue_app__ = app2;
+          return getExposeProxy(vnode.component) || vnode.component.proxy;
+        }
+      },
+      unmount() {
+        if (isMounted) {
+          render(null, app2._container);
+          delete app2._container.__vue_app__;
+        }
+      },
+      provide(key, value) {
+        context.provides[key] = value;
+        return app2;
+      },
+      runWithContext(fn) {
+        const lastApp = currentApp;
+        currentApp = app2;
+        try {
+          return fn();
+        } finally {
+          currentApp = lastApp;
+        }
+      }
+    };
+    return app2;
+  };
+}
+let currentApp = null;
+function provide(key, value) {
+  if (!currentInstance)
+    ;
+  else {
+    let provides = currentInstance.provides;
+    const parentProvides = currentInstance.parent && currentInstance.parent.provides;
+    if (parentProvides === provides) {
+      provides = currentInstance.provides = Object.create(parentProvides);
+    }
+    provides[key] = value;
+  }
+}
+function inject(key, defaultValue, treatDefaultAsFactory = false) {
+  const instance = currentInstance || currentRenderingInstance;
+  if (instance || currentApp) {
+    const provides = instance ? instance.parent == null ? instance.vnode.appContext && instance.vnode.appContext.provides : instance.parent.provides : currentApp._context.provides;
+    if (provides && key in provides) {
+      return provides[key];
+    } else if (arguments.length > 1) {
+      return treatDefaultAsFactory && isFunction$1(defaultValue) ? defaultValue.call(instance && instance.proxy) : defaultValue;
+    } else
+      ;
+  }
+}
+function hasInjectionContext() {
+  return !!(currentInstance || currentRenderingInstance || currentApp);
+}
+function initProps(instance, rawProps, isStateful, isSSR = false) {
+  const props = {};
+  const attrs = {};
+  def(attrs, InternalObjectKey, 1);
+  instance.propsDefaults = /* @__PURE__ */ Object.create(null);
+  setFullProps(instance, rawProps, props, attrs);
+  for (const key in instance.propsOptions[0]) {
+    if (!(key in props)) {
+      props[key] = void 0;
+    }
+  }
+  if (isStateful) {
+    instance.props = isSSR ? props : shallowReactive(props);
+  } else {
+    if (!instance.type.props) {
+      instance.props = attrs;
+    } else {
+      instance.props = props;
+    }
+  }
+  instance.attrs = attrs;
+}
+function updateProps(instance, rawProps, rawPrevProps, optimized) {
+  const {
+    props,
+    attrs,
+    vnode: { patchFlag }
+  } = instance;
+  const rawCurrentProps = toRaw(props);
+  const [options] = instance.propsOptions;
+  let hasAttrsChanged = false;
+  if (
+    // always force full diff in dev
+    // - #1942 if hmr is enabled with sfc component
+    // - vite#872 non-sfc component used by sfc component
+    (optimized || patchFlag > 0) && !(patchFlag & 16)
+  ) {
+    if (patchFlag & 8) {
+      const propsToUpdate = instance.vnode.dynamicProps;
+      for (let i2 = 0; i2 < propsToUpdate.length; i2++) {
+        let key = propsToUpdate[i2];
+        if (isEmitListener(instance.emitsOptions, key)) {
+          continue;
+        }
+        const value = rawProps[key];
+        if (options) {
+          if (hasOwn(attrs, key)) {
+            if (value !== attrs[key]) {
+              attrs[key] = value;
+              hasAttrsChanged = true;
+            }
+          } else {
+            const camelizedKey = camelize(key);
+            props[camelizedKey] = resolvePropValue(
+              options,
+              rawCurrentProps,
+              camelizedKey,
+              value,
+              instance,
+              false
+            );
+          }
+        } else {
+          if (value !== attrs[key]) {
+            attrs[key] = value;
+            hasAttrsChanged = true;
+          }
+        }
+      }
+    }
+  } else {
+    if (setFullProps(instance, rawProps, props, attrs)) {
+      hasAttrsChanged = true;
+    }
+    let kebabKey;
+    for (const key in rawCurrentProps) {
+      if (!rawProps || // for camelCase
+      !hasOwn(rawProps, key) && // it's possible the original props was passed in as kebab-case
+      // and converted to camelCase (#955)
+      ((kebabKey = hyphenate$1(key)) === key || !hasOwn(rawProps, kebabKey))) {
+        if (options) {
+          if (rawPrevProps && // for camelCase
+          (rawPrevProps[key] !== void 0 || // for kebab-case
+          rawPrevProps[kebabKey] !== void 0)) {
+            props[key] = resolvePropValue(
+              options,
+              rawCurrentProps,
+              key,
+              void 0,
+              instance,
+              true
+            );
+          }
+        } else {
+          delete props[key];
+        }
+      }
+    }
+    if (attrs !== rawCurrentProps) {
+      for (const key in attrs) {
+        if (!rawProps || !hasOwn(rawProps, key) && true) {
+          delete attrs[key];
+          hasAttrsChanged = true;
+        }
+      }
+    }
+  }
+  if (hasAttrsChanged) {
+    trigger(instance, "set", "$attrs");
+  }
+}
+function setFullProps(instance, rawProps, props, attrs) {
+  const [options, needCastKeys] = instance.propsOptions;
+  let hasAttrsChanged = false;
+  let rawCastValues;
+  if (rawProps) {
+    for (let key in rawProps) {
+      if (isReservedProp(key)) {
+        continue;
+      }
+      const value = rawProps[key];
+      let camelKey;
+      if (options && hasOwn(options, camelKey = camelize(key))) {
+        if (!needCastKeys || !needCastKeys.includes(camelKey)) {
+          props[camelKey] = value;
+        } else {
+          (rawCastValues || (rawCastValues = {}))[camelKey] = value;
+        }
+      } else if (!isEmitListener(instance.emitsOptions, key)) {
+        if (!(key in attrs) || value !== attrs[key]) {
+          attrs[key] = value;
+          hasAttrsChanged = true;
+        }
+      }
+    }
+  }
+  if (needCastKeys) {
+    const rawCurrentProps = toRaw(props);
+    const castValues = rawCastValues || EMPTY_OBJ;
+    for (let i2 = 0; i2 < needCastKeys.length; i2++) {
+      const key = needCastKeys[i2];
+      props[key] = resolvePropValue(
+        options,
+        rawCurrentProps,
+        key,
+        castValues[key],
+        instance,
+        !hasOwn(castValues, key)
+      );
+    }
+  }
+  return hasAttrsChanged;
+}
+function resolvePropValue(options, props, key, value, instance, isAbsent) {
+  const opt = options[key];
+  if (opt != null) {
+    const hasDefault = hasOwn(opt, "default");
+    if (hasDefault && value === void 0) {
+      const defaultValue = opt.default;
+      if (opt.type !== Function && !opt.skipFactory && isFunction$1(defaultValue)) {
+        const { propsDefaults } = instance;
+        if (key in propsDefaults) {
+          value = propsDefaults[key];
+        } else {
+          const reset = setCurrentInstance(instance);
+          value = propsDefaults[key] = defaultValue.call(
+            null,
+            props
+          );
+          reset();
+        }
+      } else {
+        value = defaultValue;
+      }
+    }
+    if (opt[
+      0
+      /* shouldCast */
+    ]) {
+      if (isAbsent && !hasDefault) {
+        value = false;
+      } else if (opt[
+        1
+        /* shouldCastTrue */
+      ] && (value === "" || value === hyphenate$1(key))) {
+        value = true;
+      }
+    }
+  }
+  return value;
+}
+function normalizePropsOptions(comp, appContext, asMixin = false) {
+  const cache = appContext.propsCache;
+  const cached = cache.get(comp);
+  if (cached) {
+    return cached;
+  }
+  const raw = comp.props;
+  const normalized = {};
+  const needCastKeys = [];
+  let hasExtends = false;
+  if (!isFunction$1(comp)) {
+    const extendProps = (raw2) => {
+      hasExtends = true;
+      const [props, keys] = normalizePropsOptions(raw2, appContext, true);
+      extend$1(normalized, props);
+      if (keys)
+        needCastKeys.push(...keys);
+    };
+    if (!asMixin && appContext.mixins.length) {
+      appContext.mixins.forEach(extendProps);
+    }
+    if (comp.extends) {
+      extendProps(comp.extends);
+    }
+    if (comp.mixins) {
+      comp.mixins.forEach(extendProps);
+    }
+  }
+  if (!raw && !hasExtends) {
+    if (isObject(comp)) {
+      cache.set(comp, EMPTY_ARR);
+    }
+    return EMPTY_ARR;
+  }
+  if (isArray$2(raw)) {
+    for (let i2 = 0; i2 < raw.length; i2++) {
+      const normalizedKey = camelize(raw[i2]);
+      if (validatePropName(normalizedKey)) {
+        normalized[normalizedKey] = EMPTY_OBJ;
+      }
+    }
+  } else if (raw) {
+    for (const key in raw) {
+      const normalizedKey = camelize(key);
+      if (validatePropName(normalizedKey)) {
+        const opt = raw[key];
+        const prop = normalized[normalizedKey] = isArray$2(opt) || isFunction$1(opt) ? { type: opt } : extend$1({}, opt);
+        if (prop) {
+          const booleanIndex = getTypeIndex(Boolean, prop.type);
+          const stringIndex = getTypeIndex(String, prop.type);
+          prop[
+            0
+            /* shouldCast */
+          ] = booleanIndex > -1;
+          prop[
+            1
+            /* shouldCastTrue */
+          ] = stringIndex < 0 || booleanIndex < stringIndex;
+          if (booleanIndex > -1 || hasOwn(prop, "default")) {
+            needCastKeys.push(normalizedKey);
+          }
+        }
+      }
+    }
+  }
+  const res = [normalized, needCastKeys];
+  if (isObject(comp)) {
+    cache.set(comp, res);
+  }
+  return res;
+}
+function validatePropName(key) {
+  if (key[0] !== "$" && !isReservedProp(key)) {
+    return true;
+  }
+  return false;
+}
+function getType(ctor) {
+  if (ctor === null) {
+    return "null";
+  }
+  if (typeof ctor === "function") {
+    return ctor.name || "";
+  } else if (typeof ctor === "object") {
+    const name = ctor.constructor && ctor.constructor.name;
+    return name || "";
+  }
+  return "";
+}
+function isSameType(a, b) {
+  return getType(a) === getType(b);
+}
+function getTypeIndex(type, expectedTypes) {
+  if (isArray$2(expectedTypes)) {
+    return expectedTypes.findIndex((t) => isSameType(t, type));
+  } else if (isFunction$1(expectedTypes)) {
+    return isSameType(expectedTypes, type) ? 0 : -1;
+  }
+  return -1;
+}
+const isInternalKey = (key) => key[0] === "_" || key === "$stable";
+const normalizeSlotValue = (value) => isArray$2(value) ? value.map(normalizeVNode) : [normalizeVNode(value)];
+const normalizeSlot$1 = (key, rawSlot, ctx) => {
+  if (rawSlot._n) {
+    return rawSlot;
+  }
+  const normalized = withCtx((...args) => {
+    if (false)
+      ;
+    return normalizeSlotValue(rawSlot(...args));
+  }, ctx);
+  normalized._c = false;
+  return normalized;
+};
+const normalizeObjectSlots = (rawSlots, slots, instance) => {
+  const ctx = rawSlots._ctx;
+  for (const key in rawSlots) {
+    if (isInternalKey(key))
+      continue;
+    const value = rawSlots[key];
+    if (isFunction$1(value)) {
+      slots[key] = normalizeSlot$1(key, value, ctx);
+    } else if (value != null) {
+      const normalized = normalizeSlotValue(value);
+      slots[key] = () => normalized;
+    }
+  }
+};
+const normalizeVNodeSlots = (instance, children) => {
+  const normalized = normalizeSlotValue(children);
+  instance.slots.default = () => normalized;
+};
+const initSlots = (instance, children) => {
+  if (instance.vnode.shapeFlag & 32) {
+    const type = children._;
+    if (type) {
+      instance.slots = toRaw(children);
+      def(children, "_", type);
+    } else {
+      normalizeObjectSlots(
+        children,
+        instance.slots = {}
+      );
+    }
+  } else {
+    instance.slots = {};
+    if (children) {
+      normalizeVNodeSlots(instance, children);
+    }
+  }
+  def(instance.slots, InternalObjectKey, 1);
+};
+const updateSlots = (instance, children, optimized) => {
+  const { vnode, slots } = instance;
+  let needDeletionCheck = true;
+  let deletionComparisonTarget = EMPTY_OBJ;
+  if (vnode.shapeFlag & 32) {
+    const type = children._;
+    if (type) {
+      if (optimized && type === 1) {
+        needDeletionCheck = false;
+      } else {
+        extend$1(slots, children);
+        if (!optimized && type === 1) {
+          delete slots._;
+        }
+      }
+    } else {
+      needDeletionCheck = !children.$stable;
+      normalizeObjectSlots(children, slots);
+    }
+    deletionComparisonTarget = children;
+  } else if (children) {
+    normalizeVNodeSlots(instance, children);
+    deletionComparisonTarget = { default: 1 };
+  }
+  if (needDeletionCheck) {
+    for (const key in slots) {
+      if (!isInternalKey(key) && deletionComparisonTarget[key] == null) {
+        delete slots[key];
+      }
+    }
+  }
+};
+function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
+  if (isArray$2(rawRef)) {
+    rawRef.forEach(
+      (r, i2) => setRef(
+        r,
+        oldRawRef && (isArray$2(oldRawRef) ? oldRawRef[i2] : oldRawRef),
+        parentSuspense,
+        vnode,
+        isUnmount
+      )
+    );
+    return;
+  }
+  if (isAsyncWrapper(vnode) && !isUnmount) {
+    return;
+  }
+  const refValue = vnode.shapeFlag & 4 ? getExposeProxy(vnode.component) || vnode.component.proxy : vnode.el;
+  const value = isUnmount ? null : refValue;
+  const { i: owner, r: ref2 } = rawRef;
+  const oldRef = oldRawRef && oldRawRef.r;
+  const refs = owner.refs === EMPTY_OBJ ? owner.refs = {} : owner.refs;
+  const setupState = owner.setupState;
+  if (oldRef != null && oldRef !== ref2) {
+    if (isString$1(oldRef)) {
+      refs[oldRef] = null;
+      if (hasOwn(setupState, oldRef)) {
+        setupState[oldRef] = null;
+      }
+    } else if (isRef(oldRef)) {
+      oldRef.value = null;
+    }
+  }
+  if (isFunction$1(ref2)) {
+    callWithErrorHandling(ref2, owner, 12, [value, refs]);
+  } else {
+    const _isString = isString$1(ref2);
+    const _isRef = isRef(ref2);
+    if (_isString || _isRef) {
+      const doSet = () => {
+        if (rawRef.f) {
+          const existing = _isString ? hasOwn(setupState, ref2) ? setupState[ref2] : refs[ref2] : ref2.value;
+          if (isUnmount) {
+            isArray$2(existing) && remove(existing, refValue);
+          } else {
+            if (!isArray$2(existing)) {
+              if (_isString) {
+                refs[ref2] = [refValue];
+                if (hasOwn(setupState, ref2)) {
+                  setupState[ref2] = refs[ref2];
+                }
+              } else {
+                ref2.value = [refValue];
+                if (rawRef.k)
+                  refs[rawRef.k] = ref2.value;
+              }
+            } else if (!existing.includes(refValue)) {
+              existing.push(refValue);
+            }
+          }
+        } else if (_isString) {
+          refs[ref2] = value;
+          if (hasOwn(setupState, ref2)) {
+            setupState[ref2] = value;
+          }
+        } else if (_isRef) {
+          ref2.value = value;
+          if (rawRef.k)
+            refs[rawRef.k] = value;
+        } else
+          ;
+      };
+      if (value) {
+        doSet.id = -1;
+        queuePostRenderEffect(doSet, parentSuspense);
+      } else {
+        doSet();
+      }
+    }
+  }
+}
+const queuePostRenderEffect = queueEffectWithSuspense;
+function createRenderer(options) {
+  return baseCreateRenderer(options);
+}
+function baseCreateRenderer(options, createHydrationFns) {
+  const target = getGlobalThis();
+  target.__VUE__ = true;
+  const {
+    insert: hostInsert,
+    remove: hostRemove,
+    patchProp: hostPatchProp,
+    createElement: hostCreateElement,
+    createText: hostCreateText,
+    createComment: hostCreateComment,
+    setText: hostSetText,
+    setElementText: hostSetElementText,
+    parentNode: hostParentNode,
+    nextSibling: hostNextSibling,
+    setScopeId: hostSetScopeId = NOOP,
+    insertStaticContent: hostInsertStaticContent
+  } = options;
+  const patch = (n1, n2, container, anchor = null, parentComponent = null, parentSuspense = null, namespace = void 0, slotScopeIds = null, optimized = !!n2.dynamicChildren) => {
+    if (n1 === n2) {
+      return;
+    }
+    if (n1 && !isSameVNodeType(n1, n2)) {
+      anchor = getNextHostNode(n1);
+      unmount(n1, parentComponent, parentSuspense, true);
+      n1 = null;
+    }
+    if (n2.patchFlag === -2) {
+      optimized = false;
+      n2.dynamicChildren = null;
+    }
+    const { type, ref: ref2, shapeFlag } = n2;
+    switch (type) {
+      case Text:
+        processText(n1, n2, container, anchor);
+        break;
+      case Comment:
+        processCommentNode(n1, n2, container, anchor);
+        break;
+      case Static:
+        if (n1 == null) {
+          mountStaticNode(n2, container, anchor, namespace);
+        }
+        break;
+      case Fragment:
+        processFragment(
+          n1,
+          n2,
+          container,
+          anchor,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          optimized
+        );
+        break;
+      default:
+        if (shapeFlag & 1) {
+          processElement(
+            n1,
+            n2,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+        } else if (shapeFlag & 6) {
+          processComponent(
+            n1,
+            n2,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+        } else if (shapeFlag & 64) {
+          type.process(
+            n1,
+            n2,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized,
+            internals
+          );
+        } else if (shapeFlag & 128) {
+          type.process(
+            n1,
+            n2,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized,
+            internals
+          );
+        } else
+          ;
+    }
+    if (ref2 != null && parentComponent) {
+      setRef(ref2, n1 && n1.ref, parentSuspense, n2 || n1, !n2);
+    }
+  };
+  const processText = (n1, n2, container, anchor) => {
+    if (n1 == null) {
+      hostInsert(
+        n2.el = hostCreateText(n2.children),
+        container,
+        anchor
+      );
+    } else {
+      const el = n2.el = n1.el;
+      if (n2.children !== n1.children) {
+        hostSetText(el, n2.children);
+      }
+    }
+  };
+  const processCommentNode = (n1, n2, container, anchor) => {
+    if (n1 == null) {
+      hostInsert(
+        n2.el = hostCreateComment(n2.children || ""),
+        container,
+        anchor
+      );
+    } else {
+      n2.el = n1.el;
+    }
+  };
+  const mountStaticNode = (n2, container, anchor, namespace) => {
+    [n2.el, n2.anchor] = hostInsertStaticContent(
+      n2.children,
+      container,
+      anchor,
+      namespace,
+      n2.el,
+      n2.anchor
+    );
+  };
+  const moveStaticNode = ({ el, anchor }, container, nextSibling) => {
+    let next;
+    while (el && el !== anchor) {
+      next = hostNextSibling(el);
+      hostInsert(el, container, nextSibling);
+      el = next;
+    }
+    hostInsert(anchor, container, nextSibling);
+  };
+  const removeStaticNode = ({ el, anchor }) => {
+    let next;
+    while (el && el !== anchor) {
+      next = hostNextSibling(el);
+      hostRemove(el);
+      el = next;
+    }
+    hostRemove(anchor);
+  };
+  const processElement = (n1, n2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    if (n2.type === "svg") {
+      namespace = "svg";
+    } else if (n2.type === "math") {
+      namespace = "mathml";
+    }
+    if (n1 == null) {
+      mountElement(
+        n2,
+        container,
+        anchor,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized
+      );
+    } else {
+      patchElement(
+        n1,
+        n2,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized
+      );
+    }
+  };
+  const mountElement = (vnode, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    let el;
+    let vnodeHook;
+    const { props, shapeFlag, transition, dirs } = vnode;
+    el = vnode.el = hostCreateElement(
+      vnode.type,
+      namespace,
+      props && props.is,
+      props
+    );
+    if (shapeFlag & 8) {
+      hostSetElementText(el, vnode.children);
+    } else if (shapeFlag & 16) {
+      mountChildren(
+        vnode.children,
+        el,
+        null,
+        parentComponent,
+        parentSuspense,
+        resolveChildrenNamespace(vnode, namespace),
+        slotScopeIds,
+        optimized
+      );
+    }
+    if (dirs) {
+      invokeDirectiveHook(vnode, null, parentComponent, "created");
+    }
+    setScopeId(el, vnode, vnode.scopeId, slotScopeIds, parentComponent);
+    if (props) {
+      for (const key in props) {
+        if (key !== "value" && !isReservedProp(key)) {
+          hostPatchProp(
+            el,
+            key,
+            null,
+            props[key],
+            namespace,
+            vnode.children,
+            parentComponent,
+            parentSuspense,
+            unmountChildren
+          );
+        }
+      }
+      if ("value" in props) {
+        hostPatchProp(el, "value", null, props.value, namespace);
+      }
+      if (vnodeHook = props.onVnodeBeforeMount) {
+        invokeVNodeHook(vnodeHook, parentComponent, vnode);
+      }
+    }
+    if (dirs) {
+      invokeDirectiveHook(vnode, null, parentComponent, "beforeMount");
+    }
+    const needCallTransitionHooks = needTransition(parentSuspense, transition);
+    if (needCallTransitionHooks) {
+      transition.beforeEnter(el);
+    }
+    hostInsert(el, container, anchor);
+    if ((vnodeHook = props && props.onVnodeMounted) || needCallTransitionHooks || dirs) {
+      queuePostRenderEffect(() => {
+        vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, vnode);
+        needCallTransitionHooks && transition.enter(el);
+        dirs && invokeDirectiveHook(vnode, null, parentComponent, "mounted");
+      }, parentSuspense);
+    }
+  };
+  const setScopeId = (el, vnode, scopeId, slotScopeIds, parentComponent) => {
+    if (scopeId) {
+      hostSetScopeId(el, scopeId);
+    }
+    if (slotScopeIds) {
+      for (let i2 = 0; i2 < slotScopeIds.length; i2++) {
+        hostSetScopeId(el, slotScopeIds[i2]);
+      }
+    }
+    if (parentComponent) {
+      let subTree = parentComponent.subTree;
+      if (vnode === subTree) {
+        const parentVNode = parentComponent.vnode;
+        setScopeId(
+          el,
+          parentVNode,
+          parentVNode.scopeId,
+          parentVNode.slotScopeIds,
+          parentComponent.parent
+        );
+      }
+    }
+  };
+  const mountChildren = (children, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized, start = 0) => {
+    for (let i2 = start; i2 < children.length; i2++) {
+      const child = children[i2] = optimized ? cloneIfMounted(children[i2]) : normalizeVNode(children[i2]);
+      patch(
+        null,
+        child,
+        container,
+        anchor,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized
+      );
+    }
+  };
+  const patchElement = (n1, n2, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    const el = n2.el = n1.el;
+    let { patchFlag, dynamicChildren, dirs } = n2;
+    patchFlag |= n1.patchFlag & 16;
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+    let vnodeHook;
+    parentComponent && toggleRecurse(parentComponent, false);
+    if (vnodeHook = newProps.onVnodeBeforeUpdate) {
+      invokeVNodeHook(vnodeHook, parentComponent, n2, n1);
+    }
+    if (dirs) {
+      invokeDirectiveHook(n2, n1, parentComponent, "beforeUpdate");
+    }
+    parentComponent && toggleRecurse(parentComponent, true);
+    if (dynamicChildren) {
+      patchBlockChildren(
+        n1.dynamicChildren,
+        dynamicChildren,
+        el,
+        parentComponent,
+        parentSuspense,
+        resolveChildrenNamespace(n2, namespace),
+        slotScopeIds
+      );
+    } else if (!optimized) {
+      patchChildren(
+        n1,
+        n2,
+        el,
+        null,
+        parentComponent,
+        parentSuspense,
+        resolveChildrenNamespace(n2, namespace),
+        slotScopeIds,
+        false
+      );
+    }
+    if (patchFlag > 0) {
+      if (patchFlag & 16) {
+        patchProps(
+          el,
+          n2,
+          oldProps,
+          newProps,
+          parentComponent,
+          parentSuspense,
+          namespace
+        );
+      } else {
+        if (patchFlag & 2) {
+          if (oldProps.class !== newProps.class) {
+            hostPatchProp(el, "class", null, newProps.class, namespace);
+          }
+        }
+        if (patchFlag & 4) {
+          hostPatchProp(el, "style", oldProps.style, newProps.style, namespace);
+        }
+        if (patchFlag & 8) {
+          const propsToUpdate = n2.dynamicProps;
+          for (let i2 = 0; i2 < propsToUpdate.length; i2++) {
+            const key = propsToUpdate[i2];
+            const prev = oldProps[key];
+            const next = newProps[key];
+            if (next !== prev || key === "value") {
+              hostPatchProp(
+                el,
+                key,
+                prev,
+                next,
+                namespace,
+                n1.children,
+                parentComponent,
+                parentSuspense,
+                unmountChildren
+              );
+            }
+          }
+        }
+      }
+      if (patchFlag & 1) {
+        if (n1.children !== n2.children) {
+          hostSetElementText(el, n2.children);
+        }
+      }
+    } else if (!optimized && dynamicChildren == null) {
+      patchProps(
+        el,
+        n2,
+        oldProps,
+        newProps,
+        parentComponent,
+        parentSuspense,
+        namespace
+      );
+    }
+    if ((vnodeHook = newProps.onVnodeUpdated) || dirs) {
+      queuePostRenderEffect(() => {
+        vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, n2, n1);
+        dirs && invokeDirectiveHook(n2, n1, parentComponent, "updated");
+      }, parentSuspense);
+    }
+  };
+  const patchBlockChildren = (oldChildren, newChildren, fallbackContainer, parentComponent, parentSuspense, namespace, slotScopeIds) => {
+    for (let i2 = 0; i2 < newChildren.length; i2++) {
+      const oldVNode = oldChildren[i2];
+      const newVNode = newChildren[i2];
+      const container = (
+        // oldVNode may be an errored async setup() component inside Suspense
+        // which will not have a mounted element
+        oldVNode.el && // - In the case of a Fragment, we need to provide the actual parent
+        // of the Fragment itself so it can move its children.
+        (oldVNode.type === Fragment || // - In the case of different nodes, there is going to be a replacement
+        // which also requires the correct parent container
+        !isSameVNodeType(oldVNode, newVNode) || // - In the case of a component, it could contain anything.
+        oldVNode.shapeFlag & (6 | 64)) ? hostParentNode(oldVNode.el) : (
+          // In other cases, the parent container is not actually used so we
+          // just pass the block element here to avoid a DOM parentNode call.
+          fallbackContainer
+        )
+      );
+      patch(
+        oldVNode,
+        newVNode,
+        container,
+        null,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        true
+      );
+    }
+  };
+  const patchProps = (el, vnode, oldProps, newProps, parentComponent, parentSuspense, namespace) => {
+    if (oldProps !== newProps) {
+      if (oldProps !== EMPTY_OBJ) {
+        for (const key in oldProps) {
+          if (!isReservedProp(key) && !(key in newProps)) {
+            hostPatchProp(
+              el,
+              key,
+              oldProps[key],
+              null,
+              namespace,
+              vnode.children,
+              parentComponent,
+              parentSuspense,
+              unmountChildren
+            );
+          }
+        }
+      }
+      for (const key in newProps) {
+        if (isReservedProp(key))
+          continue;
+        const next = newProps[key];
+        const prev = oldProps[key];
+        if (next !== prev && key !== "value") {
+          hostPatchProp(
+            el,
+            key,
+            prev,
+            next,
+            namespace,
+            vnode.children,
+            parentComponent,
+            parentSuspense,
+            unmountChildren
+          );
+        }
+      }
+      if ("value" in newProps) {
+        hostPatchProp(el, "value", oldProps.value, newProps.value, namespace);
+      }
+    }
+  };
+  const processFragment = (n1, n2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    const fragmentStartAnchor = n2.el = n1 ? n1.el : hostCreateText("");
+    const fragmentEndAnchor = n2.anchor = n1 ? n1.anchor : hostCreateText("");
+    let { patchFlag, dynamicChildren, slotScopeIds: fragmentSlotScopeIds } = n2;
+    if (fragmentSlotScopeIds) {
+      slotScopeIds = slotScopeIds ? slotScopeIds.concat(fragmentSlotScopeIds) : fragmentSlotScopeIds;
+    }
+    if (n1 == null) {
+      hostInsert(fragmentStartAnchor, container, anchor);
+      hostInsert(fragmentEndAnchor, container, anchor);
+      mountChildren(
+        // #10007
+        // such fragment like `<></>` will be compiled into
+        // a fragment which doesn't have a children.
+        // In this case fallback to an empty array
+        n2.children || [],
+        container,
+        fragmentEndAnchor,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized
+      );
+    } else {
+      if (patchFlag > 0 && patchFlag & 64 && dynamicChildren && // #2715 the previous fragment could've been a BAILed one as a result
+      // of renderSlot() with no valid children
+      n1.dynamicChildren) {
+        patchBlockChildren(
+          n1.dynamicChildren,
+          dynamicChildren,
+          container,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds
+        );
+        if (
+          // #2080 if the stable fragment has a key, it's a <template v-for> that may
+          //  get moved around. Make sure all root level vnodes inherit el.
+          // #2134 or if it's a component root, it may also get moved around
+          // as the component is being moved.
+          n2.key != null || parentComponent && n2 === parentComponent.subTree
+        ) {
+          traverseStaticChildren(
+            n1,
+            n2,
+            true
+            /* shallow */
+          );
+        }
+      } else {
+        patchChildren(
+          n1,
+          n2,
+          container,
+          fragmentEndAnchor,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          optimized
+        );
+      }
+    }
+  };
+  const processComponent = (n1, n2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    n2.slotScopeIds = slotScopeIds;
+    if (n1 == null) {
+      if (n2.shapeFlag & 512) {
+        parentComponent.ctx.activate(
+          n2,
+          container,
+          anchor,
+          namespace,
+          optimized
+        );
+      } else {
+        mountComponent(
+          n2,
+          container,
+          anchor,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          optimized
+        );
+      }
+    } else {
+      updateComponent(n1, n2, optimized);
+    }
+  };
+  const mountComponent = (initialVNode, container, anchor, parentComponent, parentSuspense, namespace, optimized) => {
+    const instance = initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent,
+      parentSuspense
+    );
+    if (isKeepAlive(initialVNode)) {
+      instance.ctx.renderer = internals;
+    }
+    {
+      setupComponent(instance);
+    }
+    if (instance.asyncDep) {
+      parentSuspense && parentSuspense.registerDep(instance, setupRenderEffect);
+      if (!initialVNode.el) {
+        const placeholder = instance.subTree = createVNode(Comment);
+        processCommentNode(null, placeholder, container, anchor);
+      }
+    } else {
+      setupRenderEffect(
+        instance,
+        initialVNode,
+        container,
+        anchor,
+        parentSuspense,
+        namespace,
+        optimized
+      );
+    }
+  };
+  const updateComponent = (n1, n2, optimized) => {
+    const instance = n2.component = n1.component;
+    if (shouldUpdateComponent(n1, n2, optimized)) {
+      if (instance.asyncDep && !instance.asyncResolved) {
+        updateComponentPreRender(instance, n2, optimized);
+        return;
+      } else {
+        instance.next = n2;
+        invalidateJob(instance.update);
+        instance.effect.dirty = true;
+        instance.update();
+      }
+    } else {
+      n2.el = n1.el;
+      instance.vnode = n2;
+    }
+  };
+  const setupRenderEffect = (instance, initialVNode, container, anchor, parentSuspense, namespace, optimized) => {
+    const componentUpdateFn = () => {
+      if (!instance.isMounted) {
+        let vnodeHook;
+        const { el, props } = initialVNode;
+        const { bm, m, parent } = instance;
+        const isAsyncWrapperVNode = isAsyncWrapper(initialVNode);
+        toggleRecurse(instance, false);
+        if (bm) {
+          invokeArrayFns$1(bm);
+        }
+        if (!isAsyncWrapperVNode && (vnodeHook = props && props.onVnodeBeforeMount)) {
+          invokeVNodeHook(vnodeHook, parent, initialVNode);
+        }
+        toggleRecurse(instance, true);
+        if (el && hydrateNode) {
+          const hydrateSubTree = () => {
+            instance.subTree = renderComponentRoot(instance);
+            hydrateNode(
+              el,
+              instance.subTree,
+              instance,
+              parentSuspense,
+              null
+            );
+          };
+          if (isAsyncWrapperVNode) {
+            initialVNode.type.__asyncLoader().then(
+              // note: we are moving the render call into an async callback,
+              // which means it won't track dependencies - but it's ok because
+              // a server-rendered async wrapper is already in resolved state
+              // and it will never need to change.
+              () => !instance.isUnmounted && hydrateSubTree()
+            );
+          } else {
+            hydrateSubTree();
+          }
+        } else {
+          const subTree = instance.subTree = renderComponentRoot(instance);
+          patch(
+            null,
+            subTree,
+            container,
+            anchor,
+            instance,
+            parentSuspense,
+            namespace
+          );
+          initialVNode.el = subTree.el;
+        }
+        if (m) {
+          queuePostRenderEffect(m, parentSuspense);
+        }
+        if (!isAsyncWrapperVNode && (vnodeHook = props && props.onVnodeMounted)) {
+          const scopedInitialVNode = initialVNode;
+          queuePostRenderEffect(
+            () => invokeVNodeHook(vnodeHook, parent, scopedInitialVNode),
+            parentSuspense
+          );
+        }
+        if (initialVNode.shapeFlag & 256 || parent && isAsyncWrapper(parent.vnode) && parent.vnode.shapeFlag & 256) {
+          instance.a && queuePostRenderEffect(instance.a, parentSuspense);
+        }
+        instance.isMounted = true;
+        initialVNode = container = anchor = null;
+      } else {
+        let { next, bu, u, parent, vnode } = instance;
+        {
+          const nonHydratedAsyncRoot = locateNonHydratedAsyncRoot(instance);
+          if (nonHydratedAsyncRoot) {
+            if (next) {
+              next.el = vnode.el;
+              updateComponentPreRender(instance, next, optimized);
+            }
+            nonHydratedAsyncRoot.asyncDep.then(() => {
+              if (!instance.isUnmounted) {
+                componentUpdateFn();
+              }
+            });
+            return;
+          }
+        }
+        let originNext = next;
+        let vnodeHook;
+        toggleRecurse(instance, false);
+        if (next) {
+          next.el = vnode.el;
+          updateComponentPreRender(instance, next, optimized);
+        } else {
+          next = vnode;
+        }
+        if (bu) {
+          invokeArrayFns$1(bu);
+        }
+        if (vnodeHook = next.props && next.props.onVnodeBeforeUpdate) {
+          invokeVNodeHook(vnodeHook, parent, next, vnode);
+        }
+        toggleRecurse(instance, true);
+        const nextTree = renderComponentRoot(instance);
+        const prevTree = instance.subTree;
+        instance.subTree = nextTree;
+        patch(
+          prevTree,
+          nextTree,
+          // parent may have changed if it's in a teleport
+          hostParentNode(prevTree.el),
+          // anchor may have changed if it's in a fragment
+          getNextHostNode(prevTree),
+          instance,
+          parentSuspense,
+          namespace
+        );
+        next.el = nextTree.el;
+        if (originNext === null) {
+          updateHOCHostEl(instance, nextTree.el);
+        }
+        if (u) {
+          queuePostRenderEffect(u, parentSuspense);
+        }
+        if (vnodeHook = next.props && next.props.onVnodeUpdated) {
+          queuePostRenderEffect(
+            () => invokeVNodeHook(vnodeHook, parent, next, vnode),
+            parentSuspense
+          );
+        }
+      }
+    };
+    const effect = instance.effect = new ReactiveEffect(
+      componentUpdateFn,
+      NOOP,
+      () => queueJob(update),
+      instance.scope
+      // track it in component's effect scope
+    );
+    const update = instance.update = () => {
+      if (effect.dirty) {
+        effect.run();
+      }
+    };
+    update.id = instance.uid;
+    toggleRecurse(instance, true);
+    update();
+  };
+  const updateComponentPreRender = (instance, nextVNode, optimized) => {
+    nextVNode.component = instance;
+    const prevProps = instance.vnode.props;
+    instance.vnode = nextVNode;
+    instance.next = null;
+    updateProps(instance, nextVNode.props, prevProps, optimized);
+    updateSlots(instance, nextVNode.children, optimized);
+    pauseTracking();
+    flushPreFlushCbs(instance);
+    resetTracking();
+  };
+  const patchChildren = (n1, n2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized = false) => {
+    const c1 = n1 && n1.children;
+    const prevShapeFlag = n1 ? n1.shapeFlag : 0;
+    const c2 = n2.children;
+    const { patchFlag, shapeFlag } = n2;
+    if (patchFlag > 0) {
+      if (patchFlag & 128) {
+        patchKeyedChildren(
+          c1,
+          c2,
+          container,
+          anchor,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          optimized
+        );
+        return;
+      } else if (patchFlag & 256) {
+        patchUnkeyedChildren(
+          c1,
+          c2,
+          container,
+          anchor,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          optimized
+        );
+        return;
+      }
+    }
+    if (shapeFlag & 8) {
+      if (prevShapeFlag & 16) {
+        unmountChildren(c1, parentComponent, parentSuspense);
+      }
+      if (c2 !== c1) {
+        hostSetElementText(container, c2);
+      }
+    } else {
+      if (prevShapeFlag & 16) {
+        if (shapeFlag & 16) {
+          patchKeyedChildren(
+            c1,
+            c2,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+        } else {
+          unmountChildren(c1, parentComponent, parentSuspense, true);
+        }
+      } else {
+        if (prevShapeFlag & 8) {
+          hostSetElementText(container, "");
+        }
+        if (shapeFlag & 16) {
+          mountChildren(
+            c2,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+        }
+      }
+    }
+  };
+  const patchUnkeyedChildren = (c1, c2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    c1 = c1 || EMPTY_ARR;
+    c2 = c2 || EMPTY_ARR;
+    const oldLength = c1.length;
+    const newLength = c2.length;
+    const commonLength = Math.min(oldLength, newLength);
+    let i2;
+    for (i2 = 0; i2 < commonLength; i2++) {
+      const nextChild = c2[i2] = optimized ? cloneIfMounted(c2[i2]) : normalizeVNode(c2[i2]);
+      patch(
+        c1[i2],
+        nextChild,
+        container,
+        null,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized
+      );
+    }
+    if (oldLength > newLength) {
+      unmountChildren(
+        c1,
+        parentComponent,
+        parentSuspense,
+        true,
+        false,
+        commonLength
+      );
+    } else {
+      mountChildren(
+        c2,
+        container,
+        anchor,
+        parentComponent,
+        parentSuspense,
+        namespace,
+        slotScopeIds,
+        optimized,
+        commonLength
+      );
+    }
+  };
+  const patchKeyedChildren = (c1, c2, container, parentAnchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized) => {
+    let i2 = 0;
+    const l2 = c2.length;
+    let e1 = c1.length - 1;
+    let e2 = l2 - 1;
+    while (i2 <= e1 && i2 <= e2) {
+      const n1 = c1[i2];
+      const n2 = c2[i2] = optimized ? cloneIfMounted(c2[i2]) : normalizeVNode(c2[i2]);
+      if (isSameVNodeType(n1, n2)) {
+        patch(
+          n1,
+          n2,
+          container,
+          null,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          optimized
+        );
+      } else {
+        break;
+      }
+      i2++;
+    }
+    while (i2 <= e1 && i2 <= e2) {
+      const n1 = c1[e1];
+      const n2 = c2[e2] = optimized ? cloneIfMounted(c2[e2]) : normalizeVNode(c2[e2]);
+      if (isSameVNodeType(n1, n2)) {
+        patch(
+          n1,
+          n2,
+          container,
+          null,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          optimized
+        );
+      } else {
+        break;
+      }
+      e1--;
+      e2--;
+    }
+    if (i2 > e1) {
+      if (i2 <= e2) {
+        const nextPos = e2 + 1;
+        const anchor = nextPos < l2 ? c2[nextPos].el : parentAnchor;
+        while (i2 <= e2) {
+          patch(
+            null,
+            c2[i2] = optimized ? cloneIfMounted(c2[i2]) : normalizeVNode(c2[i2]),
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+          i2++;
+        }
+      }
+    } else if (i2 > e2) {
+      while (i2 <= e1) {
+        unmount(c1[i2], parentComponent, parentSuspense, true);
+        i2++;
+      }
+    } else {
+      const s1 = i2;
+      const s2 = i2;
+      const keyToNewIndexMap = /* @__PURE__ */ new Map();
+      for (i2 = s2; i2 <= e2; i2++) {
+        const nextChild = c2[i2] = optimized ? cloneIfMounted(c2[i2]) : normalizeVNode(c2[i2]);
+        if (nextChild.key != null) {
+          keyToNewIndexMap.set(nextChild.key, i2);
+        }
+      }
+      let j;
+      let patched = 0;
+      const toBePatched = e2 - s2 + 1;
+      let moved = false;
+      let maxNewIndexSoFar = 0;
+      const newIndexToOldIndexMap = new Array(toBePatched);
+      for (i2 = 0; i2 < toBePatched; i2++)
+        newIndexToOldIndexMap[i2] = 0;
+      for (i2 = s1; i2 <= e1; i2++) {
+        const prevChild = c1[i2];
+        if (patched >= toBePatched) {
+          unmount(prevChild, parentComponent, parentSuspense, true);
+          continue;
+        }
+        let newIndex;
+        if (prevChild.key != null) {
+          newIndex = keyToNewIndexMap.get(prevChild.key);
+        } else {
+          for (j = s2; j <= e2; j++) {
+            if (newIndexToOldIndexMap[j - s2] === 0 && isSameVNodeType(prevChild, c2[j])) {
+              newIndex = j;
+              break;
+            }
+          }
+        }
+        if (newIndex === void 0) {
+          unmount(prevChild, parentComponent, parentSuspense, true);
+        } else {
+          newIndexToOldIndexMap[newIndex - s2] = i2 + 1;
+          if (newIndex >= maxNewIndexSoFar) {
+            maxNewIndexSoFar = newIndex;
+          } else {
+            moved = true;
+          }
+          patch(
+            prevChild,
+            c2[newIndex],
+            container,
+            null,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+          patched++;
+        }
+      }
+      const increasingNewIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : EMPTY_ARR;
+      j = increasingNewIndexSequence.length - 1;
+      for (i2 = toBePatched - 1; i2 >= 0; i2--) {
+        const nextIndex = s2 + i2;
+        const nextChild = c2[nextIndex];
+        const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : parentAnchor;
+        if (newIndexToOldIndexMap[i2] === 0) {
+          patch(
+            null,
+            nextChild,
+            container,
+            anchor,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+        } else if (moved) {
+          if (j < 0 || i2 !== increasingNewIndexSequence[j]) {
+            move(nextChild, container, anchor, 2);
+          } else {
+            j--;
+          }
+        }
+      }
+    }
+  };
+  const move = (vnode, container, anchor, moveType, parentSuspense = null) => {
+    const { el, type, transition, children, shapeFlag } = vnode;
+    if (shapeFlag & 6) {
+      move(vnode.component.subTree, container, anchor, moveType);
+      return;
+    }
+    if (shapeFlag & 128) {
+      vnode.suspense.move(container, anchor, moveType);
+      return;
+    }
+    if (shapeFlag & 64) {
+      type.move(vnode, container, anchor, internals);
+      return;
+    }
+    if (type === Fragment) {
+      hostInsert(el, container, anchor);
+      for (let i2 = 0; i2 < children.length; i2++) {
+        move(children[i2], container, anchor, moveType);
+      }
+      hostInsert(vnode.anchor, container, anchor);
+      return;
+    }
+    if (type === Static) {
+      moveStaticNode(vnode, container, anchor);
+      return;
+    }
+    const needTransition2 = moveType !== 2 && shapeFlag & 1 && transition;
+    if (needTransition2) {
+      if (moveType === 0) {
+        transition.beforeEnter(el);
+        hostInsert(el, container, anchor);
+        queuePostRenderEffect(() => transition.enter(el), parentSuspense);
+      } else {
+        const { leave, delayLeave, afterLeave } = transition;
+        const remove22 = () => hostInsert(el, container, anchor);
+        const performLeave = () => {
+          leave(el, () => {
+            remove22();
+            afterLeave && afterLeave();
+          });
+        };
+        if (delayLeave) {
+          delayLeave(el, remove22, performLeave);
+        } else {
+          performLeave();
+        }
+      }
+    } else {
+      hostInsert(el, container, anchor);
+    }
+  };
+  const unmount = (vnode, parentComponent, parentSuspense, doRemove = false, optimized = false) => {
+    const {
+      type,
+      props,
+      ref: ref2,
+      children,
+      dynamicChildren,
+      shapeFlag,
+      patchFlag,
+      dirs
+    } = vnode;
+    if (ref2 != null) {
+      setRef(ref2, null, parentSuspense, vnode, true);
+    }
+    if (shapeFlag & 256) {
+      parentComponent.ctx.deactivate(vnode);
+      return;
+    }
+    const shouldInvokeDirs = shapeFlag & 1 && dirs;
+    const shouldInvokeVnodeHook = !isAsyncWrapper(vnode);
+    let vnodeHook;
+    if (shouldInvokeVnodeHook && (vnodeHook = props && props.onVnodeBeforeUnmount)) {
+      invokeVNodeHook(vnodeHook, parentComponent, vnode);
+    }
+    if (shapeFlag & 6) {
+      unmountComponent(vnode.component, parentSuspense, doRemove);
+    } else {
+      if (shapeFlag & 128) {
+        vnode.suspense.unmount(parentSuspense, doRemove);
+        return;
+      }
+      if (shouldInvokeDirs) {
+        invokeDirectiveHook(vnode, null, parentComponent, "beforeUnmount");
+      }
+      if (shapeFlag & 64) {
+        vnode.type.remove(
+          vnode,
+          parentComponent,
+          parentSuspense,
+          optimized,
+          internals,
+          doRemove
+        );
+      } else if (dynamicChildren && // #1153: fast path should not be taken for non-stable (v-for) fragments
+      (type !== Fragment || patchFlag > 0 && patchFlag & 64)) {
+        unmountChildren(
+          dynamicChildren,
+          parentComponent,
+          parentSuspense,
+          false,
+          true
+        );
+      } else if (type === Fragment && patchFlag & (128 | 256) || !optimized && shapeFlag & 16) {
+        unmountChildren(children, parentComponent, parentSuspense);
+      }
+      if (doRemove) {
+        remove2(vnode);
+      }
+    }
+    if (shouldInvokeVnodeHook && (vnodeHook = props && props.onVnodeUnmounted) || shouldInvokeDirs) {
+      queuePostRenderEffect(() => {
+        vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, vnode);
+        shouldInvokeDirs && invokeDirectiveHook(vnode, null, parentComponent, "unmounted");
+      }, parentSuspense);
+    }
+  };
+  const remove2 = (vnode) => {
+    const { type, el, anchor, transition } = vnode;
+    if (type === Fragment) {
+      {
+        removeFragment(el, anchor);
+      }
+      return;
+    }
+    if (type === Static) {
+      removeStaticNode(vnode);
+      return;
+    }
+    const performRemove = () => {
+      hostRemove(el);
+      if (transition && !transition.persisted && transition.afterLeave) {
+        transition.afterLeave();
+      }
+    };
+    if (vnode.shapeFlag & 1 && transition && !transition.persisted) {
+      const { leave, delayLeave } = transition;
+      const performLeave = () => leave(el, performRemove);
+      if (delayLeave) {
+        delayLeave(vnode.el, performRemove, performLeave);
+      } else {
+        performLeave();
+      }
+    } else {
+      performRemove();
+    }
+  };
+  const removeFragment = (cur, end) => {
+    let next;
+    while (cur !== end) {
+      next = hostNextSibling(cur);
+      hostRemove(cur);
+      cur = next;
+    }
+    hostRemove(end);
+  };
+  const unmountComponent = (instance, parentSuspense, doRemove) => {
+    const { bum, scope, update, subTree, um } = instance;
+    if (bum) {
+      invokeArrayFns$1(bum);
+    }
+    scope.stop();
+    if (update) {
+      update.active = false;
+      unmount(subTree, instance, parentSuspense, doRemove);
+    }
+    if (um) {
+      queuePostRenderEffect(um, parentSuspense);
+    }
+    queuePostRenderEffect(() => {
+      instance.isUnmounted = true;
+    }, parentSuspense);
+    if (parentSuspense && parentSuspense.pendingBranch && !parentSuspense.isUnmounted && instance.asyncDep && !instance.asyncResolved && instance.suspenseId === parentSuspense.pendingId) {
+      parentSuspense.deps--;
+      if (parentSuspense.deps === 0) {
+        parentSuspense.resolve();
+      }
+    }
+  };
+  const unmountChildren = (children, parentComponent, parentSuspense, doRemove = false, optimized = false, start = 0) => {
+    for (let i2 = start; i2 < children.length; i2++) {
+      unmount(children[i2], parentComponent, parentSuspense, doRemove, optimized);
+    }
+  };
+  const getNextHostNode = (vnode) => {
+    if (vnode.shapeFlag & 6) {
+      return getNextHostNode(vnode.component.subTree);
+    }
+    if (vnode.shapeFlag & 128) {
+      return vnode.suspense.next();
+    }
+    return hostNextSibling(vnode.anchor || vnode.el);
+  };
+  let isFlushing2 = false;
+  const render = (vnode, container, namespace) => {
+    if (vnode == null) {
+      if (container._vnode) {
+        unmount(container._vnode, null, null, true);
+      }
+    } else {
+      patch(
+        container._vnode || null,
+        vnode,
+        container,
+        null,
+        null,
+        null,
+        namespace
+      );
+    }
+    if (!isFlushing2) {
+      isFlushing2 = true;
+      flushPreFlushCbs();
+      flushPostFlushCbs();
+      isFlushing2 = false;
+    }
+    container._vnode = vnode;
+  };
+  const internals = {
+    p: patch,
+    um: unmount,
+    m: move,
+    r: remove2,
+    mt: mountComponent,
+    mc: mountChildren,
+    pc: patchChildren,
+    pbc: patchBlockChildren,
+    n: getNextHostNode,
+    o: options
+  };
+  let hydrate;
+  let hydrateNode;
+  if (createHydrationFns) {
+    [hydrate, hydrateNode] = createHydrationFns(
+      internals
+    );
+  }
+  return {
+    render,
+    hydrate,
+    createApp: createAppAPI(render, hydrate)
+  };
+}
+function resolveChildrenNamespace({ type, props }, currentNamespace) {
+  return currentNamespace === "svg" && type === "foreignObject" || currentNamespace === "mathml" && type === "annotation-xml" && props && props.encoding && props.encoding.includes("html") ? void 0 : currentNamespace;
+}
+function toggleRecurse({ effect, update }, allowed) {
+  effect.allowRecurse = update.allowRecurse = allowed;
+}
+function needTransition(parentSuspense, transition) {
+  return (!parentSuspense || parentSuspense && !parentSuspense.pendingBranch) && transition && !transition.persisted;
+}
+function traverseStaticChildren(n1, n2, shallow = false) {
+  const ch1 = n1.children;
+  const ch2 = n2.children;
+  if (isArray$2(ch1) && isArray$2(ch2)) {
+    for (let i2 = 0; i2 < ch1.length; i2++) {
+      const c1 = ch1[i2];
+      let c2 = ch2[i2];
+      if (c2.shapeFlag & 1 && !c2.dynamicChildren) {
+        if (c2.patchFlag <= 0 || c2.patchFlag === 32) {
+          c2 = ch2[i2] = cloneIfMounted(ch2[i2]);
+          c2.el = c1.el;
+        }
+        if (!shallow)
+          traverseStaticChildren(c1, c2);
+      }
+      if (c2.type === Text) {
+        c2.el = c1.el;
+      }
+    }
+  }
+}
+function getSequence(arr) {
+  const p2 = arr.slice();
+  const result = [0];
+  let i2, j, u, v, c;
+  const len = arr.length;
+  for (i2 = 0; i2 < len; i2++) {
+    const arrI = arr[i2];
+    if (arrI !== 0) {
+      j = result[result.length - 1];
+      if (arr[j] < arrI) {
+        p2[i2] = j;
+        result.push(i2);
+        continue;
+      }
+      u = 0;
+      v = result.length - 1;
+      while (u < v) {
+        c = u + v >> 1;
+        if (arr[result[c]] < arrI) {
+          u = c + 1;
+        } else {
+          v = c;
+        }
+      }
+      if (arrI < arr[result[u]]) {
+        if (u > 0) {
+          p2[i2] = result[u - 1];
+        }
+        result[u] = i2;
+      }
+    }
+  }
+  u = result.length;
+  v = result[u - 1];
+  while (u-- > 0) {
+    result[u] = v;
+    v = p2[v];
+  }
+  return result;
+}
+function locateNonHydratedAsyncRoot(instance) {
+  const subComponent = instance.subTree.component;
+  if (subComponent) {
+    if (subComponent.asyncDep && !subComponent.asyncResolved) {
+      return subComponent;
+    } else {
+      return locateNonHydratedAsyncRoot(subComponent);
+    }
+  }
+}
+const isTeleport = (type) => type.__isTeleport;
+const Fragment = Symbol.for("v-fgt");
+const Text = Symbol.for("v-txt");
+const Comment = Symbol.for("v-cmt");
+const Static = Symbol.for("v-stc");
+const blockStack = [];
+let currentBlock = null;
+function openBlock(disableTracking = false) {
+  blockStack.push(currentBlock = disableTracking ? null : []);
+}
+function closeBlock() {
+  blockStack.pop();
+  currentBlock = blockStack[blockStack.length - 1] || null;
+}
+let isBlockTreeEnabled = 1;
+function setBlockTracking(value) {
+  isBlockTreeEnabled += value;
+}
+function setupBlock(vnode) {
+  vnode.dynamicChildren = isBlockTreeEnabled > 0 ? currentBlock || EMPTY_ARR : null;
+  closeBlock();
+  if (isBlockTreeEnabled > 0 && currentBlock) {
+    currentBlock.push(vnode);
+  }
+  return vnode;
+}
+function createElementBlock(type, props, children, patchFlag, dynamicProps, shapeFlag) {
+  return setupBlock(
+    createBaseVNode(
+      type,
+      props,
+      children,
+      patchFlag,
+      dynamicProps,
+      shapeFlag,
+      true
+    )
+  );
+}
+function createBlock(type, props, children, patchFlag, dynamicProps) {
+  return setupBlock(
+    createVNode(
+      type,
+      props,
+      children,
+      patchFlag,
+      dynamicProps,
+      true
+    )
+  );
+}
+function isVNode(value) {
+  return value ? value.__v_isVNode === true : false;
+}
+function isSameVNodeType(n1, n2) {
+  return n1.type === n2.type && n1.key === n2.key;
+}
+const InternalObjectKey = `__vInternal`;
+const normalizeKey = ({ key }) => key != null ? key : null;
+const normalizeRef = ({
+  ref: ref2,
+  ref_key,
+  ref_for
+}) => {
+  if (typeof ref2 === "number") {
+    ref2 = "" + ref2;
+  }
+  return ref2 != null ? isString$1(ref2) || isRef(ref2) || isFunction$1(ref2) ? { i: currentRenderingInstance, r: ref2, k: ref_key, f: !!ref_for } : ref2 : null;
+};
+function createBaseVNode(type, props = null, children = null, patchFlag = 0, dynamicProps = null, shapeFlag = type === Fragment ? 0 : 1, isBlockNode = false, needFullChildrenNormalization = false) {
+  const vnode = {
+    __v_isVNode: true,
+    __v_skip: true,
+    type,
+    props,
+    key: props && normalizeKey(props),
+    ref: props && normalizeRef(props),
+    scopeId: currentScopeId,
+    slotScopeIds: null,
+    children,
+    component: null,
+    suspense: null,
+    ssContent: null,
+    ssFallback: null,
+    dirs: null,
+    transition: null,
+    el: null,
+    anchor: null,
+    target: null,
+    targetAnchor: null,
+    staticCount: 0,
+    shapeFlag,
+    patchFlag,
+    dynamicProps,
+    dynamicChildren: null,
+    appContext: null,
+    ctx: currentRenderingInstance
+  };
+  if (needFullChildrenNormalization) {
+    normalizeChildren(vnode, children);
+    if (shapeFlag & 128) {
+      type.normalize(vnode);
+    }
+  } else if (children) {
+    vnode.shapeFlag |= isString$1(children) ? 8 : 16;
+  }
+  if (isBlockTreeEnabled > 0 && // avoid a block node from tracking itself
+  !isBlockNode && // has current parent block
+  currentBlock && // presence of a patch flag indicates this node needs patching on updates.
+  // component nodes also should always be patched, because even if the
+  // component doesn't need to update, it needs to persist the instance on to
+  // the next vnode so that it can be properly unmounted later.
+  (vnode.patchFlag > 0 || shapeFlag & 6) && // the EVENTS flag is only for hydration and if it is the only flag, the
+  // vnode should not be considered dynamic due to handler caching.
+  vnode.patchFlag !== 32) {
+    currentBlock.push(vnode);
+  }
+  return vnode;
+}
+const createVNode = _createVNode;
+function _createVNode(type, props = null, children = null, patchFlag = 0, dynamicProps = null, isBlockNode = false) {
+  if (!type || type === NULL_DYNAMIC_COMPONENT) {
+    type = Comment;
+  }
+  if (isVNode(type)) {
+    const cloned = cloneVNode(
+      type,
+      props,
+      true
+      /* mergeRef: true */
+    );
+    if (children) {
+      normalizeChildren(cloned, children);
+    }
+    if (isBlockTreeEnabled > 0 && !isBlockNode && currentBlock) {
+      if (cloned.shapeFlag & 6) {
+        currentBlock[currentBlock.indexOf(type)] = cloned;
+      } else {
+        currentBlock.push(cloned);
+      }
+    }
+    cloned.patchFlag |= -2;
+    return cloned;
+  }
+  if (isClassComponent(type)) {
+    type = type.__vccOpts;
+  }
+  if (props) {
+    props = guardReactiveProps(props);
+    let { class: klass, style } = props;
+    if (klass && !isString$1(klass)) {
+      props.class = normalizeClass(klass);
+    }
+    if (isObject(style)) {
+      if (isProxy(style) && !isArray$2(style)) {
+        style = extend$1({}, style);
+      }
+      props.style = normalizeStyle(style);
+    }
+  }
+  const shapeFlag = isString$1(type) ? 1 : isSuspense(type) ? 128 : isTeleport(type) ? 64 : isObject(type) ? 4 : isFunction$1(type) ? 2 : 0;
+  return createBaseVNode(
+    type,
+    props,
+    children,
+    patchFlag,
+    dynamicProps,
+    shapeFlag,
+    isBlockNode,
+    true
+  );
+}
+function guardReactiveProps(props) {
+  if (!props)
+    return null;
+  return isProxy(props) || InternalObjectKey in props ? extend$1({}, props) : props;
+}
+function cloneVNode(vnode, extraProps, mergeRef = false) {
+  const { props, ref: ref2, patchFlag, children } = vnode;
+  const mergedProps = extraProps ? mergeProps(props || {}, extraProps) : props;
+  const cloned = {
+    __v_isVNode: true,
+    __v_skip: true,
+    type: vnode.type,
+    props: mergedProps,
+    key: mergedProps && normalizeKey(mergedProps),
+    ref: extraProps && extraProps.ref ? (
+      // #2078 in the case of <component :is="vnode" ref="extra"/>
+      // if the vnode itself already has a ref, cloneVNode will need to merge
+      // the refs so the single vnode can be set on multiple refs
+      mergeRef && ref2 ? isArray$2(ref2) ? ref2.concat(normalizeRef(extraProps)) : [ref2, normalizeRef(extraProps)] : normalizeRef(extraProps)
+    ) : ref2,
+    scopeId: vnode.scopeId,
+    slotScopeIds: vnode.slotScopeIds,
+    children,
+    target: vnode.target,
+    targetAnchor: vnode.targetAnchor,
+    staticCount: vnode.staticCount,
+    shapeFlag: vnode.shapeFlag,
+    // if the vnode is cloned with extra props, we can no longer assume its
+    // existing patch flag to be reliable and need to add the FULL_PROPS flag.
+    // note: preserve flag for fragments since they use the flag for children
+    // fast paths only.
+    patchFlag: extraProps && vnode.type !== Fragment ? patchFlag === -1 ? 16 : patchFlag | 16 : patchFlag,
+    dynamicProps: vnode.dynamicProps,
+    dynamicChildren: vnode.dynamicChildren,
+    appContext: vnode.appContext,
+    dirs: vnode.dirs,
+    transition: vnode.transition,
+    // These should technically only be non-null on mounted VNodes. However,
+    // they *should* be copied for kept-alive vnodes. So we just always copy
+    // them since them being non-null during a mount doesn't affect the logic as
+    // they will simply be overwritten.
+    component: vnode.component,
+    suspense: vnode.suspense,
+    ssContent: vnode.ssContent && cloneVNode(vnode.ssContent),
+    ssFallback: vnode.ssFallback && cloneVNode(vnode.ssFallback),
+    el: vnode.el,
+    anchor: vnode.anchor,
+    ctx: vnode.ctx,
+    ce: vnode.ce
+  };
+  return cloned;
+}
+function createTextVNode(text = " ", flag = 0) {
+  return createVNode(Text, null, text, flag);
+}
+function createStaticVNode(content, numberOfNodes) {
+  const vnode = createVNode(Static, null, content);
+  vnode.staticCount = numberOfNodes;
+  return vnode;
+}
+function createCommentVNode(text = "", asBlock = false) {
+  return asBlock ? (openBlock(), createBlock(Comment, null, text)) : createVNode(Comment, null, text);
+}
+function normalizeVNode(child) {
+  if (child == null || typeof child === "boolean") {
+    return createVNode(Comment);
+  } else if (isArray$2(child)) {
+    return createVNode(
+      Fragment,
+      null,
+      // #3666, avoid reference pollution when reusing vnode
+      child.slice()
+    );
+  } else if (typeof child === "object") {
+    return cloneIfMounted(child);
+  } else {
+    return createVNode(Text, null, String(child));
+  }
+}
+function cloneIfMounted(child) {
+  return child.el === null && child.patchFlag !== -1 || child.memo ? child : cloneVNode(child);
+}
+function normalizeChildren(vnode, children) {
+  let type = 0;
+  const { shapeFlag } = vnode;
+  if (children == null) {
+    children = null;
+  } else if (isArray$2(children)) {
+    type = 16;
+  } else if (typeof children === "object") {
+    if (shapeFlag & (1 | 64)) {
+      const slot = children.default;
+      if (slot) {
+        slot._c && (slot._d = false);
+        normalizeChildren(vnode, slot());
+        slot._c && (slot._d = true);
+      }
+      return;
+    } else {
+      type = 32;
+      const slotFlag = children._;
+      if (!slotFlag && !(InternalObjectKey in children)) {
+        children._ctx = currentRenderingInstance;
+      } else if (slotFlag === 3 && currentRenderingInstance) {
+        if (currentRenderingInstance.slots._ === 1) {
+          children._ = 1;
+        } else {
+          children._ = 2;
+          vnode.patchFlag |= 1024;
+        }
+      }
+    }
+  } else if (isFunction$1(children)) {
+    children = { default: children, _ctx: currentRenderingInstance };
+    type = 32;
+  } else {
+    children = String(children);
+    if (shapeFlag & 64) {
+      type = 16;
+      children = [createTextVNode(children)];
+    } else {
+      type = 8;
+    }
+  }
+  vnode.children = children;
+  vnode.shapeFlag |= type;
+}
+function mergeProps(...args) {
+  const ret = {};
+  for (let i2 = 0; i2 < args.length; i2++) {
+    const toMerge = args[i2];
+    for (const key in toMerge) {
+      if (key === "class") {
+        if (ret.class !== toMerge.class) {
+          ret.class = normalizeClass([ret.class, toMerge.class]);
+        }
+      } else if (key === "style") {
+        ret.style = normalizeStyle([ret.style, toMerge.style]);
+      } else if (isOn$1(key)) {
+        const existing = ret[key];
+        const incoming = toMerge[key];
+        if (incoming && existing !== incoming && !(isArray$2(existing) && existing.includes(incoming))) {
+          ret[key] = existing ? [].concat(existing, incoming) : incoming;
+        }
+      } else if (key !== "") {
+        ret[key] = toMerge[key];
+      }
+    }
+  }
+  return ret;
+}
+function invokeVNodeHook(hook, instance, vnode, prevVNode = null) {
+  callWithAsyncErrorHandling(hook, instance, 7, [
+    vnode,
+    prevVNode
+  ]);
+}
+const emptyAppContext = createAppContext();
+let uid = 0;
+function createComponentInstance(vnode, parent, suspense) {
+  const type = vnode.type;
+  const appContext = (parent ? parent.appContext : vnode.appContext) || emptyAppContext;
+  const instance = {
+    uid: uid++,
+    vnode,
+    type,
+    parent,
+    appContext,
+    root: null,
+    // to be immediately set
+    next: null,
+    subTree: null,
+    // will be set synchronously right after creation
+    effect: null,
+    update: null,
+    // will be set synchronously right after creation
+    scope: new EffectScope(
+      true
+      /* detached */
+    ),
+    render: null,
+    proxy: null,
+    exposed: null,
+    exposeProxy: null,
+    withProxy: null,
+    provides: parent ? parent.provides : Object.create(appContext.provides),
+    accessCache: null,
+    renderCache: [],
+    // local resolved assets
+    components: null,
+    directives: null,
+    // resolved props and emits options
+    propsOptions: normalizePropsOptions(type, appContext),
+    emitsOptions: normalizeEmitsOptions(type, appContext),
+    // emit
+    emit: null,
+    // to be set immediately
+    emitted: null,
+    // props default value
+    propsDefaults: EMPTY_OBJ,
+    // inheritAttrs
+    inheritAttrs: type.inheritAttrs,
+    // state
+    ctx: EMPTY_OBJ,
+    data: EMPTY_OBJ,
+    props: EMPTY_OBJ,
+    attrs: EMPTY_OBJ,
+    slots: EMPTY_OBJ,
+    refs: EMPTY_OBJ,
+    setupState: EMPTY_OBJ,
+    setupContext: null,
+    attrsProxy: null,
+    slotsProxy: null,
+    // suspense related
+    suspense,
+    suspenseId: suspense ? suspense.pendingId : 0,
+    asyncDep: null,
+    asyncResolved: false,
+    // lifecycle hooks
+    // not using enums here because it results in computed properties
+    isMounted: false,
+    isUnmounted: false,
+    isDeactivated: false,
+    bc: null,
+    c: null,
+    bm: null,
+    m: null,
+    bu: null,
+    u: null,
+    um: null,
+    bum: null,
+    da: null,
+    a: null,
+    rtg: null,
+    rtc: null,
+    ec: null,
+    sp: null
+  };
+  {
+    instance.ctx = { _: instance };
+  }
+  instance.root = parent ? parent.root : instance;
+  instance.emit = emit.bind(null, instance);
+  if (vnode.ce) {
+    vnode.ce(instance);
+  }
+  return instance;
+}
+let currentInstance = null;
+let internalSetCurrentInstance;
+let setInSSRSetupState;
+{
+  const g = getGlobalThis();
+  const registerGlobalSetter = (key, setter) => {
+    let setters;
+    if (!(setters = g[key]))
+      setters = g[key] = [];
+    setters.push(setter);
+    return (v) => {
+      if (setters.length > 1)
+        setters.forEach((set2) => set2(v));
+      else
+        setters[0](v);
+    };
+  };
+  internalSetCurrentInstance = registerGlobalSetter(
+    `__VUE_INSTANCE_SETTERS__`,
+    (v) => currentInstance = v
+  );
+  setInSSRSetupState = registerGlobalSetter(
+    `__VUE_SSR_SETTERS__`,
+    (v) => isInSSRComponentSetup = v
+  );
+}
+const setCurrentInstance = (instance) => {
+  const prev = currentInstance;
+  internalSetCurrentInstance(instance);
+  instance.scope.on();
+  return () => {
+    instance.scope.off();
+    internalSetCurrentInstance(prev);
+  };
+};
+const unsetCurrentInstance = () => {
+  currentInstance && currentInstance.scope.off();
+  internalSetCurrentInstance(null);
+};
+function isStatefulComponent(instance) {
+  return instance.vnode.shapeFlag & 4;
+}
+let isInSSRComponentSetup = false;
+function setupComponent(instance, isSSR = false) {
+  isSSR && setInSSRSetupState(isSSR);
+  const { props, children } = instance.vnode;
+  const isStateful = isStatefulComponent(instance);
+  initProps(instance, props, isStateful, isSSR);
+  initSlots(instance, children);
+  const setupResult = isStateful ? setupStatefulComponent(instance, isSSR) : void 0;
+  isSSR && setInSSRSetupState(false);
+  return setupResult;
+}
+function setupStatefulComponent(instance, isSSR) {
+  const Component = instance.type;
+  instance.accessCache = /* @__PURE__ */ Object.create(null);
+  instance.proxy = markRaw(new Proxy(instance.ctx, PublicInstanceProxyHandlers));
+  const { setup } = Component;
+  if (setup) {
+    const setupContext = instance.setupContext = setup.length > 1 ? createSetupContext(instance) : null;
+    const reset = setCurrentInstance(instance);
+    pauseTracking();
+    const setupResult = callWithErrorHandling(
+      setup,
+      instance,
+      0,
+      [
+        instance.props,
+        setupContext
+      ]
+    );
+    resetTracking();
+    reset();
+    if (isPromise(setupResult)) {
+      setupResult.then(unsetCurrentInstance, unsetCurrentInstance);
+      if (isSSR) {
+        return setupResult.then((resolvedResult) => {
+          handleSetupResult(instance, resolvedResult, isSSR);
+        }).catch((e) => {
+          handleError(e, instance, 0);
+        });
+      } else {
+        instance.asyncDep = setupResult;
+      }
+    } else {
+      handleSetupResult(instance, setupResult, isSSR);
+    }
+  } else {
+    finishComponentSetup(instance, isSSR);
+  }
+}
+function handleSetupResult(instance, setupResult, isSSR) {
+  if (isFunction$1(setupResult)) {
+    if (instance.type.__ssrInlineRender) {
+      instance.ssrRender = setupResult;
+    } else {
+      instance.render = setupResult;
+    }
+  } else if (isObject(setupResult)) {
+    instance.setupState = proxyRefs(setupResult);
+  } else
+    ;
+  finishComponentSetup(instance, isSSR);
+}
+let compile;
+function finishComponentSetup(instance, isSSR, skipOptions) {
+  const Component = instance.type;
+  if (!instance.render) {
+    if (!isSSR && compile && !Component.render) {
+      const template = Component.template || resolveMergedOptions(instance).template;
+      if (template) {
+        const { isCustomElement, compilerOptions } = instance.appContext.config;
+        const { delimiters, compilerOptions: componentCompilerOptions } = Component;
+        const finalCompilerOptions = extend$1(
+          extend$1(
+            {
+              isCustomElement,
+              delimiters
+            },
+            compilerOptions
+          ),
+          componentCompilerOptions
+        );
+        Component.render = compile(template, finalCompilerOptions);
+      }
+    }
+    instance.render = Component.render || NOOP;
+  }
+  {
+    const reset = setCurrentInstance(instance);
+    pauseTracking();
+    try {
+      applyOptions(instance);
+    } finally {
+      resetTracking();
+      reset();
+    }
+  }
+}
+function getAttrsProxy(instance) {
+  return instance.attrsProxy || (instance.attrsProxy = new Proxy(
+    instance.attrs,
+    {
+      get(target, key) {
+        track(instance, "get", "$attrs");
+        return target[key];
+      }
+    }
+  ));
+}
+function createSetupContext(instance) {
+  const expose = (exposed) => {
+    instance.exposed = exposed || {};
+  };
+  {
+    return {
+      get attrs() {
+        return getAttrsProxy(instance);
+      },
+      slots: instance.slots,
+      emit: instance.emit,
+      expose
+    };
+  }
+}
+function getExposeProxy(instance) {
+  if (instance.exposed) {
+    return instance.exposeProxy || (instance.exposeProxy = new Proxy(proxyRefs(markRaw(instance.exposed)), {
+      get(target, key) {
+        if (key in target) {
+          return target[key];
+        } else if (key in publicPropertiesMap) {
+          return publicPropertiesMap[key](instance);
+        }
+      },
+      has(target, key) {
+        return key in target || key in publicPropertiesMap;
+      }
+    }));
+  }
+}
+const classifyRE = /(?:^|[-_])(\w)/g;
+const classify = (str) => str.replace(classifyRE, (c) => c.toUpperCase()).replace(/[-_]/g, "");
+function getComponentName(Component, includeInferred = true) {
+  return isFunction$1(Component) ? Component.displayName || Component.name : Component.name || includeInferred && Component.__name;
+}
+function formatComponentName(instance, Component, isRoot = false) {
+  let name = getComponentName(Component);
+  if (!name && Component.__file) {
+    const match = Component.__file.match(/([^/\\]+)\.\w+$/);
+    if (match) {
+      name = match[1];
+    }
+  }
+  if (!name && instance && instance.parent) {
+    const inferFromRegistry = (registry) => {
+      for (const key in registry) {
+        if (registry[key] === Component) {
+          return key;
+        }
+      }
+    };
+    name = inferFromRegistry(
+      instance.components || instance.parent.type.components
+    ) || inferFromRegistry(instance.appContext.components);
+  }
+  return name ? classify(name) : isRoot ? `App` : `Anonymous`;
+}
+function isClassComponent(value) {
+  return isFunction$1(value) && "__vccOpts" in value;
+}
+const computed = (getterOrOptions, debugOptions) => {
+  return computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
+};
+function h(type, propsOrChildren, children) {
+  const l = arguments.length;
+  if (l === 2) {
+    if (isObject(propsOrChildren) && !isArray$2(propsOrChildren)) {
+      if (isVNode(propsOrChildren)) {
+        return createVNode(type, null, [propsOrChildren]);
+      }
+      return createVNode(type, propsOrChildren);
+    } else {
+      return createVNode(type, null, propsOrChildren);
+    }
+  } else {
+    if (l > 3) {
+      children = Array.prototype.slice.call(arguments, 2);
+    } else if (l === 3 && isVNode(children)) {
+      children = [children];
+    }
+    return createVNode(type, propsOrChildren, children);
+  }
+}
+const version = "3.4.19";
+/**
 * @vue/shared v3.4.19
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
-**/function hp(e,t){const n=new Set(e.split(","));return t?s=>n.has(s.toLowerCase()):s=>n.has(s)}const pp=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&(e.charCodeAt(2)>122||e.charCodeAt(2)<97),gp=e=>e.startsWith("onUpdate:"),yp=Object.assign,Ci=Array.isArray,Ml=e=>typeof e=="function",lo=e=>typeof e=="string",Ol=e=>{const t=Object.create(null);return n=>t[n]||(t[n]=e(n))},vp=/\B([A-Z])/g,Fl=Ol(e=>e.replace(vp,"-$1").toLowerCase()),_p=Ol(e=>e.charAt(0).toUpperCase()+e.slice(1)),mp=(e,t)=>{for(let n=0;n<e.length;n++)e[n](t)},$a=e=>{const t=parseFloat(e);return isNaN(t)?e:t},wp="itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly",bp=hp(wp);function Hl(e){return!!e||e===""}/**
+**/
+function makeMap(str, expectsLowerCase) {
+  const set2 = new Set(str.split(","));
+  return expectsLowerCase ? (val) => set2.has(val.toLowerCase()) : (val) => set2.has(val);
+}
+const isOn = (key) => key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110 && // uppercase letter
+(key.charCodeAt(2) > 122 || key.charCodeAt(2) < 97);
+const isModelListener = (key) => key.startsWith("onUpdate:");
+const extend = Object.assign;
+const isArray$1 = Array.isArray;
+const isFunction = (val) => typeof val === "function";
+const isString = (val) => typeof val === "string";
+const cacheStringFunction = (fn) => {
+  const cache = /* @__PURE__ */ Object.create(null);
+  return (str) => {
+    const hit = cache[str];
+    return hit || (cache[str] = fn(str));
+  };
+};
+const hyphenateRE = /\B([A-Z])/g;
+const hyphenate = cacheStringFunction(
+  (str) => str.replace(hyphenateRE, "-$1").toLowerCase()
+);
+const capitalize = cacheStringFunction((str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+});
+const invokeArrayFns = (fns, arg) => {
+  for (let i2 = 0; i2 < fns.length; i2++) {
+    fns[i2](arg);
+  }
+};
+const looseToNumber = (val) => {
+  const n = parseFloat(val);
+  return isNaN(n) ? val : n;
+};
+const specialBooleanAttrs = `itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`;
+const isSpecialBooleanAttr = /* @__PURE__ */ makeMap(specialBooleanAttrs);
+function includeBooleanAttr(value) {
+  return !!value || value === "";
+}
+/**
 * @vue/runtime-dom v3.4.19
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
-**/const Ep="http://www.w3.org/2000/svg",Rp="http://www.w3.org/1998/Math/MathML",fn=typeof document<"u"?document:null,Pa=fn&&fn.createElement("template"),xp={insert:(e,t,n)=>{t.insertBefore(e,n||null)},remove:e=>{const t=e.parentNode;t&&t.removeChild(e)},createElement:(e,t,n,s)=>{const o=t==="svg"?fn.createElementNS(Ep,e):t==="mathml"?fn.createElementNS(Rp,e):fn.createElement(e,n?{is:n}:void 0);return e==="select"&&s&&s.multiple!=null&&o.setAttribute("multiple",s.multiple),o},createText:e=>fn.createTextNode(e),createComment:e=>fn.createComment(e),setText:(e,t)=>{e.nodeValue=t},setElementText:(e,t)=>{e.textContent=t},parentNode:e=>e.parentNode,nextSibling:e=>e.nextSibling,querySelector:e=>fn.querySelector(e),setScopeId(e,t){e.setAttribute(t,"")},insertStaticContent(e,t,n,s,o,r){const i=n?n.previousSibling:t.lastChild;if(o&&(o===r||o.nextSibling))for(;t.insertBefore(o.cloneNode(!0),n),!(o===r||!(o=o.nextSibling)););else{Pa.innerHTML=s==="svg"?`<svg>${e}</svg>`:s==="mathml"?`<math>${e}</math>`:e;const a=Pa.content;if(s==="svg"||s==="mathml"){const c=a.firstChild;for(;c.firstChild;)a.appendChild(c.firstChild);a.removeChild(c)}t.insertBefore(a,n)}return[i?i.nextSibling:t.firstChild,n?n.previousSibling:t.lastChild]}},Sp=Symbol("_vtc");function kp(e,t,n){const s=e[Sp];s&&(t=(t?[t,...s]:[...s]).join(" ")),t==null?e.removeAttribute("class"):n?e.setAttribute("class",t):e.className=t}const Ia=Symbol("_vod"),Cp=Symbol(""),$p=/(^|;)\s*display\s*:/;function Pp(e,t,n){const s=e.style,o=lo(n),r=s.display;let i=!1;if(n&&!o){if(t&&!lo(t))for(const a in t)n[a]==null&&Or(s,a,"");for(const a in n)a==="display"&&(i=!0),Or(s,a,n[a])}else if(o){if(t!==n){const a=s[Cp];a&&(n+=";"+a),s.cssText=n,i=$p.test(n)}}else t&&e.removeAttribute("style");Ia in e&&(e[Ia]=i?s.display:"",s.display=r)}const Aa=/\s*!important$/;function Or(e,t,n){if(Ci(n))n.forEach(s=>Or(e,t,s));else if(n==null&&(n=""),t.startsWith("--"))e.setProperty(t,n);else{const s=Ip(e,t);Aa.test(n)?e.setProperty(Fl(s),n.replace(Aa,""),"important"):e[s]=n}}const Ta=["Webkit","Moz","ms"],lr={};function Ip(e,t){const n=lr[t];if(n)return n;let s=Ot(t);if(s!=="filter"&&s in e)return lr[t]=s;s=_p(s);for(let o=0;o<Ta.length;o++){const r=Ta[o]+s;if(r in e)return lr[t]=r}return t}const La="http://www.w3.org/1999/xlink";function Ap(e,t,n,s,o){if(s&&t.startsWith("xlink:"))n==null?e.removeAttributeNS(La,t.slice(6,t.length)):e.setAttributeNS(La,t,n);else{const r=bp(t);n==null||r&&!Hl(n)?e.removeAttribute(t):e.setAttribute(t,r?"":n)}}function Tp(e,t,n,s,o,r,i){if(t==="innerHTML"||t==="textContent"){s&&i(s,o,r),e[t]=n??"";return}const a=e.tagName;if(t==="value"&&a!=="PROGRESS"&&!a.includes("-")){e._value=n;const l=a==="OPTION"?e.getAttribute("value"):e.value,d=n??"";l!==d&&(e.value=d),n==null&&e.removeAttribute(t);return}let c=!1;if(n===""||n==null){const l=typeof e[t];l==="boolean"?n=Hl(n):n==null&&l==="string"?(n="",c=!0):l==="number"&&(n=0,c=!0)}try{e[t]=n}catch{}c&&e.removeAttribute(t)}function Dn(e,t,n,s){e.addEventListener(t,n,s)}function Lp(e,t,n,s){e.removeEventListener(t,n,s)}const Ua=Symbol("_vei");function Up(e,t,n,s,o=null){const r=e[Ua]||(e[Ua]={}),i=r[t];if(s&&i)i.value=s;else{const[a,c]=Bp(t);if(s){const l=r[t]=Op(s,o);Dn(e,a,l,c)}else i&&(Lp(e,a,i,c),r[t]=void 0)}}const Ba=/(?:Once|Passive|Capture)$/;function Bp(e){let t;if(Ba.test(e)){t={};let s;for(;s=e.match(Ba);)e=e.slice(0,e.length-s[0].length),t[s[0].toLowerCase()]=!0}return[e[2]===":"?e.slice(3):Fl(e.slice(2)),t]}let ur=0;const Np=Promise.resolve(),Mp=()=>ur||(Np.then(()=>ur=0),ur=Date.now());function Op(e,t){const n=s=>{if(!s._vts)s._vts=Date.now();else if(s._vts<=n.attached)return;Rt(Fp(s,n.value),t,5,[s])};return n.value=e,n.attached=Mp(),n}function Fp(e,t){if(Ci(t)){const n=e.stopImmediatePropagation;return e.stopImmediatePropagation=()=>{n.call(e),e._stopped=!0},t.map(s=>o=>!o._stopped&&s&&s(o))}else return t}const Na=e=>e.charCodeAt(0)===111&&e.charCodeAt(1)===110&&e.charCodeAt(2)>96&&e.charCodeAt(2)<123,Hp=(e,t,n,s,o,r,i,a,c)=>{const l=o==="svg";t==="class"?kp(e,s,l):t==="style"?Pp(e,n,s):pp(t)?gp(t)||Up(e,t,n,s,i):(t[0]==="."?(t=t.slice(1),!0):t[0]==="^"?(t=t.slice(1),!1):jp(e,t,s,l))?Tp(e,t,s,r,i,a,c):(t==="true-value"?e._trueValue=s:t==="false-value"&&(e._falseValue=s),Ap(e,t,s,l))};function jp(e,t,n,s){if(s)return!!(t==="innerHTML"||t==="textContent"||t in e&&Na(t)&&Ml(n));if(t==="spellcheck"||t==="draggable"||t==="translate"||t==="form"||t==="list"&&e.tagName==="INPUT"||t==="type"&&e.tagName==="TEXTAREA")return!1;if(t==="width"||t==="height"){const o=e.tagName;if(o==="IMG"||o==="VIDEO"||o==="CANVAS"||o==="SOURCE")return!1}return Na(t)&&lo(n)?!1:t in e}const Ma=e=>{const t=e.props["onUpdate:modelValue"]||!1;return Ci(t)?n=>mp(t,n):t};function Vp(e){e.target.composing=!0}function Oa(e){const t=e.target;t.composing&&(t.composing=!1,t.dispatchEvent(new Event("input")))}const dr=Symbol("_assign"),Kt={created(e,{modifiers:{lazy:t,trim:n,number:s}},o){e[dr]=Ma(o);const r=s||o.props&&o.props.type==="number";Dn(e,t?"change":"input",i=>{if(i.target.composing)return;let a=e.value;n&&(a=a.trim()),r&&(a=$a(a)),e[dr](a)}),n&&Dn(e,"change",()=>{e.value=e.value.trim()}),t||(Dn(e,"compositionstart",Vp),Dn(e,"compositionend",Oa),Dn(e,"change",Oa))},mounted(e,{value:t}){e.value=t??""},beforeUpdate(e,{value:t,modifiers:{lazy:n,trim:s,number:o}},r){if(e[dr]=Ma(r),e.composing)return;const i=o||e.type==="number"?$a(e.value):e.value,a=t??"";i!==a&&(document.activeElement===e&&e.type!=="range"&&(n||s&&e.value.trim()===a)||(e.value=a))}},Dp=["ctrl","shift","alt","meta"],Wp={stop:e=>e.stopPropagation(),prevent:e=>e.preventDefault(),self:e=>e.target!==e.currentTarget,ctrl:e=>!e.ctrlKey,shift:e=>!e.shiftKey,alt:e=>!e.altKey,meta:e=>!e.metaKey,left:e=>"button"in e&&e.button!==0,middle:e=>"button"in e&&e.button!==1,right:e=>"button"in e&&e.button!==2,exact:(e,t)=>Dp.some(n=>e[`${n}Key`]&&!t.includes(n))},Bn=(e,t)=>{const n=e._withMods||(e._withMods={}),s=t.join(".");return n[s]||(n[s]=(o,...r)=>{for(let i=0;i<t.length;i++){const a=Wp[t[i]];if(a&&a(o,t))return}return e(o,...r)})},qp=yp({patchProp:Hp},xp);let Fa;function Kp(){return Fa||(Fa=Gh(qp))}const zp=(...e)=>{const t=Kp().createApp(...e),{mount:n}=t;return t.mount=s=>{const o=Zp(s);if(!o)return;const r=t._component;!Ml(r)&&!r.render&&!r.template&&(r.template=o.innerHTML),o.innerHTML="";const i=n(o,!1,Gp(o));return o instanceof Element&&(o.removeAttribute("v-cloak"),o.setAttribute("data-v-app","")),i},t};function Gp(e){if(e instanceof SVGElement)return"svg";if(typeof MathMLElement=="function"&&e instanceof MathMLElement)return"mathml"}function Zp(e){return lo(e)?document.querySelector(e):e}var Jp=!1;/*!
+**/
+const svgNS = "http://www.w3.org/2000/svg";
+const mathmlNS = "http://www.w3.org/1998/Math/MathML";
+const doc = typeof document !== "undefined" ? document : null;
+const templateContainer = doc && /* @__PURE__ */ doc.createElement("template");
+const nodeOps = {
+  insert: (child, parent, anchor) => {
+    parent.insertBefore(child, anchor || null);
+  },
+  remove: (child) => {
+    const parent = child.parentNode;
+    if (parent) {
+      parent.removeChild(child);
+    }
+  },
+  createElement: (tag, namespace, is, props) => {
+    const el = namespace === "svg" ? doc.createElementNS(svgNS, tag) : namespace === "mathml" ? doc.createElementNS(mathmlNS, tag) : doc.createElement(tag, is ? { is } : void 0);
+    if (tag === "select" && props && props.multiple != null) {
+      el.setAttribute("multiple", props.multiple);
+    }
+    return el;
+  },
+  createText: (text) => doc.createTextNode(text),
+  createComment: (text) => doc.createComment(text),
+  setText: (node, text) => {
+    node.nodeValue = text;
+  },
+  setElementText: (el, text) => {
+    el.textContent = text;
+  },
+  parentNode: (node) => node.parentNode,
+  nextSibling: (node) => node.nextSibling,
+  querySelector: (selector) => doc.querySelector(selector),
+  setScopeId(el, id) {
+    el.setAttribute(id, "");
+  },
+  // __UNSAFE__
+  // Reason: innerHTML.
+  // Static content here can only come from compiled templates.
+  // As long as the user only uses trusted templates, this is safe.
+  insertStaticContent(content, parent, anchor, namespace, start, end) {
+    const before = anchor ? anchor.previousSibling : parent.lastChild;
+    if (start && (start === end || start.nextSibling)) {
+      while (true) {
+        parent.insertBefore(start.cloneNode(true), anchor);
+        if (start === end || !(start = start.nextSibling))
+          break;
+      }
+    } else {
+      templateContainer.innerHTML = namespace === "svg" ? `<svg>${content}</svg>` : namespace === "mathml" ? `<math>${content}</math>` : content;
+      const template = templateContainer.content;
+      if (namespace === "svg" || namespace === "mathml") {
+        const wrapper = template.firstChild;
+        while (wrapper.firstChild) {
+          template.appendChild(wrapper.firstChild);
+        }
+        template.removeChild(wrapper);
+      }
+      parent.insertBefore(template, anchor);
+    }
+    return [
+      // first
+      before ? before.nextSibling : parent.firstChild,
+      // last
+      anchor ? anchor.previousSibling : parent.lastChild
+    ];
+  }
+};
+const vtcKey = Symbol("_vtc");
+function patchClass(el, value, isSVG) {
+  const transitionClasses = el[vtcKey];
+  if (transitionClasses) {
+    value = (value ? [value, ...transitionClasses] : [...transitionClasses]).join(" ");
+  }
+  if (value == null) {
+    el.removeAttribute("class");
+  } else if (isSVG) {
+    el.setAttribute("class", value);
+  } else {
+    el.className = value;
+  }
+}
+const vShowOldKey = Symbol("_vod");
+const CSS_VAR_TEXT = Symbol("");
+const displayRE = /(^|;)\s*display\s*:/;
+function patchStyle(el, prev, next) {
+  const style = el.style;
+  const isCssString = isString(next);
+  const currentDisplay = style.display;
+  let hasControlledDisplay = false;
+  if (next && !isCssString) {
+    if (prev && !isString(prev)) {
+      for (const key in prev) {
+        if (next[key] == null) {
+          setStyle(style, key, "");
+        }
+      }
+    }
+    for (const key in next) {
+      if (key === "display") {
+        hasControlledDisplay = true;
+      }
+      setStyle(style, key, next[key]);
+    }
+  } else {
+    if (isCssString) {
+      if (prev !== next) {
+        const cssVarText = style[CSS_VAR_TEXT];
+        if (cssVarText) {
+          next += ";" + cssVarText;
+        }
+        style.cssText = next;
+        hasControlledDisplay = displayRE.test(next);
+      }
+    } else if (prev) {
+      el.removeAttribute("style");
+    }
+  }
+  if (vShowOldKey in el) {
+    el[vShowOldKey] = hasControlledDisplay ? style.display : "";
+    style.display = currentDisplay;
+  }
+}
+const importantRE = /\s*!important$/;
+function setStyle(style, name, val) {
+  if (isArray$1(val)) {
+    val.forEach((v) => setStyle(style, name, v));
+  } else {
+    if (val == null)
+      val = "";
+    if (name.startsWith("--")) {
+      style.setProperty(name, val);
+    } else {
+      const prefixed = autoPrefix(style, name);
+      if (importantRE.test(val)) {
+        style.setProperty(
+          hyphenate(prefixed),
+          val.replace(importantRE, ""),
+          "important"
+        );
+      } else {
+        style[prefixed] = val;
+      }
+    }
+  }
+}
+const prefixes = ["Webkit", "Moz", "ms"];
+const prefixCache = {};
+function autoPrefix(style, rawName) {
+  const cached = prefixCache[rawName];
+  if (cached) {
+    return cached;
+  }
+  let name = camelize(rawName);
+  if (name !== "filter" && name in style) {
+    return prefixCache[rawName] = name;
+  }
+  name = capitalize(name);
+  for (let i2 = 0; i2 < prefixes.length; i2++) {
+    const prefixed = prefixes[i2] + name;
+    if (prefixed in style) {
+      return prefixCache[rawName] = prefixed;
+    }
+  }
+  return rawName;
+}
+const xlinkNS = "http://www.w3.org/1999/xlink";
+function patchAttr(el, key, value, isSVG, instance) {
+  if (isSVG && key.startsWith("xlink:")) {
+    if (value == null) {
+      el.removeAttributeNS(xlinkNS, key.slice(6, key.length));
+    } else {
+      el.setAttributeNS(xlinkNS, key, value);
+    }
+  } else {
+    const isBoolean = isSpecialBooleanAttr(key);
+    if (value == null || isBoolean && !includeBooleanAttr(value)) {
+      el.removeAttribute(key);
+    } else {
+      el.setAttribute(key, isBoolean ? "" : value);
+    }
+  }
+}
+function patchDOMProp(el, key, value, prevChildren, parentComponent, parentSuspense, unmountChildren) {
+  if (key === "innerHTML" || key === "textContent") {
+    if (prevChildren) {
+      unmountChildren(prevChildren, parentComponent, parentSuspense);
+    }
+    el[key] = value == null ? "" : value;
+    return;
+  }
+  const tag = el.tagName;
+  if (key === "value" && tag !== "PROGRESS" && // custom elements may use _value internally
+  !tag.includes("-")) {
+    el._value = value;
+    const oldValue = tag === "OPTION" ? el.getAttribute("value") : el.value;
+    const newValue = value == null ? "" : value;
+    if (oldValue !== newValue) {
+      el.value = newValue;
+    }
+    if (value == null) {
+      el.removeAttribute(key);
+    }
+    return;
+  }
+  let needRemove = false;
+  if (value === "" || value == null) {
+    const type = typeof el[key];
+    if (type === "boolean") {
+      value = includeBooleanAttr(value);
+    } else if (value == null && type === "string") {
+      value = "";
+      needRemove = true;
+    } else if (type === "number") {
+      value = 0;
+      needRemove = true;
+    }
+  }
+  try {
+    el[key] = value;
+  } catch (e) {
+  }
+  needRemove && el.removeAttribute(key);
+}
+function addEventListener(el, event, handler, options) {
+  el.addEventListener(event, handler, options);
+}
+function removeEventListener(el, event, handler, options) {
+  el.removeEventListener(event, handler, options);
+}
+const veiKey = Symbol("_vei");
+function patchEvent(el, rawName, prevValue, nextValue, instance = null) {
+  const invokers = el[veiKey] || (el[veiKey] = {});
+  const existingInvoker = invokers[rawName];
+  if (nextValue && existingInvoker) {
+    existingInvoker.value = nextValue;
+  } else {
+    const [name, options] = parseName(rawName);
+    if (nextValue) {
+      const invoker = invokers[rawName] = createInvoker(nextValue, instance);
+      addEventListener(el, name, invoker, options);
+    } else if (existingInvoker) {
+      removeEventListener(el, name, existingInvoker, options);
+      invokers[rawName] = void 0;
+    }
+  }
+}
+const optionsModifierRE = /(?:Once|Passive|Capture)$/;
+function parseName(name) {
+  let options;
+  if (optionsModifierRE.test(name)) {
+    options = {};
+    let m;
+    while (m = name.match(optionsModifierRE)) {
+      name = name.slice(0, name.length - m[0].length);
+      options[m[0].toLowerCase()] = true;
+    }
+  }
+  const event = name[2] === ":" ? name.slice(3) : hyphenate(name.slice(2));
+  return [event, options];
+}
+let cachedNow = 0;
+const p = /* @__PURE__ */ Promise.resolve();
+const getNow = () => cachedNow || (p.then(() => cachedNow = 0), cachedNow = Date.now());
+function createInvoker(initialValue, instance) {
+  const invoker = (e) => {
+    if (!e._vts) {
+      e._vts = Date.now();
+    } else if (e._vts <= invoker.attached) {
+      return;
+    }
+    callWithAsyncErrorHandling(
+      patchStopImmediatePropagation(e, invoker.value),
+      instance,
+      5,
+      [e]
+    );
+  };
+  invoker.value = initialValue;
+  invoker.attached = getNow();
+  return invoker;
+}
+function patchStopImmediatePropagation(e, value) {
+  if (isArray$1(value)) {
+    const originalStop = e.stopImmediatePropagation;
+    e.stopImmediatePropagation = () => {
+      originalStop.call(e);
+      e._stopped = true;
+    };
+    return value.map((fn) => (e2) => !e2._stopped && fn && fn(e2));
+  } else {
+    return value;
+  }
+}
+const isNativeOn = (key) => key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110 && // lowercase letter
+key.charCodeAt(2) > 96 && key.charCodeAt(2) < 123;
+const patchProp = (el, key, prevValue, nextValue, namespace, prevChildren, parentComponent, parentSuspense, unmountChildren) => {
+  const isSVG = namespace === "svg";
+  if (key === "class") {
+    patchClass(el, nextValue, isSVG);
+  } else if (key === "style") {
+    patchStyle(el, prevValue, nextValue);
+  } else if (isOn(key)) {
+    if (!isModelListener(key)) {
+      patchEvent(el, key, prevValue, nextValue, parentComponent);
+    }
+  } else if (key[0] === "." ? (key = key.slice(1), true) : key[0] === "^" ? (key = key.slice(1), false) : shouldSetAsProp(el, key, nextValue, isSVG)) {
+    patchDOMProp(
+      el,
+      key,
+      nextValue,
+      prevChildren,
+      parentComponent,
+      parentSuspense,
+      unmountChildren
+    );
+  } else {
+    if (key === "true-value") {
+      el._trueValue = nextValue;
+    } else if (key === "false-value") {
+      el._falseValue = nextValue;
+    }
+    patchAttr(el, key, nextValue, isSVG);
+  }
+};
+function shouldSetAsProp(el, key, value, isSVG) {
+  if (isSVG) {
+    if (key === "innerHTML" || key === "textContent") {
+      return true;
+    }
+    if (key in el && isNativeOn(key) && isFunction(value)) {
+      return true;
+    }
+    return false;
+  }
+  if (key === "spellcheck" || key === "draggable" || key === "translate") {
+    return false;
+  }
+  if (key === "form") {
+    return false;
+  }
+  if (key === "list" && el.tagName === "INPUT") {
+    return false;
+  }
+  if (key === "type" && el.tagName === "TEXTAREA") {
+    return false;
+  }
+  if (key === "width" || key === "height") {
+    const tag = el.tagName;
+    if (tag === "IMG" || tag === "VIDEO" || tag === "CANVAS" || tag === "SOURCE") {
+      return false;
+    }
+  }
+  if (isNativeOn(key) && isString(value)) {
+    return false;
+  }
+  return key in el;
+}
+const getModelAssigner = (vnode) => {
+  const fn = vnode.props["onUpdate:modelValue"] || false;
+  return isArray$1(fn) ? (value) => invokeArrayFns(fn, value) : fn;
+};
+function onCompositionStart(e) {
+  e.target.composing = true;
+}
+function onCompositionEnd(e) {
+  const target = e.target;
+  if (target.composing) {
+    target.composing = false;
+    target.dispatchEvent(new Event("input"));
+  }
+}
+const assignKey = Symbol("_assign");
+const vModelText = {
+  created(el, { modifiers: { lazy, trim, number: number2 } }, vnode) {
+    el[assignKey] = getModelAssigner(vnode);
+    const castToNumber = number2 || vnode.props && vnode.props.type === "number";
+    addEventListener(el, lazy ? "change" : "input", (e) => {
+      if (e.target.composing)
+        return;
+      let domValue = el.value;
+      if (trim) {
+        domValue = domValue.trim();
+      }
+      if (castToNumber) {
+        domValue = looseToNumber(domValue);
+      }
+      el[assignKey](domValue);
+    });
+    if (trim) {
+      addEventListener(el, "change", () => {
+        el.value = el.value.trim();
+      });
+    }
+    if (!lazy) {
+      addEventListener(el, "compositionstart", onCompositionStart);
+      addEventListener(el, "compositionend", onCompositionEnd);
+      addEventListener(el, "change", onCompositionEnd);
+    }
+  },
+  // set value on mounted so it's after min/max for type="range"
+  mounted(el, { value }) {
+    el.value = value == null ? "" : value;
+  },
+  beforeUpdate(el, { value, modifiers: { lazy, trim, number: number2 } }, vnode) {
+    el[assignKey] = getModelAssigner(vnode);
+    if (el.composing)
+      return;
+    const elValue = number2 || el.type === "number" ? looseToNumber(el.value) : el.value;
+    const newValue = value == null ? "" : value;
+    if (elValue === newValue) {
+      return;
+    }
+    if (document.activeElement === el && el.type !== "range") {
+      if (lazy) {
+        return;
+      }
+      if (trim && el.value.trim() === newValue) {
+        return;
+      }
+    }
+    el.value = newValue;
+  }
+};
+const systemModifiers = ["ctrl", "shift", "alt", "meta"];
+const modifierGuards = {
+  stop: (e) => e.stopPropagation(),
+  prevent: (e) => e.preventDefault(),
+  self: (e) => e.target !== e.currentTarget,
+  ctrl: (e) => !e.ctrlKey,
+  shift: (e) => !e.shiftKey,
+  alt: (e) => !e.altKey,
+  meta: (e) => !e.metaKey,
+  left: (e) => "button" in e && e.button !== 0,
+  middle: (e) => "button" in e && e.button !== 1,
+  right: (e) => "button" in e && e.button !== 2,
+  exact: (e, modifiers) => systemModifiers.some((m) => e[`${m}Key`] && !modifiers.includes(m))
+};
+const withModifiers = (fn, modifiers) => {
+  const cache = fn._withMods || (fn._withMods = {});
+  const cacheKey = modifiers.join(".");
+  return cache[cacheKey] || (cache[cacheKey] = (event, ...args) => {
+    for (let i2 = 0; i2 < modifiers.length; i2++) {
+      const guard = modifierGuards[modifiers[i2]];
+      if (guard && guard(event, modifiers))
+        return;
+    }
+    return fn(event, ...args);
+  });
+};
+const rendererOptions = /* @__PURE__ */ extend({ patchProp }, nodeOps);
+let renderer;
+function ensureRenderer() {
+  return renderer || (renderer = createRenderer(rendererOptions));
+}
+const createApp = (...args) => {
+  const app2 = ensureRenderer().createApp(...args);
+  const { mount } = app2;
+  app2.mount = (containerOrSelector) => {
+    const container = normalizeContainer(containerOrSelector);
+    if (!container)
+      return;
+    const component = app2._component;
+    if (!isFunction(component) && !component.render && !component.template) {
+      component.template = container.innerHTML;
+    }
+    container.innerHTML = "";
+    const proxy = mount(container, false, resolveRootNamespace(container));
+    if (container instanceof Element) {
+      container.removeAttribute("v-cloak");
+      container.setAttribute("data-v-app", "");
+    }
+    return proxy;
+  };
+  return app2;
+};
+function resolveRootNamespace(container) {
+  if (container instanceof SVGElement) {
+    return "svg";
+  }
+  if (typeof MathMLElement === "function" && container instanceof MathMLElement) {
+    return "mathml";
+  }
+}
+function normalizeContainer(container) {
+  if (isString(container)) {
+    const res = document.querySelector(container);
+    return res;
+  }
+  return container;
+}
+var isVue2 = false;
+/*!
  * pinia v2.1.7
  * (c) 2023 Eduardo San Martin Morote
  * @license MIT
- */let jl;const Lo=e=>jl=e,Vl=Symbol();function Fr(e){return e&&typeof e=="object"&&Object.prototype.toString.call(e)==="[object Object]"&&typeof e.toJSON!="function"}var xs;(function(e){e.direct="direct",e.patchObject="patch object",e.patchFunction="patch function"})(xs||(xs={}));function Yp(){const e=Mc(!0),t=e.run(()=>L({}));let n=[],s=[];const o=Eo({install(r){Lo(o),o._a=r,r.provide(Vl,o),r.config.globalProperties.$pinia=o,s.forEach(i=>n.push(i)),s=[]},use(r){return!this._a&&!Jp?s.push(r):n.push(r),this},_p:n,_a:null,_e:e,_s:new Map,state:t});return o}const Dl=()=>{};function Ha(e,t,n,s=Dl){e.push(t);const o=()=>{const r=e.indexOf(t);r>-1&&(e.splice(r,1),s())};return!n&&Oc()&&Ef(o),o}function jn(e,...t){e.slice().forEach(n=>{n(...t)})}const Qp=e=>e();function Hr(e,t){e instanceof Map&&t instanceof Map&&t.forEach((n,s)=>e.set(s,n)),e instanceof Set&&t instanceof Set&&t.forEach(e.add,e);for(const n in t){if(!t.hasOwnProperty(n))continue;const s=t[n],o=e[n];Fr(o)&&Fr(s)&&e.hasOwnProperty(n)&&!He(s)&&!vn(s)?e[n]=Hr(o,s):e[n]=s}return e}const Xp=Symbol();function eg(e){return!Fr(e)||!e.hasOwnProperty(Xp)}const{assign:ln}=Object;function tg(e){return!!(He(e)&&e.effect)}function ng(e,t,n,s){const{state:o,actions:r,getters:i}=t,a=n.state.value[e];let c;function l(){a||(n.state.value[e]=o?o():{});const d=zf(n.state.value[e]);return ln(d,r,Object.keys(i||{}).reduce((u,f)=>(u[f]=Eo(ye(()=>{Lo(n);const h=n._s.get(e);return i[f].call(h,h)})),u),{}))}return c=Wl(e,l,t,n,s,!0),c}function Wl(e,t,n={},s,o,r){let i;const a=ln({actions:{}},n),c={deep:!0};let l,d,u=[],f=[],h;const v=s.state.value[e];!r&&!v&&(s.state.value[e]={}),L({});let g;function m($){let T;l=d=!1,typeof $=="function"?($(s.state.value[e]),T={type:xs.patchFunction,storeId:e,events:h}):(Hr(s.state.value[e],$),T={type:xs.patchObject,payload:$,storeId:e,events:h});const I=g=Symbol();Qn().then(()=>{g===I&&(l=!0)}),d=!0,jn(u,T,s.state.value[e])}const w=r?function(){const{state:T}=n,I=T?T():{};this.$patch(V=>{ln(V,I)})}:Dl;function x(){i.stop(),u=[],f=[],s._s.delete(e)}function b($,T){return function(){Lo(s);const I=Array.from(arguments),V=[],z=[];function J(R){V.push(R)}function X(R){z.push(R)}jn(f,{args:I,name:$,store:P,after:J,onError:X});let H;try{H=T.apply(this&&this.$id===e?this:P,I)}catch(R){throw jn(z,R),R}return H instanceof Promise?H.then(R=>(jn(V,R),R)).catch(R=>(jn(z,R),Promise.reject(R))):(jn(V,H),H)}}const C={_p:s,$id:e,$onAction:Ha.bind(null,f),$patch:m,$reset:w,$subscribe($,T={}){const I=Ha(u,$,T.detached,()=>V()),V=i.run(()=>qe(()=>s.state.value[e],z=>{(T.flush==="sync"?d:l)&&$({storeId:e,type:xs.direct,events:h},z)},ln({},c,T)));return I},$dispose:x},P=as(C);s._s.set(e,P);const D=(s._a&&s._a.runWithContext||Qp)(()=>s._e.run(()=>(i=Mc()).run(t)));for(const $ in D){const T=D[$];if(He(T)&&!tg(T)||vn(T))r||(v&&eg(T)&&(He(T)?T.value=v[$]:Hr(T,v[$])),s.state.value[e][$]=T);else if(typeof T=="function"){const I=b($,T);D[$]=I,a.actions[$]=T}}return ln(P,D),ln(xe(P),D),Object.defineProperty(P,"$state",{get:()=>s.state.value[e],set:$=>{m(T=>{ln(T,$)})}}),s._p.forEach($=>{ln(P,i.run(()=>$({store:P,app:s._a,pinia:s,options:a})))}),v&&r&&n.hydrate&&n.hydrate(P.$state,v),l=!0,d=!0,P}function _t(e,t,n){let s,o;const r=typeof t=="function";typeof e=="string"?(s=e,o=r?n:t):(o=e,s=e.id);function i(a,c){const l=Vh();return a=a||(l?yt(Vl,null):null),a&&Lo(a),a=jl,a._s.has(s)||(r?Wl(s,t,o,a):ng(s,o,a)),a._s.get(s)}return i.$id=s,i}/*!
+ */
+let activePinia;
+const setActivePinia = (pinia2) => activePinia = pinia2;
+const piniaSymbol = (
+  /* istanbul ignore next */
+  Symbol()
+);
+function isPlainObject(o) {
+  return o && typeof o === "object" && Object.prototype.toString.call(o) === "[object Object]" && typeof o.toJSON !== "function";
+}
+var MutationType;
+(function(MutationType2) {
+  MutationType2["direct"] = "direct";
+  MutationType2["patchObject"] = "patch object";
+  MutationType2["patchFunction"] = "patch function";
+})(MutationType || (MutationType = {}));
+function createPinia() {
+  const scope = effectScope(true);
+  const state = scope.run(() => ref({}));
+  let _p = [];
+  let toBeInstalled = [];
+  const pinia2 = markRaw({
+    install(app2) {
+      setActivePinia(pinia2);
+      {
+        pinia2._a = app2;
+        app2.provide(piniaSymbol, pinia2);
+        app2.config.globalProperties.$pinia = pinia2;
+        toBeInstalled.forEach((plugin) => _p.push(plugin));
+        toBeInstalled = [];
+      }
+    },
+    use(plugin) {
+      if (!this._a && !isVue2) {
+        toBeInstalled.push(plugin);
+      } else {
+        _p.push(plugin);
+      }
+      return this;
+    },
+    _p,
+    // it's actually undefined here
+    // @ts-expect-error
+    _a: null,
+    _e: scope,
+    _s: /* @__PURE__ */ new Map(),
+    state
+  });
+  return pinia2;
+}
+const noop$1 = () => {
+};
+function addSubscription(subscriptions, callback, detached, onCleanup = noop$1) {
+  subscriptions.push(callback);
+  const removeSubscription = () => {
+    const idx = subscriptions.indexOf(callback);
+    if (idx > -1) {
+      subscriptions.splice(idx, 1);
+      onCleanup();
+    }
+  };
+  if (!detached && getCurrentScope()) {
+    onScopeDispose(removeSubscription);
+  }
+  return removeSubscription;
+}
+function triggerSubscriptions(subscriptions, ...args) {
+  subscriptions.slice().forEach((callback) => {
+    callback(...args);
+  });
+}
+const fallbackRunWithContext = (fn) => fn();
+function mergeReactiveObjects(target, patchToApply) {
+  if (target instanceof Map && patchToApply instanceof Map) {
+    patchToApply.forEach((value, key) => target.set(key, value));
+  }
+  if (target instanceof Set && patchToApply instanceof Set) {
+    patchToApply.forEach(target.add, target);
+  }
+  for (const key in patchToApply) {
+    if (!patchToApply.hasOwnProperty(key))
+      continue;
+    const subPatch = patchToApply[key];
+    const targetValue = target[key];
+    if (isPlainObject(targetValue) && isPlainObject(subPatch) && target.hasOwnProperty(key) && !isRef(subPatch) && !isReactive(subPatch)) {
+      target[key] = mergeReactiveObjects(targetValue, subPatch);
+    } else {
+      target[key] = subPatch;
+    }
+  }
+  return target;
+}
+const skipHydrateSymbol = (
+  /* istanbul ignore next */
+  Symbol()
+);
+function shouldHydrate(obj) {
+  return !isPlainObject(obj) || !obj.hasOwnProperty(skipHydrateSymbol);
+}
+const { assign: assign$1 } = Object;
+function isComputed(o) {
+  return !!(isRef(o) && o.effect);
+}
+function createOptionsStore(id, options, pinia2, hot) {
+  const { state, actions, getters } = options;
+  const initialState = pinia2.state.value[id];
+  let store;
+  function setup() {
+    if (!initialState && true) {
+      {
+        pinia2.state.value[id] = state ? state() : {};
+      }
+    }
+    const localState = toRefs(pinia2.state.value[id]);
+    return assign$1(localState, actions, Object.keys(getters || {}).reduce((computedGetters, name) => {
+      computedGetters[name] = markRaw(computed(() => {
+        setActivePinia(pinia2);
+        const store2 = pinia2._s.get(id);
+        return getters[name].call(store2, store2);
+      }));
+      return computedGetters;
+    }, {}));
+  }
+  store = createSetupStore(id, setup, options, pinia2, hot, true);
+  return store;
+}
+function createSetupStore($id, setup, options = {}, pinia2, hot, isOptionsStore) {
+  let scope;
+  const optionsForPlugin = assign$1({ actions: {} }, options);
+  const $subscribeOptions = {
+    deep: true
+    // flush: 'post',
+  };
+  let isListening;
+  let isSyncListening;
+  let subscriptions = [];
+  let actionSubscriptions = [];
+  let debuggerEvents;
+  const initialState = pinia2.state.value[$id];
+  if (!isOptionsStore && !initialState && true) {
+    {
+      pinia2.state.value[$id] = {};
+    }
+  }
+  ref({});
+  let activeListener;
+  function $patch(partialStateOrMutator) {
+    let subscriptionMutation;
+    isListening = isSyncListening = false;
+    if (typeof partialStateOrMutator === "function") {
+      partialStateOrMutator(pinia2.state.value[$id]);
+      subscriptionMutation = {
+        type: MutationType.patchFunction,
+        storeId: $id,
+        events: debuggerEvents
+      };
+    } else {
+      mergeReactiveObjects(pinia2.state.value[$id], partialStateOrMutator);
+      subscriptionMutation = {
+        type: MutationType.patchObject,
+        payload: partialStateOrMutator,
+        storeId: $id,
+        events: debuggerEvents
+      };
+    }
+    const myListenerId = activeListener = Symbol();
+    nextTick().then(() => {
+      if (activeListener === myListenerId) {
+        isListening = true;
+      }
+    });
+    isSyncListening = true;
+    triggerSubscriptions(subscriptions, subscriptionMutation, pinia2.state.value[$id]);
+  }
+  const $reset = isOptionsStore ? function $reset2() {
+    const { state } = options;
+    const newState = state ? state() : {};
+    this.$patch(($state) => {
+      assign$1($state, newState);
+    });
+  } : (
+    /* istanbul ignore next */
+    noop$1
+  );
+  function $dispose() {
+    scope.stop();
+    subscriptions = [];
+    actionSubscriptions = [];
+    pinia2._s.delete($id);
+  }
+  function wrapAction(name, action) {
+    return function() {
+      setActivePinia(pinia2);
+      const args = Array.from(arguments);
+      const afterCallbackList = [];
+      const onErrorCallbackList = [];
+      function after(callback) {
+        afterCallbackList.push(callback);
+      }
+      function onError(callback) {
+        onErrorCallbackList.push(callback);
+      }
+      triggerSubscriptions(actionSubscriptions, {
+        args,
+        name,
+        store,
+        after,
+        onError
+      });
+      let ret;
+      try {
+        ret = action.apply(this && this.$id === $id ? this : store, args);
+      } catch (error) {
+        triggerSubscriptions(onErrorCallbackList, error);
+        throw error;
+      }
+      if (ret instanceof Promise) {
+        return ret.then((value) => {
+          triggerSubscriptions(afterCallbackList, value);
+          return value;
+        }).catch((error) => {
+          triggerSubscriptions(onErrorCallbackList, error);
+          return Promise.reject(error);
+        });
+      }
+      triggerSubscriptions(afterCallbackList, ret);
+      return ret;
+    };
+  }
+  const partialStore = {
+    _p: pinia2,
+    // _s: scope,
+    $id,
+    $onAction: addSubscription.bind(null, actionSubscriptions),
+    $patch,
+    $reset,
+    $subscribe(callback, options2 = {}) {
+      const removeSubscription = addSubscription(subscriptions, callback, options2.detached, () => stopWatcher());
+      const stopWatcher = scope.run(() => watch(() => pinia2.state.value[$id], (state) => {
+        if (options2.flush === "sync" ? isSyncListening : isListening) {
+          callback({
+            storeId: $id,
+            type: MutationType.direct,
+            events: debuggerEvents
+          }, state);
+        }
+      }, assign$1({}, $subscribeOptions, options2)));
+      return removeSubscription;
+    },
+    $dispose
+  };
+  const store = reactive(partialStore);
+  pinia2._s.set($id, store);
+  const runWithContext = pinia2._a && pinia2._a.runWithContext || fallbackRunWithContext;
+  const setupStore = runWithContext(() => pinia2._e.run(() => (scope = effectScope()).run(setup)));
+  for (const key in setupStore) {
+    const prop = setupStore[key];
+    if (isRef(prop) && !isComputed(prop) || isReactive(prop)) {
+      if (!isOptionsStore) {
+        if (initialState && shouldHydrate(prop)) {
+          if (isRef(prop)) {
+            prop.value = initialState[key];
+          } else {
+            mergeReactiveObjects(prop, initialState[key]);
+          }
+        }
+        {
+          pinia2.state.value[$id][key] = prop;
+        }
+      }
+    } else if (typeof prop === "function") {
+      const actionValue = wrapAction(key, prop);
+      {
+        setupStore[key] = actionValue;
+      }
+      optionsForPlugin.actions[key] = prop;
+    } else
+      ;
+  }
+  {
+    assign$1(store, setupStore);
+    assign$1(toRaw(store), setupStore);
+  }
+  Object.defineProperty(store, "$state", {
+    get: () => pinia2.state.value[$id],
+    set: (state) => {
+      $patch(($state) => {
+        assign$1($state, state);
+      });
+    }
+  });
+  pinia2._p.forEach((extender) => {
+    {
+      assign$1(store, scope.run(() => extender({
+        store,
+        app: pinia2._a,
+        pinia: pinia2,
+        options: optionsForPlugin
+      })));
+    }
+  });
+  if (initialState && isOptionsStore && options.hydrate) {
+    options.hydrate(store.$state, initialState);
+  }
+  isListening = true;
+  isSyncListening = true;
+  return store;
+}
+function defineStore(idOrOptions, setup, setupOptions) {
+  let id;
+  let options;
+  const isSetupStore = typeof setup === "function";
+  if (typeof idOrOptions === "string") {
+    id = idOrOptions;
+    options = isSetupStore ? setupOptions : setup;
+  } else {
+    options = idOrOptions;
+    id = idOrOptions.id;
+  }
+  function useStore(pinia2, hot) {
+    const hasContext = hasInjectionContext();
+    pinia2 = // in test mode, ignore the argument provided as we can always retrieve a
+    // pinia instance with getActivePinia()
+    pinia2 || (hasContext ? inject(piniaSymbol, null) : null);
+    if (pinia2)
+      setActivePinia(pinia2);
+    pinia2 = activePinia;
+    if (!pinia2._s.has(id)) {
+      if (isSetupStore) {
+        createSetupStore(id, setup, options, pinia2);
+      } else {
+        createOptionsStore(id, options, pinia2);
+      }
+    }
+    const store = pinia2._s.get(id);
+    return store;
+  }
+  useStore.$id = id;
+  return useStore;
+}
+/*!
   * vue-router v4.2.5
   * (c) 2023 Eduardo San Martin Morote
   * @license MIT
-  */const Wn=typeof window<"u";function sg(e){return e.__esModule||e[Symbol.toStringTag]==="Module"}const $e=Object.assign;function fr(e,t){const n={};for(const s in t){const o=t[s];n[s]=xt(o)?o.map(e):e(o)}return n}const Ss=()=>{},xt=Array.isArray,og=/\/$/,rg=e=>e.replace(og,"");function hr(e,t,n="/"){let s,o={},r="",i="";const a=t.indexOf("#");let c=t.indexOf("?");return a<c&&a>=0&&(c=-1),c>-1&&(s=t.slice(0,c),r=t.slice(c+1,a>-1?a:t.length),o=e(r)),a>-1&&(s=s||t.slice(0,a),i=t.slice(a,t.length)),s=lg(s??t,n),{fullPath:s+(r&&"?")+r+i,path:s,query:o,hash:i}}function ig(e,t){const n=t.query?e(t.query):"";return t.path+(n&&"?")+n+(t.hash||"")}function ja(e,t){return!t||!e.toLowerCase().startsWith(t.toLowerCase())?e:e.slice(t.length)||"/"}function ag(e,t,n){const s=t.matched.length-1,o=n.matched.length-1;return s>-1&&s===o&&es(t.matched[s],n.matched[o])&&ql(t.params,n.params)&&e(t.query)===e(n.query)&&t.hash===n.hash}function es(e,t){return(e.aliasOf||e)===(t.aliasOf||t)}function ql(e,t){if(Object.keys(e).length!==Object.keys(t).length)return!1;for(const n in e)if(!cg(e[n],t[n]))return!1;return!0}function cg(e,t){return xt(e)?Va(e,t):xt(t)?Va(t,e):e===t}function Va(e,t){return xt(t)?e.length===t.length&&e.every((n,s)=>n===t[s]):e.length===1&&e[0]===t}function lg(e,t){if(e.startsWith("/"))return e;if(!e)return t;const n=t.split("/"),s=e.split("/"),o=s[s.length-1];(o===".."||o===".")&&s.push("");let r=n.length-1,i,a;for(i=0;i<s.length;i++)if(a=s[i],a!==".")if(a==="..")r>1&&r--;else break;return n.slice(0,r).join("/")+"/"+s.slice(i-(i===s.length?1:0)).join("/")}var Ls;(function(e){e.pop="pop",e.push="push"})(Ls||(Ls={}));var ks;(function(e){e.back="back",e.forward="forward",e.unknown=""})(ks||(ks={}));function ug(e){if(!e)if(Wn){const t=document.querySelector("base");e=t&&t.getAttribute("href")||"/",e=e.replace(/^\w+:\/\/[^\/]+/,"")}else e="/";return e[0]!=="/"&&e[0]!=="#"&&(e="/"+e),rg(e)}const dg=/^[^#]+#/;function fg(e,t){return e.replace(dg,"#")+t}function hg(e,t){const n=document.documentElement.getBoundingClientRect(),s=e.getBoundingClientRect();return{behavior:t.behavior,left:s.left-n.left-(t.left||0),top:s.top-n.top-(t.top||0)}}const Uo=()=>({left:window.pageXOffset,top:window.pageYOffset});function pg(e){let t;if("el"in e){const n=e.el,s=typeof n=="string"&&n.startsWith("#"),o=typeof n=="string"?s?document.getElementById(n.slice(1)):document.querySelector(n):n;if(!o)return;t=hg(o,e)}else t=e;"scrollBehavior"in document.documentElement.style?window.scrollTo(t):window.scrollTo(t.left!=null?t.left:window.pageXOffset,t.top!=null?t.top:window.pageYOffset)}function Da(e,t){return(history.state?history.state.position-t:-1)+e}const jr=new Map;function gg(e,t){jr.set(e,t)}function yg(e){const t=jr.get(e);return jr.delete(e),t}let vg=()=>location.protocol+"//"+location.host;function Kl(e,t){const{pathname:n,search:s,hash:o}=t,r=e.indexOf("#");if(r>-1){let a=o.includes(e.slice(r))?e.slice(r).length:1,c=o.slice(a);return c[0]!=="/"&&(c="/"+c),ja(c,"")}return ja(n,e)+s+o}function _g(e,t,n,s){let o=[],r=[],i=null;const a=({state:f})=>{const h=Kl(e,location),v=n.value,g=t.value;let m=0;if(f){if(n.value=h,t.value=f,i&&i===v){i=null;return}m=g?f.position-g.position:0}else s(h);o.forEach(w=>{w(n.value,v,{delta:m,type:Ls.pop,direction:m?m>0?ks.forward:ks.back:ks.unknown})})};function c(){i=n.value}function l(f){o.push(f);const h=()=>{const v=o.indexOf(f);v>-1&&o.splice(v,1)};return r.push(h),h}function d(){const{history:f}=window;f.state&&f.replaceState($e({},f.state,{scroll:Uo()}),"")}function u(){for(const f of r)f();r=[],window.removeEventListener("popstate",a),window.removeEventListener("beforeunload",d)}return window.addEventListener("popstate",a),window.addEventListener("beforeunload",d,{passive:!0}),{pauseListeners:c,listen:l,destroy:u}}function Wa(e,t,n,s=!1,o=!1){return{back:e,current:t,forward:n,replaced:s,position:window.history.length,scroll:o?Uo():null}}function mg(e){const{history:t,location:n}=window,s={value:Kl(e,n)},o={value:t.state};o.value||r(s.value,{back:null,current:s.value,forward:null,position:t.length-1,replaced:!0,scroll:null},!0);function r(c,l,d){const u=e.indexOf("#"),f=u>-1?(n.host&&document.querySelector("base")?e:e.slice(u))+c:vg()+e+c;try{t[d?"replaceState":"pushState"](l,"",f),o.value=l}catch(h){console.error(h),n[d?"replace":"assign"](f)}}function i(c,l){const d=$e({},t.state,Wa(o.value.back,c,o.value.forward,!0),l,{position:o.value.position});r(c,d,!0),s.value=c}function a(c,l){const d=$e({},o.value,t.state,{forward:c,scroll:Uo()});r(d.current,d,!0);const u=$e({},Wa(s.value,c,null),{position:d.position+1},l);r(c,u,!1),s.value=c}return{location:s,state:o,push:a,replace:i}}function wg(e){e=ug(e);const t=mg(e),n=_g(e,t.state,t.location,t.replace);function s(r,i=!0){i||n.pauseListeners(),history.go(r)}const o=$e({location:"",base:e,go:s,createHref:fg.bind(null,e)},t,n);return Object.defineProperty(o,"location",{enumerable:!0,get:()=>t.location.value}),Object.defineProperty(o,"state",{enumerable:!0,get:()=>t.state.value}),o}function bg(e){return e=location.host?e||location.pathname+location.search:"",e.includes("#")||(e+="#"),wg(e)}function Eg(e){return typeof e=="string"||e&&typeof e=="object"}function zl(e){return typeof e=="string"||typeof e=="symbol"}const en={path:"/",name:void 0,params:{},query:{},hash:"",fullPath:"/",matched:[],meta:{},redirectedFrom:void 0},Gl=Symbol("");var qa;(function(e){e[e.aborted=4]="aborted",e[e.cancelled=8]="cancelled",e[e.duplicated=16]="duplicated"})(qa||(qa={}));function ts(e,t){return $e(new Error,{type:e,[Gl]:!0},t)}function Ht(e,t){return e instanceof Error&&Gl in e&&(t==null||!!(e.type&t))}const Ka="[^/]+?",Rg={sensitive:!1,strict:!1,start:!0,end:!0},xg=/[.+*?^${}()[\]/\\]/g;function Sg(e,t){const n=$e({},Rg,t),s=[];let o=n.start?"^":"";const r=[];for(const l of e){const d=l.length?[]:[90];n.strict&&!l.length&&(o+="/");for(let u=0;u<l.length;u++){const f=l[u];let h=40+(n.sensitive?.25:0);if(f.type===0)u||(o+="/"),o+=f.value.replace(xg,"\\$&"),h+=40;else if(f.type===1){const{value:v,repeatable:g,optional:m,regexp:w}=f;r.push({name:v,repeatable:g,optional:m});const x=w||Ka;if(x!==Ka){h+=10;try{new RegExp(`(${x})`)}catch(C){throw new Error(`Invalid custom RegExp for param "${v}" (${x}): `+C.message)}}let b=g?`((?:${x})(?:/(?:${x}))*)`:`(${x})`;u||(b=m&&l.length<2?`(?:/${b})`:"/"+b),m&&(b+="?"),o+=b,h+=20,m&&(h+=-8),g&&(h+=-20),x===".*"&&(h+=-50)}d.push(h)}s.push(d)}if(n.strict&&n.end){const l=s.length-1;s[l][s[l].length-1]+=.7000000000000001}n.strict||(o+="/?"),n.end?o+="$":n.strict&&(o+="(?:/|$)");const i=new RegExp(o,n.sensitive?"":"i");function a(l){const d=l.match(i),u={};if(!d)return null;for(let f=1;f<d.length;f++){const h=d[f]||"",v=r[f-1];u[v.name]=h&&v.repeatable?h.split("/"):h}return u}function c(l){let d="",u=!1;for(const f of e){(!u||!d.endsWith("/"))&&(d+="/"),u=!1;for(const h of f)if(h.type===0)d+=h.value;else if(h.type===1){const{value:v,repeatable:g,optional:m}=h,w=v in l?l[v]:"";if(xt(w)&&!g)throw new Error(`Provided param "${v}" is an array but it is not repeatable (* or + modifiers)`);const x=xt(w)?w.join("/"):w;if(!x)if(m)f.length<2&&(d.endsWith("/")?d=d.slice(0,-1):u=!0);else throw new Error(`Missing required param "${v}"`);d+=x}}return d||"/"}return{re:i,score:s,keys:r,parse:a,stringify:c}}function kg(e,t){let n=0;for(;n<e.length&&n<t.length;){const s=t[n]-e[n];if(s)return s;n++}return e.length<t.length?e.length===1&&e[0]===40+40?-1:1:e.length>t.length?t.length===1&&t[0]===40+40?1:-1:0}function Cg(e,t){let n=0;const s=e.score,o=t.score;for(;n<s.length&&n<o.length;){const r=kg(s[n],o[n]);if(r)return r;n++}if(Math.abs(o.length-s.length)===1){if(za(s))return 1;if(za(o))return-1}return o.length-s.length}function za(e){const t=e[e.length-1];return e.length>0&&t[t.length-1]<0}const $g={type:0,value:""},Pg=/[a-zA-Z0-9_]/;function Ig(e){if(!e)return[[]];if(e==="/")return[[$g]];if(!e.startsWith("/"))throw new Error(`Invalid path "${e}"`);function t(h){throw new Error(`ERR (${n})/"${l}": ${h}`)}let n=0,s=n;const o=[];let r;function i(){r&&o.push(r),r=[]}let a=0,c,l="",d="";function u(){l&&(n===0?r.push({type:0,value:l}):n===1||n===2||n===3?(r.length>1&&(c==="*"||c==="+")&&t(`A repeatable param (${l}) must be alone in its segment. eg: '/:ids+.`),r.push({type:1,value:l,regexp:d,repeatable:c==="*"||c==="+",optional:c==="*"||c==="?"})):t("Invalid state to consume buffer"),l="")}function f(){l+=c}for(;a<e.length;){if(c=e[a++],c==="\\"&&n!==2){s=n,n=4;continue}switch(n){case 0:c==="/"?(l&&u(),i()):c===":"?(u(),n=1):f();break;case 4:f(),n=s;break;case 1:c==="("?n=2:Pg.test(c)?f():(u(),n=0,c!=="*"&&c!=="?"&&c!=="+"&&a--);break;case 2:c===")"?d[d.length-1]=="\\"?d=d.slice(0,-1)+c:n=3:d+=c;break;case 3:u(),n=0,c!=="*"&&c!=="?"&&c!=="+"&&a--,d="";break;default:t("Unknown state");break}}return n===2&&t(`Unfinished custom RegExp for param "${l}"`),u(),i(),o}function Ag(e,t,n){const s=Sg(Ig(e.path),n),o=$e(s,{record:e,parent:t,children:[],alias:[]});return t&&!o.record.aliasOf==!t.record.aliasOf&&t.children.push(o),o}function Tg(e,t){const n=[],s=new Map;t=Ja({strict:!1,end:!0,sensitive:!1},t);function o(d){return s.get(d)}function r(d,u,f){const h=!f,v=Lg(d);v.aliasOf=f&&f.record;const g=Ja(t,d),m=[v];if("alias"in d){const b=typeof d.alias=="string"?[d.alias]:d.alias;for(const C of b)m.push($e({},v,{components:f?f.record.components:v.components,path:C,aliasOf:f?f.record:v}))}let w,x;for(const b of m){const{path:C}=b;if(u&&C[0]!=="/"){const P=u.record.path,k=P[P.length-1]==="/"?"":"/";b.path=u.record.path+(C&&k+C)}if(w=Ag(b,u,g),f?f.alias.push(w):(x=x||w,x!==w&&x.alias.push(w),h&&d.name&&!Za(w)&&i(d.name)),v.children){const P=v.children;for(let k=0;k<P.length;k++)r(P[k],w,f&&f.children[k])}f=f||w,(w.record.components&&Object.keys(w.record.components).length||w.record.name||w.record.redirect)&&c(w)}return x?()=>{i(x)}:Ss}function i(d){if(zl(d)){const u=s.get(d);u&&(s.delete(d),n.splice(n.indexOf(u),1),u.children.forEach(i),u.alias.forEach(i))}else{const u=n.indexOf(d);u>-1&&(n.splice(u,1),d.record.name&&s.delete(d.record.name),d.children.forEach(i),d.alias.forEach(i))}}function a(){return n}function c(d){let u=0;for(;u<n.length&&Cg(d,n[u])>=0&&(d.record.path!==n[u].record.path||!Zl(d,n[u]));)u++;n.splice(u,0,d),d.record.name&&!Za(d)&&s.set(d.record.name,d)}function l(d,u){let f,h={},v,g;if("name"in d&&d.name){if(f=s.get(d.name),!f)throw ts(1,{location:d});g=f.record.name,h=$e(Ga(u.params,f.keys.filter(x=>!x.optional).map(x=>x.name)),d.params&&Ga(d.params,f.keys.map(x=>x.name))),v=f.stringify(h)}else if("path"in d)v=d.path,f=n.find(x=>x.re.test(v)),f&&(h=f.parse(v),g=f.record.name);else{if(f=u.name?s.get(u.name):n.find(x=>x.re.test(u.path)),!f)throw ts(1,{location:d,currentLocation:u});g=f.record.name,h=$e({},u.params,d.params),v=f.stringify(h)}const m=[];let w=f;for(;w;)m.unshift(w.record),w=w.parent;return{name:g,path:v,params:h,matched:m,meta:Bg(m)}}return e.forEach(d=>r(d)),{addRoute:r,resolve:l,removeRoute:i,getRoutes:a,getRecordMatcher:o}}function Ga(e,t){const n={};for(const s of t)s in e&&(n[s]=e[s]);return n}function Lg(e){return{path:e.path,redirect:e.redirect,name:e.name,meta:e.meta||{},aliasOf:void 0,beforeEnter:e.beforeEnter,props:Ug(e),children:e.children||[],instances:{},leaveGuards:new Set,updateGuards:new Set,enterCallbacks:{},components:"components"in e?e.components||null:e.component&&{default:e.component}}}function Ug(e){const t={},n=e.props||!1;if("component"in e)t.default=n;else for(const s in e.components)t[s]=typeof n=="object"?n[s]:n;return t}function Za(e){for(;e;){if(e.record.aliasOf)return!0;e=e.parent}return!1}function Bg(e){return e.reduce((t,n)=>$e(t,n.meta),{})}function Ja(e,t){const n={};for(const s in e)n[s]=s in t?t[s]:e[s];return n}function Zl(e,t){return t.children.some(n=>n===e||Zl(e,n))}const Jl=/#/g,Ng=/&/g,Mg=/\//g,Og=/=/g,Fg=/\?/g,Yl=/\+/g,Hg=/%5B/g,jg=/%5D/g,Ql=/%5E/g,Vg=/%60/g,Xl=/%7B/g,Dg=/%7C/g,eu=/%7D/g,Wg=/%20/g;function $i(e){return encodeURI(""+e).replace(Dg,"|").replace(Hg,"[").replace(jg,"]")}function qg(e){return $i(e).replace(Xl,"{").replace(eu,"}").replace(Ql,"^")}function Vr(e){return $i(e).replace(Yl,"%2B").replace(Wg,"+").replace(Jl,"%23").replace(Ng,"%26").replace(Vg,"`").replace(Xl,"{").replace(eu,"}").replace(Ql,"^")}function Kg(e){return Vr(e).replace(Og,"%3D")}function zg(e){return $i(e).replace(Jl,"%23").replace(Fg,"%3F")}function Gg(e){return e==null?"":zg(e).replace(Mg,"%2F")}function uo(e){try{return decodeURIComponent(""+e)}catch{}return""+e}function Zg(e){const t={};if(e===""||e==="?")return t;const s=(e[0]==="?"?e.slice(1):e).split("&");for(let o=0;o<s.length;++o){const r=s[o].replace(Yl," "),i=r.indexOf("="),a=uo(i<0?r:r.slice(0,i)),c=i<0?null:uo(r.slice(i+1));if(a in t){let l=t[a];xt(l)||(l=t[a]=[l]),l.push(c)}else t[a]=c}return t}function Ya(e){let t="";for(let n in e){const s=e[n];if(n=Kg(n),s==null){s!==void 0&&(t+=(t.length?"&":"")+n);continue}(xt(s)?s.map(r=>r&&Vr(r)):[s&&Vr(s)]).forEach(r=>{r!==void 0&&(t+=(t.length?"&":"")+n,r!=null&&(t+="="+r))})}return t}function Jg(e){const t={};for(const n in e){const s=e[n];s!==void 0&&(t[n]=xt(s)?s.map(o=>o==null?null:""+o):s==null?s:""+s)}return t}const Yg=Symbol(""),Qa=Symbol(""),Bo=Symbol(""),Pi=Symbol(""),Dr=Symbol("");function ys(){let e=[];function t(s){return e.push(s),()=>{const o=e.indexOf(s);o>-1&&e.splice(o,1)}}function n(){e=[]}return{add:t,list:()=>e.slice(),reset:n}}function hn(e,t,n,s,o){const r=s&&(s.enterCallbacks[o]=s.enterCallbacks[o]||[]);return()=>new Promise((i,a)=>{const c=u=>{u===!1?a(ts(4,{from:n,to:t})):u instanceof Error?a(u):Eg(u)?a(ts(2,{from:t,to:u})):(r&&s.enterCallbacks[o]===r&&typeof u=="function"&&r.push(u),i())},l=e.call(s&&s.instances[o],t,n,c);let d=Promise.resolve(l);e.length<3&&(d=d.then(c)),d.catch(u=>a(u))})}function pr(e,t,n,s){const o=[];for(const r of e)for(const i in r.components){let a=r.components[i];if(!(t!=="beforeRouteEnter"&&!r.instances[i]))if(Qg(a)){const l=(a.__vccOpts||a)[t];l&&o.push(hn(l,n,s,r,i))}else{let c=a();o.push(()=>c.then(l=>{if(!l)return Promise.reject(new Error(`Couldn't resolve component "${i}" at "${r.path}"`));const d=sg(l)?l.default:l;r.components[i]=d;const f=(d.__vccOpts||d)[t];return f&&hn(f,n,s,r,i)()}))}}return o}function Qg(e){return typeof e=="object"||"displayName"in e||"props"in e||"__vccOpts"in e}function Xa(e){const t=yt(Bo),n=yt(Pi),s=ye(()=>t.resolve(Z(e.to))),o=ye(()=>{const{matched:c}=s.value,{length:l}=c,d=c[l-1],u=n.matched;if(!d||!u.length)return-1;const f=u.findIndex(es.bind(null,d));if(f>-1)return f;const h=ec(c[l-2]);return l>1&&ec(d)===h&&u[u.length-1].path!==h?u.findIndex(es.bind(null,c[l-2])):f}),r=ye(()=>o.value>-1&&ny(n.params,s.value.params)),i=ye(()=>o.value>-1&&o.value===n.matched.length-1&&ql(n.params,s.value.params));function a(c={}){return ty(c)?t[Z(e.replace)?"replace":"push"](Z(e.to)).catch(Ss):Promise.resolve()}return{route:s,href:ye(()=>s.value.href),isActive:r,isExactActive:i,navigate:a}}const Xg=Se({name:"RouterLink",compatConfig:{MODE:3},props:{to:{type:[String,Object],required:!0},replace:Boolean,activeClass:String,exactActiveClass:String,custom:Boolean,ariaCurrentValue:{type:String,default:"page"}},useLink:Xa,setup(e,{slots:t}){const n=as(Xa(e)),{options:s}=yt(Bo),o=ye(()=>({[tc(e.activeClass,s.linkActiveClass,"router-link-active")]:n.isActive,[tc(e.exactActiveClass,s.linkExactActiveClass,"router-link-exact-active")]:n.isExactActive}));return()=>{const r=t.default&&t.default(n);return e.custom?r:Nl("a",{"aria-current":n.isExactActive?e.ariaCurrentValue:null,href:n.href,onClick:n.navigate,class:o.value},r)}}}),ey=Xg;function ty(e){if(!(e.metaKey||e.altKey||e.ctrlKey||e.shiftKey)&&!e.defaultPrevented&&!(e.button!==void 0&&e.button!==0)){if(e.currentTarget&&e.currentTarget.getAttribute){const t=e.currentTarget.getAttribute("target");if(/\b_blank\b/i.test(t))return}return e.preventDefault&&e.preventDefault(),!0}}function ny(e,t){for(const n in t){const s=t[n],o=e[n];if(typeof s=="string"){if(s!==o)return!1}else if(!xt(o)||o.length!==s.length||s.some((r,i)=>r!==o[i]))return!1}return!0}function ec(e){return e?e.aliasOf?e.aliasOf.path:e.path:""}const tc=(e,t,n)=>e??t??n,sy=Se({name:"RouterView",inheritAttrs:!1,props:{name:{type:String,default:"default"},route:Object},compatConfig:{MODE:3},setup(e,{attrs:t,slots:n}){const s=yt(Dr),o=ye(()=>e.route||s.value),r=yt(Qa,0),i=ye(()=>{let l=Z(r);const{matched:d}=o.value;let u;for(;(u=d[l])&&!u.components;)l++;return l}),a=ye(()=>o.value.matched[i.value]);Xs(Qa,ye(()=>i.value+1)),Xs(Yg,a),Xs(Dr,o);const c=L();return qe(()=>[c.value,a.value,e.name],([l,d,u],[f,h,v])=>{d&&(d.instances[u]=l,h&&h!==d&&l&&l===f&&(d.leaveGuards.size||(d.leaveGuards=h.leaveGuards),d.updateGuards.size||(d.updateGuards=h.updateGuards))),l&&d&&(!h||!es(d,h)||!f)&&(d.enterCallbacks[u]||[]).forEach(g=>g(l))},{flush:"post"}),()=>{const l=o.value,d=e.name,u=a.value,f=u&&u.components[d];if(!f)return nc(n.default,{Component:f,route:l});const h=u.props[d],v=h?h===!0?l.params:typeof h=="function"?h(l):h:null,m=Nl(f,$e({},v,t,{onVnodeUnmounted:w=>{w.component.isUnmounted&&(u.instances[d]=null)},ref:c}));return nc(n.default,{Component:m,route:l})||m}}});function nc(e,t){if(!e)return null;const n=e(t);return n.length===1?n[0]:n}const oy=sy;function ry(e){const t=Tg(e.routes,e),n=e.parseQuery||Zg,s=e.stringifyQuery||Ya,o=e.history,r=ys(),i=ys(),a=ys(),c=Wf(en);let l=en;Wn&&e.scrollBehavior&&"scrollRestoration"in history&&(history.scrollRestoration="manual");const d=fr.bind(null,j=>""+j),u=fr.bind(null,Gg),f=fr.bind(null,uo);function h(j,B){let N,ne;return zl(j)?(N=t.getRecordMatcher(j),ne=B):ne=j,t.addRoute(ne,N)}function v(j){const B=t.getRecordMatcher(j);B&&t.removeRoute(B)}function g(){return t.getRoutes().map(j=>j.record)}function m(j){return!!t.getRecordMatcher(j)}function w(j,B){if(B=$e({},B||c.value),typeof j=="string"){const y=hr(n,j,B.path),E=t.resolve({path:y.path},B),M=o.createHref(y.fullPath);return $e(y,E,{params:f(E.params),hash:uo(y.hash),redirectedFrom:void 0,href:M})}let N;if("path"in j)N=$e({},j,{path:hr(n,j.path,B.path).path});else{const y=$e({},j.params);for(const E in y)y[E]==null&&delete y[E];N=$e({},j,{params:u(y)}),B.params=u(B.params)}const ne=t.resolve(N,B),ue=j.hash||"";ne.params=d(f(ne.params));const he=ig(s,$e({},j,{hash:qg(ue),path:ne.path})),p=o.createHref(he);return $e({fullPath:he,hash:ue,query:s===Ya?Jg(j.query):j.query||{}},ne,{redirectedFrom:void 0,href:p})}function x(j){return typeof j=="string"?hr(n,j,c.value.path):$e({},j)}function b(j,B){if(l!==j)return ts(8,{from:B,to:j})}function C(j){return D(j)}function P(j){return C($e(x(j),{replace:!0}))}function k(j){const B=j.matched[j.matched.length-1];if(B&&B.redirect){const{redirect:N}=B;let ne=typeof N=="function"?N(j):N;return typeof ne=="string"&&(ne=ne.includes("?")||ne.includes("#")?ne=x(ne):{path:ne},ne.params={}),$e({query:j.query,hash:j.hash,params:"path"in ne?{}:j.params},ne)}}function D(j,B){const N=l=w(j),ne=c.value,ue=j.state,he=j.force,p=j.replace===!0,y=k(N);if(y)return D($e(x(y),{state:typeof y=="object"?$e({},ue,y.state):ue,force:he,replace:p}),B||N);const E=N;E.redirectedFrom=B;let M;return!he&&ag(s,ne,N)&&(M=ts(16,{to:E,from:ne}),oe(ne,ne,!0,!1)),(M?Promise.resolve(M):I(E,ne)).catch(O=>Ht(O)?Ht(O,2)?O:ee(O):F(O,E,ne)).then(O=>{if(O){if(Ht(O,2))return D($e({replace:p},x(O.to),{state:typeof O.to=="object"?$e({},ue,O.to.state):ue,force:he}),B||E)}else O=z(E,ne,!0,p,ue);return V(E,ne,O),O})}function $(j,B){const N=b(j,B);return N?Promise.reject(N):Promise.resolve()}function T(j){const B=le.values().next().value;return B&&typeof B.runWithContext=="function"?B.runWithContext(j):j()}function I(j,B){let N;const[ne,ue,he]=iy(j,B);N=pr(ne.reverse(),"beforeRouteLeave",j,B);for(const y of ne)y.leaveGuards.forEach(E=>{N.push(hn(E,j,B))});const p=$.bind(null,j,B);return N.push(p),ke(N).then(()=>{N=[];for(const y of r.list())N.push(hn(y,j,B));return N.push(p),ke(N)}).then(()=>{N=pr(ue,"beforeRouteUpdate",j,B);for(const y of ue)y.updateGuards.forEach(E=>{N.push(hn(E,j,B))});return N.push(p),ke(N)}).then(()=>{N=[];for(const y of he)if(y.beforeEnter)if(xt(y.beforeEnter))for(const E of y.beforeEnter)N.push(hn(E,j,B));else N.push(hn(y.beforeEnter,j,B));return N.push(p),ke(N)}).then(()=>(j.matched.forEach(y=>y.enterCallbacks={}),N=pr(he,"beforeRouteEnter",j,B),N.push(p),ke(N))).then(()=>{N=[];for(const y of i.list())N.push(hn(y,j,B));return N.push(p),ke(N)}).catch(y=>Ht(y,8)?y:Promise.reject(y))}function V(j,B,N){a.list().forEach(ne=>T(()=>ne(j,B,N)))}function z(j,B,N,ne,ue){const he=b(j,B);if(he)return he;const p=B===en,y=Wn?history.state:{};N&&(ne||p?o.replace(j.fullPath,$e({scroll:p&&y&&y.scroll},ue)):o.push(j.fullPath,ue)),c.value=j,oe(j,B,N,p),ee()}let J;function X(){J||(J=o.listen((j,B,N)=>{if(!Te.listening)return;const ne=w(j),ue=k(ne);if(ue){D($e(ue,{replace:!0}),ne).catch(Ss);return}l=ne;const he=c.value;Wn&&gg(Da(he.fullPath,N.delta),Uo()),I(ne,he).catch(p=>Ht(p,12)?p:Ht(p,2)?(D(p.to,ne).then(y=>{Ht(y,20)&&!N.delta&&N.type===Ls.pop&&o.go(-1,!1)}).catch(Ss),Promise.reject()):(N.delta&&o.go(-N.delta,!1),F(p,ne,he))).then(p=>{p=p||z(ne,he,!1),p&&(N.delta&&!Ht(p,8)?o.go(-N.delta,!1):N.type===Ls.pop&&Ht(p,20)&&o.go(-1,!1)),V(ne,he,p)}).catch(Ss)}))}let H=ys(),R=ys(),A;function F(j,B,N){ee(j);const ne=R.list();return ne.length?ne.forEach(ue=>ue(j,B,N)):console.error(j),Promise.reject(j)}function W(){return A&&c.value!==en?Promise.resolve():new Promise((j,B)=>{H.add([j,B])})}function ee(j){return A||(A=!j,X(),H.list().forEach(([B,N])=>j?N(j):B()),H.reset()),j}function oe(j,B,N,ne){const{scrollBehavior:ue}=e;if(!Wn||!ue)return Promise.resolve();const he=!N&&yg(Da(j.fullPath,0))||(ne||!N)&&history.state&&history.state.scroll||null;return Qn().then(()=>ue(j,B,he)).then(p=>p&&pg(p)).catch(p=>F(p,j,B))}const re=j=>o.go(j);let de;const le=new Set,Te={currentRoute:c,listening:!0,addRoute:h,removeRoute:v,hasRoute:m,getRoutes:g,resolve:w,options:e,push:C,replace:P,go:re,back:()=>re(-1),forward:()=>re(1),beforeEach:r.add,beforeResolve:i.add,afterEach:a.add,onError:R.add,isReady:W,install(j){const B=this;j.component("RouterLink",ey),j.component("RouterView",oy),j.config.globalProperties.$router=B,Object.defineProperty(j.config.globalProperties,"$route",{enumerable:!0,get:()=>Z(c)}),Wn&&!de&&c.value===en&&(de=!0,C(o.location).catch(ue=>{}));const N={};for(const ue in en)Object.defineProperty(N,ue,{get:()=>c.value[ue],enumerable:!0});j.provide(Bo,B),j.provide(Pi,Jc(N)),j.provide(Dr,c);const ne=j.unmount;le.add(j),j.unmount=function(){le.delete(j),le.size<1&&(l=en,J&&J(),J=null,c.value=en,de=!1,A=!1),ne()}}};function ke(j){return j.reduce((B,N)=>B.then(()=>T(N)),Promise.resolve())}return Te}function iy(e,t){const n=[],s=[],o=[],r=Math.max(t.matched.length,e.matched.length);for(let i=0;i<r;i++){const a=t.matched[i];a&&(e.matched.find(l=>es(l,a))?s.push(a):n.push(a));const c=e.matched[i];c&&(t.matched.find(l=>es(l,c))||o.push(c))}return[n,s,o]}function En(){return yt(Bo)}function No(){return yt(Pi)}function sc(e){if(!Number.isSafeInteger(e)||e<0)throw new Error(`Wrong positive integer: ${e}`)}function tu(e,...t){if(!(e instanceof Uint8Array))throw new Error("Expected Uint8Array");if(t.length>0&&!t.includes(e.length))throw new Error(`Expected Uint8Array of length ${t}, not of length=${e.length}`)}function ay(e){if(typeof e!="function"||typeof e.create!="function")throw new Error("Hash should be wrapped by utils.wrapConstructor");sc(e.outputLen),sc(e.blockLen)}function fo(e,t=!0){if(e.destroyed)throw new Error("Hash instance has been destroyed");if(t&&e.finished)throw new Error("Hash#digest() has already been called")}function cy(e,t){tu(e);const n=t.outputLen;if(e.length<n)throw new Error(`digestInto() expects output buffer of length at least ${n}`)}const gr=typeof globalThis=="object"&&"crypto"in globalThis?globalThis.crypto:void 0;/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */const nu=e=>e instanceof Uint8Array,yr=e=>new DataView(e.buffer,e.byteOffset,e.byteLength),Pt=(e,t)=>e<<32-t|e>>>t,ly=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;if(!ly)throw new Error("Non little-endian hardware is not supported");function uy(e){if(typeof e!="string")throw new Error(`utf8ToBytes expected string, got ${typeof e}`);return new Uint8Array(new TextEncoder().encode(e))}function Ii(e){if(typeof e=="string"&&(e=uy(e)),!nu(e))throw new Error(`expected Uint8Array, got ${typeof e}`);return e}function dy(...e){const t=new Uint8Array(e.reduce((s,o)=>s+o.length,0));let n=0;return e.forEach(s=>{if(!nu(s))throw new Error("Uint8Array expected");t.set(s,n),n+=s.length}),t}let su=class{clone(){return this._cloneInto()}};function fy(e){const t=s=>e().update(Ii(s)).digest(),n=e();return t.outputLen=n.outputLen,t.blockLen=n.blockLen,t.create=()=>e(),t}function ou(e=32){if(gr&&typeof gr.getRandomValues=="function")return gr.getRandomValues(new Uint8Array(e));throw new Error("crypto.getRandomValues must be defined")}function hy(e,t,n,s){if(typeof e.setBigUint64=="function")return e.setBigUint64(t,n,s);const o=BigInt(32),r=BigInt(4294967295),i=Number(n>>o&r),a=Number(n&r),c=s?4:0,l=s?0:4;e.setUint32(t+c,i,s),e.setUint32(t+l,a,s)}let py=class extends su{constructor(t,n,s,o){super(),this.blockLen=t,this.outputLen=n,this.padOffset=s,this.isLE=o,this.finished=!1,this.length=0,this.pos=0,this.destroyed=!1,this.buffer=new Uint8Array(t),this.view=yr(this.buffer)}update(t){fo(this);const{view:n,buffer:s,blockLen:o}=this;t=Ii(t);const r=t.length;for(let i=0;i<r;){const a=Math.min(o-this.pos,r-i);if(a===o){const c=yr(t);for(;o<=r-i;i+=o)this.process(c,i);continue}s.set(t.subarray(i,i+a),this.pos),this.pos+=a,i+=a,this.pos===o&&(this.process(n,0),this.pos=0)}return this.length+=t.length,this.roundClean(),this}digestInto(t){fo(this),cy(t,this),this.finished=!0;const{buffer:n,view:s,blockLen:o,isLE:r}=this;let{pos:i}=this;n[i++]=128,this.buffer.subarray(i).fill(0),this.padOffset>o-i&&(this.process(s,0),i=0);for(let u=i;u<o;u++)n[u]=0;hy(s,o-8,BigInt(this.length*8),r),this.process(s,0);const a=yr(t),c=this.outputLen;if(c%4)throw new Error("_sha2: outputLen should be aligned to 32bit");const l=c/4,d=this.get();if(l>d.length)throw new Error("_sha2: outputLen bigger than state");for(let u=0;u<l;u++)a.setUint32(4*u,d[u],r)}digest(){const{buffer:t,outputLen:n}=this;this.digestInto(t);const s=t.slice(0,n);return this.destroy(),s}_cloneInto(t){t||(t=new this.constructor),t.set(...this.get());const{blockLen:n,buffer:s,length:o,finished:r,destroyed:i,pos:a}=this;return t.length=o,t.pos=a,t.finished=r,t.destroyed=i,o%n&&t.buffer.set(s),t}};const gy=(e,t,n)=>e&t^~e&n,yy=(e,t,n)=>e&t^e&n^t&n,vy=new Uint32Array([1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298]),tn=new Uint32Array([1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225]),nn=new Uint32Array(64);let _y=class extends py{constructor(){super(64,32,8,!1),this.A=tn[0]|0,this.B=tn[1]|0,this.C=tn[2]|0,this.D=tn[3]|0,this.E=tn[4]|0,this.F=tn[5]|0,this.G=tn[6]|0,this.H=tn[7]|0}get(){const{A:t,B:n,C:s,D:o,E:r,F:i,G:a,H:c}=this;return[t,n,s,o,r,i,a,c]}set(t,n,s,o,r,i,a,c){this.A=t|0,this.B=n|0,this.C=s|0,this.D=o|0,this.E=r|0,this.F=i|0,this.G=a|0,this.H=c|0}process(t,n){for(let u=0;u<16;u++,n+=4)nn[u]=t.getUint32(n,!1);for(let u=16;u<64;u++){const f=nn[u-15],h=nn[u-2],v=Pt(f,7)^Pt(f,18)^f>>>3,g=Pt(h,17)^Pt(h,19)^h>>>10;nn[u]=g+nn[u-7]+v+nn[u-16]|0}let{A:s,B:o,C:r,D:i,E:a,F:c,G:l,H:d}=this;for(let u=0;u<64;u++){const f=Pt(a,6)^Pt(a,11)^Pt(a,25),h=d+f+gy(a,c,l)+vy[u]+nn[u]|0,g=(Pt(s,2)^Pt(s,13)^Pt(s,22))+yy(s,o,r)|0;d=l,l=c,c=a,a=i+h|0,i=r,r=o,o=s,s=h+g|0}s=s+this.A|0,o=o+this.B|0,r=r+this.C|0,i=i+this.D|0,a=a+this.E|0,c=c+this.F|0,l=l+this.G|0,d=d+this.H|0,this.set(s,o,r,i,a,c,l,d)}roundClean(){nn.fill(0)}destroy(){this.set(0,0,0,0,0,0,0,0),this.buffer.fill(0)}};const Wr=fy(()=>new _y);/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */const ru=BigInt(0),Mo=BigInt(1),my=BigInt(2),Oo=e=>e instanceof Uint8Array,wy=Array.from({length:256},(e,t)=>t.toString(16).padStart(2,"0"));function ns(e){if(!Oo(e))throw new Error("Uint8Array expected");let t="";for(let n=0;n<e.length;n++)t+=wy[e[n]];return t}function iu(e){const t=e.toString(16);return t.length&1?`0${t}`:t}function Ai(e){if(typeof e!="string")throw new Error("hex string expected, got "+typeof e);return BigInt(e===""?"0":`0x${e}`)}function ss(e){if(typeof e!="string")throw new Error("hex string expected, got "+typeof e);const t=e.length;if(t%2)throw new Error("padded hex string expected, got unpadded hex of length "+t);const n=new Uint8Array(t/2);for(let s=0;s<n.length;s++){const o=s*2,r=e.slice(o,o+2),i=Number.parseInt(r,16);if(Number.isNaN(i)||i<0)throw new Error("Invalid byte sequence");n[s]=i}return n}function et(e){return Ai(ns(e))}function Ti(e){if(!Oo(e))throw new Error("Uint8Array expected");return Ai(ns(Uint8Array.from(e).reverse()))}function bn(e,t){return ss(e.toString(16).padStart(t*2,"0"))}function Li(e,t){return bn(e,t).reverse()}function by(e){return ss(iu(e))}function Ke(e,t,n){let s;if(typeof t=="string")try{s=ss(t)}catch(r){throw new Error(`${e} must be valid hex string, got "${t}". Cause: ${r}`)}else if(Oo(t))s=Uint8Array.from(t);else throw new Error(`${e} must be hex string or Uint8Array`);const o=s.length;if(typeof n=="number"&&o!==n)throw new Error(`${e} expected ${n} bytes, got ${o}`);return s}function Nn(...e){const t=new Uint8Array(e.reduce((s,o)=>s+o.length,0));let n=0;return e.forEach(s=>{if(!Oo(s))throw new Error("Uint8Array expected");t.set(s,n),n+=s.length}),t}function Ey(e,t){if(e.length!==t.length)return!1;for(let n=0;n<e.length;n++)if(e[n]!==t[n])return!1;return!0}function Ry(e){if(typeof e!="string")throw new Error(`utf8ToBytes expected string, got ${typeof e}`);return new Uint8Array(new TextEncoder().encode(e))}function xy(e){let t;for(t=0;e>ru;e>>=Mo,t+=1);return t}function Sy(e,t){return e>>BigInt(t)&Mo}const ky=(e,t,n)=>e|(n?Mo:ru)<<BigInt(t),Ui=e=>(my<<BigInt(e-1))-Mo,vr=e=>new Uint8Array(e),oc=e=>Uint8Array.from(e);function au(e,t,n){if(typeof e!="number"||e<2)throw new Error("hashLen must be a number");if(typeof t!="number"||t<2)throw new Error("qByteLen must be a number");if(typeof n!="function")throw new Error("hmacFn must be a function");let s=vr(e),o=vr(e),r=0;const i=()=>{s.fill(1),o.fill(0),r=0},a=(...u)=>n(o,s,...u),c=(u=vr())=>{o=a(oc([0]),u),s=a(),u.length!==0&&(o=a(oc([1]),u),s=a())},l=()=>{if(r++>=1e3)throw new Error("drbg: tried 1000 values");let u=0;const f=[];for(;u<t;){s=a();const h=s.slice();f.push(h),u+=s.length}return Nn(...f)};return(u,f)=>{i(),c(u);let h;for(;!(h=f(l()));)c();return i(),h}}const Cy={bigint:e=>typeof e=="bigint",function:e=>typeof e=="function",boolean:e=>typeof e=="boolean",string:e=>typeof e=="string",stringOrUint8Array:e=>typeof e=="string"||e instanceof Uint8Array,isSafeInteger:e=>Number.isSafeInteger(e),array:e=>Array.isArray(e),field:(e,t)=>t.Fp.isValid(e),hash:e=>typeof e=="function"&&Number.isSafeInteger(e.outputLen)};function Fs(e,t,n={}){const s=(o,r,i)=>{const a=Cy[r];if(typeof a!="function")throw new Error(`Invalid validator "${r}", expected function`);const c=e[o];if(!(i&&c===void 0)&&!a(c,e))throw new Error(`Invalid param ${String(o)}=${c} (${typeof c}), expected ${r}`)};for(const[o,r]of Object.entries(t))s(o,r,!1);for(const[o,r]of Object.entries(n))s(o,r,!0);return e}const $y=Object.freeze(Object.defineProperty({__proto__:null,bitGet:Sy,bitLen:xy,bitMask:Ui,bitSet:ky,bytesToHex:ns,bytesToNumberBE:et,bytesToNumberLE:Ti,concatBytes:Nn,createHmacDrbg:au,ensureBytes:Ke,equalBytes:Ey,hexToBytes:ss,hexToNumber:Ai,numberToBytesBE:bn,numberToBytesLE:Li,numberToHexUnpadded:iu,numberToVarBytesBE:by,utf8ToBytes:Ry,validateObject:Fs},Symbol.toStringTag,{value:"Module"}));/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */const Ve=BigInt(0),Be=BigInt(1),Pn=BigInt(2),Py=BigInt(3),qr=BigInt(4),rc=BigInt(5),ic=BigInt(8);BigInt(9);BigInt(16);function De(e,t){const n=e%t;return n>=Ve?n:t+n}function Iy(e,t,n){if(n<=Ve||t<Ve)throw new Error("Expected power/modulo > 0");if(n===Be)return Ve;let s=Be;for(;t>Ve;)t&Be&&(s=s*e%n),e=e*e%n,t>>=Be;return s}function ft(e,t,n){let s=e;for(;t-- >Ve;)s*=s,s%=n;return s}function Kr(e,t){if(e===Ve||t<=Ve)throw new Error(`invert: expected positive integers, got n=${e} mod=${t}`);let n=De(e,t),s=t,o=Ve,r=Be;for(;n!==Ve;){const a=s/n,c=s%n,l=o-r*a;s=n,n=c,o=r,r=l}if(s!==Be)throw new Error("invert: does not exist");return De(o,t)}function Ay(e){const t=(e-Be)/Pn;let n,s,o;for(n=e-Be,s=0;n%Pn===Ve;n/=Pn,s++);for(o=Pn;o<e&&Iy(o,t,e)!==e-Be;o++);if(s===1){const i=(e+Be)/qr;return function(c,l){const d=c.pow(l,i);if(!c.eql(c.sqr(d),l))throw new Error("Cannot find square root");return d}}const r=(n+Be)/Pn;return function(a,c){if(a.pow(c,t)===a.neg(a.ONE))throw new Error("Cannot find square root");let l=s,d=a.pow(a.mul(a.ONE,o),n),u=a.pow(c,r),f=a.pow(c,n);for(;!a.eql(f,a.ONE);){if(a.eql(f,a.ZERO))return a.ZERO;let h=1;for(let g=a.sqr(f);h<l&&!a.eql(g,a.ONE);h++)g=a.sqr(g);const v=a.pow(d,Be<<BigInt(l-h-1));d=a.sqr(v),u=a.mul(u,v),f=a.mul(f,d),l=h}return u}}function Ty(e){if(e%qr===Py){const t=(e+Be)/qr;return function(s,o){const r=s.pow(o,t);if(!s.eql(s.sqr(r),o))throw new Error("Cannot find square root");return r}}if(e%ic===rc){const t=(e-rc)/ic;return function(s,o){const r=s.mul(o,Pn),i=s.pow(r,t),a=s.mul(o,i),c=s.mul(s.mul(a,Pn),i),l=s.mul(a,s.sub(c,s.ONE));if(!s.eql(s.sqr(l),o))throw new Error("Cannot find square root");return l}}return Ay(e)}const Ly=["create","isValid","is0","neg","inv","sqrt","sqr","eql","add","sub","mul","pow","div","addN","subN","mulN","sqrN"];function Uy(e){const t={ORDER:"bigint",MASK:"bigint",BYTES:"isSafeInteger",BITS:"isSafeInteger"},n=Ly.reduce((s,o)=>(s[o]="function",s),t);return Fs(e,n)}function By(e,t,n){if(n<Ve)throw new Error("Expected power > 0");if(n===Ve)return e.ONE;if(n===Be)return t;let s=e.ONE,o=t;for(;n>Ve;)n&Be&&(s=e.mul(s,o)),o=e.sqr(o),n>>=Be;return s}function Ny(e,t){const n=new Array(t.length),s=t.reduce((r,i,a)=>e.is0(i)?r:(n[a]=r,e.mul(r,i)),e.ONE),o=e.inv(s);return t.reduceRight((r,i,a)=>e.is0(i)?r:(n[a]=e.mul(r,n[a]),e.mul(r,i)),o),n}function cu(e,t){const n=t!==void 0?t:e.toString(2).length,s=Math.ceil(n/8);return{nBitLength:n,nByteLength:s}}function My(e,t,n=!1,s={}){if(e<=Ve)throw new Error(`Expected Field ORDER > 0, got ${e}`);const{nBitLength:o,nByteLength:r}=cu(e,t);if(r>2048)throw new Error("Field lengths over 2048 bytes are not supported");const i=Ty(e),a=Object.freeze({ORDER:e,BITS:o,BYTES:r,MASK:Ui(o),ZERO:Ve,ONE:Be,create:c=>De(c,e),isValid:c=>{if(typeof c!="bigint")throw new Error(`Invalid field element: expected bigint, got ${typeof c}`);return Ve<=c&&c<e},is0:c=>c===Ve,isOdd:c=>(c&Be)===Be,neg:c=>De(-c,e),eql:(c,l)=>c===l,sqr:c=>De(c*c,e),add:(c,l)=>De(c+l,e),sub:(c,l)=>De(c-l,e),mul:(c,l)=>De(c*l,e),pow:(c,l)=>By(a,c,l),div:(c,l)=>De(c*Kr(l,e),e),sqrN:c=>c*c,addN:(c,l)=>c+l,subN:(c,l)=>c-l,mulN:(c,l)=>c*l,inv:c=>Kr(c,e),sqrt:s.sqrt||(c=>i(a,c)),invertBatch:c=>Ny(a,c),cmov:(c,l,d)=>d?l:c,toBytes:c=>n?Li(c,r):bn(c,r),fromBytes:c=>{if(c.length!==r)throw new Error(`Fp.fromBytes: expected ${r}, got ${c.length}`);return n?Ti(c):et(c)}});return Object.freeze(a)}function lu(e){if(typeof e!="bigint")throw new Error("field order must be bigint");const t=e.toString(2).length;return Math.ceil(t/8)}function uu(e){const t=lu(e);return t+Math.ceil(t/2)}function Oy(e,t,n=!1){const s=e.length,o=lu(t),r=uu(t);if(s<16||s<r||s>1024)throw new Error(`expected ${r}-1024 bytes of input, got ${s}`);const i=n?et(e):Ti(e),a=De(i,t-Be)+Be;return n?Li(a,o):bn(a,o)}/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */const Fy=BigInt(0),_r=BigInt(1);function Hy(e,t){const n=(o,r)=>{const i=r.negate();return o?i:r},s=o=>{const r=Math.ceil(t/o)+1,i=2**(o-1);return{windows:r,windowSize:i}};return{constTimeNegate:n,unsafeLadder(o,r){let i=e.ZERO,a=o;for(;r>Fy;)r&_r&&(i=i.add(a)),a=a.double(),r>>=_r;return i},precomputeWindow(o,r){const{windows:i,windowSize:a}=s(r),c=[];let l=o,d=l;for(let u=0;u<i;u++){d=l,c.push(d);for(let f=1;f<a;f++)d=d.add(l),c.push(d);l=d.double()}return c},wNAF(o,r,i){const{windows:a,windowSize:c}=s(o);let l=e.ZERO,d=e.BASE;const u=BigInt(2**o-1),f=2**o,h=BigInt(o);for(let v=0;v<a;v++){const g=v*c;let m=Number(i&u);i>>=h,m>c&&(m-=f,i+=_r);const w=g,x=g+Math.abs(m)-1,b=v%2!==0,C=m<0;m===0?d=d.add(n(b,r[w])):l=l.add(n(C,r[x]))}return{p:l,f:d}},wNAFCached(o,r,i,a){const c=o._WINDOW_SIZE||1;let l=r.get(o);return l||(l=this.precomputeWindow(o,c),c!==1&&r.set(o,a(l))),this.wNAF(c,l,i)}}}function du(e){return Uy(e.Fp),Fs(e,{n:"bigint",h:"bigint",Gx:"field",Gy:"field"},{nBitLength:"isSafeInteger",nByteLength:"isSafeInteger"}),Object.freeze({...cu(e.n,e.nBitLength),...e,p:e.Fp.ORDER})}/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */function jy(e){const t=du(e);Fs(t,{a:"field",b:"field"},{allowedPrivateKeyLengths:"array",wrapPrivateKey:"boolean",isTorsionFree:"function",clearCofactor:"function",allowInfinityPoint:"boolean",fromBytes:"function",toBytes:"function"});const{endo:n,Fp:s,a:o}=t;if(n){if(!s.eql(o,s.ZERO))throw new Error("Endomorphism can only be defined for Koblitz curves that have a=0");if(typeof n!="object"||typeof n.beta!="bigint"||typeof n.splitScalar!="function")throw new Error("Expected endomorphism with beta: bigint and splitScalar: function")}return Object.freeze({...t})}const{bytesToNumberBE:Vy,hexToBytes:Dy}=$y,An={Err:class extends Error{constructor(t=""){super(t)}},_parseInt(e){const{Err:t}=An;if(e.length<2||e[0]!==2)throw new t("Invalid signature integer tag");const n=e[1],s=e.subarray(2,n+2);if(!n||s.length!==n)throw new t("Invalid signature integer: wrong length");if(s[0]&128)throw new t("Invalid signature integer: negative");if(s[0]===0&&!(s[1]&128))throw new t("Invalid signature integer: unnecessary leading zero");return{d:Vy(s),l:e.subarray(n+2)}},toSig(e){const{Err:t}=An,n=typeof e=="string"?Dy(e):e;if(!(n instanceof Uint8Array))throw new Error("ui8a expected");let s=n.length;if(s<2||n[0]!=48)throw new t("Invalid signature tag");if(n[1]!==s-2)throw new t("Invalid signature: incorrect length");const{d:o,l:r}=An._parseInt(n.subarray(2)),{d:i,l:a}=An._parseInt(r);if(a.length)throw new t("Invalid signature: left bytes after parsing");return{r:o,s:i}},hexFromSig(e){const t=l=>Number.parseInt(l[0],16)&8?"00"+l:l,n=l=>{const d=l.toString(16);return d.length&1?`0${d}`:d},s=t(n(e.s)),o=t(n(e.r)),r=s.length/2,i=o.length/2,a=n(r),c=n(i);return`30${n(i+r+4)}02${c}${o}02${a}${s}`}},Vt=BigInt(0),pt=BigInt(1);BigInt(2);const ac=BigInt(3);BigInt(4);function Wy(e){const t=jy(e),{Fp:n}=t,s=t.toBytes||((v,g,m)=>{const w=g.toAffine();return Nn(Uint8Array.from([4]),n.toBytes(w.x),n.toBytes(w.y))}),o=t.fromBytes||(v=>{const g=v.subarray(1),m=n.fromBytes(g.subarray(0,n.BYTES)),w=n.fromBytes(g.subarray(n.BYTES,2*n.BYTES));return{x:m,y:w}});function r(v){const{a:g,b:m}=t,w=n.sqr(v),x=n.mul(w,v);return n.add(n.add(x,n.mul(v,g)),m)}if(!n.eql(n.sqr(t.Gy),r(t.Gx)))throw new Error("bad generator point: equation left != right");function i(v){return typeof v=="bigint"&&Vt<v&&v<t.n}function a(v){if(!i(v))throw new Error("Expected valid bigint: 0 < bigint < curve.n")}function c(v){const{allowedPrivateKeyLengths:g,nByteLength:m,wrapPrivateKey:w,n:x}=t;if(g&&typeof v!="bigint"){if(v instanceof Uint8Array&&(v=ns(v)),typeof v!="string"||!g.includes(v.length))throw new Error("Invalid key");v=v.padStart(m*2,"0")}let b;try{b=typeof v=="bigint"?v:et(Ke("private key",v,m))}catch{throw new Error(`private key must be ${m} bytes, hex or bigint, not ${typeof v}`)}return w&&(b=De(b,x)),a(b),b}const l=new Map;function d(v){if(!(v instanceof u))throw new Error("ProjectivePoint expected")}class u{constructor(g,m,w){if(this.px=g,this.py=m,this.pz=w,g==null||!n.isValid(g))throw new Error("x required");if(m==null||!n.isValid(m))throw new Error("y required");if(w==null||!n.isValid(w))throw new Error("z required")}static fromAffine(g){const{x:m,y:w}=g||{};if(!g||!n.isValid(m)||!n.isValid(w))throw new Error("invalid affine point");if(g instanceof u)throw new Error("projective point not allowed");const x=b=>n.eql(b,n.ZERO);return x(m)&&x(w)?u.ZERO:new u(m,w,n.ONE)}get x(){return this.toAffine().x}get y(){return this.toAffine().y}static normalizeZ(g){const m=n.invertBatch(g.map(w=>w.pz));return g.map((w,x)=>w.toAffine(m[x])).map(u.fromAffine)}static fromHex(g){const m=u.fromAffine(o(Ke("pointHex",g)));return m.assertValidity(),m}static fromPrivateKey(g){return u.BASE.multiply(c(g))}_setWindowSize(g){this._WINDOW_SIZE=g,l.delete(this)}assertValidity(){if(this.is0()){if(t.allowInfinityPoint&&!n.is0(this.py))return;throw new Error("bad point: ZERO")}const{x:g,y:m}=this.toAffine();if(!n.isValid(g)||!n.isValid(m))throw new Error("bad point: x or y not FE");const w=n.sqr(m),x=r(g);if(!n.eql(w,x))throw new Error("bad point: equation left != right");if(!this.isTorsionFree())throw new Error("bad point: not in prime-order subgroup")}hasEvenY(){const{y:g}=this.toAffine();if(n.isOdd)return!n.isOdd(g);throw new Error("Field doesn't support isOdd")}equals(g){d(g);const{px:m,py:w,pz:x}=this,{px:b,py:C,pz:P}=g,k=n.eql(n.mul(m,P),n.mul(b,x)),D=n.eql(n.mul(w,P),n.mul(C,x));return k&&D}negate(){return new u(this.px,n.neg(this.py),this.pz)}double(){const{a:g,b:m}=t,w=n.mul(m,ac),{px:x,py:b,pz:C}=this;let P=n.ZERO,k=n.ZERO,D=n.ZERO,$=n.mul(x,x),T=n.mul(b,b),I=n.mul(C,C),V=n.mul(x,b);return V=n.add(V,V),D=n.mul(x,C),D=n.add(D,D),P=n.mul(g,D),k=n.mul(w,I),k=n.add(P,k),P=n.sub(T,k),k=n.add(T,k),k=n.mul(P,k),P=n.mul(V,P),D=n.mul(w,D),I=n.mul(g,I),V=n.sub($,I),V=n.mul(g,V),V=n.add(V,D),D=n.add($,$),$=n.add(D,$),$=n.add($,I),$=n.mul($,V),k=n.add(k,$),I=n.mul(b,C),I=n.add(I,I),$=n.mul(I,V),P=n.sub(P,$),D=n.mul(I,T),D=n.add(D,D),D=n.add(D,D),new u(P,k,D)}add(g){d(g);const{px:m,py:w,pz:x}=this,{px:b,py:C,pz:P}=g;let k=n.ZERO,D=n.ZERO,$=n.ZERO;const T=t.a,I=n.mul(t.b,ac);let V=n.mul(m,b),z=n.mul(w,C),J=n.mul(x,P),X=n.add(m,w),H=n.add(b,C);X=n.mul(X,H),H=n.add(V,z),X=n.sub(X,H),H=n.add(m,x);let R=n.add(b,P);return H=n.mul(H,R),R=n.add(V,J),H=n.sub(H,R),R=n.add(w,x),k=n.add(C,P),R=n.mul(R,k),k=n.add(z,J),R=n.sub(R,k),$=n.mul(T,H),k=n.mul(I,J),$=n.add(k,$),k=n.sub(z,$),$=n.add(z,$),D=n.mul(k,$),z=n.add(V,V),z=n.add(z,V),J=n.mul(T,J),H=n.mul(I,H),z=n.add(z,J),J=n.sub(V,J),J=n.mul(T,J),H=n.add(H,J),V=n.mul(z,H),D=n.add(D,V),V=n.mul(R,H),k=n.mul(X,k),k=n.sub(k,V),V=n.mul(X,z),$=n.mul(R,$),$=n.add($,V),new u(k,D,$)}subtract(g){return this.add(g.negate())}is0(){return this.equals(u.ZERO)}wNAF(g){return h.wNAFCached(this,l,g,m=>{const w=n.invertBatch(m.map(x=>x.pz));return m.map((x,b)=>x.toAffine(w[b])).map(u.fromAffine)})}multiplyUnsafe(g){const m=u.ZERO;if(g===Vt)return m;if(a(g),g===pt)return this;const{endo:w}=t;if(!w)return h.unsafeLadder(this,g);let{k1neg:x,k1:b,k2neg:C,k2:P}=w.splitScalar(g),k=m,D=m,$=this;for(;b>Vt||P>Vt;)b&pt&&(k=k.add($)),P&pt&&(D=D.add($)),$=$.double(),b>>=pt,P>>=pt;return x&&(k=k.negate()),C&&(D=D.negate()),D=new u(n.mul(D.px,w.beta),D.py,D.pz),k.add(D)}multiply(g){a(g);let m=g,w,x;const{endo:b}=t;if(b){const{k1neg:C,k1:P,k2neg:k,k2:D}=b.splitScalar(m);let{p:$,f:T}=this.wNAF(P),{p:I,f:V}=this.wNAF(D);$=h.constTimeNegate(C,$),I=h.constTimeNegate(k,I),I=new u(n.mul(I.px,b.beta),I.py,I.pz),w=$.add(I),x=T.add(V)}else{const{p:C,f:P}=this.wNAF(m);w=C,x=P}return u.normalizeZ([w,x])[0]}multiplyAndAddUnsafe(g,m,w){const x=u.BASE,b=(P,k)=>k===Vt||k===pt||!P.equals(x)?P.multiplyUnsafe(k):P.multiply(k),C=b(this,m).add(b(g,w));return C.is0()?void 0:C}toAffine(g){const{px:m,py:w,pz:x}=this,b=this.is0();g==null&&(g=b?n.ONE:n.inv(x));const C=n.mul(m,g),P=n.mul(w,g),k=n.mul(x,g);if(b)return{x:n.ZERO,y:n.ZERO};if(!n.eql(k,n.ONE))throw new Error("invZ was invalid");return{x:C,y:P}}isTorsionFree(){const{h:g,isTorsionFree:m}=t;if(g===pt)return!0;if(m)return m(u,this);throw new Error("isTorsionFree() has not been declared for the elliptic curve")}clearCofactor(){const{h:g,clearCofactor:m}=t;return g===pt?this:m?m(u,this):this.multiplyUnsafe(t.h)}toRawBytes(g=!0){return this.assertValidity(),s(u,this,g)}toHex(g=!0){return ns(this.toRawBytes(g))}}u.BASE=new u(t.Gx,t.Gy,n.ONE),u.ZERO=new u(n.ZERO,n.ONE,n.ZERO);const f=t.nBitLength,h=Hy(u,t.endo?Math.ceil(f/2):f);return{CURVE:t,ProjectivePoint:u,normPrivateKeyToScalar:c,weierstrassEquation:r,isWithinCurveOrder:i}}function qy(e){const t=du(e);return Fs(t,{hash:"hash",hmac:"function",randomBytes:"function"},{bits2int:"function",bits2int_modN:"function",lowS:"boolean"}),Object.freeze({lowS:!0,...t})}function Ky(e){const t=qy(e),{Fp:n,n:s}=t,o=n.BYTES+1,r=2*n.BYTES+1;function i(H){return Vt<H&&H<n.ORDER}function a(H){return De(H,s)}function c(H){return Kr(H,s)}const{ProjectivePoint:l,normPrivateKeyToScalar:d,weierstrassEquation:u,isWithinCurveOrder:f}=Wy({...t,toBytes(H,R,A){const F=R.toAffine(),W=n.toBytes(F.x),ee=Nn;return A?ee(Uint8Array.from([R.hasEvenY()?2:3]),W):ee(Uint8Array.from([4]),W,n.toBytes(F.y))},fromBytes(H){const R=H.length,A=H[0],F=H.subarray(1);if(R===o&&(A===2||A===3)){const W=et(F);if(!i(W))throw new Error("Point is not on curve");const ee=u(W);let oe=n.sqrt(ee);const re=(oe&pt)===pt;return(A&1)===1!==re&&(oe=n.neg(oe)),{x:W,y:oe}}else if(R===r&&A===4){const W=n.fromBytes(F.subarray(0,n.BYTES)),ee=n.fromBytes(F.subarray(n.BYTES,2*n.BYTES));return{x:W,y:ee}}else throw new Error(`Point of length ${R} was invalid. Expected ${o} compressed bytes or ${r} uncompressed bytes`)}}),h=H=>ns(bn(H,t.nByteLength));function v(H){const R=s>>pt;return H>R}function g(H){return v(H)?a(-H):H}const m=(H,R,A)=>et(H.slice(R,A));class w{constructor(R,A,F){this.r=R,this.s=A,this.recovery=F,this.assertValidity()}static fromCompact(R){const A=t.nByteLength;return R=Ke("compactSignature",R,A*2),new w(m(R,0,A),m(R,A,2*A))}static fromDER(R){const{r:A,s:F}=An.toSig(Ke("DER",R));return new w(A,F)}assertValidity(){if(!f(this.r))throw new Error("r must be 0 < r < CURVE.n");if(!f(this.s))throw new Error("s must be 0 < s < CURVE.n")}addRecoveryBit(R){return new w(this.r,this.s,R)}recoverPublicKey(R){const{r:A,s:F,recovery:W}=this,ee=D(Ke("msgHash",R));if(W==null||![0,1,2,3].includes(W))throw new Error("recovery id invalid");const oe=W===2||W===3?A+t.n:A;if(oe>=n.ORDER)throw new Error("recovery id 2 or 3 invalid");const re=W&1?"03":"02",de=l.fromHex(re+h(oe)),le=c(oe),Te=a(-ee*le),ke=a(F*le),j=l.BASE.multiplyAndAddUnsafe(de,Te,ke);if(!j)throw new Error("point at infinify");return j.assertValidity(),j}hasHighS(){return v(this.s)}normalizeS(){return this.hasHighS()?new w(this.r,a(-this.s),this.recovery):this}toDERRawBytes(){return ss(this.toDERHex())}toDERHex(){return An.hexFromSig({r:this.r,s:this.s})}toCompactRawBytes(){return ss(this.toCompactHex())}toCompactHex(){return h(this.r)+h(this.s)}}const x={isValidPrivateKey(H){try{return d(H),!0}catch{return!1}},normPrivateKeyToScalar:d,randomPrivateKey:()=>{const H=uu(t.n);return Oy(t.randomBytes(H),t.n)},precompute(H=8,R=l.BASE){return R._setWindowSize(H),R.multiply(BigInt(3)),R}};function b(H,R=!0){return l.fromPrivateKey(H).toRawBytes(R)}function C(H){const R=H instanceof Uint8Array,A=typeof H=="string",F=(R||A)&&H.length;return R?F===o||F===r:A?F===2*o||F===2*r:H instanceof l}function P(H,R,A=!0){if(C(H))throw new Error("first arg must be private key");if(!C(R))throw new Error("second arg must be public key");return l.fromHex(R).multiply(d(H)).toRawBytes(A)}const k=t.bits2int||function(H){const R=et(H),A=H.length*8-t.nBitLength;return A>0?R>>BigInt(A):R},D=t.bits2int_modN||function(H){return a(k(H))},$=Ui(t.nBitLength);function T(H){if(typeof H!="bigint")throw new Error("bigint expected");if(!(Vt<=H&&H<$))throw new Error(`bigint expected < 2^${t.nBitLength}`);return bn(H,t.nByteLength)}function I(H,R,A=V){if(["recovered","canonical"].some(N=>N in A))throw new Error("sign() legacy options not supported");const{hash:F,randomBytes:W}=t;let{lowS:ee,prehash:oe,extraEntropy:re}=A;ee==null&&(ee=!0),H=Ke("msgHash",H),oe&&(H=Ke("prehashed msgHash",F(H)));const de=D(H),le=d(R),Te=[T(le),T(de)];if(re!=null){const N=re===!0?W(n.BYTES):re;Te.push(Ke("extraEntropy",N))}const ke=Nn(...Te),j=de;function B(N){const ne=k(N);if(!f(ne))return;const ue=c(ne),he=l.BASE.multiply(ne).toAffine(),p=a(he.x);if(p===Vt)return;const y=a(ue*a(j+p*le));if(y===Vt)return;let E=(he.x===p?0:2)|Number(he.y&pt),M=y;return ee&&v(y)&&(M=g(y),E^=1),new w(p,M,E)}return{seed:ke,k2sig:B}}const V={lowS:t.lowS,prehash:!1},z={lowS:t.lowS,prehash:!1};function J(H,R,A=V){const{seed:F,k2sig:W}=I(H,R,A),ee=t;return au(ee.hash.outputLen,ee.nByteLength,ee.hmac)(F,W)}l.BASE._setWindowSize(8);function X(H,R,A,F=z){var he;const W=H;if(R=Ke("msgHash",R),A=Ke("publicKey",A),"strict"in F)throw new Error("options.strict was renamed to lowS");const{lowS:ee,prehash:oe}=F;let re,de;try{if(typeof W=="string"||W instanceof Uint8Array)try{re=w.fromDER(W)}catch(p){if(!(p instanceof An.Err))throw p;re=w.fromCompact(W)}else if(typeof W=="object"&&typeof W.r=="bigint"&&typeof W.s=="bigint"){const{r:p,s:y}=W;re=new w(p,y)}else throw new Error("PARSE");de=l.fromHex(A)}catch(p){if(p.message==="PARSE")throw new Error("signature must be Signature instance, Uint8Array or hex string");return!1}if(ee&&re.hasHighS())return!1;oe&&(R=t.hash(R));const{r:le,s:Te}=re,ke=D(R),j=c(Te),B=a(ke*j),N=a(le*j),ne=(he=l.BASE.multiplyAndAddUnsafe(de,B,N))==null?void 0:he.toAffine();return ne?a(ne.x)===le:!1}return{CURVE:t,getPublicKey:b,getSharedSecret:P,sign:J,verify:X,ProjectivePoint:l,Signature:w,utils:x}}let fu=class extends su{constructor(t,n){super(),this.finished=!1,this.destroyed=!1,ay(t);const s=Ii(n);if(this.iHash=t.create(),typeof this.iHash.update!="function")throw new Error("Expected instance of class which extends utils.Hash");this.blockLen=this.iHash.blockLen,this.outputLen=this.iHash.outputLen;const o=this.blockLen,r=new Uint8Array(o);r.set(s.length>o?t.create().update(s).digest():s);for(let i=0;i<r.length;i++)r[i]^=54;this.iHash.update(r),this.oHash=t.create();for(let i=0;i<r.length;i++)r[i]^=106;this.oHash.update(r),r.fill(0)}update(t){return fo(this),this.iHash.update(t),this}digestInto(t){fo(this),tu(t,this.outputLen),this.finished=!0,this.iHash.digestInto(t),this.oHash.update(t),this.oHash.digestInto(t),this.destroy()}digest(){const t=new Uint8Array(this.oHash.outputLen);return this.digestInto(t),t}_cloneInto(t){t||(t=Object.create(Object.getPrototypeOf(this),{}));const{oHash:n,iHash:s,finished:o,destroyed:r,blockLen:i,outputLen:a}=this;return t=t,t.finished=o,t.destroyed=r,t.blockLen=i,t.outputLen=a,t.oHash=n._cloneInto(t.oHash),t.iHash=s._cloneInto(t.iHash),t}destroy(){this.destroyed=!0,this.oHash.destroy(),this.iHash.destroy()}};const hu=(e,t,n)=>new fu(e,t).update(n).digest();hu.create=(e,t)=>new fu(e,t);/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */function zy(e){return{hash:e,hmac:(t,...n)=>hu(e,t,dy(...n)),randomBytes:ou}}function Gy(e,t){const n=s=>Ky({...e,...zy(s)});return Object.freeze({...n(t),create:n})}/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */const Fo=BigInt("0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"),ho=BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"),pu=BigInt(1),po=BigInt(2),cc=(e,t)=>(e+t/po)/t;function gu(e){const t=Fo,n=BigInt(3),s=BigInt(6),o=BigInt(11),r=BigInt(22),i=BigInt(23),a=BigInt(44),c=BigInt(88),l=e*e*e%t,d=l*l*e%t,u=ft(d,n,t)*d%t,f=ft(u,n,t)*d%t,h=ft(f,po,t)*l%t,v=ft(h,o,t)*h%t,g=ft(v,r,t)*v%t,m=ft(g,a,t)*g%t,w=ft(m,c,t)*m%t,x=ft(w,a,t)*g%t,b=ft(x,n,t)*d%t,C=ft(b,i,t)*v%t,P=ft(C,s,t)*l%t,k=ft(P,po,t);if(!zr.eql(zr.sqr(k),e))throw new Error("Cannot find square root");return k}const zr=My(Fo,void 0,void 0,{sqrt:gu}),cs=Gy({a:BigInt(0),b:BigInt(7),Fp:zr,n:ho,Gx:BigInt("55066263022277343669578718895168534326250603453777594175500187360389116729240"),Gy:BigInt("32670510020758816978083085130507043184471273380659243275938904335757337482424"),h:BigInt(1),lowS:!0,endo:{beta:BigInt("0x7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee"),splitScalar:e=>{const t=ho,n=BigInt("0x3086d221a7d46bcde86c90e49284eb15"),s=-pu*BigInt("0xe4437ed6010e88286f547fa90abfe4c3"),o=BigInt("0x114ca50f7a8e2f3f657c1108d9d44cfd8"),r=n,i=BigInt("0x100000000000000000000000000000000"),a=cc(r*e,t),c=cc(-s*e,t);let l=De(e-a*n-c*o,t),d=De(-a*s-c*r,t);const u=l>i,f=d>i;if(u&&(l=t-l),f&&(d=t-d),l>i||d>i)throw new Error("splitScalar: Endomorphism failed, k="+e);return{k1neg:u,k1:l,k2neg:f,k2:d}}}},Wr),Ho=BigInt(0),yu=e=>typeof e=="bigint"&&Ho<e&&e<Fo,Zy=e=>typeof e=="bigint"&&Ho<e&&e<ho,lc={};function go(e,...t){let n=lc[e];if(n===void 0){const s=Wr(Uint8Array.from(e,o=>o.charCodeAt(0)));n=Nn(s,s),lc[e]=n}return Wr(Nn(n,...t))}const Bi=e=>e.toRawBytes(!0).slice(1),Gr=e=>bn(e,32),mr=e=>De(e,Fo),Us=e=>De(e,ho),Ni=cs.ProjectivePoint,Jy=(e,t,n)=>Ni.BASE.multiplyAndAddUnsafe(e,t,n);function Zr(e){let t=cs.utils.normPrivateKeyToScalar(e),n=Ni.fromPrivateKey(t);return{scalar:n.hasEvenY()?t:Us(-t),bytes:Bi(n)}}function vu(e){if(!yu(e))throw new Error("bad x: need 0 < x < p");const t=mr(e*e),n=mr(t*e+BigInt(7));let s=gu(n);s%po!==Ho&&(s=mr(-s));const o=new Ni(e,s,pu);return o.assertValidity(),o}function _u(...e){return Us(et(go("BIP0340/challenge",...e)))}function Yy(e){return Zr(e).bytes}function Qy(e,t,n=ou(32)){const s=Ke("message",e),{bytes:o,scalar:r}=Zr(t),i=Ke("auxRand",n,32),a=Gr(r^et(go("BIP0340/aux",i))),c=go("BIP0340/nonce",a,o,s),l=Us(et(c));if(l===Ho)throw new Error("sign failed: k is zero");const{bytes:d,scalar:u}=Zr(l),f=_u(d,o,s),h=new Uint8Array(64);if(h.set(d,0),h.set(Gr(Us(u+f*r)),32),!mu(h,s,o))throw new Error("sign: Invalid signature produced");return h}function mu(e,t,n){const s=Ke("signature",e,64),o=Ke("message",t),r=Ke("publicKey",n,32);try{const i=vu(et(r)),a=et(s.subarray(0,32));if(!yu(a))return!1;const c=et(s.subarray(32,64));if(!Zy(c))return!1;const l=_u(Gr(a),Bi(i),o),d=Jy(i,c,Us(-l));return!(!d||!d.hasEvenY()||d.toAffine().x!==a)}catch{return!1}}const vs=(()=>({getPublicKey:Yy,sign:Qy,verify:mu,utils:{randomPrivateKey:cs.utils.randomPrivateKey,lift_x:vu,pointToBytes:Bi,numberToBytesBE:bn,bytesToNumberBE:et,taggedHash:go,mod:De}}))(),wr=typeof globalThis=="object"&&"crypto"in globalThis?globalThis.crypto:void 0;/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */const Mi=e=>e instanceof Uint8Array,br=e=>new DataView(e.buffer,e.byteOffset,e.byteLength),It=(e,t)=>e<<32-t|e>>>t,Xy=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;if(!Xy)throw new Error("Non little-endian hardware is not supported");const ev=Array.from({length:256},(e,t)=>t.toString(16).padStart(2,"0"));function Xe(e){if(!Mi(e))throw new Error("Uint8Array expected");let t="";for(let n=0;n<e.length;n++)t+=ev[e[n]];return t}function os(e){if(typeof e!="string")throw new Error("hex string expected, got "+typeof e);const t=e.length;if(t%2)throw new Error("padded hex string expected, got unpadded hex of length "+t);const n=new Uint8Array(t/2);for(let s=0;s<n.length;s++){const o=s*2,r=e.slice(o,o+2),i=Number.parseInt(r,16);if(Number.isNaN(i)||i<0)throw new Error("Invalid byte sequence");n[s]=i}return n}function tv(e){if(typeof e!="string")throw new Error(`utf8ToBytes expected string, got ${typeof e}`);return new Uint8Array(new TextEncoder().encode(e))}function Bs(e){if(typeof e=="string"&&(e=tv(e)),!Mi(e))throw new Error(`expected Uint8Array, got ${typeof e}`);return e}function jo(...e){const t=new Uint8Array(e.reduce((s,o)=>s+o.length,0));let n=0;return e.forEach(s=>{if(!Mi(s))throw new Error("Uint8Array expected");t.set(s,n),n+=s.length}),t}let wu=class{clone(){return this._cloneInto()}};function bu(e){const t=s=>e().update(Bs(s)).digest(),n=e();return t.outputLen=n.outputLen,t.blockLen=n.blockLen,t.create=()=>e(),t}function Eu(e=32){if(wr&&typeof wr.getRandomValues=="function")return wr.getRandomValues(new Uint8Array(e));throw new Error("crypto.getRandomValues must be defined")}function Jr(e){if(!Number.isSafeInteger(e)||e<0)throw new Error(`Wrong positive integer: ${e}`)}function nv(e){if(typeof e!="boolean")throw new Error(`Expected boolean, not ${e}`)}function Ru(e,...t){if(!(e instanceof Uint8Array))throw new Error("Expected Uint8Array");if(t.length>0&&!t.includes(e.length))throw new Error(`Expected Uint8Array of length ${t}, not of length=${e.length}`)}function sv(e){if(typeof e!="function"||typeof e.create!="function")throw new Error("Hash should be wrapped by utils.wrapConstructor");Jr(e.outputLen),Jr(e.blockLen)}function ov(e,t=!0){if(e.destroyed)throw new Error("Hash instance has been destroyed");if(t&&e.finished)throw new Error("Hash#digest() has already been called")}function rv(e,t){Ru(e);const n=t.outputLen;if(e.length<n)throw new Error(`digestInto() expects output buffer of length at least ${n}`)}const Bt={number:Jr,bool:nv,bytes:Ru,hash:sv,exists:ov,output:rv};function iv(e,t,n,s){if(typeof e.setBigUint64=="function")return e.setBigUint64(t,n,s);const o=BigInt(32),r=BigInt(4294967295),i=Number(n>>o&r),a=Number(n&r),c=s?4:0,l=s?0:4;e.setUint32(t+c,i,s),e.setUint32(t+l,a,s)}class av extends wu{constructor(t,n,s,o){super(),this.blockLen=t,this.outputLen=n,this.padOffset=s,this.isLE=o,this.finished=!1,this.length=0,this.pos=0,this.destroyed=!1,this.buffer=new Uint8Array(t),this.view=br(this.buffer)}update(t){Bt.exists(this);const{view:n,buffer:s,blockLen:o}=this;t=Bs(t);const r=t.length;for(let i=0;i<r;){const a=Math.min(o-this.pos,r-i);if(a===o){const c=br(t);for(;o<=r-i;i+=o)this.process(c,i);continue}s.set(t.subarray(i,i+a),this.pos),this.pos+=a,i+=a,this.pos===o&&(this.process(n,0),this.pos=0)}return this.length+=t.length,this.roundClean(),this}digestInto(t){Bt.exists(this),Bt.output(t,this),this.finished=!0;const{buffer:n,view:s,blockLen:o,isLE:r}=this;let{pos:i}=this;n[i++]=128,this.buffer.subarray(i).fill(0),this.padOffset>o-i&&(this.process(s,0),i=0);for(let u=i;u<o;u++)n[u]=0;iv(s,o-8,BigInt(this.length*8),r),this.process(s,0);const a=br(t),c=this.outputLen;if(c%4)throw new Error("_sha2: outputLen should be aligned to 32bit");const l=c/4,d=this.get();if(l>d.length)throw new Error("_sha2: outputLen bigger than state");for(let u=0;u<l;u++)a.setUint32(4*u,d[u],r)}digest(){const{buffer:t,outputLen:n}=this;this.digestInto(t);const s=t.slice(0,n);return this.destroy(),s}_cloneInto(t){t||(t=new this.constructor),t.set(...this.get());const{blockLen:n,buffer:s,length:o,finished:r,destroyed:i,pos:a}=this;return t.length=o,t.pos=a,t.finished=r,t.destroyed=i,o%n&&t.buffer.set(s),t}}const cv=(e,t,n)=>e&t^~e&n,lv=(e,t,n)=>e&t^e&n^t&n,uv=new Uint32Array([1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298]),sn=new Uint32Array([1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225]),on=new Uint32Array(64);let xu=class extends av{constructor(){super(64,32,8,!1),this.A=sn[0]|0,this.B=sn[1]|0,this.C=sn[2]|0,this.D=sn[3]|0,this.E=sn[4]|0,this.F=sn[5]|0,this.G=sn[6]|0,this.H=sn[7]|0}get(){const{A:t,B:n,C:s,D:o,E:r,F:i,G:a,H:c}=this;return[t,n,s,o,r,i,a,c]}set(t,n,s,o,r,i,a,c){this.A=t|0,this.B=n|0,this.C=s|0,this.D=o|0,this.E=r|0,this.F=i|0,this.G=a|0,this.H=c|0}process(t,n){for(let u=0;u<16;u++,n+=4)on[u]=t.getUint32(n,!1);for(let u=16;u<64;u++){const f=on[u-15],h=on[u-2],v=It(f,7)^It(f,18)^f>>>3,g=It(h,17)^It(h,19)^h>>>10;on[u]=g+on[u-7]+v+on[u-16]|0}let{A:s,B:o,C:r,D:i,E:a,F:c,G:l,H:d}=this;for(let u=0;u<64;u++){const f=It(a,6)^It(a,11)^It(a,25),h=d+f+cv(a,c,l)+uv[u]+on[u]|0,g=(It(s,2)^It(s,13)^It(s,22))+lv(s,o,r)|0;d=l,l=c,c=a,a=i+h|0,i=r,r=o,o=s,s=h+g|0}s=s+this.A|0,o=o+this.B|0,r=r+this.C|0,i=i+this.D|0,a=a+this.E|0,c=c+this.F|0,l=l+this.G|0,d=d+this.H|0,this.set(s,o,r,i,a,c,l,d)}roundClean(){on.fill(0)}destroy(){this.set(0,0,0,0,0,0,0,0),this.buffer.fill(0)}};class dv extends xu{constructor(){super(),this.A=-1056596264,this.B=914150663,this.C=812702999,this.D=-150054599,this.E=-4191439,this.F=1750603025,this.G=1694076839,this.H=-1090891868,this.outputLen=28}}const Hs=bu(()=>new xu);bu(()=>new dv);/*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) */function ls(e){if(!Number.isSafeInteger(e))throw new Error(`Wrong integer: ${e}`)}function Jt(...e){const t=(o,r)=>i=>o(r(i)),n=Array.from(e).reverse().reduce((o,r)=>o?t(o,r.encode):r.encode,void 0),s=e.reduce((o,r)=>o?t(o,r.decode):r.decode,void 0);return{encode:n,decode:s}}function Yt(e){return{encode:t=>{if(!Array.isArray(t)||t.length&&typeof t[0]!="number")throw new Error("alphabet.encode input should be an array of numbers");return t.map(n=>{if(ls(n),n<0||n>=e.length)throw new Error(`Digit index outside alphabet: ${n} (alphabet: ${e.length})`);return e[n]})},decode:t=>{if(!Array.isArray(t)||t.length&&typeof t[0]!="string")throw new Error("alphabet.decode input should be array of strings");return t.map(n=>{if(typeof n!="string")throw new Error(`alphabet.decode: not string element=${n}`);const s=e.indexOf(n);if(s===-1)throw new Error(`Unknown letter: "${n}". Allowed: ${e}`);return s})}}}function Qt(e=""){if(typeof e!="string")throw new Error("join separator should be string");return{encode:t=>{if(!Array.isArray(t)||t.length&&typeof t[0]!="string")throw new Error("join.encode input should be array of strings");for(let n of t)if(typeof n!="string")throw new Error(`join.encode: non-string input=${n}`);return t.join(e)},decode:t=>{if(typeof t!="string")throw new Error("join.decode input should be string");return t.split(e)}}}function Vo(e,t="="){if(ls(e),typeof t!="string")throw new Error("padding chr should be string");return{encode(n){if(!Array.isArray(n)||n.length&&typeof n[0]!="string")throw new Error("padding.encode input should be array of strings");for(let s of n)if(typeof s!="string")throw new Error(`padding.encode: non-string input=${s}`);for(;n.length*e%8;)n.push(t);return n},decode(n){if(!Array.isArray(n)||n.length&&typeof n[0]!="string")throw new Error("padding.encode input should be array of strings");for(let o of n)if(typeof o!="string")throw new Error(`padding.decode: non-string input=${o}`);let s=n.length;if(s*e%8)throw new Error("Invalid padding: string should have whole number of bytes");for(;s>0&&n[s-1]===t;s--)if(!((s-1)*e%8))throw new Error("Invalid padding: string has too much padding");return n.slice(0,s)}}}function Su(e){if(typeof e!="function")throw new Error("normalize fn should be function");return{encode:t=>t,decode:t=>e(t)}}function uc(e,t,n){if(t<2)throw new Error(`convertRadix: wrong from=${t}, base cannot be less than 2`);if(n<2)throw new Error(`convertRadix: wrong to=${n}, base cannot be less than 2`);if(!Array.isArray(e))throw new Error("convertRadix: data should be array");if(!e.length)return[];let s=0;const o=[],r=Array.from(e);for(r.forEach(i=>{if(ls(i),i<0||i>=t)throw new Error(`Wrong integer: ${i}`)});;){let i=0,a=!0;for(let c=s;c<r.length;c++){const l=r[c],d=t*i+l;if(!Number.isSafeInteger(d)||t*i/t!==i||d-l!==t*i)throw new Error("convertRadix: carry overflow");if(i=d%n,r[c]=Math.floor(d/n),!Number.isSafeInteger(r[c])||r[c]*n+i!==d)throw new Error("convertRadix: carry overflow");if(a)r[c]?a=!1:s=c;else continue}if(o.push(i),a)break}for(let i=0;i<e.length-1&&e[i]===0;i++)o.push(0);return o.reverse()}const ku=(e,t)=>t?ku(t,e%t):e,yo=(e,t)=>e+(t-ku(e,t));function Yr(e,t,n,s){if(!Array.isArray(e))throw new Error("convertRadix2: data should be array");if(t<=0||t>32)throw new Error(`convertRadix2: wrong from=${t}`);if(n<=0||n>32)throw new Error(`convertRadix2: wrong to=${n}`);if(yo(t,n)>32)throw new Error(`convertRadix2: carry overflow from=${t} to=${n} carryBits=${yo(t,n)}`);let o=0,r=0;const i=2**n-1,a=[];for(const c of e){if(ls(c),c>=2**t)throw new Error(`convertRadix2: invalid data word=${c} from=${t}`);if(o=o<<t|c,r+t>32)throw new Error(`convertRadix2: carry overflow pos=${r} from=${t}`);for(r+=t;r>=n;r-=n)a.push((o>>r-n&i)>>>0);o&=2**r-1}if(o=o<<n-r&i,!s&&r>=t)throw new Error("Excess padding");if(!s&&o)throw new Error(`Non-zero padding: ${o}`);return s&&r>0&&a.push(o>>>0),a}function fv(e){return ls(e),{encode:t=>{if(!(t instanceof Uint8Array))throw new Error("radix.encode input should be Uint8Array");return uc(Array.from(t),2**8,e)},decode:t=>{if(!Array.isArray(t)||t.length&&typeof t[0]!="number")throw new Error("radix.decode input should be array of strings");return Uint8Array.from(uc(t,e,2**8))}}}function Rn(e,t=!1){if(ls(e),e<=0||e>32)throw new Error("radix2: bits should be in (0..32]");if(yo(8,e)>32||yo(e,8)>32)throw new Error("radix2: carry overflow");return{encode:n=>{if(!(n instanceof Uint8Array))throw new Error("radix2.encode input should be Uint8Array");return Yr(Array.from(n),8,e,!t)},decode:n=>{if(!Array.isArray(n)||n.length&&typeof n[0]!="number")throw new Error("radix2.decode input should be array of strings");return Uint8Array.from(Yr(n,e,8,t))}}}function dc(e){if(typeof e!="function")throw new Error("unsafeWrapper fn should be function");return function(...t){try{return e.apply(null,t)}catch{}}}const hv=Jt(Rn(4),Yt("0123456789ABCDEF"),Qt("")),pv=Jt(Rn(5),Yt("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),Vo(5),Qt(""));Jt(Rn(5),Yt("0123456789ABCDEFGHIJKLMNOPQRSTUV"),Vo(5),Qt(""));Jt(Rn(5),Yt("0123456789ABCDEFGHJKMNPQRSTVWXYZ"),Qt(""),Su(e=>e.toUpperCase().replace(/O/g,"0").replace(/[IL]/g,"1")));const zt=Jt(Rn(6),Yt("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"),Vo(6),Qt("")),gv=Jt(Rn(6),Yt("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"),Vo(6),Qt("")),Oi=e=>Jt(fv(58),Yt(e),Qt("")),Qr=Oi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");Oi("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ");Oi("rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz");const fc=[0,2,3,5,6,7,9,10,11],yv={encode(e){let t="";for(let n=0;n<e.length;n+=8){const s=e.subarray(n,n+8);t+=Qr.encode(s).padStart(fc[s.length],"1")}return t},decode(e){let t=[];for(let n=0;n<e.length;n+=11){const s=e.slice(n,n+11),o=fc.indexOf(s.length),r=Qr.decode(s);for(let i=0;i<r.length-o;i++)if(r[i]!==0)throw new Error("base58xmr: wrong padding");t=t.concat(Array.from(r.slice(r.length-o)))}return Uint8Array.from(t)}},Xr=Jt(Yt("qpzry9x8gf2tvdw0s3jn54khce6mua7l"),Qt("")),hc=[996825010,642813549,513874426,1027748829,705979059];function _s(e){const t=e>>25;let n=(e&33554431)<<5;for(let s=0;s<hc.length;s++)(t>>s&1)===1&&(n^=hc[s]);return n}function pc(e,t,n=1){const s=e.length;let o=1;for(let r=0;r<s;r++){const i=e.charCodeAt(r);if(i<33||i>126)throw new Error(`Invalid prefix (${e})`);o=_s(o)^i>>5}o=_s(o);for(let r=0;r<s;r++)o=_s(o)^e.charCodeAt(r)&31;for(let r of t)o=_s(o)^r;for(let r=0;r<6;r++)o=_s(o);return o^=n,Xr.encode(Yr([o%2**30],30,5,!1))}function Cu(e){const t=e==="bech32"?1:734539939,n=Rn(5),s=n.decode,o=n.encode,r=dc(s);function i(d,u,f=90){if(typeof d!="string")throw new Error(`bech32.encode prefix should be string, not ${typeof d}`);if(!Array.isArray(u)||u.length&&typeof u[0]!="number")throw new Error(`bech32.encode words should be array of numbers, not ${typeof u}`);const h=d.length+7+u.length;if(f!==!1&&h>f)throw new TypeError(`Length ${h} exceeds limit ${f}`);return d=d.toLowerCase(),`${d}1${Xr.encode(u)}${pc(d,u,t)}`}function a(d,u=90){if(typeof d!="string")throw new Error(`bech32.decode input should be string, not ${typeof d}`);if(d.length<8||u!==!1&&d.length>u)throw new TypeError(`Wrong string length: ${d.length} (${d}). Expected (8..${u})`);const f=d.toLowerCase();if(d!==f&&d!==d.toUpperCase())throw new Error("String must be lowercase or uppercase");d=f;const h=d.lastIndexOf("1");if(h===0||h===-1)throw new Error('Letter "1" must be present between prefix and data only');const v=d.slice(0,h),g=d.slice(h+1);if(g.length<6)throw new Error("Data must be at least 6 characters long");const m=Xr.decode(g).slice(0,-6),w=pc(v,m,t);if(!g.endsWith(w))throw new Error(`Invalid checksum in ${d}: expected "${w}"`);return{prefix:v,words:m}}const c=dc(a);function l(d){const{prefix:u,words:f}=a(d,!1);return{prefix:u,words:f,bytes:s(f)}}return{encode:i,decode:a,decodeToBytes:l,decodeUnsafe:c,fromWords:s,fromWordsUnsafe:r,toWords:o}}const rs=Cu("bech32");Cu("bech32m");const vv={encode:e=>new TextDecoder().decode(e),decode:e=>new TextEncoder().encode(e)},_v=Jt(Rn(4),Yt("0123456789abcdef"),Qt(""),Su(e=>{if(typeof e!="string"||e.length%2)throw new TypeError(`hex.decode: expected string, got ${typeof e} with length ${e.length}`);return e.toLowerCase()})),mv={utf8:vv,hex:_v,base16:hv,base32:pv,base64:zt,base64url:gv,base58:Qr,base58xmr:yv};`${Object.keys(mv).join(", ")}`;function Er(e){if(!Number.isSafeInteger(e)||e<0)throw new Error(`positive integer expected, not ${e}`)}function gc(e){if(typeof e!="boolean")throw new Error(`boolean expected, not ${e}`)}function wv(e){return e instanceof Uint8Array||e!=null&&typeof e=="object"&&e.constructor.name==="Uint8Array"}function Dt(e,...t){if(!wv(e))throw new Error("Uint8Array expected");if(t.length>0&&!t.includes(e.length))throw new Error(`Uint8Array expected of length ${t}, not of length=${e.length}`)}/*! noble-ciphers - MIT License (c) 2023 Paul Miller (paulmillr.com) */const Ge=e=>new Uint32Array(e.buffer,e.byteOffset,Math.floor(e.byteLength/4)),bv=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;if(!bv)throw new Error("Non little-endian hardware is not supported");function Ev(e,t){if(t==null||typeof t!="object")throw new Error("options must be defined");return Object.assign(e,t)}function Rv(e,t){if(e.length!==t.length)return!1;let n=0;for(let s=0;s<e.length;s++)n|=e[s]^t[s];return n===0}const xv=(e,t)=>(Object.assign(t,e),t),mn=16,Sv=283;function Fi(e){return e<<1^Sv&-(e>>7)}function qn(e,t){let n=0;for(;t>0;t>>=1)n^=e&-(t&1),e=Fi(e);return n}const ei=(()=>{let e=new Uint8Array(256);for(let n=0,s=1;n<256;n++,s^=Fi(s))e[n]=s;const t=new Uint8Array(256);t[0]=99;for(let n=0;n<255;n++){let s=e[255-n];s|=s<<8,t[e[n]]=(s^s>>4^s>>5^s>>6^s>>7^99)&255}return t})(),kv=ei.map((e,t)=>ei.indexOf(t)),Cv=e=>e<<24|e>>>8,Rr=e=>e<<8|e>>>24;function $u(e,t){if(e.length!==256)throw new Error("Wrong sbox length");const n=new Uint32Array(256).map((l,d)=>t(e[d])),s=n.map(Rr),o=s.map(Rr),r=o.map(Rr),i=new Uint32Array(256*256),a=new Uint32Array(256*256),c=new Uint16Array(256*256);for(let l=0;l<256;l++)for(let d=0;d<256;d++){const u=l*256+d;i[u]=n[l]^s[d],a[u]=o[l]^r[d],c[u]=e[l]<<8|e[d]}return{sbox:e,sbox2:c,T0:n,T1:s,T2:o,T3:r,T01:i,T23:a}}const Hi=$u(ei,e=>qn(e,3)<<24|e<<16|e<<8|qn(e,2)),Pu=$u(kv,e=>qn(e,11)<<24|qn(e,13)<<16|qn(e,9)<<8|qn(e,14)),$v=(()=>{const e=new Uint8Array(16);for(let t=0,n=1;t<16;t++,n=Fi(n))e[t]=n;return e})();function Iu(e){Dt(e);const t=e.length;if(![16,24,32].includes(t))throw new Error(`aes: wrong key size: should be 16, 24 or 32, got: ${t}`);const{sbox2:n}=Hi,s=Ge(e),o=s.length,r=a=>Nt(n,a,a,a,a),i=new Uint32Array(t+28);i.set(s);for(let a=o;a<i.length;a++){let c=i[a-1];a%o===0?c=r(Cv(c))^$v[a/o-1]:o>6&&a%o===4&&(c=r(c)),i[a]=i[a-o]^c}return i}function Pv(e){const t=Iu(e),n=t.slice(),s=t.length,{sbox2:o}=Hi,{T0:r,T1:i,T2:a,T3:c}=Pu;for(let l=0;l<s;l+=4)for(let d=0;d<4;d++)n[l+d]=t[s-l-4+d];t.fill(0);for(let l=4;l<s-4;l++){const d=n[l],u=Nt(o,d,d,d,d);n[l]=r[u&255]^i[u>>>8&255]^a[u>>>16&255]^c[u>>>24]}return n}function pn(e,t,n,s,o,r){return e[n<<8&65280|s>>>8&255]^t[o>>>8&65280|r>>>24&255]}function Nt(e,t,n,s,o){return e[t&255|n&65280]|e[s>>>16&255|o>>>16&65280]<<16}function yc(e,t,n,s,o){const{sbox2:r,T01:i,T23:a}=Hi;let c=0;t^=e[c++],n^=e[c++],s^=e[c++],o^=e[c++];const l=e.length/4-2;for(let v=0;v<l;v++){const g=e[c++]^pn(i,a,t,n,s,o),m=e[c++]^pn(i,a,n,s,o,t),w=e[c++]^pn(i,a,s,o,t,n),x=e[c++]^pn(i,a,o,t,n,s);t=g,n=m,s=w,o=x}const d=e[c++]^Nt(r,t,n,s,o),u=e[c++]^Nt(r,n,s,o,t),f=e[c++]^Nt(r,s,o,t,n),h=e[c++]^Nt(r,o,t,n,s);return{s0:d,s1:u,s2:f,s3:h}}function Iv(e,t,n,s,o){const{sbox2:r,T01:i,T23:a}=Pu;let c=0;t^=e[c++],n^=e[c++],s^=e[c++],o^=e[c++];const l=e.length/4-2;for(let v=0;v<l;v++){const g=e[c++]^pn(i,a,t,o,s,n),m=e[c++]^pn(i,a,n,t,o,s),w=e[c++]^pn(i,a,s,n,t,o),x=e[c++]^pn(i,a,o,s,n,t);t=g,n=m,s=w,o=x}const d=e[c++]^Nt(r,t,o,s,n),u=e[c++]^Nt(r,n,t,o,s),f=e[c++]^Nt(r,s,n,t,o),h=e[c++]^Nt(r,o,s,n,t);return{s0:d,s1:u,s2:f,s3:h}}function Au(e,t){if(!t)return new Uint8Array(e);if(Dt(t),t.length<e)throw new Error(`aes: wrong destination length, expected at least ${e}, got: ${t.length}`);return t}function Av(e){if(Dt(e),e.length%mn!==0)throw new Error(`aes/(cbc-ecb).decrypt ciphertext should consist of blocks with size ${mn}`)}function Tv(e,t,n){let s=e.length;const o=s%mn;if(!t&&o!==0)throw new Error("aec/(cbc-ecb): unpadded plaintext with disabled padding");const r=Ge(e);if(t){let c=mn-o;c||(c=mn),s=s+c}const i=Au(s,n),a=Ge(i);return{b:r,o:a,out:i}}function Lv(e,t){if(!t)return e;const n=e.length;if(!n)throw new Error("aes/pcks5: empty ciphertext not allowed");const s=e[n-1];if(s<=0||s>16)throw new Error(`aes/pcks5: wrong padding byte: ${s}`);const o=e.subarray(0,-s);for(let r=0;r<s;r++)if(e[n-r-1]!==s)throw new Error("aes/pcks5: wrong padding");return o}function Uv(e){const t=new Uint8Array(16),n=Ge(t);t.set(e);const s=mn-e.length;for(let o=mn-s;o<mn;o++)t[o]=s;return n}const Tu=xv({blockSize:16,nonceLength:16},function(t,n,s={}){Dt(t),Dt(n,16);const o=!s.disablePadding;return{encrypt:(r,i)=>{const a=Iu(t),{b:c,o:l,out:d}=Tv(r,o,i),u=Ge(n);let f=u[0],h=u[1],v=u[2],g=u[3],m=0;for(;m+4<=c.length;)f^=c[m+0],h^=c[m+1],v^=c[m+2],g^=c[m+3],{s0:f,s1:h,s2:v,s3:g}=yc(a,f,h,v,g),l[m++]=f,l[m++]=h,l[m++]=v,l[m++]=g;if(o){const w=Uv(r.subarray(m*4));f^=w[0],h^=w[1],v^=w[2],g^=w[3],{s0:f,s1:h,s2:v,s3:g}=yc(a,f,h,v,g),l[m++]=f,l[m++]=h,l[m++]=v,l[m++]=g}return a.fill(0),d},decrypt:(r,i)=>{Av(r);const a=Pv(t),c=Ge(n),l=Au(r.length,i),d=Ge(r),u=Ge(l);let f=c[0],h=c[1],v=c[2],g=c[3];for(let m=0;m+4<=d.length;){const w=f,x=h,b=v,C=g;f=d[m+0],h=d[m+1],v=d[m+2],g=d[m+3];const{s0:P,s1:k,s2:D,s3:$}=Iv(a,f,h,v,g);u[m++]=P^w,u[m++]=k^x,u[m++]=D^b,u[m++]=$^C}return a.fill(0),Lv(l,o)}}}),Lu=e=>Uint8Array.from(e.split("").map(t=>t.charCodeAt(0))),Bv=Lu("expand 16-byte k"),Nv=Lu("expand 32-byte k"),Mv=Ge(Bv),Uu=Ge(Nv);Uu.slice();function Ce(e,t){return e<<t|e>>>32-t}function ti(e){return e.byteOffset%4===0}const Zs=64,Ov=16,Bu=2**32-1,vc=new Uint32Array;function Fv(e,t,n,s,o,r,i,a){const c=o.length,l=new Uint8Array(Zs),d=Ge(l),u=ti(o)&&ti(r),f=u?Ge(o):vc,h=u?Ge(r):vc;for(let v=0;v<c;i++){if(e(t,n,s,d,i,a),i>=Bu)throw new Error("arx: counter overflow");const g=Math.min(Zs,c-v);if(u&&g===Zs){const m=v/4;if(v%4!==0)throw new Error("arx: invalid block position");for(let w=0,x;w<Ov;w++)x=m+w,h[x]=f[x]^d[w];v+=Zs;continue}for(let m=0,w;m<g;m++)w=v+m,r[w]=o[w]^l[m];v+=g}}function Hv(e,t){const{allowShortKeys:n,extendNonceFn:s,counterLength:o,counterRight:r,rounds:i}=Ev({allowShortKeys:!1,counterLength:8,counterRight:!1,rounds:20},t);if(typeof e!="function")throw new Error("core must be a function");return Er(o),Er(i),gc(r),gc(n),(a,c,l,d,u=0)=>{Dt(a),Dt(c),Dt(l);const f=l.length;if(d||(d=new Uint8Array(f)),Dt(d),Er(u),u<0||u>=Bu)throw new Error("arx: counter overflow");if(d.length<f)throw new Error(`arx: output (${d.length}) is shorter than data (${f})`);const h=[];let v=a.length,g,m;if(v===32)g=a.slice(),h.push(g),m=Uu;else if(v===16&&n)g=new Uint8Array(32),g.set(a),g.set(a,16),m=Mv,h.push(g);else throw new Error(`arx: invalid 32-byte key, got length=${v}`);ti(c)||(c=c.slice(),h.push(c));const w=Ge(g);if(s){if(c.length!==24)throw new Error("arx: extended nonce must be 24 bytes");s(m,w,Ge(c.subarray(0,16)),w),c=c.subarray(16)}const x=16-o;if(x!==c.length)throw new Error(`arx: nonce must be ${x} or 16 bytes`);if(x!==12){const C=new Uint8Array(12);C.set(c,r?0:12-c.length),c=C,h.push(c)}const b=Ge(c);for(Fv(e,m,w,b,l,d,u,i);h.length>0;)h.pop().fill(0);return d}}function jv(e,t,n,s,o,r=20){let i=e[0],a=e[1],c=e[2],l=e[3],d=t[0],u=t[1],f=t[2],h=t[3],v=t[4],g=t[5],m=t[6],w=t[7],x=o,b=n[0],C=n[1],P=n[2],k=i,D=a,$=c,T=l,I=d,V=u,z=f,J=h,X=v,H=g,R=m,A=w,F=x,W=b,ee=C,oe=P;for(let de=0;de<r;de+=2)k=k+I|0,F=Ce(F^k,16),X=X+F|0,I=Ce(I^X,12),k=k+I|0,F=Ce(F^k,8),X=X+F|0,I=Ce(I^X,7),D=D+V|0,W=Ce(W^D,16),H=H+W|0,V=Ce(V^H,12),D=D+V|0,W=Ce(W^D,8),H=H+W|0,V=Ce(V^H,7),$=$+z|0,ee=Ce(ee^$,16),R=R+ee|0,z=Ce(z^R,12),$=$+z|0,ee=Ce(ee^$,8),R=R+ee|0,z=Ce(z^R,7),T=T+J|0,oe=Ce(oe^T,16),A=A+oe|0,J=Ce(J^A,12),T=T+J|0,oe=Ce(oe^T,8),A=A+oe|0,J=Ce(J^A,7),k=k+V|0,oe=Ce(oe^k,16),R=R+oe|0,V=Ce(V^R,12),k=k+V|0,oe=Ce(oe^k,8),R=R+oe|0,V=Ce(V^R,7),D=D+z|0,F=Ce(F^D,16),A=A+F|0,z=Ce(z^A,12),D=D+z|0,F=Ce(F^D,8),A=A+F|0,z=Ce(z^A,7),$=$+J|0,W=Ce(W^$,16),X=X+W|0,J=Ce(J^X,12),$=$+J|0,W=Ce(W^$,8),X=X+W|0,J=Ce(J^X,7),T=T+I|0,ee=Ce(ee^T,16),H=H+ee|0,I=Ce(I^H,12),T=T+I|0,ee=Ce(ee^T,8),H=H+ee|0,I=Ce(I^H,7);let re=0;s[re++]=i+k|0,s[re++]=a+D|0,s[re++]=c+$|0,s[re++]=l+T|0,s[re++]=d+I|0,s[re++]=u+V|0,s[re++]=f+z|0,s[re++]=h+J|0,s[re++]=v+X|0,s[re++]=g+H|0,s[re++]=m+R|0,s[re++]=w+A|0,s[re++]=x+F|0,s[re++]=b+W|0,s[re++]=C+ee|0,s[re++]=P+oe|0}const Nu=Hv(jv,{counterRight:!1,counterLength:4,allowShortKeys:!1});class Mu extends wu{constructor(t,n){super(),this.finished=!1,this.destroyed=!1,Bt.hash(t);const s=Bs(n);if(this.iHash=t.create(),typeof this.iHash.update!="function")throw new Error("Expected instance of class which extends utils.Hash");this.blockLen=this.iHash.blockLen,this.outputLen=this.iHash.outputLen;const o=this.blockLen,r=new Uint8Array(o);r.set(s.length>o?t.create().update(s).digest():s);for(let i=0;i<r.length;i++)r[i]^=54;this.iHash.update(r),this.oHash=t.create();for(let i=0;i<r.length;i++)r[i]^=106;this.oHash.update(r),r.fill(0)}update(t){return Bt.exists(this),this.iHash.update(t),this}digestInto(t){Bt.exists(this),Bt.bytes(t,this.outputLen),this.finished=!0,this.iHash.digestInto(t),this.oHash.update(t),this.oHash.digestInto(t),this.destroy()}digest(){const t=new Uint8Array(this.oHash.outputLen);return this.digestInto(t),t}_cloneInto(t){t||(t=Object.create(Object.getPrototypeOf(this),{}));const{oHash:n,iHash:s,finished:o,destroyed:r,blockLen:i,outputLen:a}=this;return t=t,t.finished=o,t.destroyed=r,t.blockLen=i,t.outputLen=a,t.oHash=n._cloneInto(t.oHash),t.iHash=s._cloneInto(t.iHash),t}destroy(){this.destroyed=!0,this.oHash.destroy(),this.iHash.destroy()}}const Do=(e,t,n)=>new Mu(e,t).update(n).digest();Do.create=(e,t)=>new Mu(e,t);function Vv(e,t,n){return Bt.hash(e),n===void 0&&(n=new Uint8Array(e.outputLen)),Do(e,Bs(n),Bs(t))}const xr=new Uint8Array([0]),_c=new Uint8Array;function Dv(e,t,n,s=32){if(Bt.hash(e),Bt.number(s),s>255*e.outputLen)throw new Error("Length should be <= 255*HashLen");const o=Math.ceil(s/e.outputLen);n===void 0&&(n=_c);const r=new Uint8Array(o*e.outputLen),i=Do.create(e,t),a=i._cloneInto(),c=new Uint8Array(i.outputLen);for(let l=0;l<o;l++)xr[0]=l+1,a.update(l===0?_c:c).update(n).update(xr).digestInto(c),r.set(c,e.outputLen*l),i._cloneInto(a);return i.destroy(),a.destroy(),c.fill(0),xr.fill(0),r.slice(0,s)}var Wv=Object.defineProperty,Ne=(e,t)=>{for(var n in t)Wv(e,n,{get:t[n],enumerable:!0})},Cn=Symbol("verified"),qv=e=>e instanceof Object;function Ou(e){if(!qv(e)||typeof e.kind!="number"||typeof e.content!="string"||typeof e.created_at!="number"||typeof e.pubkey!="string"||!e.pubkey.match(/^[a-f0-9]{64}$/)||!Array.isArray(e.tags))return!1;for(let t=0;t<e.tags.length;t++){let n=e.tags[t];if(!Array.isArray(n))return!1;for(let s=0;s<n.length;s++)if(typeof n[s]=="object")return!1}return!0}var Gt={};Ne(Gt,{Queue:()=>Hu,QueueNode:()=>Fu,binarySearch:()=>ji,insertEventIntoAscendingList:()=>zv,insertEventIntoDescendingList:()=>Kv,normalizeURL:()=>Kn,utf8Decoder:()=>Ut,utf8Encoder:()=>St});var Ut=new TextDecoder("utf-8"),St=new TextEncoder;function Kn(e){e.indexOf("://")===-1&&(e="wss://"+e);let t=new URL(e);return t.pathname=t.pathname.replace(/\/+/g,"/"),t.pathname.endsWith("/")&&(t.pathname=t.pathname.slice(0,-1)),(t.port==="80"&&t.protocol==="ws:"||t.port==="443"&&t.protocol==="wss:")&&(t.port=""),t.searchParams.sort(),t.hash="",t.toString()}function Kv(e,t){const[n,s]=ji(e,o=>t.id===o.id?0:t.created_at===o.created_at?-1:o.created_at-t.created_at);return s||e.splice(n,0,t),e}function zv(e,t){const[n,s]=ji(e,o=>t.id===o.id?0:t.created_at===o.created_at?-1:t.created_at-o.created_at);return s||e.splice(n,0,t),e}function ji(e,t){let n=0,s=e.length-1;for(;n<=s;){const o=Math.floor((n+s)/2),r=t(e[o]);if(r===0)return[o,!0];r<0?s=o-1:n=o+1}return[n,!1]}var Fu=class{constructor(e){ge(this,"value");ge(this,"next",null);ge(this,"prev",null);this.value=e}},Hu=class{constructor(){ge(this,"first");ge(this,"last");this.first=null,this.last=null}enqueue(e){const t=new Fu(e);return this.last?this.last===this.first?(this.last=t,this.last.prev=this.first,this.first.next=t):(t.prev=this.last,this.last.next=t,this.last=t):(this.first=t,this.last=t),!0}dequeue(){if(!this.first)return null;if(this.first===this.last){const t=this.first;return this.first=null,this.last=null,t.value}const e=this.first;return this.first=e.next,e.value}},Gv=class{generateSecretKey(){return vs.utils.randomPrivateKey()}getPublicKey(e){return Xe(vs.getPublicKey(e))}finalizeEvent(e,t){const n=e;return n.pubkey=Xe(vs.getPublicKey(t)),n.id=Cs(n),n.sig=Xe(vs.sign(Cs(n),t)),n[Cn]=!0,n}verifyEvent(e){if(typeof e[Cn]=="boolean")return e[Cn];const t=Cs(e);if(t!==e.id)return e[Cn]=!1,!1;try{const n=vs.verify(e.sig,t,e.pubkey);return e[Cn]=n,n}catch{return e[Cn]=!1,!1}}};function Zv(e){if(!Ou(e))throw new Error("can't serialize event with wrong or missing properties");return JSON.stringify([0,e.pubkey,e.created_at,e.kind,e.tags,e.content])}function Cs(e){let t=Hs(St.encode(Zv(e)));return Xe(t)}var Wo=new Gv,Jv=Wo.generateSecretKey,ju=Wo.getPublicKey,rt=Wo.finalizeEvent,Fn=Wo.verifyEvent,Yv={};Ne(Yv,{Application:()=>Y0,BadgeAward:()=>i0,BadgeDefinition:()=>W0,BlockedRelaysList:()=>P0,BookmarkList:()=>k0,Bookmarksets:()=>j0,Calendar:()=>o_,CalendarEventRSVP:()=>r_,ChannelCreation:()=>Ku,ChannelHideMessage:()=>Zu,ChannelMessage:()=>Gu,ChannelMetadata:()=>zu,ChannelMuteUser:()=>Ju,ClassifiedListing:()=>e_,ClientAuth:()=>Yu,CommunitiesList:()=>C0,CommunityDefinition:()=>c_,CommunityPostApproval:()=>g0,Contacts:()=>n0,CreateOrUpdateProduct:()=>z0,CreateOrUpdateStall:()=>K0,Curationsets:()=>V0,Date:()=>n_,DraftClassifiedListing:()=>t_,DraftLong:()=>Z0,Emojisets:()=>J0,EncryptedDirectMessage:()=>s0,EncryptedDirectMessages:()=>o0,EventDeletion:()=>r0,FileMetadata:()=>l0,FileServerPreference:()=>L0,Followsets:()=>O0,GenericRepost:()=>a0,Genericlists:()=>F0,HTTPAuth:()=>Wi,Handlerinformation:()=>a_,Handlerrecommendation:()=>i_,Highlights:()=>E0,InterestsList:()=>A0,Interestsets:()=>q0,JobFeedback:()=>_0,JobRequest:()=>y0,JobResult:()=>v0,Label:()=>p0,LightningPubRPC:()=>B0,LiveChatMessage:()=>u0,LiveEvent:()=>Q0,LongFormArticle:()=>G0,Metadata:()=>Xv,Mutelist:()=>R0,NWCWalletInfo:()=>U0,NWCWalletRequest:()=>Qu,NWCWalletResponse:()=>N0,NostrConnect:()=>M0,OpenTimestamps:()=>c0,Pinlist:()=>x0,ProblemTracker:()=>d0,ProfileBadges:()=>D0,PublicChatsList:()=>$0,Reaction:()=>Di,RecommendRelay:()=>t0,RelayList:()=>S0,Relaysets:()=>H0,Report:()=>f0,Reporting:()=>h0,Repost:()=>Vi,SearchRelaysList:()=>I0,ShortTextNote:()=>e0,Time:()=>s_,UserEmojiList:()=>T0,UserStatuses:()=>X0,Zap:()=>b0,ZapGoal:()=>m0,ZapRequest:()=>w0,classifyKind:()=>Qv,isEphemeralKind:()=>Wu,isParameterizedReplaceableKind:()=>qu,isRegularKind:()=>Vu,isReplaceableKind:()=>Du});function Vu(e){return 1e3<=e&&e<1e4||[1,2,4,5,6,7,8,16,40,41,42,43,44].includes(e)}function Du(e){return[0,3].includes(e)||1e4<=e&&e<2e4}function Wu(e){return 2e4<=e&&e<3e4}function qu(e){return 3e4<=e&&e<4e4}function Qv(e){return Vu(e)?"regular":Du(e)?"replaceable":Wu(e)?"ephemeral":qu(e)?"parameterized":"unknown"}var Xv=0,e0=1,t0=2,n0=3,s0=4,o0=4,r0=5,Vi=6,Di=7,i0=8,a0=16,Ku=40,zu=41,Gu=42,Zu=43,Ju=44,c0=1040,l0=1063,u0=1311,d0=1971,f0=1984,h0=1984,p0=1985,g0=4550,y0=5999,v0=6999,_0=7e3,m0=9041,w0=9734,b0=9735,E0=9802,R0=1e4,x0=10001,S0=10002,k0=10003,C0=10004,$0=10005,P0=10006,I0=10007,A0=10015,T0=10030,L0=10096,U0=13194,B0=21e3,Yu=22242,Qu=23194,N0=23195,M0=24133,Wi=27235,O0=3e4,F0=30001,H0=30002,j0=30003,V0=30004,D0=30008,W0=30009,q0=30015,K0=30017,z0=30018,G0=30023,Z0=30024,J0=30030,Y0=30078,Q0=30311,X0=30315,e_=30402,t_=30403,n_=31922,s_=31923,o_=31924,r_=31925,i_=31989,a_=31990,c_=34550;function l_(e,t){if(e.ids&&e.ids.indexOf(t.id)===-1||e.kinds&&e.kinds.indexOf(t.kind)===-1||e.authors&&e.authors.indexOf(t.pubkey)===-1)return!1;for(let n in e)if(n[0]==="#"){let s=n.slice(1),o=e[`#${s}`];if(o&&!t.tags.find(([r,i])=>r===n.slice(1)&&o.indexOf(i)!==-1))return!1}return!(e.since&&t.created_at<e.since||e.until&&t.created_at>e.until)}function u_(e,t){for(let n=0;n<e.length;n++)if(l_(e[n],t))return!0;return!1}var d_={};Ne(d_,{getHex64:()=>qo,getInt:()=>Xu,getSubscriptionId:()=>ed,matchEventId:()=>f_,matchEventKind:()=>p_,matchEventPubkey:()=>h_});function qo(e,t){let n=t.length+3,s=e.indexOf(`"${t}":`)+n,o=e.slice(s).indexOf('"')+s+1;return e.slice(o,o+64)}function Xu(e,t){let n=t.length,s=e.indexOf(`"${t}":`)+n+3,o=e.slice(s),r=Math.min(o.indexOf(","),o.indexOf("}"));return parseInt(o.slice(0,r),10)}function ed(e){let t=e.slice(0,22).indexOf('"EVENT"');if(t===-1)return null;let n=e.slice(t+7+1).indexOf('"');if(n===-1)return null;let s=t+7+1+n,o=e.slice(s+1,80).indexOf('"');if(o===-1)return null;let r=s+1+o;return e.slice(s+1,r)}function f_(e,t){return t===qo(e,"id")}function h_(e,t){return t===qo(e,"pubkey")}function p_(e,t){return t===Xu(e,"kind")}var g_={};Ne(g_,{makeAuthEvent:()=>td});function td(e,t){return{kind:Yu,created_at:Math.floor(Date.now()/1e3),tags:[["relay",e],["challenge",t]],content:""}}async function y_(){return new Promise(e=>{const t=new MessageChannel,n=()=>{t.port1.removeEventListener("message",n),e()};t.port1.addEventListener("message",n),t.port2.postMessage(0),t.port1.start()})}var v_=e=>(e[Cn]=!0,!0),qi=class{constructor(e,t){ge(this,"url");ge(this,"_connected",!1);ge(this,"onclose",null);ge(this,"onnotice",e=>console.debug(`NOTICE from ${this.url}: ${e}`));ge(this,"_onauth",null);ge(this,"baseEoseTimeout",4400);ge(this,"connectionTimeout",4400);ge(this,"openSubs",new Map);ge(this,"connectionTimeoutHandle");ge(this,"connectionPromise");ge(this,"openCountRequests",new Map);ge(this,"openEventPublishes",new Map);ge(this,"ws");ge(this,"incomingMessageQueue",new Hu);ge(this,"queueRunning",!1);ge(this,"challenge");ge(this,"serial",0);ge(this,"verifyEvent");ge(this,"_WebSocket");this.url=Kn(e),this.verifyEvent=t.verifyEvent,this._WebSocket=t.websocketImplementation||WebSocket}static async connect(e,t){const n=new qi(e,t);return await n.connect(),n}closeAllSubscriptions(e){for(let[t,n]of this.openSubs)n.close(e);this.openSubs.clear();for(let[t,n]of this.openEventPublishes)n.reject(new Error(e));this.openEventPublishes.clear();for(let[t,n]of this.openCountRequests)n.reject(new Error(e));this.openCountRequests.clear()}get connected(){return this._connected}async connect(){return this.connectionPromise?this.connectionPromise:(this.challenge=void 0,this.connectionPromise=new Promise((e,t)=>{this.connectionTimeoutHandle=setTimeout(()=>{var n;t("connection timed out"),this.connectionPromise=void 0,(n=this.onclose)==null||n.call(this),this.closeAllSubscriptions("relay connection timed out")},this.connectionTimeout);try{this.ws=new this._WebSocket(this.url)}catch(n){t(n);return}this.ws.onopen=()=>{clearTimeout(this.connectionTimeoutHandle),this._connected=!0,e()},this.ws.onerror=n=>{var s;t(n.message||"websocket error"),this._connected&&(this._connected=!1,this.connectionPromise=void 0,(s=this.onclose)==null||s.call(this),this.closeAllSubscriptions("relay connection errored"))},this.ws.onclose=async()=>{var n;this._connected&&(this._connected=!1,this.connectionPromise=void 0,(n=this.onclose)==null||n.call(this),this.closeAllSubscriptions("relay connection closed"))},this.ws.onmessage=this._onmessage.bind(this)}),this.connectionPromise)}async runQueue(){for(this.queueRunning=!0;this.handleNext()!==!1;)await y_();this.queueRunning=!1}handleNext(){var n,s,o;const e=this.incomingMessageQueue.dequeue();if(!e)return!1;const t=ed(e);if(t){const r=this.openSubs.get(t);if(!r)return;const i=qo(e,"id"),a=(n=r.alreadyHaveEvent)==null?void 0:n.call(r,i);if((s=r.receivedEvent)==null||s.call(r,this,i),a)return}try{let r=JSON.parse(e);switch(r[0]){case"EVENT":{const i=this.openSubs.get(r[1]),a=r[2];this.verifyEvent(a)&&u_(i.filters,a)&&i.onevent(a);return}case"COUNT":{const i=r[1],a=r[2],c=this.openCountRequests.get(i);c&&(c.resolve(a.count),this.openCountRequests.delete(i));return}case"EOSE":{const i=this.openSubs.get(r[1]);if(!i)return;i.receivedEose();return}case"OK":{const i=r[1],a=r[2],c=r[3],l=this.openEventPublishes.get(i);a?l.resolve(c):l.reject(new Error(c)),this.openEventPublishes.delete(i);return}case"CLOSED":{const i=r[1],a=this.openSubs.get(i);if(!a)return;a.closed=!0,a.close(r[2]);return}case"NOTICE":this.onnotice(r[1]);return;case"AUTH":{this.challenge=r[1],(o=this._onauth)==null||o.call(this,r[1]);return}}}catch{return}}async send(e){if(!this.connectionPromise)throw new Error("sending on closed connection");this.connectionPromise.then(()=>{var t;(t=this.ws)==null||t.send(e)})}async auth(e){if(!this.challenge)throw new Error("can't perform auth, no challenge was received");const t=await e(td(this.url,this.challenge)),n=new Promise((s,o)=>{this.openEventPublishes.set(t.id,{resolve:s,reject:o})});return this.send('["AUTH",'+JSON.stringify(t)+"]"),n}async publish(e){const t=new Promise((n,s)=>{this.openEventPublishes.set(e.id,{resolve:n,reject:s})});return this.send('["EVENT",'+JSON.stringify(e)+"]"),t}async count(e,t){this.serial++;const n=(t==null?void 0:t.id)||"count:"+this.serial,s=new Promise((o,r)=>{this.openCountRequests.set(n,{resolve:o,reject:r})});return this.send('["COUNT","'+n+'",'+JSON.stringify(e).substring(1)),s}subscribe(e,t){const n=this.prepareSubscription(e,t);return n.fire(),n}prepareSubscription(e,t){this.serial++;const n=t.id||"sub:"+this.serial,s=new __(this,n,e,t);return this.openSubs.set(n,s),s}close(){var e;this.closeAllSubscriptions("relay connection closed by us"),this._connected=!1,(e=this.ws)==null||e.close()}_onmessage(e){this.incomingMessageQueue.enqueue(e.data),this.queueRunning||this.runQueue()}},__=class{constructor(e,t,n,s){ge(this,"relay");ge(this,"id");ge(this,"closed",!1);ge(this,"eosed",!1);ge(this,"filters");ge(this,"alreadyHaveEvent");ge(this,"receivedEvent");ge(this,"onevent");ge(this,"oneose");ge(this,"onclose");ge(this,"eoseTimeout");ge(this,"eoseTimeoutHandle");this.relay=e,this.filters=n,this.id=t,this.alreadyHaveEvent=s.alreadyHaveEvent,this.receivedEvent=s.receivedEvent,this.eoseTimeout=s.eoseTimeout||e.baseEoseTimeout,this.oneose=s.oneose,this.onclose=s.onclose,this.onevent=s.onevent||(o=>{console.warn(`onevent() callback not defined for subscription '${this.id}' in relay ${this.relay.url}. event received:`,o)})}fire(){this.relay.send('["REQ","'+this.id+'",'+JSON.stringify(this.filters).substring(1)),this.eoseTimeoutHandle=setTimeout(this.receivedEose.bind(this),this.eoseTimeout)}receivedEose(){var e;this.eosed||(clearTimeout(this.eoseTimeoutHandle),this.eosed=!0,(e=this.oneose)==null||e.call(this))}close(e="closed by caller"){var t;!this.closed&&this.relay.connected&&(this.relay.send('["CLOSE",'+JSON.stringify(this.id)+"]"),this.closed=!0),this.relay.openSubs.delete(this.id),(t=this.onclose)==null||t.call(this,e)}},nd;try{nd=WebSocket}catch{}var ni=class extends qi{constructor(e){super(e,{verifyEvent:Fn,websocketImplementation:nd})}static async connect(e){const t=new ni(e);return await t.connect(),t}},m_=class{constructor(e){ge(this,"relays",new Map);ge(this,"seenOn",new Map);ge(this,"trackRelays",!1);ge(this,"verifyEvent");ge(this,"trustedRelayURLs",new Set);ge(this,"_WebSocket");this.verifyEvent=e.verifyEvent,this._WebSocket=e.websocketImplementation}async ensureRelay(e,t){e=Kn(e);let n=this.relays.get(e);return n||(n=new qi(e,{verifyEvent:this.trustedRelayURLs.has(e)?v_:this.verifyEvent,websocketImplementation:this._WebSocket}),t!=null&&t.connectionTimeout&&(n.connectionTimeout=t.connectionTimeout),this.relays.set(e,n)),await n.connect(),n}close(e){e.map(Kn).forEach(t=>{var n;(n=this.relays.get(t))==null||n.close()})}subscribeMany(e,t,n){return this.subscribeManyMap(Object.fromEntries(e.map(s=>[s,t])),n)}subscribeManyMap(e,t){this.trackRelays&&(t.receivedEvent=(u,f)=>{let h=this.seenOn.get(f);h||(h=new Set,this.seenOn.set(f,h)),h.add(u)});const n=new Set,s=[],o=Object.keys(e).length,r=[];let i=u=>{var f;r[u]=!0,r.filter(h=>h).length===o&&((f=t.oneose)==null||f.call(t),i=()=>{})};const a=[];let c=(u,f)=>{var h;i(u),a[u]=f,a.filter(v=>v).length===o&&((h=t.onclose)==null||h.call(t,a),c=()=>{})};const l=u=>{var h;if((h=t.alreadyHaveEvent)!=null&&h.call(t,u))return!0;const f=n.has(u);return n.add(u),f},d=Promise.all(Object.entries(e).map(async(u,f,h)=>{if(h.indexOf(u)!==f){c(f,"duplicate url");return}let[v,g]=u;v=Kn(v);let m;try{m=await this.ensureRelay(v,{connectionTimeout:t.maxWait?Math.max(t.maxWait*.8,t.maxWait-1e3):void 0})}catch(x){c(f,(x==null?void 0:x.message)||String(x));return}let w=m.subscribe(g,{...t,oneose:()=>i(f),onclose:x=>c(f,x),alreadyHaveEvent:l,eoseTimeout:t.maxWait});s.push(w)}));return{async close(){await d,s.forEach(u=>{u.close()})}}}subscribeManyEose(e,t,n){const s=this.subscribeMany(e,t,{...n,oneose(){s.close()}});return s}async querySync(e,t,n){return new Promise(async s=>{const o=[];this.subscribeManyEose(e,[t],{...n,onevent(r){o.push(r)},onclose(r){s(o)}})})}async get(e,t,n){t.limit=1;const s=await this.querySync(e,t,n);return s.sort((o,r)=>r.created_at-o.created_at),s[0]||null}publish(e,t){return e.map(Kn).map(async(n,s,o)=>o.indexOf(n)!==s?Promise.reject("duplicate url"):(await this.ensureRelay(n)).publish(t))}},sd;try{sd=WebSocket}catch{}var Ns=class extends m_{constructor(){super({verifyEvent:Fn,websocketImplementation:sd})}},Me={};Ne(Me,{BECH32_REGEX:()=>od,Bech32MaxSize:()=>Ki,decode:()=>js,encodeBytes:()=>Ko,naddrEncode:()=>k_,neventEncode:()=>S_,noteEncode:()=>R_,nprofileEncode:()=>x_,npubEncode:()=>E_,nrelayEncode:()=>C_,nsecEncode:()=>b_});var Ki=5e3,od=/[\x21-\x7E]{1,83}1[023456789acdefghjklmnpqrstuvwxyz]{6,}/;function w_(e){const t=new Uint8Array(4);return t[0]=e>>24&255,t[1]=e>>16&255,t[2]=e>>8&255,t[3]=e&255,t}function js(e){var o,r,i,a,c,l,d,u;let{prefix:t,words:n}=rs.decode(e,Ki),s=new Uint8Array(rs.fromWords(n));switch(t){case"nprofile":{let f=Js(s);if(!((o=f[0])!=null&&o[0]))throw new Error("missing TLV 0 for nprofile");if(f[0][0].length!==32)throw new Error("TLV 0 should be 32 bytes");return{type:"nprofile",data:{pubkey:Xe(f[0][0]),relays:f[1]?f[1].map(h=>Ut.decode(h)):[]}}}case"nevent":{let f=Js(s);if(!((r=f[0])!=null&&r[0]))throw new Error("missing TLV 0 for nevent");if(f[0][0].length!==32)throw new Error("TLV 0 should be 32 bytes");if(f[2]&&f[2][0].length!==32)throw new Error("TLV 2 should be 32 bytes");if(f[3]&&f[3][0].length!==4)throw new Error("TLV 3 should be 4 bytes");return{type:"nevent",data:{id:Xe(f[0][0]),relays:f[1]?f[1].map(h=>Ut.decode(h)):[],author:(i=f[2])!=null&&i[0]?Xe(f[2][0]):void 0,kind:(a=f[3])!=null&&a[0]?parseInt(Xe(f[3][0]),16):void 0}}}case"naddr":{let f=Js(s);if(!((c=f[0])!=null&&c[0]))throw new Error("missing TLV 0 for naddr");if(!((l=f[2])!=null&&l[0]))throw new Error("missing TLV 2 for naddr");if(f[2][0].length!==32)throw new Error("TLV 2 should be 32 bytes");if(!((d=f[3])!=null&&d[0]))throw new Error("missing TLV 3 for naddr");if(f[3][0].length!==4)throw new Error("TLV 3 should be 4 bytes");return{type:"naddr",data:{identifier:Ut.decode(f[0][0]),pubkey:Xe(f[2][0]),kind:parseInt(Xe(f[3][0]),16),relays:f[1]?f[1].map(h=>Ut.decode(h)):[]}}}case"nrelay":{let f=Js(s);if(!((u=f[0])!=null&&u[0]))throw new Error("missing TLV 0 for nrelay");return{type:"nrelay",data:Ut.decode(f[0][0])}}case"nsec":return{type:t,data:s};case"npub":case"note":return{type:t,data:Xe(s)};default:throw new Error(`unknown prefix ${t}`)}}function Js(e){let t={},n=e;for(;n.length>0;){let s=n[0],o=n[1],r=n.slice(2,2+o);if(n=n.slice(2+o),r.length<o)throw new Error(`not enough data to read on TLV ${s}`);t[s]=t[s]||[],t[s].push(r)}return t}function b_(e){return Ko("nsec",e)}function E_(e){return Ko("npub",os(e))}function R_(e){return Ko("note",os(e))}function Vs(e,t){let n=rs.toWords(t);return rs.encode(e,n,Ki)}function Ko(e,t){return Vs(e,t)}function x_(e){let t=zo({0:[os(e.pubkey)],1:(e.relays||[]).map(n=>St.encode(n))});return Vs("nprofile",t)}function S_(e){let t;e.kind!==void 0&&(t=w_(e.kind));let n=zo({0:[os(e.id)],1:(e.relays||[]).map(s=>St.encode(s)),2:e.author?[os(e.author)]:[],3:t?[new Uint8Array(t)]:[]});return Vs("nevent",n)}function k_(e){let t=new ArrayBuffer(4);new DataView(t).setUint32(0,e.kind,!1);let n=zo({0:[St.encode(e.identifier)],1:(e.relays||[]).map(s=>St.encode(s)),2:[os(e.pubkey)],3:[new Uint8Array(t)]});return Vs("naddr",n)}function C_(e){let t=zo({0:[St.encode(e)]});return Vs("nrelay",t)}function zo(e){let t=[];return Object.entries(e).reverse().forEach(([n,s])=>{s.forEach(o=>{let r=new Uint8Array(o.length+2);r.set([parseInt(n)],0),r.set([o.length],1),r.set(o,2),t.push(r)})}),jo(...t)}var $_=/\bnostr:((note|npub|naddr|nevent|nprofile)1\w+)\b|#\[(\d+)\]/g;function zi(e){let t=[];for(let n of e.content.matchAll($_))if(n[2])try{let{type:s,data:o}=js(n[1]);switch(s){case"npub":{t.push({text:n[0],profile:{pubkey:o,relays:[]}});break}case"nprofile":{t.push({text:n[0],profile:o});break}case"note":{t.push({text:n[0],event:{id:o,relays:[]}});break}case"nevent":{t.push({text:n[0],event:o});break}case"naddr":{t.push({text:n[0],address:o});break}}}catch{}else if(n[3]){let s=parseInt(n[3],10),o=e.tags[s];if(!o)continue;switch(o[0]){case"p":{t.push({text:n[0],profile:{pubkey:o[1],relays:o[2]?[o[2]]:[]}});break}case"e":{t.push({text:n[0],event:{id:o[1],relays:o[2]?[o[2]]:[]}});break}case"a":{try{let[r,i,a]=o[1].split(":");t.push({text:n[0],address:{identifier:a,pubkey:i,kind:parseInt(r,10),relays:o[2]?[o[2]]:[]}})}catch{}break}}}return t}var P_={};Ne(P_,{decrypt:()=>I_,encrypt:()=>rd});async function rd(e,t,n){const s=e instanceof Uint8Array?Xe(e):e,o=cs.getSharedSecret(s,"02"+t),r=id(o);let i=Uint8Array.from(Eu(16)),a=St.encode(n),c=Tu(r,i).encrypt(a),l=zt.encode(new Uint8Array(c)),d=zt.encode(new Uint8Array(i.buffer));return`${l}?iv=${d}`}async function I_(e,t,n){const s=e instanceof Uint8Array?Xe(e):e;let[o,r]=n.split("?iv="),i=cs.getSharedSecret(s,"02"+t),a=id(i),c=zt.decode(r),l=zt.decode(o),d=Tu(a,c).decrypt(l);return Ut.decode(d)}function id(e){return e.slice(1,33)}var ad={};Ne(ad,{NIP05_REGEX:()=>cd,isValid:()=>L_,queryProfile:()=>ld,searchDomain:()=>T_,useFetchImplementation:()=>A_});var cd=/^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/,Go;try{Go=fetch}catch{}function A_(e){Go=e}async function T_(e,t=""){try{const n=`https://${e}/.well-known/nostr.json?name=${t}`;return(await(await Go(n,{redirect:"error"})).json()).names}catch{return{}}}async function ld(e){var r;const t=e.match(cd);if(!t)return null;const[n,s="_",o]=t;try{const i=`https://${o}/.well-known/nostr.json?name=${s}`,a=await(await Go(i,{redirect:"error"})).json();let c=a.names[s];return c?{pubkey:c,relays:(r=a.relays)==null?void 0:r[c]}:null}catch{return null}}async function L_(e,t){let n=await ld(t);return n?n.pubkey===e:!1}var kt={};Ne(kt,{parse:()=>U_});function U_(e){const t={reply:void 0,root:void 0,mentions:[],profiles:[]},n=[];for(const s of e.tags)s[0]==="e"&&s[1]&&n.push(s),s[0]==="p"&&s[1]&&t.profiles.push({pubkey:s[1],relays:s[2]?[s[2]]:[]});for(let s=0;s<n.length;s++){const o=n[s],[r,i,a,c]=o,l={id:i,relays:a?[a]:[]},d=s===0,u=s===n.length-1;if(c==="root"){t.root=l;continue}if(c==="reply"){t.reply=l;continue}if(c==="mention"){t.mentions.push(l);continue}if(d){t.root=l;continue}if(u){t.reply=l;continue}t.mentions.push(l)}return t}var B_={};Ne(B_,{fetchRelayInformation:()=>M_,useFetchImplementation:()=>N_});var ud;try{ud=fetch}catch{}function N_(e){ud=e}async function M_(e){return await(await fetch(e.replace("ws://","http://").replace("wss://","https://"),{headers:{Accept:"application/nostr+json"}})).json()}var O_={};Ne(O_,{getPow:()=>dd,minePow:()=>F_});function dd(e){let t=0;for(let n=0;n<e.length;n++){const s=parseInt(e[n],16);if(s===0)t+=4;else{t+=Math.clz32(s)-28;break}}return t}function F_(e,t){let n=0;const s=e,o=["nonce",n.toString(),t.toString()];for(s.tags.push(o);;){const r=Math.floor(new Date().getTime()/1e3);if(r!==s.created_at&&(n=0,s.created_at=r),o[1]=(++n).toString(),s.id=Cs(s),dd(s.id)>=t)break}return s}var H_={};Ne(H_,{finishRepostEvent:()=>j_,getRepostedEvent:()=>V_,getRepostedEventPointer:()=>fd});function j_(e,t,n,s){return rt({kind:Vi,tags:[...e.tags??[],["e",t.id,n],["p",t.pubkey]],content:e.content===""?"":JSON.stringify(t),created_at:e.created_at},s)}function fd(e){if(e.kind!==Vi)return;let t,n;for(let s=e.tags.length-1;s>=0&&(t===void 0||n===void 0);s--){const o=e.tags[s];o.length>=2&&(o[0]==="e"&&t===void 0?t=o:o[0]==="p"&&n===void 0&&(n=o))}if(t!==void 0)return{id:t[1],relays:[t[2],n==null?void 0:n[2]].filter(s=>typeof s=="string"),author:n==null?void 0:n[1]}}function V_(e,{skipVerification:t}={}){const n=fd(e);if(n===void 0||e.content==="")return;let s;try{s=JSON.parse(e.content)}catch{return}if(s.id===n.id&&!(!t&&!Fn(s)))return s}var D_={};Ne(D_,{NOSTR_URI_REGEX:()=>Zo,parse:()=>q_,test:()=>W_});var Zo=new RegExp(`nostr:(${od.source})`);function W_(e){return typeof e=="string"&&new RegExp(`^${Zo.source}$`).test(e)}function q_(e){const t=e.match(new RegExp(`^${Zo.source}$`));if(!t)throw new Error(`Invalid Nostr URI: ${e}`);return{uri:t[0],value:t[1],decoded:js(t[1])}}var K_={};Ne(K_,{finishReactionEvent:()=>z_,getReactedEventPointer:()=>G_});function z_(e,t,n){const s=t.tags.filter(o=>o.length>=2&&(o[0]==="e"||o[0]==="p"));return rt({...e,kind:Di,tags:[...e.tags??[],...s,["e",t.id],["p",t.pubkey]],content:e.content??"+"},n)}function G_(e){if(e.kind!==Di)return;let t,n;for(let s=e.tags.length-1;s>=0&&(t===void 0||n===void 0);s--){const o=e.tags[s];o.length>=2&&(o[0]==="e"&&t===void 0?t=o:o[0]==="p"&&n===void 0&&(n=o))}if(!(t===void 0||n===void 0))return{id:t[1],relays:[t[2],n[2]].filter(s=>s!==void 0),author:n[1]}}var Z_={};Ne(Z_,{matchAll:()=>J_,regex:()=>Gi,replaceAll:()=>Y_});var Gi=()=>new RegExp(`\\b${Zo.source}\\b`,"g");function*J_(e){const t=e.matchAll(Gi());for(const n of t)try{const[s,o]=n;yield{uri:s,value:o,decoded:js(o),start:n.index,end:n.index+s.length}}catch{}}function Y_(e,t){return e.replaceAll(Gi(),(n,s)=>t({uri:n,value:s,decoded:js(s)}))}var Q_={};Ne(Q_,{channelCreateEvent:()=>X_,channelHideMessageEvent:()=>n1,channelMessageEvent:()=>t1,channelMetadataEvent:()=>e1,channelMuteUserEvent:()=>s1});var X_=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return rt({kind:Ku,tags:[...e.tags??[]],content:n,created_at:e.created_at},t)},e1=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return rt({kind:zu,tags:[["e",e.channel_create_event_id],...e.tags??[]],content:n,created_at:e.created_at},t)},t1=(e,t)=>{const n=[["e",e.channel_create_event_id,e.relay_url,"root"]];return e.reply_to_channel_message_event_id&&n.push(["e",e.reply_to_channel_message_event_id,e.relay_url,"reply"]),rt({kind:Gu,tags:[...n,...e.tags??[]],content:e.content,created_at:e.created_at},t)},n1=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return rt({kind:Zu,tags:[["e",e.channel_message_event_id],...e.tags??[]],content:n,created_at:e.created_at},t)},s1=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return rt({kind:Ju,tags:[["p",e.pubkey_to_mute],...e.tags??[]],content:n,created_at:e.created_at},t)},o1={};Ne(o1,{EMOJI_SHORTCODE_REGEX:()=>hd,matchAll:()=>r1,regex:()=>Zi,replaceAll:()=>i1});var hd=/:(\w+):/,Zi=()=>new RegExp(`\\B${hd.source}\\B`,"g");function*r1(e){const t=e.matchAll(Zi());for(const n of t)try{const[s,o]=n;yield{shortcode:s,name:o,start:n.index,end:n.index+s.length}}catch{}}function i1(e,t){return e.replaceAll(Zi(),(n,s)=>t({shortcode:n,name:s}))}var a1={};Ne(a1,{useFetchImplementation:()=>c1,validateGithub:()=>l1});var Ji;try{Ji=fetch}catch{}function c1(e){Ji=e}async function l1(e,t,n){try{return await(await Ji(`https://gist.github.com/${t}/${n}/raw`)).text()===`Verifying that I control the following Nostr public key: ${e}`}catch{return!1}}var Jo={};Ne(Jo,{decrypt:()=>wd,encrypt:()=>md,getConversationKey:()=>yd,v2:()=>p1});var pd=1,gd=65535;function yd(e,t){const n=cs.getSharedSecret(e,"02"+t).subarray(1,33);return Vv(Hs,n,"nip44-v2")}function vd(e,t){const n=Dv(Hs,e,t,76);return{chacha_key:n.subarray(0,32),chacha_nonce:n.subarray(32,44),hmac_key:n.subarray(44,76)}}function Yi(e){if(!Number.isSafeInteger(e)||e<1)throw new Error("expected positive integer");if(e<=32)return 32;const t=1<<Math.floor(Math.log2(e-1))+1,n=t<=256?32:t/8;return n*(Math.floor((e-1)/n)+1)}function u1(e){if(!Number.isSafeInteger(e)||e<pd||e>gd)throw new Error("invalid plaintext size: must be between 1 and 65535 bytes");const t=new Uint8Array(2);return new DataView(t.buffer).setUint16(0,e,!1),t}function d1(e){const t=St.encode(e),n=t.length,s=u1(n),o=new Uint8Array(Yi(n)-n);return jo(s,t,o)}function f1(e){const t=new DataView(e.buffer).getUint16(0),n=e.subarray(2,2+t);if(t<pd||t>gd||n.length!==t||e.length!==2+Yi(t))throw new Error("invalid padding");return Ut.decode(n)}function _d(e,t,n){if(n.length!==32)throw new Error("AAD associated data must be 32 bytes");const s=jo(n,t);return Do(Hs,e,s)}function h1(e){if(typeof e!="string")throw new Error("payload must be a valid string");const t=e.length;if(t<132||t>87472)throw new Error("invalid payload length: "+t);if(e[0]==="#")throw new Error("unknown encryption version");let n;try{n=zt.decode(e)}catch(r){throw new Error("invalid base64: "+r.message)}const s=n.length;if(s<99||s>65603)throw new Error("invalid data length: "+s);const o=n[0];if(o!==2)throw new Error("unknown encryption version "+o);return{nonce:n.subarray(1,33),ciphertext:n.subarray(33,-32),mac:n.subarray(-32)}}function md(e,t,n=Eu(32)){const{chacha_key:s,chacha_nonce:o,hmac_key:r}=vd(t,n),i=d1(e),a=Nu(s,o,i),c=_d(r,a,n);return zt.encode(jo(new Uint8Array([2]),n,a,c))}function wd(e,t){const{nonce:n,ciphertext:s,mac:o}=h1(e),{chacha_key:r,chacha_nonce:i,hmac_key:a}=vd(t,n),c=_d(a,s,n);if(!Rv(c,o))throw new Error("invalid MAC");const l=Nu(r,i,s);return f1(l)}var p1={utils:{getConversationKey:yd,calcPaddedLen:Yi},encrypt:md,decrypt:wd},g1={};Ne(g1,{makeNwcRequestEvent:()=>v1,parseConnectionString:()=>y1});function y1(e){const{pathname:t,searchParams:n}=new URL(e),s=t,o=n.get("relay"),r=n.get("secret");if(!s||!o||!r)throw new Error("invalid connection string");return{pubkey:s,relay:o,secret:r}}async function v1(e,t,n){const o=await rd(t,e,JSON.stringify({method:"pay_invoice",params:{invoice:n}})),r={kind:Qu,created_at:Math.round(Date.now()/1e3),content:o,tags:[["p",e]]};return rt(r,t)}var _1={};Ne(_1,{getZapEndpoint:()=>w1,makeZapReceipt:()=>R1,makeZapRequest:()=>b1,useFetchImplementation:()=>m1,validateZapRequest:()=>E1});var Qi;try{Qi=fetch}catch{}function m1(e){Qi=e}async function w1(e){try{let t="",{lud06:n,lud16:s}=JSON.parse(e.content);if(n){let{words:i}=rs.decode(n,1e3),a=rs.fromWords(i);t=Ut.decode(a)}else if(s){let[i,a]=s.split("@");t=new URL(`/.well-known/lnurlp/${i}`,`https://${a}`).toString()}else return null;let r=await(await Qi(t)).json();if(r.allowsNostr&&r.nostrPubkey)return r.callback}catch{}return null}function b1({profile:e,event:t,amount:n,relays:s,comment:o=""}){if(!n)throw new Error("amount not given");if(!e)throw new Error("profile not given");let r={kind:9734,created_at:Math.round(Date.now()/1e3),content:o,tags:[["p",e],["amount",n.toString()],["relays",...s]]};return t&&r.tags.push(["e",t]),r}function E1(e){let t;try{t=JSON.parse(e)}catch{return"Invalid zap request JSON."}if(!Ou(t))return"Zap request is not a valid Nostr event.";if(!Fn(t))return"Invalid signature on zap request.";let n=t.tags.find(([r,i])=>r==="p"&&i);if(!n)return"Zap request doesn't have a 'p' tag.";if(!n[1].match(/^[a-f0-9]{64}$/))return"Zap request 'p' tag is not valid hex.";let s=t.tags.find(([r,i])=>r==="e"&&i);return s&&!s[1].match(/^[a-f0-9]{64}$/)?"Zap request 'e' tag is not valid hex.":t.tags.find(([r,i])=>r==="relays"&&i)?null:"Zap request doesn't have a 'relays' tag."}function R1({zapRequest:e,preimage:t,bolt11:n,paidAt:s}){let o=JSON.parse(e),r=o.tags.filter(([a])=>a==="e"||a==="p"||a==="a"),i={kind:9735,created_at:Math.round(s.getTime()/1e3),content:"",tags:[...r,["P",o.pubkey],["bolt11",n],["description",e]]};return t&&i.tags.push(["preimage",t]),i}var x1={};Ne(x1,{getToken:()=>S1,hashPayload:()=>Xi,unpackEventFromToken:()=>Ed,validateEvent:()=>$d,validateEventKind:()=>xd,validateEventMethodTag:()=>kd,validateEventPayloadTag:()=>Cd,validateEventTimestamp:()=>Rd,validateEventUrlTag:()=>Sd,validateToken:()=>k1});var bd="Nostr ";async function S1(e,t,n,s=!1,o){const r={kind:Wi,tags:[["u",e],["method",t]],created_at:Math.round(new Date().getTime()/1e3),content:""};o&&r.tags.push(["payload",Xi(o)]);const i=await n(r);return(s?bd:"")+zt.encode(St.encode(JSON.stringify(i)))}async function k1(e,t,n){const s=await Ed(e).catch(r=>{throw r});return await $d(s,t,n).catch(r=>{throw r})}async function Ed(e){if(!e)throw new Error("Missing token");e=e.replace(bd,"");const t=Ut.decode(zt.decode(e));if(!t||t.length===0||!t.startsWith("{"))throw new Error("Invalid token");return JSON.parse(t)}function Rd(e){return e.created_at?Math.round(new Date().getTime()/1e3)-e.created_at<60:!1}function xd(e){return e.kind===Wi}function Sd(e,t){const n=e.tags.find(s=>s[0]==="u");return n?n.length>0&&n[1]===t:!1}function kd(e,t){const n=e.tags.find(s=>s[0]==="method");return n?n.length>0&&n[1].toLowerCase()===t.toLowerCase():!1}function Xi(e){const t=Hs(St.encode(JSON.stringify(e)));return Xe(t)}function Cd(e,t){const n=e.tags.find(o=>o[0]==="payload");if(!n)return!1;const s=Xi(t);return n.length>0&&n[1]===s}async function $d(e,t,n,s){if(!Fn(e))throw new Error("Invalid nostr event, signature invalid");if(!xd(e))throw new Error("Invalid nostr event, kind invalid");if(!Rd(e))throw new Error("Invalid nostr event, created_at timestamp invalid");if(!Sd(e,t))throw new Error("Invalid nostr event, url tag invalid");if(!kd(e,n))throw new Error("Invalid nostr event, method tag invalid");if(s&&typeof s=="object"&&Object.keys(s).length>0&&!Cd(e,s))throw new Error("Invalid nostr event, payload tag does not match request body hash");return!0}const lt={META:0,TEXT_NOTE:1,REPLY:1,LIKE:7,REPOST:6,DM_RELAYS:10050,GIFT_WRAP:1059,RELAY_LIST_META:10002,FOLLOW_LIST:3},mc="wss://purplepag.es/",C1=e=>{e.forEach(t=>t.isRoot=!0)},$1=e=>{e.forEach(t=>t.isRoot=!1)},P1=(e,t=[])=>{(!t||!t.length)&&(t=[]);const{likes:n,reposts:s,replies:o}=Pd(t);Td(e,n),Ld(e,s),T1(e,o)},I1=(e,t=[])=>{(!t||!t.length)&&(t=[]);const{likes:n,reposts:s,replies:o}=Pd(t);Td(e,n),Ld(e,s),L1(e,o)},Pd=e=>{if(!e||!e.length)return{likes:[],reposts:[],replies:[]};const t=[],n=[],s=[];for(const o of e)switch(o.kind){case lt.LIKE:t.push(o);break;case lt.REPOST:n.push(o);break;case lt.REPLY:s.push(o);break}return{likes:t,reposts:n,replies:s}},A1=(e,t)=>{for(const n of t)n.replyingTo={user:e.author,pubkey:e.pubkey,event:e}},T1=(e,t)=>{let n=0;for(const s of t)Fd(e.id,s)&&n++;e.replies=n},L1=(e,t)=>{let n=0;for(const s of t)Hd(e.id,s)&&n++;e.replies=n},Id=(e,t)=>{const n=[...e],s=[];return n.forEach(o=>{let r=!1;t.forEach(i=>{if(!r&&o.pubkey===(i==null?void 0:i.pubkey)){const a=o;a.author=JSON.parse(i.content),a.authorEvent=i,s.push(a),r=!0}}),r||s.push(o)}),s},U1=e=>{if(!N1(e.content))return[];const t=new Set,n=zi(e);for(let s=0;s<n.length;s++){let{profile:o}=n[s];o!=null&&o.pubkey&&t.add(o.pubkey)}return t.size?[...t]:[]},B1=(e,t)=>{if(!t.length){e.references=[];return}const n=zi(e),s=[];for(let o=0;o<n.length;o++){let{profile:r}=n[o];r!=null&&r.pubkey&&t.forEach(i=>{if((i==null?void 0:i.pubkey)===(r==null?void 0:r.pubkey)){const a=n[o];a.profile_details=JSON.parse((i==null?void 0:i.content)||"{}"),s.push(a)}})}e.references=s},Ad=e=>{const t=new Set,n=[];return e.sort((o,r)=>r.created_at-o.created_at).forEach(o=>{const{pubkey:r}=o;t.has(r)||(t.add(r),n.push(o))}),n},Td=(e,t)=>{let n=0;t.forEach(s=>{var r;const o=(r=s.tags.reverse().find(i=>i[0]==="e"))==null?void 0:r[1];o&&o===e.id&&s.content&&M1(s.content)&&n++}),e.likes=n},Ld=(e,t)=>{let n=0;t.forEach(s=>{var r;const o=(r=s.tags.find(i=>i[0]==="e"))==null?void 0:r[1];o&&o===e.id&&n++}),e.reposts=n},Ud=(e,t)=>t.filter(n=>{var o;const s=kt.parse(n);return!s.reply&&((o=s==null?void 0:s.root)==null?void 0:o.id)===e.id}),Bd=(e,t)=>t.filter(n=>{var o,r;const s=kt.parse(n);return((o=s==null?void 0:s.reply)==null?void 0:o.id)===e.id||((r=s==null?void 0:s.root)==null?void 0:r.id)===e.id}),N1=e=>e.indexOf("nostr:npub")!==-1||e.indexOf("nostr:nprofile1")!==-1,M1=e=>!["-","👎"].includes(e),vo=(e,t=3e3)=>{try{return new Promise(n=>{const s=new WebSocket(e),o=setTimeout(()=>{s.close(),n(!1)},t);s.onopen=()=>{clearTimeout(o),s.close(),n(!0)},s.onerror=()=>{clearTimeout(o),s.close(),n(!1)}})}catch{return Promise.resolve(!1)}},_o=e=>/^[a-f0-9]{64}$/.test(e),wc=(e,t,n)=>{const s=new Promise(r=>{setTimeout(()=>{r(null)},n)}),o=new Promise(r=>{const i=e.subscribe(t,{onevent(a){r(a)},oneose(){i.close()}})});return Promise.race([o,s])},Nd=e=>{const{tags:t}=e,n={read:[],write:[],all:[]};return t.length&&t.forEach(s=>{if(s[0]==="r"){const r=Gt.normalizeURL(s[1]),i=s[2];i?i==="read"?n.read.push(r):i==="write"&&n.write.push(r):(n.read.push(r),n.write.push(r)),n.all.push({url:r,type:i||"write"})}}),n},Jn=async(e,t,n)=>{const s=e.map(async o=>{const r=t.publish([o],n),i=(await Promise.allSettled(r))[0];return{relay:o,success:i.status==="fulfilled"}});return await Promise.all(s)},Md=e=>new Date(e*1e3).toLocaleString("default",{day:"numeric",month:"short",hour:"numeric",minute:"numeric"}),O1=e=>new Date(e*1e3).toLocaleString("default",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"numeric"}),Od=(e,t,n)=>{if(e.length===0)return;const s=e.map(o=>o.then(r=>({result:r,isFulfilled:!0,originalPromise:o})).catch(r=>({result:r,isFulfilled:!1,originalPromise:o})));Promise.race(s).then(({result:o,isFulfilled:r,originalPromise:i})=>{r?t(o):n(o);const a=e.filter(c=>c!==i);Od(a,t,n)})},Fd=(e,t)=>{var s;const n=kt.parse(t);return!n.reply&&((s=n==null?void 0:n.root)==null?void 0:s.id)===e},Hd=(e,t)=>{var s,o;const n=kt.parse(t);return((s=n==null?void 0:n.reply)==null?void 0:s.id)===e||((o=n==null?void 0:n.root)==null?void 0:o.id)===e},Mt=async(e,t,n={},s=[],o,r,i,a=()=>{})=>{var f;const c=[],l=new Set;let d=s,u=!1;for(const h of e){const v=h.pubkey;Object.keys(n).length&&((f=n[v])!=null&&f.length)&&(d=n[v],u=d.includes(mc));let g=null,m=null;const w=U1(h);!u&&!w.includes(v)&&w.push(v),u&&!o.hasPubkey(v)&&!l.has(v)&&(m=r.get([mc],{kinds:[0],authors:[v]}),l.add(v));const x=[];w.forEach(P=>{!o.hasPubkey(v)&&!l.has(P)&&x.push(P),l.add(P)}),x.length&&(g=r.querySync(d,{kinds:[0],authors:x}));const b=r.querySync(d,{kinds:[1,6,7],"#e":[h.id]}),C=Promise.all([h,g,b,m]);c.push(C)}for(const h of c){const v=await h,g=v[0],m=v[1]||[],w=v[2]||[];let x=v[3];const b=[],C=[];x&&(o.addMeta(x),b.push(x),C.push(x.pubkey)),Ad(m).forEach(k=>{const D=k;o.addMeta(k),b.push(D),C.push(D.pubkey),k.pubkey===g.pubkey&&(x=k)}),l.forEach(k=>{if(C.includes(k))return;o.hasPubkey(k)||o.setMetaValue(k,null);const D=o.getMeta(k);b.push(D),k===g.pubkey&&(x=D)}),B1(g,b),Id([g],[x]),i?(P1(g,w),C1([g])):(I1(g,w),$1([g]),t&&A1(t,[g])),a(g)}},jd=async(e,t,n)=>{const s=await n.get(t,{kinds:[1],ids:[e]});if(s){const o=await n.get(t,{kinds:[0],authors:[s.pubkey]});o&&Id([s],[o])}return s},F1=e=>{const{reply:t,root:n}=kt.parse(e);return!!t||!!n},H1=(e,t,n)=>new Promise(s=>{const o=[];let r,i=n;if(n&&n.length&&n[0].limit){const{limit:l,...d}=n[0];i=[d],r=l}let a=!1;const c=e.subscribeMany(t,i,{onevent(l){if(a)return;const d=kt.parse(l);d.reply||d.root||(o.push(l),r&&o.length>=r&&(c.close(),a=!0,s(o.slice(0,r))))},oneose(){c.close();const l=r?o.slice(0,r):o;s(l)}})}),Vd=(e,t)=>{const{username:n,name:s,display_name:o}=e,r=n||s||o;return r.length?r:Me.npubEncode(t).slice(0,10)+"..."},$s=e=>`/user/${Me.npubEncode(e)}`,si=e=>{if(!e.length)throw new Error("Public key or event id is required.");const t="Public key or event id should be in npub or note format, or hex.";let n;try{n=Me.decode(e)}catch{throw new Error(t)}const{type:s}=n;if(s!=="npub"&&s!=="note")throw new Error(t);return n},Dd=e=>(st("data-v-393546d0"),e=e(),ot(),e),j1={class:"event-details"},V1={key:0},D1={class:"highlight"},W1={key:1},q1={key:0,class:"highlight"},K1={key:1,class:"event-details__no-user"},z1=Dd(()=>_("div",null,"No info about author on this relay.",-1)),G1={class:"highlight"},Z1={key:2},J1={key:0,class:"highlight"},Y1={key:1,class:"event-details__no-user"},Q1=Dd(()=>_("div",null,"No info about author on this relay.",-1)),X1={class:"highlight"},em=Se({__name:"RawData",props:{event:{},authorEvent:{},isUserEvent:{}},setup(e){const t=e,n=L(1),s=L(!0),o=L(),r=L({});vt(()=>{const{event:c,authorEvent:l}=t;o.value=i(c),l&&(r.value=i(l)),t.authorEvent&&(s.value=t.event.id!==t.authorEvent.id)});const i=c=>{const{id:l,pubkey:d,created_at:u,kind:f,tags:h,content:v,sig:g}=c;return{id:l,pubkey:d,created_at:u,kind:f,tags:h,content:v,sig:g}},a=c=>{n.value=c};return(c,l)=>(S(),U("div",j1,[_("div",{class:ve(["event-details__header",{"event-details__header_user":c.isUserEvent}])},[_("span",{onClick:l[0]||(l[0]=()=>a(1)),class:ve(["event-details__tab",{"event-details__tab_active":n.value===1}])},"Note",2),s.value?(S(),U("span",{key:0,onClick:l[1]||(l[1]=()=>a(2)),class:ve(["event-details__tab",{"event-details__tab_active":n.value===2}])},"Author",2)):te("",!0),_("span",{onClick:l[2]||(l[2]=()=>a(3)),class:ve(["event-details__tab",{"event-details__tab_active":n.value===3}])},"Author content",2)],2),n.value===1?(S(),U("div",V1,[_("pre",D1,se(JSON.stringify(o.value,null,2)),1)])):te("",!0),s.value&&n.value===2?(S(),U("div",W1,[c.authorEvent?(S(),U("pre",q1,se(JSON.stringify(r.value,null,2)),1)):(S(),U("div",K1,[z1,_("pre",G1,"pubkey: "+se(c.event.pubkey)+` 
-npub: `+se(Z(Me).npubEncode(c.event.pubkey)),1)]))])):te("",!0),n.value===3?(S(),U("div",Z1,[c.event.author?(S(),U("pre",J1,se(JSON.stringify(c.event.author,null,2)),1)):(S(),U("div",Y1,[Q1,_("pre",X1,"pubkey: "+se(c.event.pubkey)+`
-npub: `+se(Z(Me).npubEncode(c.event.pubkey)),1)]))])):te("",!0)]))}});const me=(e,t)=>{const n=e.__vccOpts||e;for(const[s,o]of t)n[s]=o;return n},Wd=me(em,[["__scopeId","data-v-393546d0"]]),tm={},nm={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-heart",viewBox:"0 0 16 16"},sm=_("path",{d:"m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"},null,-1),om=[sm];function rm(e,t){return S(),U("svg",nm,om)}const im=me(tm,[["render",rm]]),am={},cm={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-repeat",viewBox:"0 0 16 16"},lm=_("path",{d:"M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z"},null,-1),um=[lm];function dm(e,t){return S(),U("svg",cm,um)}const fm=me(am,[["render",dm]]),hm={},pm={xmlns:"http://www.w3.org/2000/svg",width:"22",height:"22",fill:"currentColor",class:"bi bi-reply",viewBox:"0 0 16 16"},gm=_("path",{d:"M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z"},null,-1),ym=[gm];function vm(e,t){return S(),U("svg",pm,ym)}const _m=me(hm,[["render",vm]]),mm={},wm={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-chat",viewBox:"0 0 16 16"},bm=_("path",{d:"M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"},null,-1),Em=[bm];function Rm(e,t){return S(),U("svg",wm,Em)}const xm=me(mm,[["render",Rm]]),Sm={class:"actions-bar"},km={class:"actions-bar__action actions-bar__num"},Cm={class:"actions_bar-number"},$m={class:"actions-bar__action actions-bar__num"},Pm={class:"actions_bar-number"},Im={class:"actions_bar-number"},Am=Se({__name:"EventActionsBar",props:{likes:{},reposts:{},replies:{},hasReplyBtn:{type:Boolean}},emits:["showReplyField","handleShowReplies","handleHideReplies"],setup(e,{emit:t}){const n=t,s=()=>{n("showReplyField")},o=()=>{n("handleShowReplies")};return(r,i)=>(S(),U("div",Sm,[_("span",km,[fe(im,{class:"actions-bar__icon"}),_("span",Cm,se(r.likes),1)]),_("span",$m,[fe(fm,{class:"actions-bar__icon"}),_("span",Pm,se(r.reposts),1)]),r.hasReplyBtn?(S(),U("span",{key:0,onClick:o,class:"actions-bar__action actions-bar__num actions-bar__replies"},[fe(xm,{class:"actions-bar__icon"}),_("span",Im,se(r.replies),1)])):te("",!0),r.hasReplyBtn?(S(),U("span",{key:1,onClick:s,class:"actions-bar__action actions-bar__reply"},[fe(_m,{class:"actions-bar__icon"})])):te("",!0)]))}});const us=_t("npub",()=>{const e=L(""),t=L(""),n=L("");function s(i){e.value=i}function o(i){t.value=i}function r(i){n.value=i}return{npubInput:e,cachedUrlNpub:t,updateNpubInput:s,updateCachedUrl:o,setError:r,error:n}}),ds=_t("user",()=>{const e=L(!1),t=L(!1);function n(o){e.value=o}function s(o){t.value=o}return{isRoutingUser:e,updateRoutingStatus:n,updateSearchStatus:s,isSearchUsed:t}}),Tm={class:"event-content"},Lm={key:0},Um={key:1},Bm=["onClick"],Nm=Se({__name:"EventText",props:{event:{},slice:{}},setup(e){const t=e,n=En(),s=us(),o=ds(),r=L([]);vt(()=>{r.value=a(t.event,t.slice)}),bi(()=>{r.value=a(t.event,t.slice)});const i=(u,f)=>{let h=[],v="";for(const g of u){const m=v.length;if(v+=g.value,v.length<=f)h.push(g);else{if(g.type==="text"){const w=f-m;g.value=g.value.slice(0,w)}h.push(g),h.push({type:"text",value:"..."});break}}return h},a=(u,f)=>{const h=u.content,v=u.references;let g=[];if(!(v!=null&&v.length))return g.push({type:"text",value:h}),g;const m=[];v.forEach(x=>{let b=h.indexOf(x.text);if(m.includes(b))for(const C of m){if(!m.includes(b))break;b=h.indexOf(x.text,b+x.text.length)}x.textIndex=b,m.push(b)}),v.sort((x,b)=>x.textIndex-b.textIndex);let w=h;return v.forEach(x=>{const b=w.indexOf(x.text),C=w.slice(0,b),P=w.slice(b+x.text.length),k=c(x);g.push({type:"text",value:C}),g.push({type:"profile",value:k,npub:l(x.profile.pubkey)}),w=P}),g.push({type:"text",value:w}),f&&(g=i(g,f)),g},c=u=>{const f=u.profile_details,h=l(u.profile.pubkey);return`@${f.name||f.username||f.display_name||`${h.slice(0,15)}...`}`},l=u=>Me.npubEncode(u),d=u=>{u&&(s.updateNpubInput(u),o.updateRoutingStatus(!0),n.push({path:`/user/${u}`}))};return(u,f)=>(S(),U("div",Tm,[(S(!0),U(Ee,null,ut(r.value,h=>(S(),U("span",null,[h.type==="text"?(S(),U("span",Lm,se(h.value),1)):te("",!0),h.type==="profile"?(S(),U("span",Um,[_("a",{onClick:Bn(()=>d(h.npub),["prevent"]),href:"#"},se(h.value),9,Bm)])):te("",!0)]))),256))]))}});const Mm=me(Nm,[["__scopeId","data-v-2c0eedfd"]]);function Om(e){return e instanceof Uint8Array||e!=null&&typeof e=="object"&&e.constructor.name==="Uint8Array"}function ea(e,...t){if(!Om(e))throw new Error("Uint8Array expected");if(t.length>0&&!t.includes(e.length))throw new Error(`Uint8Array expected of length ${t}, not of length=${e.length}`)}function bc(e,t=!0){if(e.destroyed)throw new Error("Hash instance has been destroyed");if(t&&e.finished)throw new Error("Hash#digest() has already been called")}function Fm(e,t){ea(e);const n=t.outputLen;if(e.length<n)throw new Error(`digestInto() expects output buffer of length at least ${n}`)}/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */const Sr=e=>new DataView(e.buffer,e.byteOffset,e.byteLength),At=(e,t)=>e<<32-t|e>>>t;new Uint8Array(new Uint32Array([287454020]).buffer)[0];const Hm=Array.from({length:256},(e,t)=>t.toString(16).padStart(2,"0"));function Yo(e){ea(e);let t="";for(let n=0;n<e.length;n++)t+=Hm[e[n]];return t}const jt={_0:48,_9:57,_A:65,_F:70,_a:97,_f:102};function Ec(e){if(e>=jt._0&&e<=jt._9)return e-jt._0;if(e>=jt._A&&e<=jt._F)return e-(jt._A-10);if(e>=jt._a&&e<=jt._f)return e-(jt._a-10)}function Rc(e){if(typeof e!="string")throw new Error("hex string expected, got "+typeof e);const t=e.length,n=t/2;if(t%2)throw new Error("padded hex string expected, got unpadded hex of length "+t);const s=new Uint8Array(n);for(let o=0,r=0;o<n;o++,r+=2){const i=Ec(e.charCodeAt(r)),a=Ec(e.charCodeAt(r+1));if(i===void 0||a===void 0){const c=e[r]+e[r+1];throw new Error('hex string expected, got non-hex character "'+c+'" at index '+r)}s[o]=i*16+a}return s}function jm(e){if(typeof e!="string")throw new Error(`utf8ToBytes expected string, got ${typeof e}`);return new Uint8Array(new TextEncoder().encode(e))}function qd(e){return typeof e=="string"&&(e=jm(e)),ea(e),e}class Vm{clone(){return this._cloneInto()}}function Dm(e){const t=s=>e().update(qd(s)).digest(),n=e();return t.outputLen=n.outputLen,t.blockLen=n.blockLen,t.create=()=>e(),t}const dt=_t("nsec",()=>{const e=L(""),t=L(!1),n=L("");function s(v){e.value=v}function o(v){n.value=v}function r(v){t.value=v}function i(){try{const v=a();if(!v)throw new Error("Invalid private key");return ju(v)}catch{return""}}function a(){try{return e.value.indexOf("nsec")===-1?Rc(e.value):Me.decode(e.value).data}catch{return null}}function c(){const v=a();if(!v)return"";try{return Yo(v)}catch{return""}}function l(){try{return e.value.indexOf("nsec")===-1?Me.nsecEncode(Rc(e.value)):e.value}catch{return""}}function d(){return e.value.length>0&&f()}function u(){return e.value.length>0&&!f()}function f(){return e.value.length===0?!1:i().length>0}const h=ye(()=>f());return{nsec:e,updateNsec:s,rememberMe:t,setRememberMe:r,isNsecValid:f,isValidNsecPresented:d,isNotValidNsecPresented:u,getPubkey:i,cachedNsec:n,updateCachedNsec:o,getPrivkeyBytes:a,getPrivkeyHex:c,getPrivkey:l,isNsecValidTemp:h}}),fs=_t("images",()=>{const e=L(!1);function t(n){e.value=n}return{showImages:e,updateShowImages:t}}),{normalizeURL:ht}=Gt,Ye=_t("relay",()=>{const e=L({}),t=L(!1),n=L(""),s=L(""),o=L(0),r=L([]),i=L([]),a=L([]),c=L([]),l=L([]),d=L(!1),u=L(!1),f=L([]),h=L([]),v=ye(()=>{const B=new Set([...c.value,...l.value]),N=[],ne=[];return B.forEach(ue=>{c.value.includes(ue)&&!l.value.includes(ue)?N.push({url:ue,type:"read"}):ne.push({url:ue,type:"write"})}),[...N,...ne].sort((ue,he)=>ue.url.localeCompare(he.url))}),g=ye(()=>{const B=new Set([...i.value,...a.value]);return e.value.connected&&B.add(e.value.url),[...B]}),m=ye(()=>h.value.length?h.value:g.value),w=ye(()=>v.value.map(B=>B.url)),x=ye(()=>{const B=e.value.url,N=w.value;return N.includes(B)?N:[B,...N]}),b=ye(()=>{const B=i.value,N=e.value;return N.connected&&!B.includes(N.url)&&B.push(N.url),B}),C=ye(()=>{const B=c.value,N=l.value,ne=new Set([...B,...N]),ue=[];return ne.forEach(he=>{B.includes(he)&&N.includes(he)?ue.push(["r",he]):B.includes(he)?ue.push(["r",he,"read"]):N.includes(he)&&ue.push(["r",he,"write"])}),ue}),P=ye(()=>f.value.map(B=>B.replace("wss://","").replace("/","")).join(", ")),k=ye(()=>e.value.connected);function D(B){e.value=B}function $(B){t.value=B}function T(B){i.value=B.map(N=>ht(N))}function I(B){const N=ht(B);N&&(i.value.includes(N)||i.value.push(N))}function V(B){a.value=B.map(N=>ht(N))}function z(B){const N=ht(B);N&&(a.value.includes(N)||a.value.push(N))}function J(B){a.value=a.value.filter(N=>N!==B)}function X(B){f.value=B.map(N=>ht(N))}function H(B){c.value=B.map(N=>ht(N))}function R(B){l.value=B.map(N=>ht(N))}function A(B){l.value.includes(B)||l.value.push(ht(B))}function F(B){l.value=l.value.filter(N=>N!==B)}function W(B){const N=ht(B);if(!N||w.value.includes(N))return!1;c.value.push(N)}function ee(B){c.value=c.value.filter(N=>N!==B),l.value=l.value.filter(N=>N!==B),i.value=i.value.filter(N=>N!==B),a.value=a.value.filter(N=>N!==B)}function oe(B){n.value=B==="custom"?"custom":ht(B)}function re(B){o.value=B}function de(B,N){r.value[B]=N.length?ht(N):""}function le(B){d.value=B}function Te(B){u.value=B}function ke(B){h.value=B.map(N=>ht(N))}function j(){e.value={},i.value=[],a.value=[],c.value=[],l.value=[],d.value=!1,u.value=!1,f.value=[],h.value=[]}return{isConnectingToRelay:t,setConnectionToRelayStatus:$,connectedUserReadRelayUrls:i,setConnectedUserReadRelayUrls:T,selectInputRelayUrl:n,setSelectedRelay:oe,selectInputCustomRelayUrl:s,currentRelay:e,updateCurrentRelay:D,additionalRelaysCountForSignedEvent:o,updateAdditionalRelaysCountForSignedEvent:re,additionalRelaysUrlsForSignedEvent:r,updateRelayAdditionalRelaysUrlsForSignedEvent:de,connectedFeedRelaysPrettyStr:P,reedRelays:c,writeRelays:l,setReedRelays:H,setWriteRelays:R,isConnectedToRelay:k,userReadWriteRelays:v,removeWriteRelay:F,addWriteRelay:A,removeUserRelay:ee,addUserRelay:W,nip65Tags:C,userReadWriteRelaysUrls:w,allRelaysUrlsWithSelectedRelay:x,connectedFeedRelaysUrls:f,setConnectedFeedRelayUrls:X,connectedUserReadRelayUrlsWithSelectedRelay:b,isConnectingToReadWriteRelays:d,setIsConnectingToReadWriteRelaysStatus:le,setConnectedUserWriteRelayUrls:V,connectedUserWriteRelaysUrls:a,connectedUserReadWriteUrlsWithSelectedRelay:g,setIsConnectedToReadWriteRelaysStatus:Te,isConnectedToReadWriteRelays:u,userChatRelaysUrls:m,setUserDMRelaysUrls:ke,clear:j,addConnectedUserReadRelay:I,addConnectedUserWriteRelay:z,removeConnectedUserWriteRelay:J}}),Qo=_t("metasCache",()=>{const e=L({});function t(i){e.value[i.pubkey]=i}function n(i){return e.value[i]||null}function s(i,a){e.value[i]=a}function o(i){return!!e.value[i]}function r(i){return e.value.hasOwnProperty(i)}return{metas:e,addMeta:t,getMeta:n,hasMeta:o,hasPubkey:r,setMetaValue:s}}),Wm={},qm={xmlns:"http://www.w3.org/2000/svg",width:"22",height:"22",fill:"currentColor",class:"bi bi-link-45deg",viewBox:"0 0 16 16"},Km=_("path",{d:"M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"},null,-1),zm=_("path",{d:"M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"},null,-1),Gm=[Km,zm];function Zm(e,t){return S(),U("svg",qm,Gm)}const xc=me(Wm,[["render",Zm]]),Jm={},Ym={xmlns:"http://www.w3.org/2000/svg",width:"22",height:"22",fill:"currentColor",class:"bi bi-check2",viewBox:"0 0 16 16"},Qm=_("path",{d:"M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"},null,-1),Xm=[Qm];function ew(e,t){return S(),U("svg",Ym,Xm)}const Sc=me(Jm,[["render",ew]]),tw={},nw={xmlns:"http://www.w3.org/2000/svg",width:"18",height:"18",fill:"currentColor",class:"bi bi-check-square",viewBox:"0 0 16 16"},sw=_("path",{d:"M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"},null,-1),ow=_("path",{d:"M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"},null,-1),rw=[sw,ow];function iw(e,t){return S(),U("svg",nw,rw)}const Kd=me(tw,[["render",iw]]),aw={},cw={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-diagram-2-fill",viewBox:"0 0 16 16"},lw=_("path",{"fill-rule":"evenodd",d:"M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 5 7h2.5V6A1.5 1.5 0 0 1 6 4.5zm-3 8A1.5 1.5 0 0 1 4.5 10h1A1.5 1.5 0 0 1 7 11.5v1A1.5 1.5 0 0 1 5.5 14h-1A1.5 1.5 0 0 1 3 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 9 12.5z"},null,-1),uw=[lw];function dw(e,t){return S(),U("svg",cw,uw)}const fw=me(aw,[["render",dw]]),hw={},pw={xmlns:"http://www.w3.org/2000/svg",width:"18",height:"18",fill:"currentColor",class:"bi bi-exclamation-octagon",viewBox:"0 0 16 16"},gw=_("path",{d:"M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z"},null,-1),yw=_("path",{d:"M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"},null,-1),vw=[gw,yw];function _w(e,t){return S(),U("svg",pw,vw)}const zd=me(hw,[["render",_w]]),mw={class:"thread"},ww={key:0,class:"loading-thread"},bw={class:"event-card"},Ew={key:0,class:"event-img"},Rw=["src","title"],xw={key:1,class:"bi bi-person-circle author-pic__alternate"},Sw={class:"event-content"},kw={class:"event-header"},Cw=["href"],$w={class:"event-username-text"},Pw={key:0,class:"event-replying-to"},Iw={key:1,class:"replying-to-separator"},Aw=["href"],Tw={class:"event-body"},Lw={class:"event-footer"},Uw={class:"event-footer__right-actions"},Bw={class:"event-footer__link-wrapper"},Nw={class:"event__raw-data"},Mw={class:"event-footer-code-wrapper"},Ow={class:"event-footer__signature-text"},Fw={class:"event-footer__right-actions"},Hw={class:"event-footer__link-wrapper"},jw={key:0,class:"reply-field"},Vw={class:"reply-field__actions"},Dw={class:"reply-field__error"},Ww=["disabled"],qw={key:1,class:"loading-replies"},Kw={key:2,class:"replies"},zw=Se({__name:"EventContent",props:{event:{},pool:{},pubKey:{},index:{},hasReplyBtn:{type:Boolean},isMainEvent:{type:Boolean},currentReadRelays:{},threadDescender:{}},emits:["toggleRawData","showReplyField","loadRootReplies","resetSentStatus","loadMoreReplies"],setup(e,{emit:t}){const n=t,s=L(""),o=L(""),r=e,i=En(),a=us(),c=dt(),l=ds(),d=fs(),u=Ye(),f=Qo(),h=L(!1),v=L(!1),g=L([]),m=L(!1),w=L(!1),x=L(!1),b=L(!1),C=L([]),P=L(!1),k=R=>{if(r.isMainEvent)return n("toggleRawData",R);r.event.showRawData=!r.event.showRawData};vt(()=>{Object.keys(r.event).length!==0&&(x.value=Fn(r.event))});const D=(R,A)=>{if(R){let F="";if(R.name?F=R.name:R.username?F=R.username:F=R.display_name,F.length)return F}return Me.npubEncode(A).slice(0,10)+"..."},$=()=>{h.value=!h.value,n("showReplyField")},T=async()=>{if(v.value)return;if(!c.isValidNsecPresented()){o.value="Please login with your private key to send a reply.";return}const R=s.value.trim();if(!R.length){o.value="Please provide message to broadcast.";return}let A,F;try{if(A=c.getPrivkeyBytes(),!A)throw new Error;if(F=c.getPubkey(),!F.length)throw new Error}catch{o.value="Invalid private key. Please check it and try again.";return}const W=u.connectedUserWriteRelaysUrls;if(!W.length){o.value="Please provide your write relays to broadcast event";return}const ee={kind:1,pubkey:F,created_at:Math.floor(Date.now()/1e3),content:R,tags:[],id:"",sig:""},oe=[],re=[];r.event.tags.forEach(y=>{const E=[y[0],y[1]];y[2]&&E.push(y[2]),y[3]&&E.push(y[3]),E[0]==="e"?oe.push(E):E[0]==="p"&&re.push(E)});const de=[];if(oe.length){const y=oe.find(E=>E[3]==="root");y?de.push(y):de.push(oe[0]),de.push(["e",r.event.id,"","reply"])}else de.push(["e",r.event.id,"","root"]);const le=zi(ee),Te=re.map(y=>y[1]),ke=[];le.forEach(y=>{var M;const E=(M=y==null?void 0:y.profile)==null?void 0:M.pubkey;E&&!Te.includes(E)&&(ke.push(["p",E]),Te.push(E))});const j=[...ke,...re];Te.includes(r.event.pubkey)||j.push(["p",r.event.pubkey]),ee.tags=[...j,...de];const B=rt(ee,A);o.value="",v.value=!0;const N=j.filter(y=>y[1]!==F).map(y=>y[1]);let ne=[];const{pool:ue}=r;if(N.length){const y=[...u.reedRelays,...u.writeRelays,u.currentRelay.url],E=[...new Set(y)],M=await ue.querySync(E,{kinds:[10002],authors:N}),O=new Set;M.forEach(q=>{if(q.tags.length){const{read:Y}=Nd(q);Y.forEach(G=>{u.writeRelays.includes(G)||O.add(G)})}}),ne=[...O]}if(!(await Jn(W,ue,B)).some(y=>y.success)){o.value="Failed to broadcast reply";return}if(ne.length)try{await ue.publish(ne,B)}catch{console.error("Failed to broadcast reply to some additional relays")}if(v.value=!1,h.value=!1,s.value="",r.isMainEvent)return n("loadRootReplies");I()},I=async()=>{const{event:R,currentReadRelays:A,pool:F}=r;if(!(A!=null&&A.length)||!F)return;if(r.isMainEvent)return n("loadMoreReplies");b.value=!0;let W=await F.querySync(A,{kinds:[1],"#e":[R.id]});R.isRoot?W=Ud(R,W):W=Bd(R,W);const ee=r.threadDescender;if(W.length==1&&(ee==null?void 0:ee.id)===W[0].id){b.value=!1;return}await Mt(W,R,{},A,f,F,!1),g.value=W,m.value=!0,b.value=!1},V=()=>{m.value=!1},z=()=>{const{origin:R,pathname:A}=window.location;let F=Me.noteEncode(r.event.id);const W=`${R}${A}#/event/${F}`;navigator.clipboard.writeText(W),w.value=!0,setTimeout(()=>{w.value=!1},2e3)},J=R=>{const A=Me.npubEncode(R);a.updateNpubInput(A),l.updateRoutingStatus(!0),i.push({path:$s(R)})},X=async(R,A=null)=>{var oe,re;const{currentReadRelays:F,pool:W}=r;if(!(F!=null&&F.length)||!W)return[];const ee=kt.parse(R);if(!ee.root&&!ee.reply)return[];if(ee.root&&!ee.reply){let de=A;return de||(de=await W.get(F,{kinds:[1],ids:[ee.root.id]})),de?(await Mt([de],null,{},F,f,W,!0),[de]):[]}if(ee.reply){if(A||(A=await W.get(F,{kinds:[1],ids:[ee.reply.id]})),!A)return[];const de=kt.parse(A),le=((oe=de==null?void 0:de.reply)==null?void 0:oe.id)||((re=de==null?void 0:de.root)==null?void 0:re.id),Te=await jd(le||"",F,W);await Mt([A],Te,{},F,f,W,!1);const j=await X(A,Te);return[A,...j]}return[]},H=async()=>{const{event:R,pool:A,currentReadRelays:F}=r;if(!(F!=null&&F.length)||!A||P.value)return;P.value=!0;const ee=(await X(R,R.replyingTo.event)).reverse();P.value=!1,C.value=ee};return(R,A)=>{const F=Ms("EventContent",!0);return S(),U(Ee,null,[_("div",mw,[(S(!0),U(Ee,null,ut(C.value,(W,ee)=>(S(),U("div",{class:"ancestor",key:R.event.id},[fe(F,{onToggleRawData:()=>k(W.id),event:W,currentReadRelays:R.currentReadRelays,pool:R.pool,hasReplyBtn:R.hasReplyBtn,threadDescender:C.value[ee+1]?C.value[ee+1]:R.event},null,8,["onToggleRawData","event","currentReadRelays","pool","hasReplyBtn","threadDescender"])]))),128)),P.value?(S(),U("div",ww,"Loading thread...")):te("",!0)]),_("div",bw,[_("div",{class:ve(["event-card__content",{flipped:R.event.showRawData}])},[_("div",{class:ve(["event-card__front","event__presentable-date",{"event-card__front_custom":R.pubKey===R.event.pubkey}])},[Z(d).showImages?(S(),U("div",Ew,[R.event.author?(S(),U("img",{key:0,class:ve(["author-pic",{"author-pic__squared":!R.event.author.picture}]),src:R.event.author.picture,title:`Avatar for ${R.event.author.name}`,alt:"user's avatar"},null,10,Rw)):(S(),U("i",xw))])):te("",!0),_("div",Sw,[_("div",kw,[_("div",null,[_("a",{class:"event-username-link",onClick:A[0]||(A[0]=Bn(()=>J(R.event.pubkey),["prevent"])),href:Z($s)(R.event.pubkey)},[_("b",$w,se(D(R.event.author,R.event.pubkey)),1)],8,Cw)]),_("div",null,se(Z(Md)(R.event.created_at)),1)]),R.event.replyingTo?(S(),U("div",Pw,[R.isMainEvent?(S(),U("span",{key:0,onClick:H,class:"view-thread event-username-link event-username-text"},[fe(fw),Re(" View thread ")])):te("",!0),R.isMainEvent?(S(),U("span",Iw,"  |  ")):te("",!0),_("span",null,[Re(" Replying to "),_("a",{onClick:A[1]||(A[1]=Bn(()=>J(R.event.replyingTo.pubkey),["prevent"])),href:Z($s)(R.event.replyingTo.pubkey),class:"event-username-link event-username-text"},"@"+se(D(R.event.replyingTo.user,R.event.replyingTo.pubkey)),9,Aw)])])):te("",!0),_("div",Tw,[fe(Mm,{event:R.event},null,8,["event"])]),_("div",Lw,[fe(Am,{onShowReplyField:$,onHandleShowReplies:I,onHandleHideReplies:V,hasReplyBtn:R.hasReplyBtn,likes:R.event.likes,reposts:R.event.reposts,replies:R.event.replies},null,8,["hasReplyBtn","likes","reposts","replies"]),_("div",Uw,[_("div",Bw,[w.value?(S(),Ie(Sc,{key:0,class:"event-footer-copy-icon event-footer-copy-icon_check"})):te("",!0),w.value?te("",!0):(S(),Ie(xc,{key:1,onClick:z,title:"Copy link",class:"event-footer-copy-icon"}))]),_("span",{onClick:A[2]||(A[2]=()=>k(R.event.id)),title:"See raw data",class:"event-footer-code"}," {...} ")])])])],2),_("div",{class:ve(["event-card__back",{"event-card__back_custom":R.pubKey===R.event.pubkey,"event-details-first":R.index===0}])},[_("div",Nw,[fe(Wd,{event:R.event,authorEvent:R.event.authorEvent},null,8,["event","authorEvent"])]),_("div",Mw,[_("div",{class:ve(["event-footer__signature",{"event-footer__signature_invalid":!x.value}])},[x.value?(S(),Ie(Kd,{key:0})):te("",!0),x.value?te("",!0):(S(),Ie(zd,{key:1})),_("span",Ow,se(x.value?"Signature is valid":"Invalid signature"),1)],2),_("div",Fw,[_("div",Hw,[w.value?(S(),Ie(Sc,{key:0,class:"event-footer-copy-icon event-footer-copy-icon_check"})):te("",!0),w.value?te("",!0):(S(),Ie(xc,{key:1,onClick:z,title:"Copy link",class:"event-footer-copy-icon"}))]),_("span",{onClick:A[3]||(A[3]=()=>k(R.event.id)),title:"See raw data",class:"event-footer-code"}," {...} ")])])],2)],2)]),h.value?(S(),U("div",jw,[qt(_("textarea",{"onUpdate:modelValue":A[4]||(A[4]=W=>s.value=W),rows:"4",class:"reply-field__textarea",placeholder:"Write a reply..."},null,512),[[Kt,s.value]]),_("div",Vw,[_("div",Dw,se(o.value),1),_("button",{disabled:v.value,onClick:T,class:"reply-field__btn"},se(v.value?"Sending reply...":"Reply"),9,Ww)])])):te("",!0),b.value?(S(),U("div",qw,"Loading replies...")):te("",!0),m.value&&g.value.length?(S(),U("div",Kw,[(S(!0),U(Ee,null,ut(g.value,W=>(S(),U("div",{class:"reply",key:W.id},[fe(F,{onToggleRawData:A[5]||(A[5]=()=>k(R.event.id)),event:W,currentReadRelays:R.currentReadRelays,pool:R.pool,hasReplyBtn:R.hasReplyBtn},null,8,["event","currentReadRelays","pool","hasReplyBtn"])]))),128))])):te("",!0)],64)}}});const kr=me(zw,[["__scopeId","data-v-48e6ed81"]]),Gw={},Zw={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-arrows-expand",viewBox:"0 0 16 16"},Jw=_("path",{"fill-rule":"evenodd",d:"M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8ZM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2ZM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10Z"},null,-1),Yw=[Jw];function Qw(e,t){return S(),U("svg",Zw,Yw)}const Xw=me(Gw,[["render",Qw]]),Ft=_t("pool",()=>{const e=L(new Ns);function t(){e.value=new Ns}return{pool:e,resetPool:t}}),Gd=e=>(st("data-v-5f3cf145"),e=e(),ot(),e),eb={class:"event"},tb={key:0},nb={key:1,class:"replies"},sb={class:"replies__other-link"},ob=Gd(()=>_("span",{class:"replies__other-text"}," Show more replies ",-1)),rb={key:1,class:"replies__other"},ib={key:2,class:"replies__other"},ab={class:"replies__other-text"},cb={key:4},lb={key:5,class:"replies__list"},ub={class:"replies__list-item"},db=Gd(()=>_("div",{class:"replies__list-item-line-horizontal"},null,-1)),fb=Se({__name:"ParentEventView",props:{event:{},pubKey:{},index:{},hasReplyBtn:{type:Boolean},showRootReplies:{type:Boolean},currentReadRelays:{}},emits:["toggleRawData"],setup(e,{emit:t}){const n=Qo(),o=Ft().pool,r=t,i=e,a=L(!1),c=L(!1),l=L(!1),d=L(!1),u=L(!1),f=L(null),h=L([]);vt(async()=>{await v()});const v=async()=>{const{event:b,currentReadRelays:C}=i;if(!C.length)return;let P=await o.querySync(C,{kinds:[1],"#e":[b.id]});if(i.showRootReplies?P=P.filter($=>Fd(b.id,$)):P=P.filter($=>Hd(b.id,$)),!P.length)return;u.value=!0,c.value=P.length>1;const k=P[0];await Mt([k],b,{},C,n,o,!1,$=>{f.value=$,u.value=!1})},g=(b,C=!1)=>{if(C)return r("toggleRawData",b)},m=()=>{a.value=!a.value},w=async()=>{const{event:b,currentReadRelays:C}=i;if(!C.length)return;d.value=!0;let P=await o.querySync(C,{kinds:[1],"#e":[b.id]});if(b.isRoot?P=Ud(b,P):P=Bd(b,P),!P.length){d.value=!1;return}await Mt(P,b,{},C,n,o,!1),h.value=P,l.value=!0,d.value=!1},x=async()=>{a.value=!1,l.value?await w():await v()};return(b,C)=>(S(),U("div",eb,[(S(),Ie(kr,{key:b.event.id,onLoadRootReplies:x,onShowReplyField:m,onToggleRawData:C[0]||(C[0]=P=>g(P,!0)),onLoadMoreReplies:w,event:b.event,pubKey:b.pubKey,isMainEvent:!0,currentReadRelays:b.currentReadRelays,pool:Z(o),hasReplyBtn:b.hasReplyBtn},null,8,["event","pubKey","currentReadRelays","pool","hasReplyBtn"])),u.value?(S(),U("div",tb,"Loading replies...")):te("",!0),f.value?(S(),U("div",nb,[!l.value&&c.value&&!d.value?(S(),U("div",{key:0,onClick:w,class:"replies__other"},[_("span",sb,[ob,fe(Xw)])])):te("",!0),d.value?(S(),U("div",rb,"Loading replies...")):te("",!0),l.value&&c.value?(S(),U("div",ib,[_("span",ab," Loaded "+se(h.value.length)+" replies ",1)])):te("",!0),_("div",{class:ve(["line-vertical",{"line-vertical_long":c.value,"line-vertical_reply-field":a.value&&!c.value,"line-vertical_reply-field_long":a.value&&c.value}])},null,2),l.value?te("",!0):(S(),U("div",{key:3,class:ve(["line-horizontal",{"line-horizontal_height":c.value}])},null,2)),l.value?te("",!0):(S(),U("div",cb,[(S(),Ie(kr,{key:f.value.id,event:f.value,currentReadRelays:b.currentReadRelays,pool:Z(o),hasReplyBtn:b.hasReplyBtn},null,8,["event","currentReadRelays","pool","hasReplyBtn"]))])),l.value?(S(),U("div",lb,[(S(!0),U(Ee,null,ut(h.value,(P,k)=>(S(),U("div",ub,[db,_("div",{class:ve(["replies__list-item-line-vertical",{"replies__list-item-line-vertical_short":k===h.value.length-1}])},null,2),(S(),Ie(kr,{key:P.id,event:P,currentReadRelays:b.currentReadRelays,pool:Z(o),hasReplyBtn:b.hasReplyBtn},null,8,["event","currentReadRelays","pool","hasReplyBtn"]))]))),256))])):te("",!0)])):te("",!0)]))}});const Zd=me(fb,[["__scopeId","data-v-5f3cf145"]]),hb=Se({__name:"RelayEventsList",props:{events:{},pubKey:{},currentReadRelays:{}},emits:["toggleRawData"],setup(e,{emit:t}){const n=t,s=o=>{n("toggleRawData",o)};return(o,r)=>(S(),U("div",null,[(S(!0),U(Ee,null,ut(o.events,(i,a)=>(S(),Ie(Zd,{key:i.id,class:"event",onToggleRawData:s,currentReadRelays:o.currentReadRelays,event:i,pubKey:o.pubKey,index:a,showRootReplies:!0,hasReplyBtn:!0},null,8,["currentReadRelays","event","pubKey","index"]))),128))]))}});const pb=me(hb,[["__scopeId","data-v-421078f4"]]),gb={key:0,class:"pagination"},yb={key:0},vb={key:1},_b={key:1},mb={key:4},wb=Se({__name:"Pagination",props:{pagesCount:{},currentPage:{}},emits:["showPage"],setup(e,{emit:t}){const n=t,s=No(),o=r=>({path:s.path,query:{...s.query,page:r}});return qe(()=>s.query.page,async r=>{const i=parseInt(r);i&&n("showPage",i)}),(r,i)=>{const a=Ms("router-link");return r.pagesCount>1?(S(),U("div",gb,[Re(" Pages: "),r.pagesCount<5?(S(),U("span",yb,[(S(!0),U(Ee,null,ut(r.pagesCount,c=>(S(),Ie(a,{key:c,class:ve(["pagination__link",{pagination__link_active:r.currentPage==c}]),to:o(c)},{default:ct(()=>[Re(se(c),1)]),_:2},1032,["class","to"]))),128))])):te("",!0),r.pagesCount>=5?(S(),U("span",vb,[r.currentPage>=3?(S(),Ie(a,{key:1,class:ve(["pagination__link"]),to:o(1)},{default:ct(()=>[Re(se(1))]),_:1},8,["to"])):te("",!0),r.currentPage>3?(S(),U("span",_b,"...")):te("",!0),r.currentPage!=1?(S(),Ie(a,{key:r.currentPage-1,class:ve(["pagination__link"]),to:o(r.currentPage-1)},{default:ct(()=>[Re(se(r.currentPage-1),1)]),_:1},8,["to"])):te("",!0),(S(),Ie(a,{key:r.currentPage,class:ve(["pagination__link pagination__link_active"]),to:o(r.currentPage)},{default:ct(()=>[Re(se(r.currentPage),1)]),_:1},8,["to"])),r.currentPage!=r.pagesCount?(S(),Ie(a,{key:r.currentPage+1,class:ve(["pagination__link"]),to:o(r.currentPage+1)},{default:ct(()=>[Re(se(r.currentPage+1),1)]),_:1},8,["to"])):te("",!0),r.currentPage<r.pagesCount-2?(S(),U("span",mb,"...")):te("",!0),r.currentPage<=r.pagesCount-2?(S(),Ie(a,{key:r.pagesCount,class:ve(["pagination__link"]),to:o(r.pagesCount)},{default:ct(()=>[Re(se(r.pagesCount),1)]),_:1},8,["to"])):te("",!0)])):te("",!0)])):te("",!0)}}});const Jd=me(wb,[["__scopeId","data-v-6b61b6ba"]]),xn=_t("feed",()=>{const e=L([]),t=L(!1),n=L([]),s=L(0),o=L([]),r=L([]),i=L(""),a=L(""),c=L(0),l=L("network"),d=ye(()=>e.value.map(le=>le.id)),u=ye(()=>l.value==="follows"),f=ye(()=>l.value==="network"),h=L(!1),v=L(!1),g=L(!1),m=L(!1),w=L(!1),x=L(new Ns);function b(){oe(),e.value=[],t.value=!1,o.value=[],r.value=[],l.value="network",h.value=!1,v.value=!1,g.value=!1}function C(le){e.value=le}function P(le){e.value.push(le)}function k(le){const Te=e.value.find(ke=>ke.id===le);Te&&(Te.showRawData=!Te.showRawData)}function D(le){t.value=le}function $(le){n.value=le}function T(le){s.value=le}function I(le){o.value=le}function V(le){o.value.push(le)}function z(le){r.value=le}function J(le){r.value.push(le)}function X(le){i.value=le}function H(le){a.value=le}function R(le){h.value=le}function A(le){g.value=le}function F(le){v.value=le}function W(le){l.value=le==="follows"?le:"network"}function ee(le){m.value=le}function oe(){clearInterval(c.value),c.value=0}function re(){x.value=new Ns}function de(le){w.value=le}return{events:e,updateEvents:C,toggleEventRawData:k,showNewEventsBadge:t,setShowNewEventsBadge:D,newEventsBadgeImageUrls:n,setNewEventsBadgeImageUrls:$,newEventsBadgeCount:s,setNewEventsBadgeCount:T,newEventsToShow:o,updateNewEventsToShow:I,pushToNewEventsToShow:V,paginationEventsIds:r,updatePaginationEventsIds:z,pushToPaginationEventsIds:J,messageToBroadcast:i,updateMessageToBroadcast:X,signedJson:a,updateSignedJson:H,selectedFeedSource:l,setSelectedFeedSource:W,isFollowsSource:u,isNetworkSource:f,isLoadingFeedSource:h,setLoadingFeedSourceStatus:R,setLoadingNewEventsStatus:F,isLoadingNewEvents:v,pushToEvents:P,setLoadingMoreStatus:A,isLoadingMore:g,isMountAfterLogin:m,setMountAfterLogin:ee,eventsId:d,newEventsBadgeUpdateInterval:c,clearNewEventsBadgeUpdateInterval:oe,clear:b,pool:x,resetPool:re,toRemountFeed:w,setToRemountFeed:de}}),Yd=e=>(st("data-v-2d4fce59"),e=e(),ot(),e),bb=["disabled","rows"],Eb={class:"message-footer"},Rb=Yd(()=>_("i",{class:"bi bi-braces presigned-icon"},null,-1)),xb=Yd(()=>_("span",null,"Send presigned message",-1)),Sb=[Rb,xb],kb=["disabled"],Cb={class:"error"},$b={class:"warning"},Pb=Se({__name:"MessageInput",props:{sentEventIds:{},isSendingMessage:{type:Boolean}},emits:["broadcastEvent","toggleMessageType","clearBroadcastError"],setup(e,{emit:t}){const n=e,s=t,o=dt(),r=xn(),i=Ye(),a=L(""),c=L(""),l=L(!1),d=L(3);qe(()=>a.value,m=>{m.length&&setTimeout(()=>{a.value=""},5e3)});const u=async()=>{if(s("clearBroadcastError"),c.value="",!o.isValidNsecPresented()){a.value="Please login with your private key or generate random key in settings.";return}const m=r.messageToBroadcast;if(!m.length){a.value="Please provide message to broadcast.";return}let w,x;try{if(w=o.getPrivkeyBytes(),!w)throw new Error;if(x=o.getPubkey(),!x.length)throw new Error}catch{a.value="Invalid private key. Please check it and try again.";return}const b={kind:1,pubkey:x,created_at:Math.floor(Date.now()/1e3),content:m,tags:[],id:"",sig:""},C=rt(b,w);if(n.sentEventIds.has(C.id)){a.value="The same event can't be sent twice (same id, signature).";return}a.value="",s("broadcastEvent",C,"text")},f=()=>{const m=r.messageToBroadcast;if(!m.length)return;let w=m.split(`
-`).length;w<3&&(w=3),d.value=w},h=()=>{l.value=!0,!a.value.length&&!o.isValidNsecPresented()&&(c.value="Please login to broadcast the message. Or send a presigned message.")},v=()=>{l.value=!1,c.value=""},g=()=>{s("toggleMessageType")};return(m,w)=>(S(),U(Ee,null,[_("div",{class:ve(["message-field",{active:l.value}])},[qt(_("textarea",{disabled:!Z(i).isConnectedToRelay,class:"message-input",name:"message",id:"message",rows:d.value,"onUpdate:modelValue":w[0]||(w[0]=x=>Z(r).messageToBroadcast=x),onInput:f,onFocus:h,onBlur:v,placeholder:"What do you want to say?"},null,40,bb),[[Kt,Z(r).messageToBroadcast,void 0,{trim:!0}]]),_("div",Eb,[_("button",{onClick:g,class:"send-presigned-btn"},Sb),_("button",{disabled:m.isSendingMessage||!Z(i).isConnectedToRelay,class:ve(["send-btn",{disabled:m.isSendingMessage||!Z(i).isConnectedToRelay}]),onClick:u},se(m.isSendingMessage?"Posting...":"Post"),11,kb)])],2),_("div",Cb,se(a.value),1),_("div",$b,se(c.value),1)],64))}});const Ib=me(Pb,[["__scopeId","data-v-2d4fce59"]]),hs=e=>(st("data-v-7a0c8f52"),e=e(),ot(),e),Ab={class:"signed-message-desc"},Tb=hs(()=>_("p",{class:"signed-message-desc_p"},[Re(" Event should be signed with your private key in advance. More details about events and signatures are "),_("a",{target:"_blank",href:"https://github.com/nostr-protocol/nips/blob/master/01.md#events-and-signatures"},"here"),Re(". ")],-1)),Lb={class:"signed-message-desc_p"},Ub=hs(()=>_("br",null,null,-1)),Bb={class:"warning"},Nb={key:0,class:"additional-relays"},Mb={class:"additional-relay-field"},Ob=hs(()=>_("span",{class:"aditinal-relay-num"},"1.",-1)),Fb=["value"],Hb={class:"additional-relay-field"},jb={class:"aditinal-relay-num"},Vb=["onInput"],Db=hs(()=>_("div",{class:"message-field-label"},[_("label",{for:"signed_json"},[_("strong",null,"JSON of a signed event")])],-1)),Wb=["disabled"],qb={class:"message-footer"},Kb=hs(()=>_("i",{class:"bi bi-pencil-square post-icon"},null,-1)),zb=hs(()=>_("span",null,"New post within your profile",-1)),Gb=[Kb,zb],Zb=["disabled"],Jb={class:"error"},Yb={class:"warning"},Qb=Se({__name:"SignedEventInput",props:{isSendingMessage:{type:Boolean},sentEventIds:{}},emits:["broadcastEvent","toggleMessageType","clearBroadcastError"],setup(e,{emit:t}){const n=t,s=Ye(),o=xn(),r=L(""),i=L(""),a=L(""),c=L(!1),l=()=>{if(n("clearBroadcastError"),!o.signedJson.length){r.value="Please provide a signed event.";return}let g;try{g=JSON.parse(o.signedJson)}catch{r.value="Invalid JSON. Please check it and try again.";return}if(!s.isConnectedToRelay){r.value="Please connect to broadcast the message.";return}r.value="",n("broadcastEvent",g,"json")},d=()=>{if(!s.isConnectedToRelay){a.value="Please connect first to add relays and broadcast the message.",setTimeout(()=>{a.value=""},5e3);return}const g=s.additionalRelaysCountForSignedEvent+1;s.updateAdditionalRelaysCountForSignedEvent(g)},u=(g,m)=>{var x;const w=(x=g==null?void 0:g.target)==null?void 0:x.value.trim();s.updateRelayAdditionalRelaysUrlsForSignedEvent(m,w)},f=()=>{n("toggleMessageType")},h=()=>{c.value=!0},v=()=>{c.value=!1,i.value=""};return(g,m)=>{var w,x;return S(),U(Ee,null,[_("div",Ab,[Tb,_("p",Lb,[Re(" Event will be broadcasted to a selected relay("),_("em",null,se(Z(s).isConnectedToRelay?Z(s).currentRelay.url:"available after connect"),1),Re("). You can add more relays to retransmit the event. "),Ub]),_("p",{class:"signed-message-desc_p"},[_("button",{class:"additional-relay-btn button",onClick:d},"Add relay")]),_("div",Bb,se(a.value),1),Z(s).additionalRelaysCountForSignedEvent>0?(S(),U("div",Nb,[_("div",Mb,[Ob,_("input",{class:"additional-relay-input",readonly:"",value:(w=Z(s).currentRelay)!=null&&w.url?`${(x=Z(s).currentRelay)==null?void 0:x.url} (selected)`:"Firstly connect to default relay",type:"text"},null,8,Fb)]),(S(!0),U(Ee,null,ut(Z(s).additionalRelaysCountForSignedEvent,b=>(S(),U("div",{key:b},[_("div",Hb,[_("span",jb,se(b+1)+".",1),_("input",{class:"additional-relay-input",onInput:C=>u(C,b),placeholder:"[wss://]relay.example.com",type:"text"},null,40,Vb)])]))),128))])):te("",!0)]),Db,_("div",{class:ve(["message-field",{active:c.value}])},[qt(_("textarea",{disabled:!Z(s).isConnectedToRelay,class:"message-input",name:"signed_json",id:"signed_json",cols:"30",rows:"5",onFocus:h,onBlur:v,"onUpdate:modelValue":m[0]||(m[0]=b=>Z(o).signedJson=b),placeholder:'{"kind":1,"pubkey":"5486dbb083512982669fa180aa02d722ce35054233cea724061fbc5f39f81aa3","created_at":1685664152,"content":"Test message 👋","tags":[],"id":"89adae408121ba6d721203365becff4d312292a9dd9b7a35ffa230a1483b09a2","sig":"b2592ae88ba1040c928e458dd6822413f148c8cc4f478d992e024e8c9d9648b96e6ce6dc564ab5815675007f824d9e9f634f8dbde554afeb6e594bcaac4389dd"}'},null,40,Wb),[[Kt,Z(o).signedJson,void 0,{trim:!0}]]),_("div",qb,[_("button",{onClick:f,class:"send-presigned-btn"},Gb),_("button",{disabled:g.isSendingMessage||!Z(s).isConnectedToRelay,class:ve(["button send-btn",{disabled:!Z(s).isConnectedToRelay}]),onClick:l},se(g.isSendingMessage?"Posting...":"Post"),11,Zb)])],2),_("div",Jb,se(r.value),1),_("div",Yb,se(i.value),1)],64)}}});const Xb=me(Qb,[["__scopeId","data-v-7a0c8f52"]]),e2={class:"message-field-wrapper"},t2={class:"error"},n2=Se({__name:"MessageWrapper",props:{newEvents:{}},emits:["loadNewRelayEvents"],setup(e,{emit:t}){const n=Ye();dt();const s=xn(),r=Ft().pool,i=t,a=e,c=L(new Set),l=L(!1),d=L(!1),u=L(""),f=()=>{l.value=!l.value},h=async(m,w)=>{let x=[];if(d.value)return;if(d.value=!0,w==="json"){const T=n.additionalRelaysUrlsForSignedEvent;let I=[];if(T.length){let V=`Message was not sent. Can't connect to the next relays: 
-`,z=!1;for(const X of T)if(X!=null&&X.length){if(!await vo(X)){z=!0,V+=`- ${X} 
-`;continue}I.push(X)}const J=n.currentRelay.url;if(await vo(J)||(z=!0,V+=`- ${J} 
-`),z){V+="Relays are unavailable or you are offline. Please try again or change the list of relays.",u.value=V,d.value=!1;return}}x=[n.currentRelay.url,...I],x=[...new Set(x)]}if(w==="text"&&(x=n.connectedUserWriteRelaysUrls),!x.length)return v(null,"No relays to broadcast the message. Please provide the list of write relays in settings.");const b=n.connectedFeedRelaysUrls;let C=null,P;if(b.some(T=>x.includes(T))){const T=[{ids:[m.id]}];C=r.subscribeMany(b,T,{onevent(I){P=setInterval(()=>{a.newEvents.some(V=>V.id===I.id)&&(i("loadNewRelayEvents"),C==null||C.close())},100)},onclose(){clearInterval(P)}})}if((await Jn(x,r,m)).every(T=>T.success===!1))return v(C,"Failed to broadcast the message. Please check the connection or there may be a problem on the all provided relays. Also please try again.");if(w==="json"&&x.length>1){const T=await Promise.all(x.map(async J=>{const X=await r.get([J],{ids:[m.id]});return{relay:J,success:!!X}}));if(T.some(J=>J.success===!1)){let J=`Event was sent, but the next relay(s) were not accepted event for some reason: 
-`;if(T.forEach(H=>{H.success||(J+=`- ${H.relay} 
-`)}),T.every(H=>H.success===!1))return v(C,J)}const V=T.filter(J=>J.success).map(J=>J.relay);b.some(J=>V.includes(J))&&(i("loadNewRelayEvents"),C==null||C.close())}else if((await r.querySync(x,{ids:[m.id]})).length)i("loadNewRelayEvents"),C==null||C.close();else return v(C,"Failed to broadcast the message. Please check the connection or there may be a problem with relay(s).");w==="text"&&s.updateMessageToBroadcast(""),w==="json"&&s.updateSignedJson(""),c.value.add(m.id),d.value=!1},v=(m,w)=>{u.value=w,m==null||m.close(),d.value=!1},g=()=>{u.value=""};return(m,w)=>(S(),U("div",e2,[l.value?(S(),Ie(Xb,{key:0,onBroadcastEvent:h,onToggleMessageType:f,onClearBroadcastError:g,sentEventIds:c.value,isSendingMessage:d.value},null,8,["sentEventIds","isSendingMessage"])):(S(),Ie(Ib,{key:1,onBroadcastEvent:h,onToggleMessageType:f,onClearBroadcastError:g,sentEventIds:c.value,isSendingMessage:d.value},null,8,["sentEventIds","isSendingMessage"])),_("div",t2,se(u.value),1)]))}});const s2=me(n2,[["__scopeId","data-v-cf86de64"]]),o2={class:"dropdown"},r2=["data-value"],i2=Se({__name:"Dropdown",props:{listItems:{},simpleStyling:{type:Boolean},disabled:{type:Boolean},selectedKey:{}},emits:["handleSelect"],setup(e,{emit:t}){const n=L(null),s=L(null),o=L(null),r=t,i=e,a=L(0);vt(()=>{if(o.value=document.querySelector(".active"),document.addEventListener("click",f=>{const h=f.target,{classList:v}=h;v.contains("item")||v.contains("select-button")||v.contains("items")||u()}),document.addEventListener("keydown",f=>{f.key==="Escape"&&u()}),i.selectedKey){const f=i.listItems.findIndex(h=>h.key===i.selectedKey);f!==-1&&(a.value=f)}});const c=()=>{i.disabled||n.value&&n.value.classList.toggle("open")},l=f=>{if(!n.value||!s.value)return;const h=f.target;if(!h.classList.contains("item"))return;d(h),u();const v=h.dataset.value;r("handleSelect",v)},d=f=>{s.value&&(s.value.textContent=f.textContent,o.value&&o.value.classList.remove("active"),f.classList.add("active"),o.value=f)},u=()=>{n.value&&n.value.classList.remove("open")};return(f,h)=>(S(),U("div",o2,[_("button",{ref_key:"selectBtn",ref:s,onClick:c,class:ve(["select-button",{simple:f.simpleStyling,disabled:f.disabled}])},se(f.listItems[a.value].value),3),_("ul",{ref_key:"items",ref:n,class:"items",onClick:l},[(S(!0),U(Ee,null,ut(f.listItems,(v,g)=>(S(),U("li",{key:`item-${g}`,"data-value":v.key,class:ve(["item",{active:g===a.value}])},se(v.value),11,r2))),128))],512)]))}});const Qd=me(i2,[["__scopeId","data-v-206086dd"]]),a2=Se({__name:"FeedSourceSelect",props:{disabled:{type:Boolean}},emits:["showFeedNotice"],setup(e,{emit:t}){const n=e,s=t,o=dt(),r=xn(),i=Ye(),a=[{key:"network",value:"Network"},{key:"follows",value:"Follows"}],c=l=>{if(!i.isConnectedToRelay)return s("showFeedNotice","Please connect and login to load posts from people you follow.");if(!o.isValidNsecPresented()&&l==="follows")return s("showFeedNotice","Please login to load posts from people you follow.");s("showFeedNotice",""),r.setSelectedFeedSource(l)};return(l,d)=>(S(),Ie(Qd,{disabled:n.disabled,simpleStyling:!0,listItems:a,selectedKey:Z(r).selectedFeedSource,onHandleSelect:c},null,8,["disabled","selectedKey"]))}}),c2={class:"wrapper"},l2={class:"custom-checkbox"},u2=["checked"],d2=_("span",{class:"checkmark"},null,-1),f2=_("span",{class:"label-text",for:"show-feed-images"}," Show avatars ",-1),Xd=Se({__name:"ShowImagesCheckbox",setup(e){const t=fs(),n=()=>{t.updateShowImages(!t.showImages)};return(s,o)=>{const r=Ms("router-link");return S(),U("div",c2,[_("div",l2,[_("label",null,[_("input",{id:"show-feed-images",onChange:n,checked:Z(t).showImages,type:"checkbox"},null,40,u2),d2,f2])]),_("small",null,[Re(" ("),fe(r,{to:{path:"/help",hash:"#privacy"}},{default:ct(()=>[Re("Exposes your IP")]),_:1}),Re(") ")])])}}});const h2={class:"feed-header"},p2={key:0,class:"warning"},g2=Se({__name:"FeedHeader",props:{isDisabledSourceSelect:{type:Boolean}},setup(e){const t=e,n=L(""),s=o=>{n.value=o,setTimeout(()=>{n.value=""},5e3)};return(o,r)=>(S(),U(Ee,null,[_("div",h2,[fe(a2,{class:"dropdown",disabled:t.isDisabledSourceSelect,onShowFeedNotice:s},null,8,["disabled"]),fe(Xd)]),n.value.length?(S(),U("div",p2,se(n.value),1)):te("",!0)],64))}});const y2=me(g2,[["__scopeId","data-v-03f1c3ab"]]),v2="wss://nos.lol",_2=["wss://nos.lol","wss://relay.damus.io","wss://relay.snort.social","wss://relay.nostr.band","wss://eden.nostr.land"],kc=["wss://nos.lol","wss://relay.damus.io","wss://relay.nostr.band","wss://relay.snort.social","wss://relay.primal.net","wss://eden.nostr.land","wss://nostr.wine","wss://offchain.pub","wss://relay.nostr.bg","wss://relay.mostr.pub"],Tn=20,m2=e=>new Promise(t=>setTimeout(t,e)),w2=async e=>{let t;try{try{t=await ni.connect(e)}catch{await m2(500),t=await ni.connect(e)}}catch{let s=`WebSocket connection to "${e}" failed. You can try again `;throw navigator.onLine?s+="Check WebSocket address. Relay address should be a correct WebSocket URL. Maybe the relay is unavailable or you are offline.":s+="or check your internet connection.",new Error(s)}return t},b2=async e=>{const t=[],n=[];return e.length&&(await Promise.all(e.map(async o=>{const r=await vo(o.url);return{url:o.url,connected:r,type:o.type}}))).forEach(o=>{o.connected&&(t.push(o.url),o.type==="write"&&n.push(o.url))}),{userConnectedReadRelays:t,userConnectedWriteRelays:n}},E2=async(e,t,n)=>{const s={};let o=[];if(e.tags.length){o=e.tags.map(l=>l[1]);const r=await n.querySync(t,{kinds:[10002],authors:o}),i=new Set;r.forEach(l=>{l.tags.forEach(d=>{if(d[0]!=="r")return;const u=Gt.normalizeURL(d[1]);t.includes(u)||i.add(u)})});const c=(await Promise.all(Array.from(i).map(async l=>{const d=await vo(l,1e3);return{url:l,connected:d}}))).filter(l=>l.connected).map(l=>l.url);r.forEach(l=>{const d=[];l.tags.forEach(u=>{if(u[0]!=="r")return;const f=Gt.normalizeURL(u[1]);(c.includes(f)||t.includes(f))&&d.push(f)}),s[l.pubkey]=d})}return s},R2=e=>new Promise((t,n)=>{if(e.readyState===WebSocket.CLOSING||e.readyState===WebSocket.CLOSED){t(!0);return}e.onclose=function(){t(!0)},e.onerror=function(){n(!1)},e.close()}),oi=async e=>{try{const t=[];e.relays.forEach(n=>{n.connected&&t.push(R2(n.ws))}),await Promise.all(t)}catch(t){console.error("Error while closing websocket:",t)}},x2=e=>(st("data-v-fd8ac58c"),e=e(),ot(),e),S2={id:"feed"},k2={class:"columns"},C2={key:0,class:"connecting-notice"},$2={key:1,class:"connecting-notice"},P2={key:0,class:"new-events__imgs"},I2=["src"],A2=["src"],T2={class:"new-events__text"},L2=x2(()=>_("b",{class:"new-events__arrow"},"↑",-1)),U2={key:3,class:"loading-more"},B2=Se({__name:"Feed",props:{eventsLog:{}},setup(e){const t=Ye(),n=fs(),s=xn(),o=dt(),r=Ft(),i=Qo(),a=ye(()=>s.newEventsBadgeImageUrls[0]),c=ye(()=>s.newEventsBadgeImageUrls[1]),l=No(),d=En(),u=L(1),f=ye(()=>Math.ceil(s.paginationEventsIds.length/Tn)),h=ye(()=>l.path);let v=L([]);const g=r.pool,m=L(!1);qe(()=>l.path,()=>{u.value>1&&k(1)}),qe(()=>s.selectedFeedSource,async()=>{t.currentRelay.connected&&o.isValidNsecPresented()&&await w()}),qe(()=>s.isMountAfterLogin,()=>{s.isMountAfterLogin&&(s.setMountAfterLogin(!1),b())},{immediate:!0}),vt(()=>{f.value>1&&k(1),s.toRemountFeed&&(s.setToRemountFeed(!1),x())});const w=async()=>{await x()},x=async()=>{if(m.value=!0,s.newEventsBadgeUpdateInterval&&s.clearNewEventsBadgeUpdateInterval(),s.pool)try{await oi(s.pool),s.resetPool()}catch($){console.error("Error while closing websocket:",$)}s.setShowNewEventsBadge(!1),s.updateNewEventsToShow([]),s.updatePaginationEventsIds([]),s.updateEvents([]),await b()};async function b(){m.value=!0,s.setLoadingFeedSourceStatus(!0);const $=o.getPubkey();let T=t.connectedUserReadRelayUrls.length?t.connectedUserReadRelayUrls:[t.currentRelay.url],I={};const V=new Set;let z=[];if(s.isFollowsSource&&$.length){const A=await g.get(T,{kinds:[lt.FOLLOW_LIST],limit:1,authors:[$]});if(A){z=A.tags.map(F=>F[1]),I=await E2(A,T,g);for(const F of Object.values(I))F.forEach(W=>V.add(W))}}V.size&&(T=Array.from(V)),t.setConnectedFeedRelayUrls(T);let J={kinds:[1],limit:Tn};z.length&&(J.authors=z);let X=await H1(g,T,[J]);X=X.sort((A,F)=>F.created_at-A.created_at),await Mt(X,null,I,T,i,g,!0,A=>{s.pushToEvents(A),s.isLoadingFeedSource&&(s.setLoadingFeedSourceStatus(!1),s.setLoadingMoreStatus(!0)),s.pushToPaginationEventsIds(A.id)}),s.setLoadingMoreStatus(!1);let R={kinds:[1],limit:1};z.length&&(R.authors=z),await C(T,R),s.newEventsBadgeUpdateInterval=setInterval(P,3e3),m.value=!1}async function C($,T){var I;await((I=s.pool)==null?void 0:I.subscribeMany($,[T],{onevent(V){if(s.eventsId.includes(V.id))return;const z=kt.parse(V);z.reply||z.root||(v.value.push({id:V.id,pubkey:V.pubkey}),s.pushToNewEventsToShow({id:V.id,pubkey:V.pubkey}))},onclose(V){console.warn("Subscription closed",V)}}))}async function P(){var F,W;const $=t.connectedFeedRelaysUrls;if(!$.length)return;const T=s.newEventsToShow;if(T.length<2||!s.newEventsBadgeUpdateInterval)return;s.setNewEventsBadgeCount(T.length),s.setShowNewEventsBadge(!0);const I=T[T.length-1].pubkey,V=T[T.length-2].pubkey,z={kinds:[0],authors:[I],limit:1},J={kinds:[0],authors:[V],limit:1},X=await g.querySync($,z),H=await g.querySync($,J);if(!s.newEventsBadgeUpdateInterval||!((F=X[0])!=null&&F.content)||!((W=H[0])!=null&&W.content))return;const R=JSON.parse(X[0].content).picture,A=JSON.parse(H[0].content).picture;s.setNewEventsBadgeImageUrls([R,A])}const k=async $=>{if(s.isLoadingNewEvents)return;s.setLoadingNewEventsStatus(!0);const T=t.connectedFeedRelaysUrls;if(!T.length)return;const I=Tn,V=($-1)*I,z=V+I,X=s.paginationEventsIds.slice().reverse().slice(V,z);let R=(await g.querySync(T,{ids:X})).sort((F,W)=>W.created_at-F.created_at);await Mt(R,null,{},T,i,g,!0),s.updateEvents(R),s.setLoadingNewEventsStatus(!1),u.value=$},D=async()=>{if(s.isLoadingNewEvents)return;s.setLoadingNewEventsStatus(!0),s.setShowNewEventsBadge(!1);const $=t.connectedFeedRelaysUrls;if(!$.length)return;d.push({path:`${l.path}`});let T=s.newEventsToShow;s.updateNewEventsToShow(s.newEventsToShow.filter(R=>!T.includes(R)));const I=T.map(R=>R.id),V=Tn;s.updatePaginationEventsIds(s.paginationEventsIds.concat(I));const z=s.paginationEventsIds.slice(-V);let X=(await g.querySync($,{ids:z})).sort((R,A)=>A.created_at-R.created_at);await Mt(X,null,{},$,i,g,!0),s.updateEvents(X),s.setLoadingNewEventsStatus(!1),u.value=1};return($,T)=>(S(),U("div",S2,[fe(s2,{onLoadNewRelayEvents:D,newEvents:Z(v)},null,8,["newEvents"]),fe(y2,{isDisabledSourceSelect:m.value},null,8,["isDisabledSourceSelect"]),_("div",k2,[_("div",{class:ve(["events",{events_hidden:h.value==="/log"}])},[Z(s).isLoadingFeedSource?(S(),U("div",C2," Loading feed from "+se(Z(s).selectedFeedSource)+"... ",1)):te("",!0),Z(s).isLoadingNewEvents?(S(),U("div",$2," Loading new notes... ")):te("",!0),Z(s).showNewEventsBadge?(S(),U("div",{key:2,onClick:D,class:ve(["new-events",{"new-events_top-shifted":Z(s).isLoadingNewEvents}])},[Z(n).showImages&&Z(s).newEventsBadgeImageUrls.length?(S(),U("div",P2,[_("img",{class:"new-events__img",src:a.value,alt:"user's avatar"},null,8,I2),_("img",{class:"new-events__img",src:c.value,alt:"user's avatar"},null,8,A2)])):te("",!0),_("span",T2,se(Z(s).newEventsBadgeCount)+" new notes",1),L2],2)):te("",!0),fe(pb,{events:Z(s).events,pubKey:Z(o).getPubkey(),showImages:Z(n).showImages,currentReadRelays:Z(t).connectedFeedRelaysUrls,onToggleRawData:Z(s).toggleEventRawData},null,8,["events","pubKey","showImages","currentReadRelays","onToggleRawData"]),Z(s).isLoadingMore?(S(),U("div",U2,"Loading more posts...")):te("",!0),fe(Jd,{pagesCount:f.value,currentPage:u.value,onShowPage:k},null,8,["pagesCount","currentPage"])],2)])]))}});const Cc=me(B2,[["__scopeId","data-v-fd8ac58c"]]),N2=Si('<h3>Slightly Private App</h3><p><a href="https://nostr.com">nostr</a> is public, censorship-resistant social network. It&#39;s simple: <ol><li>Select a relay from the list, or specify a <a href="https://nostr.watch/" target="_blank">custom URL</a></li><li><em>Optionally</em>, set your private key, to create new messages</li></ol></p><p> Traditional social networks can suppress certain posts or users. In nostr, every message is signed by user&#39;s <em>private key</em> and broadcasted to <em>relays</em>. <strong>Messages are tamper-resistant</strong>: no one can edit them, or the signature will become invalid. <strong>Users can&#39;t be blocked</strong>: even if a relay blocks someone, it&#39;s always possible to switch to a different one, or create up a personal relay. </p><p> The app is available at <a href="http://nostr.spa">nostr.spa</a>. You can: <ul><li><em>Connect</em> and see relay&#39;s global feed.</li><li><em>Post</em> new messages to the relay.</li><li><em>Broadcast</em> a pre-signed message. No need to enter a private key.</li><li><em>Search</em> information about a user or an event.</li></ul></p>',4),M2=Si("<ul><li>No tracking from our end</li><li>Private keys are not sent anywhere. They are stored in RAM of your device</li><li>Relay will see your ip+browser after you click <em>Connect</em> button</li><li>GitHub will see ip+browser of anyone who&#39;s using the app, because it&#39;s hosted on GitHub Pages. They won&#39;t see any nostr-specific interactions you will make</li><li><em>Show avatars</em> feature will leak your ip+browser to random people on the internet. Since there are no centralized servers in nostr, every user can specify their own URL for avatar hosting. Meaning, users can control the hosting webservers and see logs</li><li><em>Remember me</em> feature will write private key you&#39;ve entered to browser&#39;s Local Storage, which is usually stored on your device&#39;s disk</li><li>VPN or TOR usage is advised, <em>as with any nostr client</em>, to prevent ip leakage</li></ul>",1),O2=Si('<h3>Open source</h3><p> The lightweight nostr client is built to showcase <a href="/noble/">noble</a> cryptography. Signing is done using <a target="_blank" href="https://github.com/paulmillr/noble-curves">noble-curves</a>, while <a target="_blank" href="https://github.com/paulmillr/scure-base">scure-base</a> is used for bech32, <a target="_blank" href="https://github.com/nbd-wtf/nostr-tools">nostr-tools</a> are used for general nostr utilities and Vue.js is utilized for UI. Check out <a target="_blank" href="https://github.com/paulmillr/paulmillr.github.io">the source code</a>. You are welcome to host the client on your personal website. </p>',2),$c=Se({__name:"Help",props:{showPrivacy:{}},setup(e){const t=No(),n=L(null);return vt(()=>{n.value&&t.hash=="#privacy"&&n.value.scrollIntoView()}),bi(()=>{n.value&&t.hash=="#privacy"&&n.value.scrollIntoView()}),(s,o)=>(S(),U(Ee,null,[N2,_("p",null,[_("h3",{id:"#privacy",ref_key:"privacyEl",ref:n},"Privacy policy",512),M2]),O2],64))}}),bt=as({value:1,update(e){this.value=e}}),F2=_t("user-notes",()=>{const e=L([]),t=L([]);function n(r){e.value=r}function s(r){t.value=r}function o(r){const i=e.value.find(a=>a.id===r);i&&(i.showRawData=!i.showRawData)}return{notes:e,allNotesIds:t,updateNotes:n,updateIds:s,toggleRawData:o}}),Xo=_t("ownProfile",()=>{const e=L({}),t=L(null),n=L(null),s=ye(()=>!n.value||!t.value?"":Vd(n.value,t.value.pubkey)),o=ye(()=>t.value?t.value.pubkey:"");function r(a){e.value=a}function i(a){t.value=a,n.value=JSON.parse(a.content)}return{contactsEvent:e,updateContactsEvent:r,updateMeta:i,username:s,pubkey:o}}),er=e=>(st("data-v-7d13b372"),e=e(),ot(),e),H2={class:"event"},j2={key:0,class:"event__content"},V2=er(()=>_("hr",null,null,-1)),D2={class:"event__code-block"},W2={class:"event__code-title"},q2=er(()=>_("b",null,"Author: ",-1)),K2={class:"content-col_code"},z2={class:"event__code"},G2={class:"event__code-block"},Z2={class:"event__code-title"},J2=er(()=>_("b",null,"Meta event id: ",-1)),Y2={class:"content-col_code"},Q2={class:"event__code"},X2=er(()=>_("div",{class:"header-col"},[_("b",null,"Created: ")],-1)),eE={class:"content-col_code"},tE={class:"event__code"},nE={class:"event-footer__signature-text"},sE=Se({__name:"UserEvent",props:{event:{},author:{}},setup(e){const t=e,n=L(!1),s=L(!1),o=L(!1),r=L(""),i=L(""),a=L(""),c=L(0),l=L(!1);Eh(()=>{const{event:u}=t;r.value=u.id,i.value=u.sig,a.value=u.pubkey,c.value=u.created_at}),vt(()=>{Object.keys(t.event).length!==0&&(l.value=Fn(t.event))});const d=()=>{n.value=!n.value};return(u,f)=>(S(),U("div",H2,[n.value?te("",!0):(S(),U("div",j2,[Lh(u.$slots,"default",{},()=>[Re("No content for event")],!0),V2,_("div",D2,[_("div",W2,[q2,_("button",{class:"event__code-btn",onClick:f[0]||(f[0]=h=>o.value=!o.value)},se(o.value?"npub":"hex"),1)]),_("div",K2,[_("code",z2,se(o.value?a.value:Z(Me).npubEncode(a.value)),1)])]),_("div",G2,[_("div",Z2,[J2,_("button",{class:"event__code-btn",onClick:f[1]||(f[1]=h=>s.value=!s.value)},se(s.value?"nevent":"hex"),1)]),_("div",Y2,[_("code",Q2,se(s.value?r.value:Z(Me).neventEncode({id:r.value})),1)])]),_("div",null,[X2,_("div",eE,[_("code",tE,se(Z(Md)(c.value)),1)])])])),n.value?(S(),Ie(Wd,{key:1,isUserEvent:!0,event:u.event,authorEvent:u.event},null,8,["event","authorEvent"])):te("",!0),_("div",{class:ve(["event-footer",{"event-footer_flex-end":!n.value}])},[n.value?(S(),U("div",{key:0,class:ve(["event-footer__signature",{"event-footer__signature_invalid":!l.value}])},[l.value?(S(),Ie(Kd,{key:0})):te("",!0),l.value?te("",!0):(S(),Ie(zd,{key:1})),_("span",nE,se(l.value?"Signature is valid":"Invalid signature"),1)],2)):te("",!0),_("div",null,[_("span",{class:"event-footer-code",onClick:d},"{...}")])],2)]))}});const oE=me(sE,[["__scopeId","data-v-7d13b372"]]),ef=2*24*60*60,rE=()=>crypto.getRandomValues(new Uint32Array(1))[0]/(4294967295+1),tr=()=>Math.round(Date.now()/1e3),tf=()=>Math.round(tr()-rE()*ef),nf=(e,t)=>Jo.v2.utils.getConversationKey(Yo(e),t),sf=(e,t,n)=>Jo.v2.encrypt(JSON.stringify(e),nf(t,n)),Pc=(e,t)=>JSON.parse(Jo.v2.decrypt(e.content,nf(t,e.pubkey))),iE=(e,t)=>{const n={kind:14,created_at:tr(),content:"",tags:[],...e,pubkey:ju(t)};return n.id=Cs(n),n},aE=(e,t,n)=>rt({kind:13,content:sf(e,t,n),created_at:tf(),tags:[]},t),cE=(e,t)=>{const n=Jv();return rt({kind:1059,content:sf(e,n,t),created_at:tf(),tags:[["p",t]]},n)},lE="Please login to follow the user.",uE="Something went wrong, please ensure that your write relays are online.",dE=Se({__name:"FollowBtn",props:{isFollowed:{type:Boolean},pubkeyToFollow:{}},emits:["toggleFollow","handleFollowError"],setup(e,{emit:t}){const n=t,s=dt(),o=Ye(),r=Xo(),a=Ft().pool,c=e,l=async()=>{if(!s.getPubkey()){n("handleFollowError",lE);return}const{isFollowed:f}=c,h=r.contactsEvent;let v=(h==null?void 0:h.tags)||[];f?v=v.filter(b=>b[0]==="p"&&b[1]!==c.pubkeyToFollow):v.push(["p",c.pubkeyToFollow]);const g=d(v);if(!g)return;n("toggleFollow");const m=o.connectedUserWriteRelaysUrls;if((await Jn(m,a,g)).every(b=>b.success===!1)){n("toggleFollow"),n("handleFollowError",uE);return}r.updateContactsEvent(g)},d=u=>{const f=s.getPrivkeyBytes();return f?rt({kind:lt.FOLLOW_LIST,created_at:tr(),tags:u,content:""},f):null};return(u,f)=>(S(),U("span",{onClick:l,class:ve(["button",{outline:u.isFollowed}])},se(u.isFollowed?"unfollow":"follow"),3))}});const fE=me(dE,[["__scopeId","data-v-8646c4c8"]]),hE={},pE={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-download",viewBox:"0 0 16 16"},gE=_("path",{d:"M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"},null,-1),yE=_("path",{d:"M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"},null,-1),vE=[gE,yE];function _E(e,t){return S(),U("svg",pE,vE)}const mE=me(hE,[["render",_E]]),of=e=>(st("data-v-9313bf91"),e=e(),ot(),e),wE={key:0,class:"loading-notice"},bE={class:"user"},EE={key:0,class:"user__avatar-wrapper"},RE=["src"],xE={class:"user__info"},SE={class:"user__info__content"},kE={class:"user__nickname-wrapper"},CE={class:"user__nickname"},$E={class:"user-action-error warning"},PE={class:"user__name"},IE={key:0,class:"user__nip05"},AE=["href"],TE=of(()=>_("strong",null,"nip05",-1)),LE={key:1,class:"user__contacts"},UE={class:"user__contacts-col user__following-cnt"},BE={class:"user__contacts-col user__followers-cnt"},NE={key:0},ME={key:1,class:"user__contacts-download-icon"},OE=of(()=>_("span",{class:"user__contacts-followers-word"}," Followers ",-1)),FE={class:"user__desc"},HE={key:2},jE={key:3,id:"user-posts"},VE={key:0},DE={key:1},WE={key:5,class:"not-found"},qE={class:"not-found__desc"},KE={key:0},zE={key:1},GE=Se({__name:"User",setup(e){const n=Ft().pool,s=us(),o=F2(),r=ds(),i=fs(),a=dt(),c=Ye(),l=Qo(),d=Xo(),u=L({}),f=L({}),h=L(!1);L("");const v=L(!1),g=L(""),m=L(!1),w=L(""),x=L(!1),b=L(!1),C=L(!1),P=L(!1),k=L(!1),D=L(!1),$=L(""),T=L(!1),I=L(!0),V=L(1),z=ye(()=>Math.ceil(o.allNotesIds.length/Tn)),J=En(),X=No(),H=p=>{const[y,E]=p.split("@");return`https://${E}/.well-known/nostr.json?name=${y}`},R=L([]);vt(()=>{var p,y,E,M;if((y=(p=X.params)==null?void 0:p.id)!=null&&y.length&&!c.currentRelay.connected){s.updateNpubInput(X.params.id),s.updateCachedUrl(X.params.id),c.currentRelay.connected||(C.value=!0),P.value=!0,W();return}if(r.isRoutingUser&&s.npubInput.length){s.updateCachedUrl(s.npubInput),r.updateRoutingStatus(!1),W();return}if(!s.npubInput.length&&((M=(E=X.params)==null?void 0:E.id)!=null&&M.length)){s.updateNpubInput(X.params.id),s.updateCachedUrl(X.params.id),r.updateRoutingStatus(!1),W();return}}),Ei(()=>{F(),r.isSearchUsed||s.updateNpubInput(""),r.updateSearchStatus(!1)}),qe(()=>X.params,()=>{r.isRoutingUser&&(s.updateCachedUrl(s.npubInput),r.updateRoutingStatus(!1),W())}),qe(()=>X.redirectedFrom,()=>{s.updateNpubInput(X.params.id),s.updateCachedUrl(X.params.id),F()}),qe(()=>c.isConnectingToReadWriteRelays,p=>{p&&!C.value&&F()}),qe(()=>c.isConnectedToReadWriteRelays,p=>{p&&!C.value&&W()});const A=async p=>{const y=R.value;if(!y.length)return;const E=Tn,M=(p-1)*E,O=M+E,q=o.allNotesIds.slice(M,O),Y=await n.querySync(y,{ids:q});await de(Y,y),o.updateNotes(Y),V.value=p},F=()=>{u.value={},f.value={},o.updateNotes([]),o.updateIds([]),k.value=!1,D.value=!1,$.value=""},W=async(p=!1)=>{bt.update(bt.value+1);const y=bt.value,E=s.npubInput;let M=!1;if(T.value=!1,_o(E))g.value=E,M=!0;else try{const{data:ae,type:ce}=si(E);T.value=ce==="note",g.value=ae.toString()}catch(ae){s.setError(ae.message);return}if(F(),p&&(x.value=!0),y!==bt.value)return;const O=p?kc:c.connectedUserReadWriteUrlsWithSelectedRelay;if(!O.length){P.value=!0;return}s.error.length&&s.setError(""),p||(m.value=!0);let q=[];if(T.value||M){const ae=g.value;if(q=await n.querySync(O,{kinds:[1],ids:[ae]}),y!==bt.value)return;if(q.length){const ce=q[0];g.value=ce.pubkey,T.value=ce.kind===1}}const Y=await n.get(O,{kinds:[0],limit:1,authors:[g.value]});if(y!==bt.value)return;if(!Y){p?(x.value=!1,w.value="User or event was not found on listed relays."):(m.value=!1,v.value=!0);return}l.addMeta(Y),R.value=O;const G=[g.value],Q=a.getPubkey();Q.length&&Q!==g.value&&G.push(Q);let K=await n.querySync(O,{kinds:[3],authors:G});if(y!==bt.value)return;K=Ad(K);const ie=K.find(ae=>ae.pubkey===g.value);if(Q!==g.value){const ae=K.find(ce=>ce.pubkey===Q);ae&&(k.value=ae.tags.some(ce=>ce[0]==="p"&&ce[1]===g.value)||!1,d.updateContactsEvent(ae)),D.value=!0}if(u.value=Y,f.value=JSON.parse(Y.content),f.value.followingCount=(ie==null?void 0:ie.tags.length)||0,p?(w.value="",x.value=!1,P.value=!1):m.value=!1,h.value=!1,v.value=!1,ee(E,T.value),b.value=!0,Te(y),!T.value)try{const ae=await oe(O,y);if(y!==bt.value)return;q=ae.viewNotes,o.updateIds(ae.allNotes.map(ce=>ce.id)),V.value=1}catch{return}if(T.value){const ae=q[0];if(await re(q[0],O),y!==bt.value)return;o.updateIds([ae.id])}o.updateNotes(q),b.value=!1},ee=(p,y)=>{y?J.push({path:`/event/${p}`}):J.push({path:`/user/${p}`}),s.updateCachedUrl(p)},oe=async(p,y=0)=>{let E=await n.querySync(p,{kinds:[1],authors:[g.value]});if(y&&y!==bt.value)throw new Error("Operation was canceled");E=E.filter(q=>!F1(q)),E=E.sort((q,Y)=>Y.created_at-q.created_at);const M=[...E],O=E.slice(0,Tn);return await de(O,p),{viewNotes:O,allNotes:M}},re=async(p,y)=>{const E=kt.parse(p),M=E.reply||E.root;if(M){I.value=!1;const O=await jd(M.id,y,n);await le([p],O,y)}else await de([p],y)},de=async(p,y)=>{await Mt(p,null,{},y,l,n,!0)},le=async(p,y,E)=>{await Mt(p,y,{},E,l,n,!1)},Te=async(p=0)=>{const y=f.value.nip05,E=u.value.pubkey;if(!(!y||!E))try{const M=await ke(y,E);if(p&&p!==bt.value)return;h.value=M}catch{console.log("Failed to check nip05")}},ke=async(p,y)=>{const E=await ad.queryProfile(p);return y===(E==null?void 0:E.pubkey)},j=()=>{W(!0)},B=async()=>{const p=new Set;f.value.followersCount=0;const y=n.subscribeMany(R.value,[{"#p":[g.value],kinds:[3]}],{onevent(E){p.has(E.pubkey)||(p.add(E.pubkey),f.value.followersCount=f.value.followersCount+1)},oneose(){y.close()}})},N=p=>{o.toggleRawData(p)},ne=()=>{k.value=!k.value},ue=p=>{$.value=p,setTimeout(()=>{$.value=""},1e4)},he=p=>{const{username:y,name:E,display_name:M}=p;return(y!=null&&y.length||E!=null&&E.length)&&M||""};return(p,y)=>(S(),U(Ee,null,[m.value?(S(),U("div",wE,"Loading profile info...")):te("",!0),u.value.id?(S(),Ie(oE,{author:f.value,event:u.value,key:u.value.id},{default:ct(()=>[_("div",bE,[Z(i).showImages?(S(),U("div",EE,[_("img",{alt:"user's avatar",class:"user__avatar",src:f.value.picture},null,8,RE)])):te("",!0),_("div",xE,[_("div",SE,[_("div",kE,[_("span",CE,se(Z(Vd)(f.value,g.value)),1),D.value?(S(),Ie(fE,{key:0,pubkeyToFollow:g.value,isFollowed:k.value,onToggleFollow:ne,onHandleFollowError:ue},null,8,["pubkeyToFollow","isFollowed"])):te("",!0)]),_("div",$E,se($.value),1),_("div",PE,se(he(f.value)),1),h.value?(S(),U("div",IE,[_("a",{target:"_blank",href:H(f.value.nip05)},[TE,Re(": "+se(f.value.nip05),1)],8,AE)])):te("",!0),f.value.followingCount>=0?(S(),U("div",LE,[_("span",UE,[_("b",null,se(f.value.followingCount),1),Re(" Following ")]),_("span",BE,[f.value.followersCount?(S(),U("b",NE,se(f.value.followersCount),1)):(S(),U("span",ME,[fe(mE,{onClick:B})])),OE])])):te("",!0)])])]),_("div",FE,se(f.value.about||""),1)]),_:1},8,["author","event"])):te("",!0),b.value?(S(),U("div",HE,"Loading notes...")):te("",!0),Z(o).notes.length>0&&!b.value?(S(),U("h3",jE,[T.value?(S(),U("span",VE,"Event info")):(S(),U("span",DE,"User notes"))])):te("",!0),(S(!0),U(Ee,null,ut(Z(o).notes,(E,M)=>(S(),Ie(Zd,{key:E.id,hasReplyBtn:!0,showRootReplies:I.value,currentReadRelays:R.value,index:M,onToggleRawData:N,event:E},null,8,["showRootReplies","currentReadRelays","index","event"]))),128)),!b.value&&!m.value?(S(),Ie(Jd,{key:4,pagesCount:z.value,currentPage:V.value,onShowPage:A},null,8,["pagesCount","currentPage"])):te("",!0),v.value||P.value?(S(),U("div",WE,[_("div",qE,[v.value?(S(),U("span",KE," Data was not found on selected relay. Please try to connect to another one or you can try to load info from the list of popular relays. ")):te("",!0),P.value?(S(),U("span",zE,"Please connect first or search in the list of popular relays.")):te("",!0)]),_("div",null,[_("button",{onClick:j,class:"fallback-search-btn"}," Search in the listed relays "),_("div",{class:ve(["not-found__status",{warning:w.value.length}])},se(w.value)+" "+se(x.value?"Searching...":""),3),_("ul",null,[(S(!0),U(Ee,null,ut(Z(kc),E=>(S(),U("li",null,se(E),1))),256))])])])):te("",!0)],64))}});const Ic=me(GE,[["__scopeId","data-v-9313bf91"]]),ZE={},JE={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-trash",viewBox:"0 0 16 16"},YE=_("path",{d:"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"},null,-1),QE=_("path",{d:"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"},null,-1),XE=[YE,QE];function eR(e,t){return S(),U("svg",JE,XE)}const tR=me(ZE,[["render",eR]]),mt=e=>(st("data-v-df6b991a"),e=e(),ot(),e),nR=mt(()=>_("h4",null,"Images:",-1)),sR={class:"show-images"},oR=mt(()=>_("h4",null,"Your relays:",-1)),rR={class:"error"},iR={class:"warning"},aR={class:"relays"},cR={class:"actions"},lR=["onChange","id","name","checked"],uR=["for"],dR=mt(()=>_("span",{class:"actions__delimiter"}," | ",-1)),fR=["onClick"],hR=mt(()=>_("span",{class:"actions__remove-label"},"remove",-1)),pR={key:0},gR={key:1},yR={key:2},vR=mt(()=>_("h4",null,"Add relay:",-1)),_R={class:"add-relay"},mR={class:"error"},wR=mt(()=>_("h4",null,"Your Keys:",-1)),bR={class:"keys"},ER={class:"key-block"},RR=mt(()=>_("div",null,"Public key:",-1)),xR=mt(()=>_("div",{class:"key-block__desc"},[_("small",null," Public key identifies your Nostr account. Feel free to share it with others. ")],-1)),SR={key:0,class:"key-block__code"},kR={key:1},CR={class:"key-block"},$R=mt(()=>_("div",null,"Private key:",-1)),PR=mt(()=>_("div",{class:"key-block__desc"},[_("small",null,[Re(" Private key fully controls your Nostr account and used to cryptographically sign your messages. "),_("b",null,"Do not share your private key with anyone and keep it secure.")])],-1)),IR={key:0,class:"key-block__code"},AR={key:1},TR={key:3,class:"logout-block"},LR={key:0},UR=mt(()=>_("i",{class:"bi bi-door-closed"},null,-1)),BR={key:1},NR=mt(()=>_("i",{class:"bi bi-door-closed"},null,-1)),Vn="Updating relays error. Please reload the page and try again or write us about the issue.",MR=Se({__name:"Settings",emits:["relayConnect","relayDisconnect","clearAppState"],setup(e,{emit:t}){const n=t,s=Ft(),o=dt(),r=xn(),i=fs(),a=s.pool,c=Ye(),l=L(""),d=L(""),u=L(""),f=L(""),h=D=>{if(u.value="",!(o.nsec?o.nsec.trim():"").length){u.value="Please provide your private key.";return}let T,I;try{if(T=o.getPrivkeyBytes(),!T)throw new Error;if(I=o.getPubkey(),!I.length)throw new Error}catch{u.value="Invalid private key. Please check it and try again.";return}const V={kind:10002,pubkey:I,created_at:Math.floor(Date.now()/1e3),content:"",tags:D};return rt(V,T)},v=async(D,$)=>{u.value="";const T=D.target.checked;T?c.addWriteRelay($):c.removeWriteRelay($);const I=c.nip65Tags,V=h(I);if(!V){u.value=Vn;return}if(!(await Jn(c.allRelaysUrlsWithSelectedRelay,a,V)).some(X=>X.success)){u.value=Vn;return}r.setToRemountFeed(!0),T?c.addConnectedUserWriteRelay($):c.removeConnectedUserWriteRelay($)},g=async D=>{u.value="",c.removeUserRelay(D);const $=c.nip65Tags,T=h($);if(!T){u.value=Vn;return}(await Jn(c.allRelaysUrlsWithSelectedRelay,a,T)).some(z=>z.success)||(u.value=Vn),r.setToRemountFeed(!0)},m=async()=>{let D="";u.value="",d.value="";try{D=Gt.normalizeURL(l.value)}catch{d.value="Invalid relay url.";return}c.addUserRelay(D),l.value="";const $=c.nip65Tags,T=h($);if(!T){u.value=Vn;return}if(!(await Jn(c.allRelaysUrlsWithSelectedRelay,a,T)).some(z=>z.success)){u.value=Vn,c.removeUserRelay(D);return}r.setToRemountFeed(!0),c.addConnectedUserReadRelay(D)},w=()=>{i.updateShowImages(!i.showImages)},x=()=>{if(!o.isValidNsecPresented())return;const D=o.getPubkey();navigator.clipboard.writeText(Me.npubEncode(D))},b=()=>{o.isValidNsecPresented()&&navigator.clipboard.writeText(o.getPubkey())},C=()=>{o.isValidNsecPresented()&&navigator.clipboard.writeText(o.getPrivkey())},P=()=>{o.isValidNsecPresented()&&navigator.clipboard.writeText(o.getPrivkeyHex())},k=()=>{n("clearAppState")};return(D,$)=>(S(),U(Ee,null,[nR,_("div",sR,[fe(Xd,{showImages:Z(i).showImages,onToggleImages:w},null,8,["showImages"])]),oR,_("div",rR,se(u.value),1),_("div",iR,se(f.value),1),_("ul",aR,[(S(!0),U(Ee,null,ut(Z(c).userReadWriteRelays,(T,I)=>(S(),U("li",{class:"relay",key:I},[Re(se(T.url)+" ",1),_("div",cR,[_("input",{onChange:V=>v(V,T.url),class:"actions__checkbox",type:"checkbox",id:`write-${I}`,name:`write-${I}`,checked:T.type==="write"},null,40,lR),_("label",{class:"actions__label",for:`write-${I}`}," publish to relay",8,uR),dR,_("span",{onClick:()=>g(T.url),class:"actions__remove"},[fe(tR,{class:"trash-icon"}),hR],8,fR)])]))),128))]),Z(c).isConnectedToRelay&&Z(o).isValidNsecPresented()&&!Z(c).userReadWriteRelays.length?(S(),U("div",pR,[Re(" The list with your relays was not found on "),_("b",null,se(Z(c).currentRelay.url),1)])):te("",!0),!Z(c).isConnectedToRelay||!Z(o).isValidNsecPresented()?(S(),U("div",gR," Please login to see and edit the list of your relays. ")):te("",!0),Z(c).isConnectedToRelay&&Z(o).isValidNsecPresented()?(S(),U("div",yR,[vR,_("div",_R,[qt(_("input",{"onUpdate:modelValue":$[0]||($[0]=T=>l.value=T),class:"add-relay__input",type:"text",placeholder:"[wss://]relay.url"},null,512),[[Kt,l.value]]),_("button",{onClick:m,class:"add-relay__btn"},"Add")]),_("div",mR,se(d.value),1)])):te("",!0),wR,_("div",bR,[_("div",ER,[RR,xR,_("div",null,[Re(" 🔑  "),Z(o).isValidNsecPresented()?(S(),U("code",SR,se(Z(Me).npubEncode(Z(o).getPubkey())),1)):(S(),U("span",kR,"Please login to see your public key."))]),_("div",{class:"key-block__btns"},[_("button",{class:"copy-btn",onClick:x},"Copy pubkey"),_("button",{class:"copy-btn",onClick:b},"Copy hex")])]),_("div",CR,[$R,PR,_("div",null,[Re(" 🔐  "),Z(o).isValidNsecPresented()?(S(),U("code",IR," *************************************************************** ")):(S(),U("span",AR,"Please login to get your private key."))]),_("div",{class:"key-block__btns"},[_("button",{class:"copy-btn",onClick:C},"Copy privkey"),_("button",{class:"copy-btn",onClick:P},"Copy hex")])])]),Z(c).isConnectedToRelay?(S(),U("div",TR,[_("button",{class:"logout-btn",onClick:k},[Z(o).isValidNsecPresented()?(S(),U("span",LR,[Re(" Log Out "),UR])):(S(),U("span",BR,[Re("Disconnect "),NR]))])])):te("",!0)],64))}});const OR=me(MR,[["__scopeId","data-v-df6b991a"]]);function FR(e,t,n,s){if(typeof e.setBigUint64=="function")return e.setBigUint64(t,n,s);const o=BigInt(32),r=BigInt(4294967295),i=Number(n>>o&r),a=Number(n&r),c=s?4:0,l=s?0:4;e.setUint32(t+c,i,s),e.setUint32(t+l,a,s)}const HR=(e,t,n)=>e&t^~e&n,jR=(e,t,n)=>e&t^e&n^t&n;class VR extends Vm{constructor(t,n,s,o){super(),this.blockLen=t,this.outputLen=n,this.padOffset=s,this.isLE=o,this.finished=!1,this.length=0,this.pos=0,this.destroyed=!1,this.buffer=new Uint8Array(t),this.view=Sr(this.buffer)}update(t){bc(this);const{view:n,buffer:s,blockLen:o}=this;t=qd(t);const r=t.length;for(let i=0;i<r;){const a=Math.min(o-this.pos,r-i);if(a===o){const c=Sr(t);for(;o<=r-i;i+=o)this.process(c,i);continue}s.set(t.subarray(i,i+a),this.pos),this.pos+=a,i+=a,this.pos===o&&(this.process(n,0),this.pos=0)}return this.length+=t.length,this.roundClean(),this}digestInto(t){bc(this),Fm(t,this),this.finished=!0;const{buffer:n,view:s,blockLen:o,isLE:r}=this;let{pos:i}=this;n[i++]=128,this.buffer.subarray(i).fill(0),this.padOffset>o-i&&(this.process(s,0),i=0);for(let u=i;u<o;u++)n[u]=0;FR(s,o-8,BigInt(this.length*8),r),this.process(s,0);const a=Sr(t),c=this.outputLen;if(c%4)throw new Error("_sha2: outputLen should be aligned to 32bit");const l=c/4,d=this.get();if(l>d.length)throw new Error("_sha2: outputLen bigger than state");for(let u=0;u<l;u++)a.setUint32(4*u,d[u],r)}digest(){const{buffer:t,outputLen:n}=this;this.digestInto(t);const s=t.slice(0,n);return this.destroy(),s}_cloneInto(t){t||(t=new this.constructor),t.set(...this.get());const{blockLen:n,buffer:s,length:o,finished:r,destroyed:i,pos:a}=this;return t.length=o,t.pos=a,t.finished=r,t.destroyed=i,o%n&&t.buffer.set(s),t}}const DR=new Uint32Array([1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298]),rn=new Uint32Array([1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225]),an=new Uint32Array(64);class WR extends VR{constructor(){super(64,32,8,!1),this.A=rn[0]|0,this.B=rn[1]|0,this.C=rn[2]|0,this.D=rn[3]|0,this.E=rn[4]|0,this.F=rn[5]|0,this.G=rn[6]|0,this.H=rn[7]|0}get(){const{A:t,B:n,C:s,D:o,E:r,F:i,G:a,H:c}=this;return[t,n,s,o,r,i,a,c]}set(t,n,s,o,r,i,a,c){this.A=t|0,this.B=n|0,this.C=s|0,this.D=o|0,this.E=r|0,this.F=i|0,this.G=a|0,this.H=c|0}process(t,n){for(let u=0;u<16;u++,n+=4)an[u]=t.getUint32(n,!1);for(let u=16;u<64;u++){const f=an[u-15],h=an[u-2],v=At(f,7)^At(f,18)^f>>>3,g=At(h,17)^At(h,19)^h>>>10;an[u]=g+an[u-7]+v+an[u-16]|0}let{A:s,B:o,C:r,D:i,E:a,F:c,G:l,H:d}=this;for(let u=0;u<64;u++){const f=At(a,6)^At(a,11)^At(a,25),h=d+f+HR(a,c,l)+DR[u]+an[u]|0,g=(At(s,2)^At(s,13)^At(s,22))+jR(s,o,r)|0;d=l,l=c,c=a,a=i+h|0,i=r,r=o,o=s,s=h+g|0}s=s+this.A|0,o=o+this.B|0,r=r+this.C|0,i=i+this.D|0,a=a+this.E|0,c=c+this.F|0,l=l+this.G|0,d=d+this.H|0,this.set(s,o,r,i,a,c,l,d)}roundClean(){an.fill(0)}destroy(){this.set(0,0,0,0,0,0,0,0),this.buffer.fill(0)}}const rf=Dm(()=>new WR),qR=async(e,t,n,s)=>{const o=n||new Ns,r=await KR(e.messages,t,o,s);return e.title=r,e},KR=async(e,t,n,s)=>{const o=e[0].event,{pubkey:r,tags:i}=o,a=i.filter(h=>h[0]==="p").map(h=>h[1]),c=[r,...a],l=new Set(c);if(l.size>2)return`group of ${l.size} events`;let d={};if(l.size===1)d={kinds:[0],authors:[r]};else if(l.size===2){const h=c.filter(v=>v!==t)[0];d={kinds:[0],authors:[h]}}const u=await n.get(s,d),f=JSON.parse((u==null?void 0:u.content)||"{}");return f.display_name?f.display_name:f.name?f.name:f.username?f.username:Me.npubEncode(r).slice(0,10)+"..."},zR=async(e,t,n)=>{let s={};s={kinds:[0],authors:[e]};const o=await t.get(n,s),r=JSON.parse((o==null?void 0:o.content)||"{}");return r.display_name?r.display_name:r.name?r.name:r.username?r.username:Me.npubEncode(e).slice(0,10)+"..."},Ac=e=>{const n=e.tags.filter(s=>s[0]==="p").map(s=>s[1]).sort().join("");return Yo(rf(n))},GR=e=>{const t=e.sort().join("");return Yo(rf(t))},Tc=(e,t)=>{let n,s;try{n=Pc(e,t),s=Pc(n,t)}catch{return null}return n.pubkey!==s.pubkey?null:s},Lc=e=>({event:e,isPublished:!0}),Uc=e=>e.tags.filter(n=>(n[0]==="r"||n[0]==="relay")&&n[1]&&n[1].length).map(n=>n[1]).length>2,af=_t("chat",()=>{const e=L(new Set);function t(n){e.value.add(n)}return{ownRumors:e,addOwnRumor:t}}),ZR={key:0,class:"no-chats"},JR=["onClick"],YR=Se({__name:"ChatsList",props:{chats:{},currentChatId:{},showChatsList:{type:Boolean},handleSelectChat:{type:Function}},setup(e){return(t,n)=>(S(),U("div",{class:ve(["chats__list",{"chats__list_mobile-hidden":!t.showChatsList}])},[t.chats.length?te("",!0):(S(),U("div",ZR," No chats yet... ")),(S(!0),U(Ee,null,ut(t.chats,s=>(S(),U("div",{key:s.id,class:ve(["chats__list-item",{active:t.currentChatId===s.id}]),onClick:o=>t.handleSelectChat(s.id)},[_("strong",null,se(s.title),1)],10,JR))),128))],2))}});const QR=me(YR,[["__scopeId","data-v-8b709582"]]),XR={class:"message-date"},ex=Se({__name:"ChatMessagesList",props:{messages:{},userPubkey:{}},setup(e){return(t,n)=>(S(!0),U(Ee,null,ut(t.messages,s=>(S(),U("div",{class:ve(["message-line",{own:s.event.pubkey===t.userPubkey}])},[_("div",{class:ve(["message",{own:s.event.pubkey===t.userPubkey}])},[_("div",null,se(s.event.content),1)],2),_("div",XR,se(s.isPublished?Z(O1)(s.event.created_at):"sending..."),1)],2))),256))}});const tx=me(ex,[["__scopeId","data-v-a4799345"]]),nx=e=>(st("data-v-05389505"),e=e(),ot(),e),sx={class:"chats__text-field"},ox=nx(()=>_("button",{type:"submit",class:"chats__send-btn"},"Send",-1)),rx=Se({__name:"ChatMessageForm",props:{roomTags:{},recipientsPubkeys:{},userPubkey:{}},emits:["preSendMessage"],setup(e,{emit:t}){const n=t,s=L(""),o=dt(),r=e,i=()=>{const a=s.value;if(!a.length)return;const c=o.getPrivkeyBytes();if(!c)return;const l=r.roomTags;if(!l.length)return;const d=r.recipientsPubkeys;if(!d.length)return;const u={content:a,tags:l},f=[];let h=null;d.forEach(v=>{const g=iE(u,c),m=aE(g,c,v),w=cE(m,v);f.push(w),v===r.userPubkey&&(h=g)}),s.value="",n("preSendMessage",h,f)};return(a,c)=>(S(),U("form",{onSubmit:Bn(i,["prevent"])},[_("div",sx,[qt(_("input",{"onUpdate:modelValue":c[0]||(c[0]=l=>s.value=l),class:"chats__input",type:"text"},null,512),[[Kt,s.value,void 0,{trim:!0}]]),ox])],32))}});const ix=me(rx,[["__scopeId","data-v-05389505"]]),ax={},cx={xmlns:"http://www.w3.org/2000/svg",width:"16",height:"16",fill:"currentColor",class:"bi bi-chevron-left",viewBox:"0 0 16 16"},lx=_("path",{"fill-rule":"evenodd",d:"M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"},null,-1),ux=[lx];function dx(e,t){return S(),U("svg",cx,ux)}const fx=me(ax,[["render",dx]]),{normalizeURL:hx}=Gt,px=_t("chatsRelaysCache",()=>{const e=L({}),t=L(!1);function n(i){i.forEach(a=>{const{pubkey:c,tags:l}=a;e.value.hasOwnProperty(c)||(e.value[c]={relays:new Set,cache_created:Date.now()}),l.forEach(d=>{if((d[0]==="r"||d[0]==="relay")&&d[1]&&d[1].length){const u=hx(d[1]);e.value[c].relays.add(u)}})})}function s(i){const a=new Set;return i.forEach(c=>{r(c).forEach(d=>a.add(d))}),a}function o(i){return e.value.hasOwnProperty(i)}function r(i){return o(i)?e.value[i].relays:new Set}return{metas:e,hasMeta:o,getMetaRelays:r,addMetas:n,getRelaysByPubkeys:s,isLoadingRelays:t}}),gx=e=>(st("data-v-e5e92b02"),e=e(),ot(),e),yx={class:"chat-header"},vx=gx(()=>_("span",null,"Chats",-1)),_x={class:"chat-title"},mx={class:"chats__chat-footer"},wx=Se({__name:"ChatsConversation",props:{chat:{},userPubkey:{},showChatsList:{type:Boolean}},emits:["setMessageStatusToPublished","handleDeselectChat"],setup(e,{emit:t}){const n=t,s=af(),o=px(),r=Ye(),a=Ft().pool,c=L({}),l=L({}),d=e,u=L(null),f=ye(()=>{var b,C,P;return(b=d==null?void 0:d.chat)!=null&&b.messages.length?(C=d.chat.messages[d.chat.messages.length-1])==null?void 0:C.event.tags:(P=d==null?void 0:d.chat)!=null&&P.initialRoomTags?d.chat.initialRoomTags:[]}),h=ye(()=>f.value.length?[...new Set(f.value.map(b=>b[1]))]:[]),v=ye(()=>h.value.filter(b=>b!==d.userPubkey));bl(async()=>{g();let b=[];v.value.forEach($=>{o.hasMeta($)||b.push($)});const{chat:C}=d;if(!b.length||l.value[C.id])return;l.value[C.id]=!0;const P=r.connectedUserReadWriteUrlsWithSelectedRelay,k=await a.querySync(P,{kinds:[lt.DM_RELAYS],authors:b}),D=new Set;if(k.forEach($=>{$.tags.some(I=>(I[0]==="r"||I[0]==="relay")&&I[1]&&I[1].length)&&D.add($.pubkey)}),o.addMetas(k),b=b.filter($=>!D.has($)),b.length){const $=await a.querySync(P,{kinds:[lt.RELAY_LIST_META],authors:b});o.addMetas($)}l.value[C.id]=!1,await Qn(),setTimeout(()=>{var T;if(!((T=c.value[C.id])!=null&&T.length))return;const $=[...c.value[C.id]].reverse();c.value[C.id]=[],$.forEach(async I=>{await x(I.relays,I.wrapsBundle),n("setMessageStatusToPublished",C.id,I.rumorId)})},1)});const g=async()=>{await Qn();const b=u.value;b&&(b.scrollTop=b.scrollHeight)},m=async(b,C)=>{const{chat:P}=d,k={event:b,isPublished:!1};s.addOwnRumor(b.id),P.messages.push(k),g();const D=w();if(l.value[P.id]){c.value[P.id]||(c.value[P.id]=[]),c.value[P.id].push({rumorId:b.id,relays:D,wrapsBundle:C});return}await x(D,C);const $=P.messages.findIndex(T=>T.event.id===b.id);P.messages[$].isPublished=!0},w=()=>{const b=r.userChatRelaysUrls,C=o.getRelaysByPubkeys(v.value);return[...new Set([...b,...C])]},x=async(b,C)=>{const P=[];return C.forEach(k=>{P.push(...a.publish(b,k))}),await Promise.allSettled(P)};return(b,C)=>(S(),U("div",{class:ve(["conversation",{"conversation_mobile-hidden":b.showChatsList}])},[_("div",yx,[_("span",{onClick:C[0]||(C[0]=P=>n("handleDeselectChat")),class:"chats-link"},[fe(fx),vx]),_("span",_x,se(b.chat?b.chat.title:"Select chat"),1)]),b.chat?(S(),U("div",{key:0,class:"chats__messages",ref_key:"messagesContainer",ref:u},[fe(tx,{messages:b.chat.messages,userPubkey:b.userPubkey},null,8,["messages","userPubkey"])],512)):te("",!0),_("div",mx,[fe(ix,{roomTags:f.value,recipientsPubkeys:h.value,userPubkey:b.userPubkey,onPreSendMessage:m},null,8,["roomTags","recipientsPubkeys","userPubkey"])])],2))}});const bx=me(wx,[["__scopeId","data-v-e5e92b02"]]),cf=e=>(st("data-v-f8464317"),e=e(),ot(),e),Ex=cf(()=>_("label",{for:"start-chat-pubkey"},[_("strong",null,"Profile's public key")],-1)),Rx={class:"user-field"},xx=cf(()=>_("button",{type:"submit",class:"start-chat-btn"},"Start chat",-1)),Sx={key:0,class:"notice"},kx={key:1,class:"error"},Cx=Se({__name:"ChatCreateRoomForm",props:{isLoadingProfile:{type:Boolean}},emits:["startChat"],setup(e,{emit:t}){const n=t,s=Ye(),o=L(""),r=L(""),i=()=>{const a=o.value;let c="";if(!s.isConnectedToReadWriteRelays){r.value="Please connect to a relay first.";return}if(!a.length){r.value="Provide the public key of the person to chat with.";return}if(_o(a))c=a;else try{let{data:l,type:d}=Me.decode(a);if(d!=="npub"){r.value="Public key is invalid. Please check it and try again.";return}c=l.toString()}catch{r.value="Public key is invalid. Please check it and try again.";return}r.value="",n("startChat",c)};return(a,c)=>(S(),U(Ee,null,[_("form",{onSubmit:Bn(i,["prevent"])},[Ex,_("div",Rx,[qt(_("input",{"onUpdate:modelValue":c[0]||(c[0]=l=>o.value=l),class:"find-user-input",id:"start-chat-pubkey",type:"text",placeholder:"npub or hex of pubkey"},null,512),[[Kt,o.value,void 0,{trim:!0}]]),xx])],32),a.isLoadingProfile?(S(),U("div",Sx,"Loading profile info...")):te("",!0),r.value?(S(),U("div",kx,se(r.value),1)):te("",!0)],64))}});const $x=me(Cx,[["__scopeId","data-v-f8464317"]]),lf=e=>(st("data-v-fccd00d5"),e=e(),ot(),e),Px=lf(()=>_("div",{class:"chats-desc"},[_("p",null,[Re(" Chats use the new Nostr "),_("a",{target:"_blank",href:"https://github.com/nostr-protocol/nips/blob/master/44.md"},"NIP-44"),Re(" encryption standard. Make sure the person you are chatting with uses a Nostr client that supports this NIP. ")])],-1)),Ix={class:"user-field-wrapper"},Ax=lf(()=>_("h3",{class:"chats-title"},"Chats",-1)),Tx={key:0,class:"no-chats"},Lx={key:1},Ux={key:2,class:"chats"},Bx=Se({__name:"Chat",setup(e){const{normalizeURL:t}=Gt;let n;const s=Ye(),o=dt(),r=af(),a=Ft().pool,c=L(""),l=L(!1),d=L({}),u=L({}),f=L(""),h=L(!1),v=ye(()=>Object.keys(d.value).length===0),g=ye(()=>s.isConnectedToReadWriteRelays&&o.isNsecValidTemp),m=ye(()=>Object.entries(d.value).map(([I,V])=>V).sort((I,V)=>V.created_at_last_message-I.created_at_last_message)),w=L(!0);qe(()=>o.nsec,async()=>{o.isNsecValidTemp&&(f.value=o.getPubkey())},{immediate:!0}),qe(()=>s.isConnectingToReadWriteRelays,I=>{I&&(h.value=!0)}),qe(()=>s.isConnectedToReadWriteRelays,I=>{I&&o.isNsecValidTemp&&C()}),vt(()=>{g.value&&C()});const x=I=>{d.value[I.id]=I,setTimeout(()=>{if(u.value[I.id]){const V=[...u.value[I.id]];u.value[I.id]=[],V.forEach(z=>{d.value[I.id].messages.push(z)})}},1),h.value=!1},b=I=>{console.error("Chats error:",I)},C=async()=>{h.value=!0;let I=s.connectedUserReadWriteUrlsWithSelectedRelay;const V=o.getPubkey();d.value={},n==null||n.close();const z=await a.querySync(I,{kinds:[lt.DM_RELAYS],authors:[V]});if(z.length){const ee=new Set;z.forEach(oe=>{oe.tags.forEach(re=>{(re[0]==="r"||re[0]==="relay")&&re[1]&&re[1].length&&ee.add(t(re[1]))})}),ee.size&&(I=[...ee],s.setUserDMRelaysUrls(I))}const J=await a.querySync(I,{kinds:[lt.GIFT_WRAP],"#p":[V]}),X=o.getPrivkeyBytes();let H={},R=0;const A=new Set;J.forEach(ee=>{A.add(ee.id);const oe=Tc(ee,X);if(!oe||Uc(oe))return;const re=Ac(oe),de=Lc(oe);H[re]?H[re].messages.push(de):H[re]={messages:[de]},oe.created_at>R&&(R=oe.created_at)});const F=[];for(const ee in H){const oe=H[ee];oe.id=ee,oe.messages=oe.messages.sort((de,le)=>de.event.created_at-le.event.created_at),oe.created_at_last_message=oe.messages[oe.messages.length-1].event.created_at;const re=qR(oe,V,a,s.connectedUserReadWriteUrlsWithSelectedRelay);F.push(re)}F.length?Od(F,x,b):h.value=!1;const W=J.length?R-ef:null;P(I,W,A)},P=(I,V=null,z=null)=>{const J=o.getPubkey(),X=o.getPrivkeyBytes(),H={kinds:[lt.GIFT_WRAP],"#p":[J]};V&&(H.since=V),n=a.subscribeMany(I,[H],{onevent(R){if(z&&z.has(R.id))return;const A=Tc(R,X);if(!A||Uc(A))return;const F=Ac(A),W=Lc(A);if(d.value[F]){if(r.ownRumors.has(W.event.id))return;d.value[F].messages.push(W)}else u.value[F]||(u.value[F]=[]),u.value[F].push(W)}})},k=I=>{c.value=I,w.value=!1},D=()=>{c.value="",w.value=!0},$=(I,V)=>{const z=d.value[I].messages.find(J=>J.event.id===V);z&&(z.isPublished=!0)},T=async I=>{const V=I===f.value?[I]:[f.value,I],z=GR(V);if(d.value[z])return k(z);l.value=!0;const J=await zR(I,a,s.connectedUserReadWriteUrlsWithSelectedRelay);l.value=!1;const X={id:z,messages:[],title:J,initialRoomTags:V.map(H=>["p",H]),created_at_last_message:tr()};x(X),await Qn(),k(z)};return(I,V)=>(S(),U(Ee,null,[Px,_("div",Ix,[fe($x,{onStartChat:T,isLoadingProfile:l.value},null,8,["isLoadingProfile"])]),Ax,!g.value&&!h.value?(S(),U("div",Tx," Please connect and login to see you chats. ")):te("",!0),h.value?(S(),U("div",Lx,"Loading chats...")):te("",!0),g.value&&!h.value?(S(),U("div",Ux,[fe(QR,{chats:m.value,currentChatId:c.value,handleSelectChat:k,showChatsList:w.value},null,8,["chats","currentChatId","showChatsList"]),v.value?te("",!0):(S(),Ie(bx,{key:0,onSetMessageStatusToPublished:$,onHandleDeselectChat:D,chat:d.value[c.value],userPubkey:f.value,showChatsList:w.value},null,8,["chat","userPubkey","showChatsList"]))])):te("",!0)],64))}});const Nx=me(Bx,[["__scopeId","data-v-fccd00d5"]]),uf=e=>(st("data-v-d8e9a087"),e=e(),ot(),e),Mx={class:"fields"},Ox={class:"field"},Fx=uf(()=>_("label",{class:"select-relay-label"},[_("strong",null,"Select relay")],-1)),Hx={key:0,class:"field"},jx={class:"field-elements"},Vx={class:"field"},Dx=uf(()=>_("label",{class:"text-input-label",for:"priv_key"},[_("strong",null,"Login with private key (optional)")],-1)),Wx={class:"field-elements"},qx={class:"field"},Kx=["disabled"],zx={class:"error"},Gx=Se({__name:"Login",setup(e){const n=Ft().pool,s=Ye(),o=dt(),r=xn(),i=Xo(),a=ds(),c=En(),l=L(v2),d=ye(()=>l.value==="custom"),u=L(""),f=L(!1),h=_2.map(C=>({key:C,value:C})).concat({key:"custom",value:"Custom relay url"});let v="/feed",g=!1;vt(()=>{m()&&(v=history.state.back,g=!0)});const m=()=>history.state&&/^\/(user|event)\/[a-zA-Z0-9]+$/g.test(history.state.back),w=C=>{l.value=C},x=C=>{u.value=C},b=async()=>{let C=l.value;if(C==="custom"){const k=s.selectInputCustomRelayUrl;C=k.length?k:""}if(!C.length)return x("Please provide relay URL or choose one from the list.");if(C=Gt.normalizeURL(C),!C.length)return x("Invalid relay URL");if(f.value)return;if(o.isNotValidNsecPresented())return x("Private key is invalid. Please check it and try again.");o.isValidNsecPresented()&&o.updateCachedNsec(o.nsec);let P;f.value=!0;try{P=await w2(C)}catch(k){return f.value=!1,x(k.message)}if(s.updateCurrentRelay(P),o.isValidNsecPresented()){const k=o.getPubkey(),D=await wc(P,[{kinds:[lt.META],limit:1,authors:[k]}],3e3);if(!D)return f.value=!1,x("Your profile was not found on the selected relay. Please check the private key or change the relay and try again.");i.updateMeta(D),r.setSelectedFeedSource("follows");let $=await wc(P,[{kinds:[lt.RELAY_LIST_META],limit:1,authors:[k]}],3e3);if($.tags.length){const V=$.tags.map(H=>H[1]),z=await n.get(V,{kinds:[lt.RELAY_LIST_META],authors:[k],limit:1});z&&z.tags.length&&z.created_at>$.created_at&&($=z);const{read:J,write:X}=Nd($);s.setReedRelays(J),s.setWriteRelays(X)}s.setIsConnectingToReadWriteRelaysStatus(!0),s.setIsConnectedToReadWriteRelaysStatus(!1);const{userConnectedReadRelays:T,userConnectedWriteRelays:I}=await b2(s.userReadWriteRelays);s.setConnectedUserReadRelayUrls(T),s.setConnectedUserWriteRelayUrls(I),s.setIsConnectingToReadWriteRelaysStatus(!1),s.setIsConnectedToReadWriteRelaysStatus(!0)}f.value=!1,r.setMountAfterLogin(!0),g&&a.updateRoutingStatus(!0),c.push({path:v})};return(C,P)=>(S(),U("div",Mx,[_("div",Ox,[Fx,fe(Qd,{listItems:Z(h),onHandleSelect:w},null,8,["listItems"])]),d.value?(S(),U("div",Hx,[_("div",jx,[qt(_("input",{"onUpdate:modelValue":P[0]||(P[0]=k=>Z(s).selectInputCustomRelayUrl=k),class:"text-input",id:"relay_url",type:"text",placeholder:"[wss://]relay.example.com"},null,512),[[Kt,Z(s).selectInputCustomRelayUrl]])])])):te("",!0),_("div",Vx,[Dx,_("div",Wx,[qt(_("input",{"onUpdate:modelValue":P[1]||(P[1]=k=>Z(o).nsec=k),class:"text-input",id:"priv_key",type:"password",placeholder:"nsec..."},null,512),[[Kt,Z(o).nsec]])])]),_("div",qx,[_("button",{disabled:f.value,onClick:b,class:"button button-block"},se(f.value?"Connecting...":"Connect"),9,Kx)]),_("div",zx,se(u.value),1)]))}});const Zx=me(Gx,[["__scopeId","data-v-d8e9a087"]]),nr=e=>(st("data-v-4496e101"),e=e(),ot(),e),Jx={class:"tabs"},Yx=nr(()=>_("span",{class:"tab-link-text"},[_("i",{class:"tab-icon bi bi-justify-right"}),Re(" Feed ")],-1)),Qx=nr(()=>_("span",{class:"tab-link-text"},[_("i",{class:"tab-icon bi bi-chat-dots"}),Re(" Chat ")],-1)),Xx=nr(()=>_("span",{class:"tab-link-text"},[_("i",{class:"tab-icon bi bi-info-circle"}),Re(" Help ")],-1)),e3=nr(()=>_("span",{class:"tab-link-text"},[_("i",{class:"tab-icon bi bi-gear"}),Re(" Settings ")],-1)),t3=Se({__name:"MainMenu",setup(e){const t=us();return ye(()=>t.cachedUrlNpub.length?`/user/${t.cachedUrlNpub}`:"/user"),(n,s)=>{const o=Ms("router-link");return S(),U("div",Jx,[fe(o,{class:"tab-link",to:"/feed"},{default:ct(()=>[Yx]),_:1}),fe(o,{class:"tab-link",to:"/chat"},{default:ct(()=>[Qx]),_:1}),fe(o,{class:"tab-link",to:"/help"},{default:ct(()=>[Xx]),_:1}),fe(o,{class:"tab-link",to:"/settings"},{default:ct(()=>[e3]),_:1})])}}});const n3=me(t3,[["__scopeId","data-v-4496e101"]]),s3={class:"search"},o3={key:0,class:"warning"},r3=Se({__name:"MainSearchField",setup(e){const t=us(),n=ds(),s=En(),o=L(!1),r=L(0),i=L({}),a=()=>{clearTimeout(r.value);const u=t.npubInput;if(!u.length){t.setError("");return}let f="user";if(!_o(u))try{const{type:h}=si(u);h==="note"&&(f="event")}catch(h){u.length>62?t.setError(h.message):r.value=setTimeout(()=>{t.setError(h.message)},2e3);return}t.setError(""),l(u,f)},c=()=>{o.value=!0;const u=t.npubInput;if(!u.length){t.setError("");return}let f="user";if(_o(u))l(u,f);else try{const{type:h}=si(u);h==="note"&&(f="event"),l(u,f)}catch{}},l=(u,f)=>{n.updateSearchStatus(!0),n.updateRoutingStatus(!0),s.push({path:`/${f}/${u}`})},d=()=>{clearTimeout(r.value),t.updateNpubInput(""),t.setError(""),i.value.focus()};return(u,f)=>(S(),U("div",s3,[_("div",{class:ve(["search-field",{active:o.value,"has-content":Z(t).npubInput.length}])},[_("i",{onClick:f[0]||(f[0]=h=>i.value.focus()),class:"bi bi-search search-icon"}),qt(_("input",{onFocus:c,onBlur:f[1]||(f[1]=h=>o.value=!1),class:ve(["search-input",{active:o.value}]),type:"text",placeholder:"pubkey or note id...","onUpdate:modelValue":f[2]||(f[2]=h=>Z(t).npubInput=h),onInput:a,ref_key:"input",ref:i},null,34),[[Kt,Z(t).npubInput,void 0,{trim:!0}]]),Z(t).npubInput.length?(S(),U("i",{key:0,onClick:d,class:"bi bi-x-circle clear-icon"})):te("",!0)],2),Z(t).error.length?(S(),U("div",o3,"* "+se(Z(t).error),1)):te("",!0)]))}});const i3=me(r3,[["__scopeId","data-v-14bfe52e"]]),a3={class:"header"},c3=["href"],l3={key:1,class:"connect-wrapper"},u3=Se({__name:"Header",emits:["clearAppState"],setup(e,{emit:t}){const n=t,s=Xo(),o=us(),r=ds(),i=dt(),a=Ye(),c=En(),l=ye(()=>i.isValidNsecPresented()&&s.username.length?s.username:""),d=()=>{const f=i.getPubkey(),h=Me.npubEncode(f);o.updateNpubInput(h),r.updateRoutingStatus(!0),c.push({path:$s(f)})},u=()=>{n("clearAppState")};return(f,h)=>(S(),U("div",a3,[_("div",{class:ve(["menu",{loggedin:Z(i).isValidNsecPresented()}])},[fe(n3),l.value.length?(S(),U("a",{key:0,class:"username-link",onClick:Bn(d,["prevent"]),href:Z($s)(Z(i).getPubkey())}," @"+se(l.value),9,c3)):(S(),U("span",l3,[Z(a).isConnectedToRelay?(S(),U("a",{key:0,onClick:Bn(u,["prevent"]),class:"login-link",href:"/login"}," Login ")):(S(),U("button",{key:1,class:"connect-btn",onClick:u},"Connect"))]))],2),fe(i3)]))}});const cn=me(u3,[["__scopeId","data-v-ce261291"]]),d3=[{path:"/feed",name:"Feed",components:{default:Cc,Header:cn}},{path:"/message",name:"Message",components:{default:Cc,Header:cn}},{path:"/chat",name:"Chat",components:{default:Nx,Header:cn}},{path:"/user",name:"User",alias:["/event"],components:{default:Ic,Header:cn}},{path:"/user/:id",alias:["/event/:id"],components:{default:Ic,Header:cn}},{path:"/help",name:"Help",components:{default:$c,Header:cn}},{path:"/",components:{default:$c,Header:cn},beforeEnter:(e,t,n)=>{const s=e.query.user,o=e.query.event;s!=null&&s.length?n({path:`/user/${s}`}):o!=null&&o.length?n({path:`/event/${o}`}):n()}},{path:"/settings",components:{default:OR,Header:cn}},{path:"/login",component:Zx}],f3=ry({history:bg(),routes:d3}),h3=Se({__name:"App",setup(e){const t=En(),n=dt(),s=Ye(),o=xn(),r=fs(),i=Ft(),a=i.pool,c=localStorage.getItem("rememberMe")==="true";n.setRememberMe(c);const l=c?localStorage.getItem("privkey"):"";n.updateNsec(l||"");const d=L([]),u=()=>{var f;s.isConnectedToRelay&&((f=s.currentRelay)==null||f.close()),oi(a),i.resetPool(),o.pool&&(oi(o.pool),o.resetPool()),localStorage.removeItem("privkey"),n.updateNsec(""),o.clear(),s.clear(),r.updateShowImages(!1),t.push("/login")};return(f,h)=>{const v=Ms("router-view");return S(),U(Ee,null,[fe(v,{onClearAppState:u,name:"Header"}),fe(v,{onClearAppState:u,eventsLog:d.value},null,8,["eventsLog"])],64)}}});const p3=zp(h3),g3=Yp();p3.use(f3).use(g3).mount("#app");
-//# sourceMappingURL=main.js.map
+  */
+const isBrowser = typeof window !== "undefined";
+function isESModule(obj) {
+  return obj.__esModule || obj[Symbol.toStringTag] === "Module";
+}
+const assign = Object.assign;
+function applyToParams(fn, params) {
+  const newParams = {};
+  for (const key in params) {
+    const value = params[key];
+    newParams[key] = isArray(value) ? value.map(fn) : fn(value);
+  }
+  return newParams;
+}
+const noop = () => {
+};
+const isArray = Array.isArray;
+const TRAILING_SLASH_RE = /\/$/;
+const removeTrailingSlash = (path) => path.replace(TRAILING_SLASH_RE, "");
+function parseURL(parseQuery2, location2, currentLocation = "/") {
+  let path, query = {}, searchString = "", hash2 = "";
+  const hashPos = location2.indexOf("#");
+  let searchPos = location2.indexOf("?");
+  if (hashPos < searchPos && hashPos >= 0) {
+    searchPos = -1;
+  }
+  if (searchPos > -1) {
+    path = location2.slice(0, searchPos);
+    searchString = location2.slice(searchPos + 1, hashPos > -1 ? hashPos : location2.length);
+    query = parseQuery2(searchString);
+  }
+  if (hashPos > -1) {
+    path = path || location2.slice(0, hashPos);
+    hash2 = location2.slice(hashPos, location2.length);
+  }
+  path = resolveRelativePath(path != null ? path : location2, currentLocation);
+  return {
+    fullPath: path + (searchString && "?") + searchString + hash2,
+    path,
+    query,
+    hash: hash2
+  };
+}
+function stringifyURL(stringifyQuery2, location2) {
+  const query = location2.query ? stringifyQuery2(location2.query) : "";
+  return location2.path + (query && "?") + query + (location2.hash || "");
+}
+function stripBase(pathname, base) {
+  if (!base || !pathname.toLowerCase().startsWith(base.toLowerCase()))
+    return pathname;
+  return pathname.slice(base.length) || "/";
+}
+function isSameRouteLocation(stringifyQuery2, a, b) {
+  const aLastIndex = a.matched.length - 1;
+  const bLastIndex = b.matched.length - 1;
+  return aLastIndex > -1 && aLastIndex === bLastIndex && isSameRouteRecord(a.matched[aLastIndex], b.matched[bLastIndex]) && isSameRouteLocationParams(a.params, b.params) && stringifyQuery2(a.query) === stringifyQuery2(b.query) && a.hash === b.hash;
+}
+function isSameRouteRecord(a, b) {
+  return (a.aliasOf || a) === (b.aliasOf || b);
+}
+function isSameRouteLocationParams(a, b) {
+  if (Object.keys(a).length !== Object.keys(b).length)
+    return false;
+  for (const key in a) {
+    if (!isSameRouteLocationParamsValue(a[key], b[key]))
+      return false;
+  }
+  return true;
+}
+function isSameRouteLocationParamsValue(a, b) {
+  return isArray(a) ? isEquivalentArray(a, b) : isArray(b) ? isEquivalentArray(b, a) : a === b;
+}
+function isEquivalentArray(a, b) {
+  return isArray(b) ? a.length === b.length && a.every((value, i2) => value === b[i2]) : a.length === 1 && a[0] === b;
+}
+function resolveRelativePath(to, from) {
+  if (to.startsWith("/"))
+    return to;
+  if (!to)
+    return from;
+  const fromSegments = from.split("/");
+  const toSegments = to.split("/");
+  const lastToSegment = toSegments[toSegments.length - 1];
+  if (lastToSegment === ".." || lastToSegment === ".") {
+    toSegments.push("");
+  }
+  let position = fromSegments.length - 1;
+  let toPosition;
+  let segment;
+  for (toPosition = 0; toPosition < toSegments.length; toPosition++) {
+    segment = toSegments[toPosition];
+    if (segment === ".")
+      continue;
+    if (segment === "..") {
+      if (position > 1)
+        position--;
+    } else
+      break;
+  }
+  return fromSegments.slice(0, position).join("/") + "/" + toSegments.slice(toPosition - (toPosition === toSegments.length ? 1 : 0)).join("/");
+}
+var NavigationType;
+(function(NavigationType2) {
+  NavigationType2["pop"] = "pop";
+  NavigationType2["push"] = "push";
+})(NavigationType || (NavigationType = {}));
+var NavigationDirection;
+(function(NavigationDirection2) {
+  NavigationDirection2["back"] = "back";
+  NavigationDirection2["forward"] = "forward";
+  NavigationDirection2["unknown"] = "";
+})(NavigationDirection || (NavigationDirection = {}));
+function normalizeBase(base) {
+  if (!base) {
+    if (isBrowser) {
+      const baseEl = document.querySelector("base");
+      base = baseEl && baseEl.getAttribute("href") || "/";
+      base = base.replace(/^\w+:\/\/[^\/]+/, "");
+    } else {
+      base = "/";
+    }
+  }
+  if (base[0] !== "/" && base[0] !== "#")
+    base = "/" + base;
+  return removeTrailingSlash(base);
+}
+const BEFORE_HASH_RE = /^[^#]+#/;
+function createHref(base, location2) {
+  return base.replace(BEFORE_HASH_RE, "#") + location2;
+}
+function getElementPosition(el, offset) {
+  const docRect = document.documentElement.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  return {
+    behavior: offset.behavior,
+    left: elRect.left - docRect.left - (offset.left || 0),
+    top: elRect.top - docRect.top - (offset.top || 0)
+  };
+}
+const computeScrollPosition = () => ({
+  left: window.pageXOffset,
+  top: window.pageYOffset
+});
+function scrollToPosition(position) {
+  let scrollToOptions;
+  if ("el" in position) {
+    const positionEl = position.el;
+    const isIdSelector = typeof positionEl === "string" && positionEl.startsWith("#");
+    const el = typeof positionEl === "string" ? isIdSelector ? document.getElementById(positionEl.slice(1)) : document.querySelector(positionEl) : positionEl;
+    if (!el) {
+      return;
+    }
+    scrollToOptions = getElementPosition(el, position);
+  } else {
+    scrollToOptions = position;
+  }
+  if ("scrollBehavior" in document.documentElement.style)
+    window.scrollTo(scrollToOptions);
+  else {
+    window.scrollTo(scrollToOptions.left != null ? scrollToOptions.left : window.pageXOffset, scrollToOptions.top != null ? scrollToOptions.top : window.pageYOffset);
+  }
+}
+function getScrollKey(path, delta) {
+  const position = history.state ? history.state.position - delta : -1;
+  return position + path;
+}
+const scrollPositions = /* @__PURE__ */ new Map();
+function saveScrollPosition(key, scrollPosition) {
+  scrollPositions.set(key, scrollPosition);
+}
+function getSavedScrollPosition(key) {
+  const scroll = scrollPositions.get(key);
+  scrollPositions.delete(key);
+  return scroll;
+}
+let createBaseLocation = () => location.protocol + "//" + location.host;
+function createCurrentLocation(base, location2) {
+  const { pathname, search, hash: hash2 } = location2;
+  const hashPos = base.indexOf("#");
+  if (hashPos > -1) {
+    let slicePos = hash2.includes(base.slice(hashPos)) ? base.slice(hashPos).length : 1;
+    let pathFromHash = hash2.slice(slicePos);
+    if (pathFromHash[0] !== "/")
+      pathFromHash = "/" + pathFromHash;
+    return stripBase(pathFromHash, "");
+  }
+  const path = stripBase(pathname, base);
+  return path + search + hash2;
+}
+function useHistoryListeners(base, historyState, currentLocation, replace) {
+  let listeners = [];
+  let teardowns = [];
+  let pauseState = null;
+  const popStateHandler = ({ state }) => {
+    const to = createCurrentLocation(base, location);
+    const from = currentLocation.value;
+    const fromState = historyState.value;
+    let delta = 0;
+    if (state) {
+      currentLocation.value = to;
+      historyState.value = state;
+      if (pauseState && pauseState === from) {
+        pauseState = null;
+        return;
+      }
+      delta = fromState ? state.position - fromState.position : 0;
+    } else {
+      replace(to);
+    }
+    listeners.forEach((listener) => {
+      listener(currentLocation.value, from, {
+        delta,
+        type: NavigationType.pop,
+        direction: delta ? delta > 0 ? NavigationDirection.forward : NavigationDirection.back : NavigationDirection.unknown
+      });
+    });
+  };
+  function pauseListeners() {
+    pauseState = currentLocation.value;
+  }
+  function listen(callback) {
+    listeners.push(callback);
+    const teardown = () => {
+      const index = listeners.indexOf(callback);
+      if (index > -1)
+        listeners.splice(index, 1);
+    };
+    teardowns.push(teardown);
+    return teardown;
+  }
+  function beforeUnloadListener() {
+    const { history: history2 } = window;
+    if (!history2.state)
+      return;
+    history2.replaceState(assign({}, history2.state, { scroll: computeScrollPosition() }), "");
+  }
+  function destroy() {
+    for (const teardown of teardowns)
+      teardown();
+    teardowns = [];
+    window.removeEventListener("popstate", popStateHandler);
+    window.removeEventListener("beforeunload", beforeUnloadListener);
+  }
+  window.addEventListener("popstate", popStateHandler);
+  window.addEventListener("beforeunload", beforeUnloadListener, {
+    passive: true
+  });
+  return {
+    pauseListeners,
+    listen,
+    destroy
+  };
+}
+function buildState(back, current, forward, replaced = false, computeScroll = false) {
+  return {
+    back,
+    current,
+    forward,
+    replaced,
+    position: window.history.length,
+    scroll: computeScroll ? computeScrollPosition() : null
+  };
+}
+function useHistoryStateNavigation(base) {
+  const { history: history2, location: location2 } = window;
+  const currentLocation = {
+    value: createCurrentLocation(base, location2)
+  };
+  const historyState = { value: history2.state };
+  if (!historyState.value) {
+    changeLocation(currentLocation.value, {
+      back: null,
+      current: currentLocation.value,
+      forward: null,
+      // the length is off by one, we need to decrease it
+      position: history2.length - 1,
+      replaced: true,
+      // don't add a scroll as the user may have an anchor, and we want
+      // scrollBehavior to be triggered without a saved position
+      scroll: null
+    }, true);
+  }
+  function changeLocation(to, state, replace2) {
+    const hashIndex = base.indexOf("#");
+    const url = hashIndex > -1 ? (location2.host && document.querySelector("base") ? base : base.slice(hashIndex)) + to : createBaseLocation() + base + to;
+    try {
+      history2[replace2 ? "replaceState" : "pushState"](state, "", url);
+      historyState.value = state;
+    } catch (err) {
+      {
+        console.error(err);
+      }
+      location2[replace2 ? "replace" : "assign"](url);
+    }
+  }
+  function replace(to, data) {
+    const state = assign({}, history2.state, buildState(
+      historyState.value.back,
+      // keep back and forward entries but override current position
+      to,
+      historyState.value.forward,
+      true
+    ), data, { position: historyState.value.position });
+    changeLocation(to, state, true);
+    currentLocation.value = to;
+  }
+  function push(to, data) {
+    const currentState = assign(
+      {},
+      // use current history state to gracefully handle a wrong call to
+      // history.replaceState
+      // https://github.com/vuejs/router/issues/366
+      historyState.value,
+      history2.state,
+      {
+        forward: to,
+        scroll: computeScrollPosition()
+      }
+    );
+    changeLocation(currentState.current, currentState, true);
+    const state = assign({}, buildState(currentLocation.value, to, null), { position: currentState.position + 1 }, data);
+    changeLocation(to, state, false);
+    currentLocation.value = to;
+  }
+  return {
+    location: currentLocation,
+    state: historyState,
+    push,
+    replace
+  };
+}
+function createWebHistory(base) {
+  base = normalizeBase(base);
+  const historyNavigation = useHistoryStateNavigation(base);
+  const historyListeners = useHistoryListeners(base, historyNavigation.state, historyNavigation.location, historyNavigation.replace);
+  function go(delta, triggerListeners = true) {
+    if (!triggerListeners)
+      historyListeners.pauseListeners();
+    history.go(delta);
+  }
+  const routerHistory = assign({
+    // it's overridden right after
+    location: "",
+    base,
+    go,
+    createHref: createHref.bind(null, base)
+  }, historyNavigation, historyListeners);
+  Object.defineProperty(routerHistory, "location", {
+    enumerable: true,
+    get: () => historyNavigation.location.value
+  });
+  Object.defineProperty(routerHistory, "state", {
+    enumerable: true,
+    get: () => historyNavigation.state.value
+  });
+  return routerHistory;
+}
+function createWebHashHistory(base) {
+  base = location.host ? base || location.pathname + location.search : "";
+  if (!base.includes("#"))
+    base += "#";
+  return createWebHistory(base);
+}
+function isRouteLocation(route) {
+  return typeof route === "string" || route && typeof route === "object";
+}
+function isRouteName(name) {
+  return typeof name === "string" || typeof name === "symbol";
+}
+const START_LOCATION_NORMALIZED = {
+  path: "/",
+  name: void 0,
+  params: {},
+  query: {},
+  hash: "",
+  fullPath: "/",
+  matched: [],
+  meta: {},
+  redirectedFrom: void 0
+};
+const NavigationFailureSymbol = Symbol("");
+var NavigationFailureType;
+(function(NavigationFailureType2) {
+  NavigationFailureType2[NavigationFailureType2["aborted"] = 4] = "aborted";
+  NavigationFailureType2[NavigationFailureType2["cancelled"] = 8] = "cancelled";
+  NavigationFailureType2[NavigationFailureType2["duplicated"] = 16] = "duplicated";
+})(NavigationFailureType || (NavigationFailureType = {}));
+function createRouterError(type, params) {
+  {
+    return assign(new Error(), {
+      type,
+      [NavigationFailureSymbol]: true
+    }, params);
+  }
+}
+function isNavigationFailure(error, type) {
+  return error instanceof Error && NavigationFailureSymbol in error && (type == null || !!(error.type & type));
+}
+const BASE_PARAM_PATTERN = "[^/]+?";
+const BASE_PATH_PARSER_OPTIONS = {
+  sensitive: false,
+  strict: false,
+  start: true,
+  end: true
+};
+const REGEX_CHARS_RE = /[.+*?^${}()[\]/\\]/g;
+function tokensToParser(segments, extraOptions) {
+  const options = assign({}, BASE_PATH_PARSER_OPTIONS, extraOptions);
+  const score = [];
+  let pattern = options.start ? "^" : "";
+  const keys = [];
+  for (const segment of segments) {
+    const segmentScores = segment.length ? [] : [
+      90
+      /* PathScore.Root */
+    ];
+    if (options.strict && !segment.length)
+      pattern += "/";
+    for (let tokenIndex = 0; tokenIndex < segment.length; tokenIndex++) {
+      const token = segment[tokenIndex];
+      let subSegmentScore = 40 + (options.sensitive ? 0.25 : 0);
+      if (token.type === 0) {
+        if (!tokenIndex)
+          pattern += "/";
+        pattern += token.value.replace(REGEX_CHARS_RE, "\\$&");
+        subSegmentScore += 40;
+      } else if (token.type === 1) {
+        const { value, repeatable, optional, regexp } = token;
+        keys.push({
+          name: value,
+          repeatable,
+          optional
+        });
+        const re2 = regexp ? regexp : BASE_PARAM_PATTERN;
+        if (re2 !== BASE_PARAM_PATTERN) {
+          subSegmentScore += 10;
+          try {
+            new RegExp(`(${re2})`);
+          } catch (err) {
+            throw new Error(`Invalid custom RegExp for param "${value}" (${re2}): ` + err.message);
+          }
+        }
+        let subPattern = repeatable ? `((?:${re2})(?:/(?:${re2}))*)` : `(${re2})`;
+        if (!tokenIndex)
+          subPattern = // avoid an optional / if there are more segments e.g. /:p?-static
+          // or /:p?-:p2
+          optional && segment.length < 2 ? `(?:/${subPattern})` : "/" + subPattern;
+        if (optional)
+          subPattern += "?";
+        pattern += subPattern;
+        subSegmentScore += 20;
+        if (optional)
+          subSegmentScore += -8;
+        if (repeatable)
+          subSegmentScore += -20;
+        if (re2 === ".*")
+          subSegmentScore += -50;
+      }
+      segmentScores.push(subSegmentScore);
+    }
+    score.push(segmentScores);
+  }
+  if (options.strict && options.end) {
+    const i2 = score.length - 1;
+    score[i2][score[i2].length - 1] += 0.7000000000000001;
+  }
+  if (!options.strict)
+    pattern += "/?";
+  if (options.end)
+    pattern += "$";
+  else if (options.strict)
+    pattern += "(?:/|$)";
+  const re = new RegExp(pattern, options.sensitive ? "" : "i");
+  function parse3(path) {
+    const match = path.match(re);
+    const params = {};
+    if (!match)
+      return null;
+    for (let i2 = 1; i2 < match.length; i2++) {
+      const value = match[i2] || "";
+      const key = keys[i2 - 1];
+      params[key.name] = value && key.repeatable ? value.split("/") : value;
+    }
+    return params;
+  }
+  function stringify(params) {
+    let path = "";
+    let avoidDuplicatedSlash = false;
+    for (const segment of segments) {
+      if (!avoidDuplicatedSlash || !path.endsWith("/"))
+        path += "/";
+      avoidDuplicatedSlash = false;
+      for (const token of segment) {
+        if (token.type === 0) {
+          path += token.value;
+        } else if (token.type === 1) {
+          const { value, repeatable, optional } = token;
+          const param = value in params ? params[value] : "";
+          if (isArray(param) && !repeatable) {
+            throw new Error(`Provided param "${value}" is an array but it is not repeatable (* or + modifiers)`);
+          }
+          const text = isArray(param) ? param.join("/") : param;
+          if (!text) {
+            if (optional) {
+              if (segment.length < 2) {
+                if (path.endsWith("/"))
+                  path = path.slice(0, -1);
+                else
+                  avoidDuplicatedSlash = true;
+              }
+            } else
+              throw new Error(`Missing required param "${value}"`);
+          }
+          path += text;
+        }
+      }
+    }
+    return path || "/";
+  }
+  return {
+    re,
+    score,
+    keys,
+    parse: parse3,
+    stringify
+  };
+}
+function compareScoreArray(a, b) {
+  let i2 = 0;
+  while (i2 < a.length && i2 < b.length) {
+    const diff = b[i2] - a[i2];
+    if (diff)
+      return diff;
+    i2++;
+  }
+  if (a.length < b.length) {
+    return a.length === 1 && a[0] === 40 + 40 ? -1 : 1;
+  } else if (a.length > b.length) {
+    return b.length === 1 && b[0] === 40 + 40 ? 1 : -1;
+  }
+  return 0;
+}
+function comparePathParserScore(a, b) {
+  let i2 = 0;
+  const aScore = a.score;
+  const bScore = b.score;
+  while (i2 < aScore.length && i2 < bScore.length) {
+    const comp = compareScoreArray(aScore[i2], bScore[i2]);
+    if (comp)
+      return comp;
+    i2++;
+  }
+  if (Math.abs(bScore.length - aScore.length) === 1) {
+    if (isLastScoreNegative(aScore))
+      return 1;
+    if (isLastScoreNegative(bScore))
+      return -1;
+  }
+  return bScore.length - aScore.length;
+}
+function isLastScoreNegative(score) {
+  const last = score[score.length - 1];
+  return score.length > 0 && last[last.length - 1] < 0;
+}
+const ROOT_TOKEN = {
+  type: 0,
+  value: ""
+};
+const VALID_PARAM_RE = /[a-zA-Z0-9_]/;
+function tokenizePath(path) {
+  if (!path)
+    return [[]];
+  if (path === "/")
+    return [[ROOT_TOKEN]];
+  if (!path.startsWith("/")) {
+    throw new Error(`Invalid path "${path}"`);
+  }
+  function crash(message) {
+    throw new Error(`ERR (${state})/"${buffer}": ${message}`);
+  }
+  let state = 0;
+  let previousState = state;
+  const tokens = [];
+  let segment;
+  function finalizeSegment() {
+    if (segment)
+      tokens.push(segment);
+    segment = [];
+  }
+  let i2 = 0;
+  let char;
+  let buffer = "";
+  let customRe = "";
+  function consumeBuffer() {
+    if (!buffer)
+      return;
+    if (state === 0) {
+      segment.push({
+        type: 0,
+        value: buffer
+      });
+    } else if (state === 1 || state === 2 || state === 3) {
+      if (segment.length > 1 && (char === "*" || char === "+"))
+        crash(`A repeatable param (${buffer}) must be alone in its segment. eg: '/:ids+.`);
+      segment.push({
+        type: 1,
+        value: buffer,
+        regexp: customRe,
+        repeatable: char === "*" || char === "+",
+        optional: char === "*" || char === "?"
+      });
+    } else {
+      crash("Invalid state to consume buffer");
+    }
+    buffer = "";
+  }
+  function addCharToBuffer() {
+    buffer += char;
+  }
+  while (i2 < path.length) {
+    char = path[i2++];
+    if (char === "\\" && state !== 2) {
+      previousState = state;
+      state = 4;
+      continue;
+    }
+    switch (state) {
+      case 0:
+        if (char === "/") {
+          if (buffer) {
+            consumeBuffer();
+          }
+          finalizeSegment();
+        } else if (char === ":") {
+          consumeBuffer();
+          state = 1;
+        } else {
+          addCharToBuffer();
+        }
+        break;
+      case 4:
+        addCharToBuffer();
+        state = previousState;
+        break;
+      case 1:
+        if (char === "(") {
+          state = 2;
+        } else if (VALID_PARAM_RE.test(char)) {
+          addCharToBuffer();
+        } else {
+          consumeBuffer();
+          state = 0;
+          if (char !== "*" && char !== "?" && char !== "+")
+            i2--;
+        }
+        break;
+      case 2:
+        if (char === ")") {
+          if (customRe[customRe.length - 1] == "\\")
+            customRe = customRe.slice(0, -1) + char;
+          else
+            state = 3;
+        } else {
+          customRe += char;
+        }
+        break;
+      case 3:
+        consumeBuffer();
+        state = 0;
+        if (char !== "*" && char !== "?" && char !== "+")
+          i2--;
+        customRe = "";
+        break;
+      default:
+        crash("Unknown state");
+        break;
+    }
+  }
+  if (state === 2)
+    crash(`Unfinished custom RegExp for param "${buffer}"`);
+  consumeBuffer();
+  finalizeSegment();
+  return tokens;
+}
+function createRouteRecordMatcher(record, parent, options) {
+  const parser = tokensToParser(tokenizePath(record.path), options);
+  const matcher = assign(parser, {
+    record,
+    parent,
+    // these needs to be populated by the parent
+    children: [],
+    alias: []
+  });
+  if (parent) {
+    if (!matcher.record.aliasOf === !parent.record.aliasOf)
+      parent.children.push(matcher);
+  }
+  return matcher;
+}
+function createRouterMatcher(routes2, globalOptions) {
+  const matchers = [];
+  const matcherMap = /* @__PURE__ */ new Map();
+  globalOptions = mergeOptions({ strict: false, end: true, sensitive: false }, globalOptions);
+  function getRecordMatcher(name) {
+    return matcherMap.get(name);
+  }
+  function addRoute(record, parent, originalRecord) {
+    const isRootAdd = !originalRecord;
+    const mainNormalizedRecord = normalizeRouteRecord(record);
+    mainNormalizedRecord.aliasOf = originalRecord && originalRecord.record;
+    const options = mergeOptions(globalOptions, record);
+    const normalizedRecords = [
+      mainNormalizedRecord
+    ];
+    if ("alias" in record) {
+      const aliases = typeof record.alias === "string" ? [record.alias] : record.alias;
+      for (const alias of aliases) {
+        normalizedRecords.push(assign({}, mainNormalizedRecord, {
+          // this allows us to hold a copy of the `components` option
+          // so that async components cache is hold on the original record
+          components: originalRecord ? originalRecord.record.components : mainNormalizedRecord.components,
+          path: alias,
+          // we might be the child of an alias
+          aliasOf: originalRecord ? originalRecord.record : mainNormalizedRecord
+          // the aliases are always of the same kind as the original since they
+          // are defined on the same record
+        }));
+      }
+    }
+    let matcher;
+    let originalMatcher;
+    for (const normalizedRecord of normalizedRecords) {
+      const { path } = normalizedRecord;
+      if (parent && path[0] !== "/") {
+        const parentPath = parent.record.path;
+        const connectingSlash = parentPath[parentPath.length - 1] === "/" ? "" : "/";
+        normalizedRecord.path = parent.record.path + (path && connectingSlash + path);
+      }
+      matcher = createRouteRecordMatcher(normalizedRecord, parent, options);
+      if (originalRecord) {
+        originalRecord.alias.push(matcher);
+      } else {
+        originalMatcher = originalMatcher || matcher;
+        if (originalMatcher !== matcher)
+          originalMatcher.alias.push(matcher);
+        if (isRootAdd && record.name && !isAliasRecord(matcher))
+          removeRoute(record.name);
+      }
+      if (mainNormalizedRecord.children) {
+        const children = mainNormalizedRecord.children;
+        for (let i2 = 0; i2 < children.length; i2++) {
+          addRoute(children[i2], matcher, originalRecord && originalRecord.children[i2]);
+        }
+      }
+      originalRecord = originalRecord || matcher;
+      if (matcher.record.components && Object.keys(matcher.record.components).length || matcher.record.name || matcher.record.redirect) {
+        insertMatcher(matcher);
+      }
+    }
+    return originalMatcher ? () => {
+      removeRoute(originalMatcher);
+    } : noop;
+  }
+  function removeRoute(matcherRef) {
+    if (isRouteName(matcherRef)) {
+      const matcher = matcherMap.get(matcherRef);
+      if (matcher) {
+        matcherMap.delete(matcherRef);
+        matchers.splice(matchers.indexOf(matcher), 1);
+        matcher.children.forEach(removeRoute);
+        matcher.alias.forEach(removeRoute);
+      }
+    } else {
+      const index = matchers.indexOf(matcherRef);
+      if (index > -1) {
+        matchers.splice(index, 1);
+        if (matcherRef.record.name)
+          matcherMap.delete(matcherRef.record.name);
+        matcherRef.children.forEach(removeRoute);
+        matcherRef.alias.forEach(removeRoute);
+      }
+    }
+  }
+  function getRoutes() {
+    return matchers;
+  }
+  function insertMatcher(matcher) {
+    let i2 = 0;
+    while (i2 < matchers.length && comparePathParserScore(matcher, matchers[i2]) >= 0 && // Adding children with empty path should still appear before the parent
+    // https://github.com/vuejs/router/issues/1124
+    (matcher.record.path !== matchers[i2].record.path || !isRecordChildOf(matcher, matchers[i2])))
+      i2++;
+    matchers.splice(i2, 0, matcher);
+    if (matcher.record.name && !isAliasRecord(matcher))
+      matcherMap.set(matcher.record.name, matcher);
+  }
+  function resolve2(location2, currentLocation) {
+    let matcher;
+    let params = {};
+    let path;
+    let name;
+    if ("name" in location2 && location2.name) {
+      matcher = matcherMap.get(location2.name);
+      if (!matcher)
+        throw createRouterError(1, {
+          location: location2
+        });
+      name = matcher.record.name;
+      params = assign(
+        // paramsFromLocation is a new object
+        paramsFromLocation(
+          currentLocation.params,
+          // only keep params that exist in the resolved location
+          // TODO: only keep optional params coming from a parent record
+          matcher.keys.filter((k) => !k.optional).map((k) => k.name)
+        ),
+        // discard any existing params in the current location that do not exist here
+        // #1497 this ensures better active/exact matching
+        location2.params && paramsFromLocation(location2.params, matcher.keys.map((k) => k.name))
+      );
+      path = matcher.stringify(params);
+    } else if ("path" in location2) {
+      path = location2.path;
+      matcher = matchers.find((m) => m.re.test(path));
+      if (matcher) {
+        params = matcher.parse(path);
+        name = matcher.record.name;
+      }
+    } else {
+      matcher = currentLocation.name ? matcherMap.get(currentLocation.name) : matchers.find((m) => m.re.test(currentLocation.path));
+      if (!matcher)
+        throw createRouterError(1, {
+          location: location2,
+          currentLocation
+        });
+      name = matcher.record.name;
+      params = assign({}, currentLocation.params, location2.params);
+      path = matcher.stringify(params);
+    }
+    const matched = [];
+    let parentMatcher = matcher;
+    while (parentMatcher) {
+      matched.unshift(parentMatcher.record);
+      parentMatcher = parentMatcher.parent;
+    }
+    return {
+      name,
+      path,
+      params,
+      matched,
+      meta: mergeMetaFields(matched)
+    };
+  }
+  routes2.forEach((route) => addRoute(route));
+  return { addRoute, resolve: resolve2, removeRoute, getRoutes, getRecordMatcher };
+}
+function paramsFromLocation(params, keys) {
+  const newParams = {};
+  for (const key of keys) {
+    if (key in params)
+      newParams[key] = params[key];
+  }
+  return newParams;
+}
+function normalizeRouteRecord(record) {
+  return {
+    path: record.path,
+    redirect: record.redirect,
+    name: record.name,
+    meta: record.meta || {},
+    aliasOf: void 0,
+    beforeEnter: record.beforeEnter,
+    props: normalizeRecordProps(record),
+    children: record.children || [],
+    instances: {},
+    leaveGuards: /* @__PURE__ */ new Set(),
+    updateGuards: /* @__PURE__ */ new Set(),
+    enterCallbacks: {},
+    components: "components" in record ? record.components || null : record.component && { default: record.component }
+  };
+}
+function normalizeRecordProps(record) {
+  const propsObject = {};
+  const props = record.props || false;
+  if ("component" in record) {
+    propsObject.default = props;
+  } else {
+    for (const name in record.components)
+      propsObject[name] = typeof props === "object" ? props[name] : props;
+  }
+  return propsObject;
+}
+function isAliasRecord(record) {
+  while (record) {
+    if (record.record.aliasOf)
+      return true;
+    record = record.parent;
+  }
+  return false;
+}
+function mergeMetaFields(matched) {
+  return matched.reduce((meta, record) => assign(meta, record.meta), {});
+}
+function mergeOptions(defaults, partialOptions) {
+  const options = {};
+  for (const key in defaults) {
+    options[key] = key in partialOptions ? partialOptions[key] : defaults[key];
+  }
+  return options;
+}
+function isRecordChildOf(record, parent) {
+  return parent.children.some((child) => child === record || isRecordChildOf(record, child));
+}
+const HASH_RE = /#/g;
+const AMPERSAND_RE = /&/g;
+const SLASH_RE = /\//g;
+const EQUAL_RE = /=/g;
+const IM_RE = /\?/g;
+const PLUS_RE = /\+/g;
+const ENC_BRACKET_OPEN_RE = /%5B/g;
+const ENC_BRACKET_CLOSE_RE = /%5D/g;
+const ENC_CARET_RE = /%5E/g;
+const ENC_BACKTICK_RE = /%60/g;
+const ENC_CURLY_OPEN_RE = /%7B/g;
+const ENC_PIPE_RE = /%7C/g;
+const ENC_CURLY_CLOSE_RE = /%7D/g;
+const ENC_SPACE_RE = /%20/g;
+function commonEncode(text) {
+  return encodeURI("" + text).replace(ENC_PIPE_RE, "|").replace(ENC_BRACKET_OPEN_RE, "[").replace(ENC_BRACKET_CLOSE_RE, "]");
+}
+function encodeHash(text) {
+  return commonEncode(text).replace(ENC_CURLY_OPEN_RE, "{").replace(ENC_CURLY_CLOSE_RE, "}").replace(ENC_CARET_RE, "^");
+}
+function encodeQueryValue(text) {
+  return commonEncode(text).replace(PLUS_RE, "%2B").replace(ENC_SPACE_RE, "+").replace(HASH_RE, "%23").replace(AMPERSAND_RE, "%26").replace(ENC_BACKTICK_RE, "`").replace(ENC_CURLY_OPEN_RE, "{").replace(ENC_CURLY_CLOSE_RE, "}").replace(ENC_CARET_RE, "^");
+}
+function encodeQueryKey(text) {
+  return encodeQueryValue(text).replace(EQUAL_RE, "%3D");
+}
+function encodePath(text) {
+  return commonEncode(text).replace(HASH_RE, "%23").replace(IM_RE, "%3F");
+}
+function encodeParam(text) {
+  return text == null ? "" : encodePath(text).replace(SLASH_RE, "%2F");
+}
+function decode$1(text) {
+  try {
+    return decodeURIComponent("" + text);
+  } catch (err) {
+  }
+  return "" + text;
+}
+function parseQuery(search) {
+  const query = {};
+  if (search === "" || search === "?")
+    return query;
+  const hasLeadingIM = search[0] === "?";
+  const searchParams = (hasLeadingIM ? search.slice(1) : search).split("&");
+  for (let i2 = 0; i2 < searchParams.length; ++i2) {
+    const searchParam = searchParams[i2].replace(PLUS_RE, " ");
+    const eqPos = searchParam.indexOf("=");
+    const key = decode$1(eqPos < 0 ? searchParam : searchParam.slice(0, eqPos));
+    const value = eqPos < 0 ? null : decode$1(searchParam.slice(eqPos + 1));
+    if (key in query) {
+      let currentValue = query[key];
+      if (!isArray(currentValue)) {
+        currentValue = query[key] = [currentValue];
+      }
+      currentValue.push(value);
+    } else {
+      query[key] = value;
+    }
+  }
+  return query;
+}
+function stringifyQuery(query) {
+  let search = "";
+  for (let key in query) {
+    const value = query[key];
+    key = encodeQueryKey(key);
+    if (value == null) {
+      if (value !== void 0) {
+        search += (search.length ? "&" : "") + key;
+      }
+      continue;
+    }
+    const values = isArray(value) ? value.map((v) => v && encodeQueryValue(v)) : [value && encodeQueryValue(value)];
+    values.forEach((value2) => {
+      if (value2 !== void 0) {
+        search += (search.length ? "&" : "") + key;
+        if (value2 != null)
+          search += "=" + value2;
+      }
+    });
+  }
+  return search;
+}
+function normalizeQuery(query) {
+  const normalizedQuery = {};
+  for (const key in query) {
+    const value = query[key];
+    if (value !== void 0) {
+      normalizedQuery[key] = isArray(value) ? value.map((v) => v == null ? null : "" + v) : value == null ? value : "" + value;
+    }
+  }
+  return normalizedQuery;
+}
+const matchedRouteKey = Symbol("");
+const viewDepthKey = Symbol("");
+const routerKey = Symbol("");
+const routeLocationKey = Symbol("");
+const routerViewLocationKey = Symbol("");
+function useCallbacks() {
+  let handlers = [];
+  function add2(handler) {
+    handlers.push(handler);
+    return () => {
+      const i2 = handlers.indexOf(handler);
+      if (i2 > -1)
+        handlers.splice(i2, 1);
+    };
+  }
+  function reset() {
+    handlers = [];
+  }
+  return {
+    add: add2,
+    list: () => handlers.slice(),
+    reset
+  };
+}
+function guardToPromiseFn(guard, to, from, record, name) {
+  const enterCallbackArray = record && // name is defined if record is because of the function overload
+  (record.enterCallbacks[name] = record.enterCallbacks[name] || []);
+  return () => new Promise((resolve2, reject) => {
+    const next = (valid) => {
+      if (valid === false) {
+        reject(createRouterError(4, {
+          from,
+          to
+        }));
+      } else if (valid instanceof Error) {
+        reject(valid);
+      } else if (isRouteLocation(valid)) {
+        reject(createRouterError(2, {
+          from: to,
+          to: valid
+        }));
+      } else {
+        if (enterCallbackArray && // since enterCallbackArray is truthy, both record and name also are
+        record.enterCallbacks[name] === enterCallbackArray && typeof valid === "function") {
+          enterCallbackArray.push(valid);
+        }
+        resolve2();
+      }
+    };
+    const guardReturn = guard.call(record && record.instances[name], to, from, next);
+    let guardCall = Promise.resolve(guardReturn);
+    if (guard.length < 3)
+      guardCall = guardCall.then(next);
+    guardCall.catch((err) => reject(err));
+  });
+}
+function extractComponentsGuards(matched, guardType, to, from) {
+  const guards = [];
+  for (const record of matched) {
+    for (const name in record.components) {
+      let rawComponent = record.components[name];
+      if (guardType !== "beforeRouteEnter" && !record.instances[name])
+        continue;
+      if (isRouteComponent(rawComponent)) {
+        const options = rawComponent.__vccOpts || rawComponent;
+        const guard = options[guardType];
+        guard && guards.push(guardToPromiseFn(guard, to, from, record, name));
+      } else {
+        let componentPromise = rawComponent();
+        guards.push(() => componentPromise.then((resolved) => {
+          if (!resolved)
+            return Promise.reject(new Error(`Couldn't resolve component "${name}" at "${record.path}"`));
+          const resolvedComponent = isESModule(resolved) ? resolved.default : resolved;
+          record.components[name] = resolvedComponent;
+          const options = resolvedComponent.__vccOpts || resolvedComponent;
+          const guard = options[guardType];
+          return guard && guardToPromiseFn(guard, to, from, record, name)();
+        }));
+      }
+    }
+  }
+  return guards;
+}
+function isRouteComponent(component) {
+  return typeof component === "object" || "displayName" in component || "props" in component || "__vccOpts" in component;
+}
+function useLink(props) {
+  const router2 = inject(routerKey);
+  const currentRoute = inject(routeLocationKey);
+  const route = computed(() => router2.resolve(unref(props.to)));
+  const activeRecordIndex = computed(() => {
+    const { matched } = route.value;
+    const { length } = matched;
+    const routeMatched = matched[length - 1];
+    const currentMatched = currentRoute.matched;
+    if (!routeMatched || !currentMatched.length)
+      return -1;
+    const index = currentMatched.findIndex(isSameRouteRecord.bind(null, routeMatched));
+    if (index > -1)
+      return index;
+    const parentRecordPath = getOriginalPath(matched[length - 2]);
+    return (
+      // we are dealing with nested routes
+      length > 1 && // if the parent and matched route have the same path, this link is
+      // referring to the empty child. Or we currently are on a different
+      // child of the same parent
+      getOriginalPath(routeMatched) === parentRecordPath && // avoid comparing the child with its parent
+      currentMatched[currentMatched.length - 1].path !== parentRecordPath ? currentMatched.findIndex(isSameRouteRecord.bind(null, matched[length - 2])) : index
+    );
+  });
+  const isActive = computed(() => activeRecordIndex.value > -1 && includesParams(currentRoute.params, route.value.params));
+  const isExactActive = computed(() => activeRecordIndex.value > -1 && activeRecordIndex.value === currentRoute.matched.length - 1 && isSameRouteLocationParams(currentRoute.params, route.value.params));
+  function navigate(e = {}) {
+    if (guardEvent(e)) {
+      return router2[unref(props.replace) ? "replace" : "push"](
+        unref(props.to)
+        // avoid uncaught errors are they are logged anyway
+      ).catch(noop);
+    }
+    return Promise.resolve();
+  }
+  return {
+    route,
+    href: computed(() => route.value.href),
+    isActive,
+    isExactActive,
+    navigate
+  };
+}
+const RouterLinkImpl = /* @__PURE__ */ defineComponent({
+  name: "RouterLink",
+  compatConfig: { MODE: 3 },
+  props: {
+    to: {
+      type: [String, Object],
+      required: true
+    },
+    replace: Boolean,
+    activeClass: String,
+    // inactiveClass: String,
+    exactActiveClass: String,
+    custom: Boolean,
+    ariaCurrentValue: {
+      type: String,
+      default: "page"
+    }
+  },
+  useLink,
+  setup(props, { slots }) {
+    const link = reactive(useLink(props));
+    const { options } = inject(routerKey);
+    const elClass = computed(() => ({
+      [getLinkClass(props.activeClass, options.linkActiveClass, "router-link-active")]: link.isActive,
+      // [getLinkClass(
+      //   props.inactiveClass,
+      //   options.linkInactiveClass,
+      //   'router-link-inactive'
+      // )]: !link.isExactActive,
+      [getLinkClass(props.exactActiveClass, options.linkExactActiveClass, "router-link-exact-active")]: link.isExactActive
+    }));
+    return () => {
+      const children = slots.default && slots.default(link);
+      return props.custom ? children : h("a", {
+        "aria-current": link.isExactActive ? props.ariaCurrentValue : null,
+        href: link.href,
+        // this would override user added attrs but Vue will still add
+        // the listener, so we end up triggering both
+        onClick: link.navigate,
+        class: elClass.value
+      }, children);
+    };
+  }
+});
+const RouterLink = RouterLinkImpl;
+function guardEvent(e) {
+  if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
+    return;
+  if (e.defaultPrevented)
+    return;
+  if (e.button !== void 0 && e.button !== 0)
+    return;
+  if (e.currentTarget && e.currentTarget.getAttribute) {
+    const target = e.currentTarget.getAttribute("target");
+    if (/\b_blank\b/i.test(target))
+      return;
+  }
+  if (e.preventDefault)
+    e.preventDefault();
+  return true;
+}
+function includesParams(outer, inner) {
+  for (const key in inner) {
+    const innerValue = inner[key];
+    const outerValue = outer[key];
+    if (typeof innerValue === "string") {
+      if (innerValue !== outerValue)
+        return false;
+    } else {
+      if (!isArray(outerValue) || outerValue.length !== innerValue.length || innerValue.some((value, i2) => value !== outerValue[i2]))
+        return false;
+    }
+  }
+  return true;
+}
+function getOriginalPath(record) {
+  return record ? record.aliasOf ? record.aliasOf.path : record.path : "";
+}
+const getLinkClass = (propClass, globalClass, defaultClass) => propClass != null ? propClass : globalClass != null ? globalClass : defaultClass;
+const RouterViewImpl = /* @__PURE__ */ defineComponent({
+  name: "RouterView",
+  // #674 we manually inherit them
+  inheritAttrs: false,
+  props: {
+    name: {
+      type: String,
+      default: "default"
+    },
+    route: Object
+  },
+  // Better compat for @vue/compat users
+  // https://github.com/vuejs/router/issues/1315
+  compatConfig: { MODE: 3 },
+  setup(props, { attrs, slots }) {
+    const injectedRoute = inject(routerViewLocationKey);
+    const routeToDisplay = computed(() => props.route || injectedRoute.value);
+    const injectedDepth = inject(viewDepthKey, 0);
+    const depth = computed(() => {
+      let initialDepth = unref(injectedDepth);
+      const { matched } = routeToDisplay.value;
+      let matchedRoute;
+      while ((matchedRoute = matched[initialDepth]) && !matchedRoute.components) {
+        initialDepth++;
+      }
+      return initialDepth;
+    });
+    const matchedRouteRef = computed(() => routeToDisplay.value.matched[depth.value]);
+    provide(viewDepthKey, computed(() => depth.value + 1));
+    provide(matchedRouteKey, matchedRouteRef);
+    provide(routerViewLocationKey, routeToDisplay);
+    const viewRef = ref();
+    watch(() => [viewRef.value, matchedRouteRef.value, props.name], ([instance, to, name], [oldInstance, from, oldName]) => {
+      if (to) {
+        to.instances[name] = instance;
+        if (from && from !== to && instance && instance === oldInstance) {
+          if (!to.leaveGuards.size) {
+            to.leaveGuards = from.leaveGuards;
+          }
+          if (!to.updateGuards.size) {
+            to.updateGuards = from.updateGuards;
+          }
+        }
+      }
+      if (instance && to && // if there is no instance but to and from are the same this might be
+      // the first visit
+      (!from || !isSameRouteRecord(to, from) || !oldInstance)) {
+        (to.enterCallbacks[name] || []).forEach((callback) => callback(instance));
+      }
+    }, { flush: "post" });
+    return () => {
+      const route = routeToDisplay.value;
+      const currentName = props.name;
+      const matchedRoute = matchedRouteRef.value;
+      const ViewComponent = matchedRoute && matchedRoute.components[currentName];
+      if (!ViewComponent) {
+        return normalizeSlot(slots.default, { Component: ViewComponent, route });
+      }
+      const routePropsOption = matchedRoute.props[currentName];
+      const routeProps = routePropsOption ? routePropsOption === true ? route.params : typeof routePropsOption === "function" ? routePropsOption(route) : routePropsOption : null;
+      const onVnodeUnmounted = (vnode) => {
+        if (vnode.component.isUnmounted) {
+          matchedRoute.instances[currentName] = null;
+        }
+      };
+      const component = h(ViewComponent, assign({}, routeProps, attrs, {
+        onVnodeUnmounted,
+        ref: viewRef
+      }));
+      return (
+        // pass the vnode to the slot as a prop.
+        // h and <component :is="..."> both accept vnodes
+        normalizeSlot(slots.default, { Component: component, route }) || component
+      );
+    };
+  }
+});
+function normalizeSlot(slot, data) {
+  if (!slot)
+    return null;
+  const slotContent = slot(data);
+  return slotContent.length === 1 ? slotContent[0] : slotContent;
+}
+const RouterView = RouterViewImpl;
+function createRouter(options) {
+  const matcher = createRouterMatcher(options.routes, options);
+  const parseQuery$1 = options.parseQuery || parseQuery;
+  const stringifyQuery$1 = options.stringifyQuery || stringifyQuery;
+  const routerHistory = options.history;
+  const beforeGuards = useCallbacks();
+  const beforeResolveGuards = useCallbacks();
+  const afterGuards = useCallbacks();
+  const currentRoute = shallowRef(START_LOCATION_NORMALIZED);
+  let pendingLocation = START_LOCATION_NORMALIZED;
+  if (isBrowser && options.scrollBehavior && "scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+  const normalizeParams = applyToParams.bind(null, (paramValue) => "" + paramValue);
+  const encodeParams = applyToParams.bind(null, encodeParam);
+  const decodeParams = (
+    // @ts-expect-error: intentionally avoid the type check
+    applyToParams.bind(null, decode$1)
+  );
+  function addRoute(parentOrRoute, route) {
+    let parent;
+    let record;
+    if (isRouteName(parentOrRoute)) {
+      parent = matcher.getRecordMatcher(parentOrRoute);
+      record = route;
+    } else {
+      record = parentOrRoute;
+    }
+    return matcher.addRoute(record, parent);
+  }
+  function removeRoute(name) {
+    const recordMatcher = matcher.getRecordMatcher(name);
+    if (recordMatcher) {
+      matcher.removeRoute(recordMatcher);
+    }
+  }
+  function getRoutes() {
+    return matcher.getRoutes().map((routeMatcher) => routeMatcher.record);
+  }
+  function hasRoute(name) {
+    return !!matcher.getRecordMatcher(name);
+  }
+  function resolve2(rawLocation, currentLocation) {
+    currentLocation = assign({}, currentLocation || currentRoute.value);
+    if (typeof rawLocation === "string") {
+      const locationNormalized = parseURL(parseQuery$1, rawLocation, currentLocation.path);
+      const matchedRoute2 = matcher.resolve({ path: locationNormalized.path }, currentLocation);
+      const href2 = routerHistory.createHref(locationNormalized.fullPath);
+      return assign(locationNormalized, matchedRoute2, {
+        params: decodeParams(matchedRoute2.params),
+        hash: decode$1(locationNormalized.hash),
+        redirectedFrom: void 0,
+        href: href2
+      });
+    }
+    let matcherLocation;
+    if ("path" in rawLocation) {
+      matcherLocation = assign({}, rawLocation, {
+        path: parseURL(parseQuery$1, rawLocation.path, currentLocation.path).path
+      });
+    } else {
+      const targetParams = assign({}, rawLocation.params);
+      for (const key in targetParams) {
+        if (targetParams[key] == null) {
+          delete targetParams[key];
+        }
+      }
+      matcherLocation = assign({}, rawLocation, {
+        params: encodeParams(targetParams)
+      });
+      currentLocation.params = encodeParams(currentLocation.params);
+    }
+    const matchedRoute = matcher.resolve(matcherLocation, currentLocation);
+    const hash2 = rawLocation.hash || "";
+    matchedRoute.params = normalizeParams(decodeParams(matchedRoute.params));
+    const fullPath = stringifyURL(stringifyQuery$1, assign({}, rawLocation, {
+      hash: encodeHash(hash2),
+      path: matchedRoute.path
+    }));
+    const href = routerHistory.createHref(fullPath);
+    return assign({
+      fullPath,
+      // keep the hash encoded so fullPath is effectively path + encodedQuery +
+      // hash
+      hash: hash2,
+      query: (
+        // if the user is using a custom query lib like qs, we might have
+        // nested objects, so we keep the query as is, meaning it can contain
+        // numbers at `$route.query`, but at the point, the user will have to
+        // use their own type anyway.
+        // https://github.com/vuejs/router/issues/328#issuecomment-649481567
+        stringifyQuery$1 === stringifyQuery ? normalizeQuery(rawLocation.query) : rawLocation.query || {}
+      )
+    }, matchedRoute, {
+      redirectedFrom: void 0,
+      href
+    });
+  }
+  function locationAsObject(to) {
+    return typeof to === "string" ? parseURL(parseQuery$1, to, currentRoute.value.path) : assign({}, to);
+  }
+  function checkCanceledNavigation(to, from) {
+    if (pendingLocation !== to) {
+      return createRouterError(8, {
+        from,
+        to
+      });
+    }
+  }
+  function push(to) {
+    return pushWithRedirect(to);
+  }
+  function replace(to) {
+    return push(assign(locationAsObject(to), { replace: true }));
+  }
+  function handleRedirectRecord(to) {
+    const lastMatched = to.matched[to.matched.length - 1];
+    if (lastMatched && lastMatched.redirect) {
+      const { redirect } = lastMatched;
+      let newTargetLocation = typeof redirect === "function" ? redirect(to) : redirect;
+      if (typeof newTargetLocation === "string") {
+        newTargetLocation = newTargetLocation.includes("?") || newTargetLocation.includes("#") ? newTargetLocation = locationAsObject(newTargetLocation) : (
+          // force empty params
+          { path: newTargetLocation }
+        );
+        newTargetLocation.params = {};
+      }
+      return assign({
+        query: to.query,
+        hash: to.hash,
+        // avoid transferring params if the redirect has a path
+        params: "path" in newTargetLocation ? {} : to.params
+      }, newTargetLocation);
+    }
+  }
+  function pushWithRedirect(to, redirectedFrom) {
+    const targetLocation = pendingLocation = resolve2(to);
+    const from = currentRoute.value;
+    const data = to.state;
+    const force = to.force;
+    const replace2 = to.replace === true;
+    const shouldRedirect = handleRedirectRecord(targetLocation);
+    if (shouldRedirect)
+      return pushWithRedirect(
+        assign(locationAsObject(shouldRedirect), {
+          state: typeof shouldRedirect === "object" ? assign({}, data, shouldRedirect.state) : data,
+          force,
+          replace: replace2
+        }),
+        // keep original redirectedFrom if it exists
+        redirectedFrom || targetLocation
+      );
+    const toLocation = targetLocation;
+    toLocation.redirectedFrom = redirectedFrom;
+    let failure;
+    if (!force && isSameRouteLocation(stringifyQuery$1, from, targetLocation)) {
+      failure = createRouterError(16, { to: toLocation, from });
+      handleScroll(
+        from,
+        from,
+        // this is a push, the only way for it to be triggered from a
+        // history.listen is with a redirect, which makes it become a push
+        true,
+        // This cannot be the first navigation because the initial location
+        // cannot be manually navigated to
+        false
+      );
+    }
+    return (failure ? Promise.resolve(failure) : navigate(toLocation, from)).catch((error) => isNavigationFailure(error) ? (
+      // navigation redirects still mark the router as ready
+      isNavigationFailure(
+        error,
+        2
+        /* ErrorTypes.NAVIGATION_GUARD_REDIRECT */
+      ) ? error : markAsReady(error)
+    ) : (
+      // reject any unknown error
+      triggerError(error, toLocation, from)
+    )).then((failure2) => {
+      if (failure2) {
+        if (isNavigationFailure(
+          failure2,
+          2
+          /* ErrorTypes.NAVIGATION_GUARD_REDIRECT */
+        )) {
+          return pushWithRedirect(
+            // keep options
+            assign({
+              // preserve an existing replacement but allow the redirect to override it
+              replace: replace2
+            }, locationAsObject(failure2.to), {
+              state: typeof failure2.to === "object" ? assign({}, data, failure2.to.state) : data,
+              force
+            }),
+            // preserve the original redirectedFrom if any
+            redirectedFrom || toLocation
+          );
+        }
+      } else {
+        failure2 = finalizeNavigation(toLocation, from, true, replace2, data);
+      }
+      triggerAfterEach(toLocation, from, failure2);
+      return failure2;
+    });
+  }
+  function checkCanceledNavigationAndReject(to, from) {
+    const error = checkCanceledNavigation(to, from);
+    return error ? Promise.reject(error) : Promise.resolve();
+  }
+  function runWithContext(fn) {
+    const app2 = installedApps.values().next().value;
+    return app2 && typeof app2.runWithContext === "function" ? app2.runWithContext(fn) : fn();
+  }
+  function navigate(to, from) {
+    let guards;
+    const [leavingRecords, updatingRecords, enteringRecords] = extractChangingRecords(to, from);
+    guards = extractComponentsGuards(leavingRecords.reverse(), "beforeRouteLeave", to, from);
+    for (const record of leavingRecords) {
+      record.leaveGuards.forEach((guard) => {
+        guards.push(guardToPromiseFn(guard, to, from));
+      });
+    }
+    const canceledNavigationCheck = checkCanceledNavigationAndReject.bind(null, to, from);
+    guards.push(canceledNavigationCheck);
+    return runGuardQueue(guards).then(() => {
+      guards = [];
+      for (const guard of beforeGuards.list()) {
+        guards.push(guardToPromiseFn(guard, to, from));
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      guards = extractComponentsGuards(updatingRecords, "beforeRouteUpdate", to, from);
+      for (const record of updatingRecords) {
+        record.updateGuards.forEach((guard) => {
+          guards.push(guardToPromiseFn(guard, to, from));
+        });
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      guards = [];
+      for (const record of enteringRecords) {
+        if (record.beforeEnter) {
+          if (isArray(record.beforeEnter)) {
+            for (const beforeEnter of record.beforeEnter)
+              guards.push(guardToPromiseFn(beforeEnter, to, from));
+          } else {
+            guards.push(guardToPromiseFn(record.beforeEnter, to, from));
+          }
+        }
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      to.matched.forEach((record) => record.enterCallbacks = {});
+      guards = extractComponentsGuards(enteringRecords, "beforeRouteEnter", to, from);
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).then(() => {
+      guards = [];
+      for (const guard of beforeResolveGuards.list()) {
+        guards.push(guardToPromiseFn(guard, to, from));
+      }
+      guards.push(canceledNavigationCheck);
+      return runGuardQueue(guards);
+    }).catch((err) => isNavigationFailure(
+      err,
+      8
+      /* ErrorTypes.NAVIGATION_CANCELLED */
+    ) ? err : Promise.reject(err));
+  }
+  function triggerAfterEach(to, from, failure) {
+    afterGuards.list().forEach((guard) => runWithContext(() => guard(to, from, failure)));
+  }
+  function finalizeNavigation(toLocation, from, isPush, replace2, data) {
+    const error = checkCanceledNavigation(toLocation, from);
+    if (error)
+      return error;
+    const isFirstNavigation = from === START_LOCATION_NORMALIZED;
+    const state = !isBrowser ? {} : history.state;
+    if (isPush) {
+      if (replace2 || isFirstNavigation)
+        routerHistory.replace(toLocation.fullPath, assign({
+          scroll: isFirstNavigation && state && state.scroll
+        }, data));
+      else
+        routerHistory.push(toLocation.fullPath, data);
+    }
+    currentRoute.value = toLocation;
+    handleScroll(toLocation, from, isPush, isFirstNavigation);
+    markAsReady();
+  }
+  let removeHistoryListener;
+  function setupListeners() {
+    if (removeHistoryListener)
+      return;
+    removeHistoryListener = routerHistory.listen((to, _from, info) => {
+      if (!router2.listening)
+        return;
+      const toLocation = resolve2(to);
+      const shouldRedirect = handleRedirectRecord(toLocation);
+      if (shouldRedirect) {
+        pushWithRedirect(assign(shouldRedirect, { replace: true }), toLocation).catch(noop);
+        return;
+      }
+      pendingLocation = toLocation;
+      const from = currentRoute.value;
+      if (isBrowser) {
+        saveScrollPosition(getScrollKey(from.fullPath, info.delta), computeScrollPosition());
+      }
+      navigate(toLocation, from).catch((error) => {
+        if (isNavigationFailure(
+          error,
+          4 | 8
+          /* ErrorTypes.NAVIGATION_CANCELLED */
+        )) {
+          return error;
+        }
+        if (isNavigationFailure(
+          error,
+          2
+          /* ErrorTypes.NAVIGATION_GUARD_REDIRECT */
+        )) {
+          pushWithRedirect(
+            error.to,
+            toLocation
+            // avoid an uncaught rejection, let push call triggerError
+          ).then((failure) => {
+            if (isNavigationFailure(
+              failure,
+              4 | 16
+              /* ErrorTypes.NAVIGATION_DUPLICATED */
+            ) && !info.delta && info.type === NavigationType.pop) {
+              routerHistory.go(-1, false);
+            }
+          }).catch(noop);
+          return Promise.reject();
+        }
+        if (info.delta) {
+          routerHistory.go(-info.delta, false);
+        }
+        return triggerError(error, toLocation, from);
+      }).then((failure) => {
+        failure = failure || finalizeNavigation(
+          // after navigation, all matched components are resolved
+          toLocation,
+          from,
+          false
+        );
+        if (failure) {
+          if (info.delta && // a new navigation has been triggered, so we do not want to revert, that will change the current history
+          // entry while a different route is displayed
+          !isNavigationFailure(
+            failure,
+            8
+            /* ErrorTypes.NAVIGATION_CANCELLED */
+          )) {
+            routerHistory.go(-info.delta, false);
+          } else if (info.type === NavigationType.pop && isNavigationFailure(
+            failure,
+            4 | 16
+            /* ErrorTypes.NAVIGATION_DUPLICATED */
+          )) {
+            routerHistory.go(-1, false);
+          }
+        }
+        triggerAfterEach(toLocation, from, failure);
+      }).catch(noop);
+    });
+  }
+  let readyHandlers = useCallbacks();
+  let errorListeners = useCallbacks();
+  let ready;
+  function triggerError(error, to, from) {
+    markAsReady(error);
+    const list = errorListeners.list();
+    if (list.length) {
+      list.forEach((handler) => handler(error, to, from));
+    } else {
+      console.error(error);
+    }
+    return Promise.reject(error);
+  }
+  function isReady() {
+    if (ready && currentRoute.value !== START_LOCATION_NORMALIZED)
+      return Promise.resolve();
+    return new Promise((resolve3, reject) => {
+      readyHandlers.add([resolve3, reject]);
+    });
+  }
+  function markAsReady(err) {
+    if (!ready) {
+      ready = !err;
+      setupListeners();
+      readyHandlers.list().forEach(([resolve3, reject]) => err ? reject(err) : resolve3());
+      readyHandlers.reset();
+    }
+    return err;
+  }
+  function handleScroll(to, from, isPush, isFirstNavigation) {
+    const { scrollBehavior } = options;
+    if (!isBrowser || !scrollBehavior)
+      return Promise.resolve();
+    const scrollPosition = !isPush && getSavedScrollPosition(getScrollKey(to.fullPath, 0)) || (isFirstNavigation || !isPush) && history.state && history.state.scroll || null;
+    return nextTick().then(() => scrollBehavior(to, from, scrollPosition)).then((position) => position && scrollToPosition(position)).catch((err) => triggerError(err, to, from));
+  }
+  const go = (delta) => routerHistory.go(delta);
+  let started;
+  const installedApps = /* @__PURE__ */ new Set();
+  const router2 = {
+    currentRoute,
+    listening: true,
+    addRoute,
+    removeRoute,
+    hasRoute,
+    getRoutes,
+    resolve: resolve2,
+    options,
+    push,
+    replace,
+    go,
+    back: () => go(-1),
+    forward: () => go(1),
+    beforeEach: beforeGuards.add,
+    beforeResolve: beforeResolveGuards.add,
+    afterEach: afterGuards.add,
+    onError: errorListeners.add,
+    isReady,
+    install(app2) {
+      const router3 = this;
+      app2.component("RouterLink", RouterLink);
+      app2.component("RouterView", RouterView);
+      app2.config.globalProperties.$router = router3;
+      Object.defineProperty(app2.config.globalProperties, "$route", {
+        enumerable: true,
+        get: () => unref(currentRoute)
+      });
+      if (isBrowser && // used for the initial navigation client side to avoid pushing
+      // multiple times when the router is used in multiple apps
+      !started && currentRoute.value === START_LOCATION_NORMALIZED) {
+        started = true;
+        push(routerHistory.location).catch((err) => {
+        });
+      }
+      const reactiveRoute = {};
+      for (const key in START_LOCATION_NORMALIZED) {
+        Object.defineProperty(reactiveRoute, key, {
+          get: () => currentRoute.value[key],
+          enumerable: true
+        });
+      }
+      app2.provide(routerKey, router3);
+      app2.provide(routeLocationKey, shallowReactive(reactiveRoute));
+      app2.provide(routerViewLocationKey, currentRoute);
+      const unmountApp = app2.unmount;
+      installedApps.add(app2);
+      app2.unmount = function() {
+        installedApps.delete(app2);
+        if (installedApps.size < 1) {
+          pendingLocation = START_LOCATION_NORMALIZED;
+          removeHistoryListener && removeHistoryListener();
+          removeHistoryListener = null;
+          currentRoute.value = START_LOCATION_NORMALIZED;
+          started = false;
+          ready = false;
+        }
+        unmountApp();
+      };
+    }
+  };
+  function runGuardQueue(guards) {
+    return guards.reduce((promise, guard) => promise.then(() => runWithContext(guard)), Promise.resolve());
+  }
+  return router2;
+}
+function extractChangingRecords(to, from) {
+  const leavingRecords = [];
+  const updatingRecords = [];
+  const enteringRecords = [];
+  const len = Math.max(from.matched.length, to.matched.length);
+  for (let i2 = 0; i2 < len; i2++) {
+    const recordFrom = from.matched[i2];
+    if (recordFrom) {
+      if (to.matched.find((record) => isSameRouteRecord(record, recordFrom)))
+        updatingRecords.push(recordFrom);
+      else
+        leavingRecords.push(recordFrom);
+    }
+    const recordTo = to.matched[i2];
+    if (recordTo) {
+      if (!from.matched.find((record) => isSameRouteRecord(record, recordTo))) {
+        enteringRecords.push(recordTo);
+      }
+    }
+  }
+  return [leavingRecords, updatingRecords, enteringRecords];
+}
+function useRouter() {
+  return inject(routerKey);
+}
+function useRoute() {
+  return inject(routeLocationKey);
+}
+function number$2(n) {
+  if (!Number.isSafeInteger(n) || n < 0)
+    throw new Error(`Wrong positive integer: ${n}`);
+}
+function bytes$3(b, ...lengths) {
+  if (!(b instanceof Uint8Array))
+    throw new Error("Expected Uint8Array");
+  if (lengths.length > 0 && !lengths.includes(b.length))
+    throw new Error(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
+}
+function hash$1(hash2) {
+  if (typeof hash2 !== "function" || typeof hash2.create !== "function")
+    throw new Error("Hash should be wrapped by utils.wrapConstructor");
+  number$2(hash2.outputLen);
+  number$2(hash2.blockLen);
+}
+function exists$2(instance, checkFinished = true) {
+  if (instance.destroyed)
+    throw new Error("Hash instance has been destroyed");
+  if (checkFinished && instance.finished)
+    throw new Error("Hash#digest() has already been called");
+}
+function output$2(out, instance) {
+  bytes$3(out);
+  const min = instance.outputLen;
+  if (out.length < min) {
+    throw new Error(`digestInto() expects output buffer of length at least ${min}`);
+  }
+}
+const crypto$2 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
+/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const u8a$2 = (a) => a instanceof Uint8Array;
+const createView$2 = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+const rotr$2 = (word, shift) => word << 32 - shift | word >>> shift;
+const isLE$2 = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+if (!isLE$2)
+  throw new Error("Non little-endian hardware is not supported");
+function utf8ToBytes$3(str) {
+  if (typeof str !== "string")
+    throw new Error(`utf8ToBytes expected string, got ${typeof str}`);
+  return new Uint8Array(new TextEncoder().encode(str));
+}
+function toBytes$2(data) {
+  if (typeof data === "string")
+    data = utf8ToBytes$3(data);
+  if (!u8a$2(data))
+    throw new Error(`expected Uint8Array, got ${typeof data}`);
+  return data;
+}
+function concatBytes$2(...arrays) {
+  const r = new Uint8Array(arrays.reduce((sum, a) => sum + a.length, 0));
+  let pad2 = 0;
+  arrays.forEach((a) => {
+    if (!u8a$2(a))
+      throw new Error("Uint8Array expected");
+    r.set(a, pad2);
+    pad2 += a.length;
+  });
+  return r;
+}
+let Hash$2 = class Hash {
+  // Safe version that clones internal state
+  clone() {
+    return this._cloneInto();
+  }
+};
+function wrapConstructor$2(hashCons) {
+  const hashC = (msg) => hashCons().update(toBytes$2(msg)).digest();
+  const tmp = hashCons();
+  hashC.outputLen = tmp.outputLen;
+  hashC.blockLen = tmp.blockLen;
+  hashC.create = () => hashCons();
+  return hashC;
+}
+function randomBytes$1(bytesLength = 32) {
+  if (crypto$2 && typeof crypto$2.getRandomValues === "function") {
+    return crypto$2.getRandomValues(new Uint8Array(bytesLength));
+  }
+  throw new Error("crypto.getRandomValues must be defined");
+}
+function setBigUint64$2(view, byteOffset, value, isLE2) {
+  if (typeof view.setBigUint64 === "function")
+    return view.setBigUint64(byteOffset, value, isLE2);
+  const _32n = BigInt(32);
+  const _u32_max = BigInt(4294967295);
+  const wh = Number(value >> _32n & _u32_max);
+  const wl = Number(value & _u32_max);
+  const h2 = isLE2 ? 4 : 0;
+  const l = isLE2 ? 0 : 4;
+  view.setUint32(byteOffset + h2, wh, isLE2);
+  view.setUint32(byteOffset + l, wl, isLE2);
+}
+let SHA2$1 = class SHA2 extends Hash$2 {
+  constructor(blockLen, outputLen, padOffset, isLE2) {
+    super();
+    this.blockLen = blockLen;
+    this.outputLen = outputLen;
+    this.padOffset = padOffset;
+    this.isLE = isLE2;
+    this.finished = false;
+    this.length = 0;
+    this.pos = 0;
+    this.destroyed = false;
+    this.buffer = new Uint8Array(blockLen);
+    this.view = createView$2(this.buffer);
+  }
+  update(data) {
+    exists$2(this);
+    const { view, buffer, blockLen } = this;
+    data = toBytes$2(data);
+    const len = data.length;
+    for (let pos = 0; pos < len; ) {
+      const take = Math.min(blockLen - this.pos, len - pos);
+      if (take === blockLen) {
+        const dataView = createView$2(data);
+        for (; blockLen <= len - pos; pos += blockLen)
+          this.process(dataView, pos);
+        continue;
+      }
+      buffer.set(data.subarray(pos, pos + take), this.pos);
+      this.pos += take;
+      pos += take;
+      if (this.pos === blockLen) {
+        this.process(view, 0);
+        this.pos = 0;
+      }
+    }
+    this.length += data.length;
+    this.roundClean();
+    return this;
+  }
+  digestInto(out) {
+    exists$2(this);
+    output$2(out, this);
+    this.finished = true;
+    const { buffer, view, blockLen, isLE: isLE2 } = this;
+    let { pos } = this;
+    buffer[pos++] = 128;
+    this.buffer.subarray(pos).fill(0);
+    if (this.padOffset > blockLen - pos) {
+      this.process(view, 0);
+      pos = 0;
+    }
+    for (let i2 = pos; i2 < blockLen; i2++)
+      buffer[i2] = 0;
+    setBigUint64$2(view, blockLen - 8, BigInt(this.length * 8), isLE2);
+    this.process(view, 0);
+    const oview = createView$2(out);
+    const len = this.outputLen;
+    if (len % 4)
+      throw new Error("_sha2: outputLen should be aligned to 32bit");
+    const outLen = len / 4;
+    const state = this.get();
+    if (outLen > state.length)
+      throw new Error("_sha2: outputLen bigger than state");
+    for (let i2 = 0; i2 < outLen; i2++)
+      oview.setUint32(4 * i2, state[i2], isLE2);
+  }
+  digest() {
+    const { buffer, outputLen } = this;
+    this.digestInto(buffer);
+    const res = buffer.slice(0, outputLen);
+    this.destroy();
+    return res;
+  }
+  _cloneInto(to) {
+    to || (to = new this.constructor());
+    to.set(...this.get());
+    const { blockLen, buffer, length, finished, destroyed, pos } = this;
+    to.length = length;
+    to.pos = pos;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    if (length % blockLen)
+      to.buffer.set(buffer);
+    return to;
+  }
+};
+const Chi$2 = (a, b, c) => a & b ^ ~a & c;
+const Maj$2 = (a, b, c) => a & b ^ a & c ^ b & c;
+const SHA256_K$2 = /* @__PURE__ */ new Uint32Array([
+  1116352408,
+  1899447441,
+  3049323471,
+  3921009573,
+  961987163,
+  1508970993,
+  2453635748,
+  2870763221,
+  3624381080,
+  310598401,
+  607225278,
+  1426881987,
+  1925078388,
+  2162078206,
+  2614888103,
+  3248222580,
+  3835390401,
+  4022224774,
+  264347078,
+  604807628,
+  770255983,
+  1249150122,
+  1555081692,
+  1996064986,
+  2554220882,
+  2821834349,
+  2952996808,
+  3210313671,
+  3336571891,
+  3584528711,
+  113926993,
+  338241895,
+  666307205,
+  773529912,
+  1294757372,
+  1396182291,
+  1695183700,
+  1986661051,
+  2177026350,
+  2456956037,
+  2730485921,
+  2820302411,
+  3259730800,
+  3345764771,
+  3516065817,
+  3600352804,
+  4094571909,
+  275423344,
+  430227734,
+  506948616,
+  659060556,
+  883997877,
+  958139571,
+  1322822218,
+  1537002063,
+  1747873779,
+  1955562222,
+  2024104815,
+  2227730452,
+  2361852424,
+  2428436474,
+  2756734187,
+  3204031479,
+  3329325298
+]);
+const IV$1 = /* @__PURE__ */ new Uint32Array([
+  1779033703,
+  3144134277,
+  1013904242,
+  2773480762,
+  1359893119,
+  2600822924,
+  528734635,
+  1541459225
+]);
+const SHA256_W$2 = /* @__PURE__ */ new Uint32Array(64);
+let SHA256$2 = class SHA256 extends SHA2$1 {
+  constructor() {
+    super(64, 32, 8, false);
+    this.A = IV$1[0] | 0;
+    this.B = IV$1[1] | 0;
+    this.C = IV$1[2] | 0;
+    this.D = IV$1[3] | 0;
+    this.E = IV$1[4] | 0;
+    this.F = IV$1[5] | 0;
+    this.G = IV$1[6] | 0;
+    this.H = IV$1[7] | 0;
+  }
+  get() {
+    const { A, B, C, D, E, F, G, H } = this;
+    return [A, B, C, D, E, F, G, H];
+  }
+  // prettier-ignore
+  set(A, B, C, D, E, F, G, H) {
+    this.A = A | 0;
+    this.B = B | 0;
+    this.C = C | 0;
+    this.D = D | 0;
+    this.E = E | 0;
+    this.F = F | 0;
+    this.G = G | 0;
+    this.H = H | 0;
+  }
+  process(view, offset) {
+    for (let i2 = 0; i2 < 16; i2++, offset += 4)
+      SHA256_W$2[i2] = view.getUint32(offset, false);
+    for (let i2 = 16; i2 < 64; i2++) {
+      const W15 = SHA256_W$2[i2 - 15];
+      const W2 = SHA256_W$2[i2 - 2];
+      const s0 = rotr$2(W15, 7) ^ rotr$2(W15, 18) ^ W15 >>> 3;
+      const s1 = rotr$2(W2, 17) ^ rotr$2(W2, 19) ^ W2 >>> 10;
+      SHA256_W$2[i2] = s1 + SHA256_W$2[i2 - 7] + s0 + SHA256_W$2[i2 - 16] | 0;
+    }
+    let { A, B, C, D, E, F, G, H } = this;
+    for (let i2 = 0; i2 < 64; i2++) {
+      const sigma1 = rotr$2(E, 6) ^ rotr$2(E, 11) ^ rotr$2(E, 25);
+      const T1 = H + sigma1 + Chi$2(E, F, G) + SHA256_K$2[i2] + SHA256_W$2[i2] | 0;
+      const sigma0 = rotr$2(A, 2) ^ rotr$2(A, 13) ^ rotr$2(A, 22);
+      const T2 = sigma0 + Maj$2(A, B, C) | 0;
+      H = G;
+      G = F;
+      F = E;
+      E = D + T1 | 0;
+      D = C;
+      C = B;
+      B = A;
+      A = T1 + T2 | 0;
+    }
+    A = A + this.A | 0;
+    B = B + this.B | 0;
+    C = C + this.C | 0;
+    D = D + this.D | 0;
+    E = E + this.E | 0;
+    F = F + this.F | 0;
+    G = G + this.G | 0;
+    H = H + this.H | 0;
+    this.set(A, B, C, D, E, F, G, H);
+  }
+  roundClean() {
+    SHA256_W$2.fill(0);
+  }
+  destroy() {
+    this.set(0, 0, 0, 0, 0, 0, 0, 0);
+    this.buffer.fill(0);
+  }
+};
+const sha256$2 = /* @__PURE__ */ wrapConstructor$2(() => new SHA256$2());
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const _0n$4 = BigInt(0);
+const _1n$4 = BigInt(1);
+const _2n$2 = BigInt(2);
+const u8a$1 = (a) => a instanceof Uint8Array;
+const hexes$2 = /* @__PURE__ */ Array.from({ length: 256 }, (_, i2) => i2.toString(16).padStart(2, "0"));
+function bytesToHex$2(bytes2) {
+  if (!u8a$1(bytes2))
+    throw new Error("Uint8Array expected");
+  let hex2 = "";
+  for (let i2 = 0; i2 < bytes2.length; i2++) {
+    hex2 += hexes$2[bytes2[i2]];
+  }
+  return hex2;
+}
+function numberToHexUnpadded(num) {
+  const hex2 = num.toString(16);
+  return hex2.length & 1 ? `0${hex2}` : hex2;
+}
+function hexToNumber(hex2) {
+  if (typeof hex2 !== "string")
+    throw new Error("hex string expected, got " + typeof hex2);
+  return BigInt(hex2 === "" ? "0" : `0x${hex2}`);
+}
+function hexToBytes$2(hex2) {
+  if (typeof hex2 !== "string")
+    throw new Error("hex string expected, got " + typeof hex2);
+  const len = hex2.length;
+  if (len % 2)
+    throw new Error("padded hex string expected, got unpadded hex of length " + len);
+  const array = new Uint8Array(len / 2);
+  for (let i2 = 0; i2 < array.length; i2++) {
+    const j = i2 * 2;
+    const hexByte = hex2.slice(j, j + 2);
+    const byte = Number.parseInt(hexByte, 16);
+    if (Number.isNaN(byte) || byte < 0)
+      throw new Error("Invalid byte sequence");
+    array[i2] = byte;
+  }
+  return array;
+}
+function bytesToNumberBE(bytes2) {
+  return hexToNumber(bytesToHex$2(bytes2));
+}
+function bytesToNumberLE(bytes2) {
+  if (!u8a$1(bytes2))
+    throw new Error("Uint8Array expected");
+  return hexToNumber(bytesToHex$2(Uint8Array.from(bytes2).reverse()));
+}
+function numberToBytesBE(n, len) {
+  return hexToBytes$2(n.toString(16).padStart(len * 2, "0"));
+}
+function numberToBytesLE(n, len) {
+  return numberToBytesBE(n, len).reverse();
+}
+function numberToVarBytesBE(n) {
+  return hexToBytes$2(numberToHexUnpadded(n));
+}
+function ensureBytes(title, hex2, expectedLength) {
+  let res;
+  if (typeof hex2 === "string") {
+    try {
+      res = hexToBytes$2(hex2);
+    } catch (e) {
+      throw new Error(`${title} must be valid hex string, got "${hex2}". Cause: ${e}`);
+    }
+  } else if (u8a$1(hex2)) {
+    res = Uint8Array.from(hex2);
+  } else {
+    throw new Error(`${title} must be hex string or Uint8Array`);
+  }
+  const len = res.length;
+  if (typeof expectedLength === "number" && len !== expectedLength)
+    throw new Error(`${title} expected ${expectedLength} bytes, got ${len}`);
+  return res;
+}
+function concatBytes$1(...arrays) {
+  const r = new Uint8Array(arrays.reduce((sum, a) => sum + a.length, 0));
+  let pad2 = 0;
+  arrays.forEach((a) => {
+    if (!u8a$1(a))
+      throw new Error("Uint8Array expected");
+    r.set(a, pad2);
+    pad2 += a.length;
+  });
+  return r;
+}
+function equalBytes$1(b1, b2) {
+  if (b1.length !== b2.length)
+    return false;
+  for (let i2 = 0; i2 < b1.length; i2++)
+    if (b1[i2] !== b2[i2])
+      return false;
+  return true;
+}
+function utf8ToBytes$2(str) {
+  if (typeof str !== "string")
+    throw new Error(`utf8ToBytes expected string, got ${typeof str}`);
+  return new Uint8Array(new TextEncoder().encode(str));
+}
+function bitLen(n) {
+  let len;
+  for (len = 0; n > _0n$4; n >>= _1n$4, len += 1)
+    ;
+  return len;
+}
+function bitGet(n, pos) {
+  return n >> BigInt(pos) & _1n$4;
+}
+const bitSet = (n, pos, value) => {
+  return n | (value ? _1n$4 : _0n$4) << BigInt(pos);
+};
+const bitMask = (n) => (_2n$2 << BigInt(n - 1)) - _1n$4;
+const u8n = (data) => new Uint8Array(data);
+const u8fr = (arr) => Uint8Array.from(arr);
+function createHmacDrbg(hashLen, qByteLen, hmacFn) {
+  if (typeof hashLen !== "number" || hashLen < 2)
+    throw new Error("hashLen must be a number");
+  if (typeof qByteLen !== "number" || qByteLen < 2)
+    throw new Error("qByteLen must be a number");
+  if (typeof hmacFn !== "function")
+    throw new Error("hmacFn must be a function");
+  let v = u8n(hashLen);
+  let k = u8n(hashLen);
+  let i2 = 0;
+  const reset = () => {
+    v.fill(1);
+    k.fill(0);
+    i2 = 0;
+  };
+  const h2 = (...b) => hmacFn(k, v, ...b);
+  const reseed = (seed = u8n()) => {
+    k = h2(u8fr([0]), seed);
+    v = h2();
+    if (seed.length === 0)
+      return;
+    k = h2(u8fr([1]), seed);
+    v = h2();
+  };
+  const gen = () => {
+    if (i2++ >= 1e3)
+      throw new Error("drbg: tried 1000 values");
+    let len = 0;
+    const out = [];
+    while (len < qByteLen) {
+      v = h2();
+      const sl = v.slice();
+      out.push(sl);
+      len += v.length;
+    }
+    return concatBytes$1(...out);
+  };
+  const genUntil = (seed, pred) => {
+    reset();
+    reseed(seed);
+    let res = void 0;
+    while (!(res = pred(gen())))
+      reseed();
+    reset();
+    return res;
+  };
+  return genUntil;
+}
+const validatorFns = {
+  bigint: (val) => typeof val === "bigint",
+  function: (val) => typeof val === "function",
+  boolean: (val) => typeof val === "boolean",
+  string: (val) => typeof val === "string",
+  stringOrUint8Array: (val) => typeof val === "string" || val instanceof Uint8Array,
+  isSafeInteger: (val) => Number.isSafeInteger(val),
+  array: (val) => Array.isArray(val),
+  field: (val, object) => object.Fp.isValid(val),
+  hash: (val) => typeof val === "function" && Number.isSafeInteger(val.outputLen)
+};
+function validateObject(object, validators, optValidators = {}) {
+  const checkField = (fieldName, type, isOptional) => {
+    const checkVal = validatorFns[type];
+    if (typeof checkVal !== "function")
+      throw new Error(`Invalid validator "${type}", expected function`);
+    const val = object[fieldName];
+    if (isOptional && val === void 0)
+      return;
+    if (!checkVal(val, object)) {
+      throw new Error(`Invalid param ${String(fieldName)}=${val} (${typeof val}), expected ${type}`);
+    }
+  };
+  for (const [fieldName, type] of Object.entries(validators))
+    checkField(fieldName, type, false);
+  for (const [fieldName, type] of Object.entries(optValidators))
+    checkField(fieldName, type, true);
+  return object;
+}
+const ut = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  bitGet,
+  bitLen,
+  bitMask,
+  bitSet,
+  bytesToHex: bytesToHex$2,
+  bytesToNumberBE,
+  bytesToNumberLE,
+  concatBytes: concatBytes$1,
+  createHmacDrbg,
+  ensureBytes,
+  equalBytes: equalBytes$1,
+  hexToBytes: hexToBytes$2,
+  hexToNumber,
+  numberToBytesBE,
+  numberToBytesLE,
+  numberToHexUnpadded,
+  numberToVarBytesBE,
+  utf8ToBytes: utf8ToBytes$2,
+  validateObject
+}, Symbol.toStringTag, { value: "Module" }));
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const _0n$3 = BigInt(0), _1n$3 = BigInt(1), _2n$1 = BigInt(2), _3n$1 = BigInt(3);
+const _4n = BigInt(4), _5n = BigInt(5), _8n = BigInt(8);
+BigInt(9);
+BigInt(16);
+function mod(a, b) {
+  const result = a % b;
+  return result >= _0n$3 ? result : b + result;
+}
+function pow(num, power, modulo) {
+  if (modulo <= _0n$3 || power < _0n$3)
+    throw new Error("Expected power/modulo > 0");
+  if (modulo === _1n$3)
+    return _0n$3;
+  let res = _1n$3;
+  while (power > _0n$3) {
+    if (power & _1n$3)
+      res = res * num % modulo;
+    num = num * num % modulo;
+    power >>= _1n$3;
+  }
+  return res;
+}
+function pow2(x, power, modulo) {
+  let res = x;
+  while (power-- > _0n$3) {
+    res *= res;
+    res %= modulo;
+  }
+  return res;
+}
+function invert(number2, modulo) {
+  if (number2 === _0n$3 || modulo <= _0n$3) {
+    throw new Error(`invert: expected positive integers, got n=${number2} mod=${modulo}`);
+  }
+  let a = mod(number2, modulo);
+  let b = modulo;
+  let x = _0n$3, u = _1n$3;
+  while (a !== _0n$3) {
+    const q = b / a;
+    const r = b % a;
+    const m = x - u * q;
+    b = a, a = r, x = u, u = m;
+  }
+  const gcd2 = b;
+  if (gcd2 !== _1n$3)
+    throw new Error("invert: does not exist");
+  return mod(x, modulo);
+}
+function tonelliShanks(P) {
+  const legendreC = (P - _1n$3) / _2n$1;
+  let Q, S, Z;
+  for (Q = P - _1n$3, S = 0; Q % _2n$1 === _0n$3; Q /= _2n$1, S++)
+    ;
+  for (Z = _2n$1; Z < P && pow(Z, legendreC, P) !== P - _1n$3; Z++)
+    ;
+  if (S === 1) {
+    const p1div4 = (P + _1n$3) / _4n;
+    return function tonelliFast(Fp2, n) {
+      const root = Fp2.pow(n, p1div4);
+      if (!Fp2.eql(Fp2.sqr(root), n))
+        throw new Error("Cannot find square root");
+      return root;
+    };
+  }
+  const Q1div2 = (Q + _1n$3) / _2n$1;
+  return function tonelliSlow(Fp2, n) {
+    if (Fp2.pow(n, legendreC) === Fp2.neg(Fp2.ONE))
+      throw new Error("Cannot find square root");
+    let r = S;
+    let g = Fp2.pow(Fp2.mul(Fp2.ONE, Z), Q);
+    let x = Fp2.pow(n, Q1div2);
+    let b = Fp2.pow(n, Q);
+    while (!Fp2.eql(b, Fp2.ONE)) {
+      if (Fp2.eql(b, Fp2.ZERO))
+        return Fp2.ZERO;
+      let m = 1;
+      for (let t2 = Fp2.sqr(b); m < r; m++) {
+        if (Fp2.eql(t2, Fp2.ONE))
+          break;
+        t2 = Fp2.sqr(t2);
+      }
+      const ge2 = Fp2.pow(g, _1n$3 << BigInt(r - m - 1));
+      g = Fp2.sqr(ge2);
+      x = Fp2.mul(x, ge2);
+      b = Fp2.mul(b, g);
+      r = m;
+    }
+    return x;
+  };
+}
+function FpSqrt(P) {
+  if (P % _4n === _3n$1) {
+    const p1div4 = (P + _1n$3) / _4n;
+    return function sqrt3mod4(Fp2, n) {
+      const root = Fp2.pow(n, p1div4);
+      if (!Fp2.eql(Fp2.sqr(root), n))
+        throw new Error("Cannot find square root");
+      return root;
+    };
+  }
+  if (P % _8n === _5n) {
+    const c1 = (P - _5n) / _8n;
+    return function sqrt5mod8(Fp2, n) {
+      const n2 = Fp2.mul(n, _2n$1);
+      const v = Fp2.pow(n2, c1);
+      const nv = Fp2.mul(n, v);
+      const i2 = Fp2.mul(Fp2.mul(nv, _2n$1), v);
+      const root = Fp2.mul(nv, Fp2.sub(i2, Fp2.ONE));
+      if (!Fp2.eql(Fp2.sqr(root), n))
+        throw new Error("Cannot find square root");
+      return root;
+    };
+  }
+  return tonelliShanks(P);
+}
+const FIELD_FIELDS = [
+  "create",
+  "isValid",
+  "is0",
+  "neg",
+  "inv",
+  "sqrt",
+  "sqr",
+  "eql",
+  "add",
+  "sub",
+  "mul",
+  "pow",
+  "div",
+  "addN",
+  "subN",
+  "mulN",
+  "sqrN"
+];
+function validateField(field) {
+  const initial = {
+    ORDER: "bigint",
+    MASK: "bigint",
+    BYTES: "isSafeInteger",
+    BITS: "isSafeInteger"
+  };
+  const opts = FIELD_FIELDS.reduce((map, val) => {
+    map[val] = "function";
+    return map;
+  }, initial);
+  return validateObject(field, opts);
+}
+function FpPow(f, num, power) {
+  if (power < _0n$3)
+    throw new Error("Expected power > 0");
+  if (power === _0n$3)
+    return f.ONE;
+  if (power === _1n$3)
+    return num;
+  let p2 = f.ONE;
+  let d = num;
+  while (power > _0n$3) {
+    if (power & _1n$3)
+      p2 = f.mul(p2, d);
+    d = f.sqr(d);
+    power >>= _1n$3;
+  }
+  return p2;
+}
+function FpInvertBatch(f, nums) {
+  const tmp = new Array(nums.length);
+  const lastMultiplied = nums.reduce((acc, num, i2) => {
+    if (f.is0(num))
+      return acc;
+    tmp[i2] = acc;
+    return f.mul(acc, num);
+  }, f.ONE);
+  const inverted = f.inv(lastMultiplied);
+  nums.reduceRight((acc, num, i2) => {
+    if (f.is0(num))
+      return acc;
+    tmp[i2] = f.mul(acc, tmp[i2]);
+    return f.mul(acc, num);
+  }, inverted);
+  return tmp;
+}
+function nLength(n, nBitLength) {
+  const _nBitLength = nBitLength !== void 0 ? nBitLength : n.toString(2).length;
+  const nByteLength = Math.ceil(_nBitLength / 8);
+  return { nBitLength: _nBitLength, nByteLength };
+}
+function Field(ORDER, bitLen2, isLE2 = false, redef = {}) {
+  if (ORDER <= _0n$3)
+    throw new Error(`Expected Field ORDER > 0, got ${ORDER}`);
+  const { nBitLength: BITS, nByteLength: BYTES } = nLength(ORDER, bitLen2);
+  if (BYTES > 2048)
+    throw new Error("Field lengths over 2048 bytes are not supported");
+  const sqrtP = FpSqrt(ORDER);
+  const f = Object.freeze({
+    ORDER,
+    BITS,
+    BYTES,
+    MASK: bitMask(BITS),
+    ZERO: _0n$3,
+    ONE: _1n$3,
+    create: (num) => mod(num, ORDER),
+    isValid: (num) => {
+      if (typeof num !== "bigint")
+        throw new Error(`Invalid field element: expected bigint, got ${typeof num}`);
+      return _0n$3 <= num && num < ORDER;
+    },
+    is0: (num) => num === _0n$3,
+    isOdd: (num) => (num & _1n$3) === _1n$3,
+    neg: (num) => mod(-num, ORDER),
+    eql: (lhs, rhs) => lhs === rhs,
+    sqr: (num) => mod(num * num, ORDER),
+    add: (lhs, rhs) => mod(lhs + rhs, ORDER),
+    sub: (lhs, rhs) => mod(lhs - rhs, ORDER),
+    mul: (lhs, rhs) => mod(lhs * rhs, ORDER),
+    pow: (num, power) => FpPow(f, num, power),
+    div: (lhs, rhs) => mod(lhs * invert(rhs, ORDER), ORDER),
+    // Same as above, but doesn't normalize
+    sqrN: (num) => num * num,
+    addN: (lhs, rhs) => lhs + rhs,
+    subN: (lhs, rhs) => lhs - rhs,
+    mulN: (lhs, rhs) => lhs * rhs,
+    inv: (num) => invert(num, ORDER),
+    sqrt: redef.sqrt || ((n) => sqrtP(f, n)),
+    invertBatch: (lst) => FpInvertBatch(f, lst),
+    // TODO: do we really need constant cmov?
+    // We don't have const-time bigints anyway, so probably will be not very useful
+    cmov: (a, b, c) => c ? b : a,
+    toBytes: (num) => isLE2 ? numberToBytesLE(num, BYTES) : numberToBytesBE(num, BYTES),
+    fromBytes: (bytes2) => {
+      if (bytes2.length !== BYTES)
+        throw new Error(`Fp.fromBytes: expected ${BYTES}, got ${bytes2.length}`);
+      return isLE2 ? bytesToNumberLE(bytes2) : bytesToNumberBE(bytes2);
+    }
+  });
+  return Object.freeze(f);
+}
+function getFieldBytesLength(fieldOrder) {
+  if (typeof fieldOrder !== "bigint")
+    throw new Error("field order must be bigint");
+  const bitLength = fieldOrder.toString(2).length;
+  return Math.ceil(bitLength / 8);
+}
+function getMinHashLength(fieldOrder) {
+  const length = getFieldBytesLength(fieldOrder);
+  return length + Math.ceil(length / 2);
+}
+function mapHashToField(key, fieldOrder, isLE2 = false) {
+  const len = key.length;
+  const fieldLen = getFieldBytesLength(fieldOrder);
+  const minLen = getMinHashLength(fieldOrder);
+  if (len < 16 || len < minLen || len > 1024)
+    throw new Error(`expected ${minLen}-1024 bytes of input, got ${len}`);
+  const num = isLE2 ? bytesToNumberBE(key) : bytesToNumberLE(key);
+  const reduced = mod(num, fieldOrder - _1n$3) + _1n$3;
+  return isLE2 ? numberToBytesLE(reduced, fieldLen) : numberToBytesBE(reduced, fieldLen);
+}
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const _0n$2 = BigInt(0);
+const _1n$2 = BigInt(1);
+function wNAF(c, bits) {
+  const constTimeNegate = (condition, item) => {
+    const neg = item.negate();
+    return condition ? neg : item;
+  };
+  const opts = (W) => {
+    const windows = Math.ceil(bits / W) + 1;
+    const windowSize = 2 ** (W - 1);
+    return { windows, windowSize };
+  };
+  return {
+    constTimeNegate,
+    // non-const time multiplication ladder
+    unsafeLadder(elm, n) {
+      let p2 = c.ZERO;
+      let d = elm;
+      while (n > _0n$2) {
+        if (n & _1n$2)
+          p2 = p2.add(d);
+        d = d.double();
+        n >>= _1n$2;
+      }
+      return p2;
+    },
+    /**
+     * Creates a wNAF precomputation window. Used for caching.
+     * Default window size is set by `utils.precompute()` and is equal to 8.
+     * Number of precomputed points depends on the curve size:
+     * 2^(𝑊−1) * (Math.ceil(𝑛 / 𝑊) + 1), where:
+     * - 𝑊 is the window size
+     * - 𝑛 is the bitlength of the curve order.
+     * For a 256-bit curve and window size 8, the number of precomputed points is 128 * 33 = 4224.
+     * @returns precomputed point tables flattened to a single array
+     */
+    precomputeWindow(elm, W) {
+      const { windows, windowSize } = opts(W);
+      const points = [];
+      let p2 = elm;
+      let base = p2;
+      for (let window2 = 0; window2 < windows; window2++) {
+        base = p2;
+        points.push(base);
+        for (let i2 = 1; i2 < windowSize; i2++) {
+          base = base.add(p2);
+          points.push(base);
+        }
+        p2 = base.double();
+      }
+      return points;
+    },
+    /**
+     * Implements ec multiplication using precomputed tables and w-ary non-adjacent form.
+     * @param W window size
+     * @param precomputes precomputed tables
+     * @param n scalar (we don't check here, but should be less than curve order)
+     * @returns real and fake (for const-time) points
+     */
+    wNAF(W, precomputes, n) {
+      const { windows, windowSize } = opts(W);
+      let p2 = c.ZERO;
+      let f = c.BASE;
+      const mask = BigInt(2 ** W - 1);
+      const maxNumber = 2 ** W;
+      const shiftBy = BigInt(W);
+      for (let window2 = 0; window2 < windows; window2++) {
+        const offset = window2 * windowSize;
+        let wbits = Number(n & mask);
+        n >>= shiftBy;
+        if (wbits > windowSize) {
+          wbits -= maxNumber;
+          n += _1n$2;
+        }
+        const offset1 = offset;
+        const offset2 = offset + Math.abs(wbits) - 1;
+        const cond1 = window2 % 2 !== 0;
+        const cond2 = wbits < 0;
+        if (wbits === 0) {
+          f = f.add(constTimeNegate(cond1, precomputes[offset1]));
+        } else {
+          p2 = p2.add(constTimeNegate(cond2, precomputes[offset2]));
+        }
+      }
+      return { p: p2, f };
+    },
+    wNAFCached(P, precomputesMap, n, transform) {
+      const W = P._WINDOW_SIZE || 1;
+      let comp = precomputesMap.get(P);
+      if (!comp) {
+        comp = this.precomputeWindow(P, W);
+        if (W !== 1) {
+          precomputesMap.set(P, transform(comp));
+        }
+      }
+      return this.wNAF(W, comp, n);
+    }
+  };
+}
+function validateBasic(curve) {
+  validateField(curve.Fp);
+  validateObject(curve, {
+    n: "bigint",
+    h: "bigint",
+    Gx: "field",
+    Gy: "field"
+  }, {
+    nBitLength: "isSafeInteger",
+    nByteLength: "isSafeInteger"
+  });
+  return Object.freeze({
+    ...nLength(curve.n, curve.nBitLength),
+    ...curve,
+    ...{ p: curve.Fp.ORDER }
+  });
+}
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+function validatePointOpts(curve) {
+  const opts = validateBasic(curve);
+  validateObject(opts, {
+    a: "field",
+    b: "field"
+  }, {
+    allowedPrivateKeyLengths: "array",
+    wrapPrivateKey: "boolean",
+    isTorsionFree: "function",
+    clearCofactor: "function",
+    allowInfinityPoint: "boolean",
+    fromBytes: "function",
+    toBytes: "function"
+  });
+  const { endo, Fp: Fp2, a } = opts;
+  if (endo) {
+    if (!Fp2.eql(a, Fp2.ZERO)) {
+      throw new Error("Endomorphism can only be defined for Koblitz curves that have a=0");
+    }
+    if (typeof endo !== "object" || typeof endo.beta !== "bigint" || typeof endo.splitScalar !== "function") {
+      throw new Error("Expected endomorphism with beta: bigint and splitScalar: function");
+    }
+  }
+  return Object.freeze({ ...opts });
+}
+const { bytesToNumberBE: b2n, hexToBytes: h2b } = ut;
+const DER = {
+  // asn.1 DER encoding utils
+  Err: class DERErr extends Error {
+    constructor(m = "") {
+      super(m);
+    }
+  },
+  _parseInt(data) {
+    const { Err: E } = DER;
+    if (data.length < 2 || data[0] !== 2)
+      throw new E("Invalid signature integer tag");
+    const len = data[1];
+    const res = data.subarray(2, len + 2);
+    if (!len || res.length !== len)
+      throw new E("Invalid signature integer: wrong length");
+    if (res[0] & 128)
+      throw new E("Invalid signature integer: negative");
+    if (res[0] === 0 && !(res[1] & 128))
+      throw new E("Invalid signature integer: unnecessary leading zero");
+    return { d: b2n(res), l: data.subarray(len + 2) };
+  },
+  toSig(hex2) {
+    const { Err: E } = DER;
+    const data = typeof hex2 === "string" ? h2b(hex2) : hex2;
+    if (!(data instanceof Uint8Array))
+      throw new Error("ui8a expected");
+    let l = data.length;
+    if (l < 2 || data[0] != 48)
+      throw new E("Invalid signature tag");
+    if (data[1] !== l - 2)
+      throw new E("Invalid signature: incorrect length");
+    const { d: r, l: sBytes } = DER._parseInt(data.subarray(2));
+    const { d: s, l: rBytesLeft } = DER._parseInt(sBytes);
+    if (rBytesLeft.length)
+      throw new E("Invalid signature: left bytes after parsing");
+    return { r, s };
+  },
+  hexFromSig(sig) {
+    const slice = (s2) => Number.parseInt(s2[0], 16) & 8 ? "00" + s2 : s2;
+    const h2 = (num) => {
+      const hex2 = num.toString(16);
+      return hex2.length & 1 ? `0${hex2}` : hex2;
+    };
+    const s = slice(h2(sig.s));
+    const r = slice(h2(sig.r));
+    const shl = s.length / 2;
+    const rhl = r.length / 2;
+    const sl = h2(shl);
+    const rl = h2(rhl);
+    return `30${h2(rhl + shl + 4)}02${rl}${r}02${sl}${s}`;
+  }
+};
+const _0n$1 = BigInt(0), _1n$1 = BigInt(1);
+BigInt(2);
+const _3n = BigInt(3);
+BigInt(4);
+function weierstrassPoints(opts) {
+  const CURVE = validatePointOpts(opts);
+  const { Fp: Fp2 } = CURVE;
+  const toBytes2 = CURVE.toBytes || ((_c, point, _isCompressed) => {
+    const a = point.toAffine();
+    return concatBytes$1(Uint8Array.from([4]), Fp2.toBytes(a.x), Fp2.toBytes(a.y));
+  });
+  const fromBytes = CURVE.fromBytes || ((bytes2) => {
+    const tail = bytes2.subarray(1);
+    const x = Fp2.fromBytes(tail.subarray(0, Fp2.BYTES));
+    const y = Fp2.fromBytes(tail.subarray(Fp2.BYTES, 2 * Fp2.BYTES));
+    return { x, y };
+  });
+  function weierstrassEquation(x) {
+    const { a, b } = CURVE;
+    const x2 = Fp2.sqr(x);
+    const x3 = Fp2.mul(x2, x);
+    return Fp2.add(Fp2.add(x3, Fp2.mul(x, a)), b);
+  }
+  if (!Fp2.eql(Fp2.sqr(CURVE.Gy), weierstrassEquation(CURVE.Gx)))
+    throw new Error("bad generator point: equation left != right");
+  function isWithinCurveOrder(num) {
+    return typeof num === "bigint" && _0n$1 < num && num < CURVE.n;
+  }
+  function assertGE(num) {
+    if (!isWithinCurveOrder(num))
+      throw new Error("Expected valid bigint: 0 < bigint < curve.n");
+  }
+  function normPrivateKeyToScalar(key) {
+    const { allowedPrivateKeyLengths: lengths, nByteLength, wrapPrivateKey, n } = CURVE;
+    if (lengths && typeof key !== "bigint") {
+      if (key instanceof Uint8Array)
+        key = bytesToHex$2(key);
+      if (typeof key !== "string" || !lengths.includes(key.length))
+        throw new Error("Invalid key");
+      key = key.padStart(nByteLength * 2, "0");
+    }
+    let num;
+    try {
+      num = typeof key === "bigint" ? key : bytesToNumberBE(ensureBytes("private key", key, nByteLength));
+    } catch (error) {
+      throw new Error(`private key must be ${nByteLength} bytes, hex or bigint, not ${typeof key}`);
+    }
+    if (wrapPrivateKey)
+      num = mod(num, n);
+    assertGE(num);
+    return num;
+  }
+  const pointPrecomputes = /* @__PURE__ */ new Map();
+  function assertPrjPoint(other) {
+    if (!(other instanceof Point2))
+      throw new Error("ProjectivePoint expected");
+  }
+  class Point2 {
+    constructor(px, py, pz) {
+      this.px = px;
+      this.py = py;
+      this.pz = pz;
+      if (px == null || !Fp2.isValid(px))
+        throw new Error("x required");
+      if (py == null || !Fp2.isValid(py))
+        throw new Error("y required");
+      if (pz == null || !Fp2.isValid(pz))
+        throw new Error("z required");
+    }
+    // Does not validate if the point is on-curve.
+    // Use fromHex instead, or call assertValidity() later.
+    static fromAffine(p2) {
+      const { x, y } = p2 || {};
+      if (!p2 || !Fp2.isValid(x) || !Fp2.isValid(y))
+        throw new Error("invalid affine point");
+      if (p2 instanceof Point2)
+        throw new Error("projective point not allowed");
+      const is0 = (i2) => Fp2.eql(i2, Fp2.ZERO);
+      if (is0(x) && is0(y))
+        return Point2.ZERO;
+      return new Point2(x, y, Fp2.ONE);
+    }
+    get x() {
+      return this.toAffine().x;
+    }
+    get y() {
+      return this.toAffine().y;
+    }
+    /**
+     * Takes a bunch of Projective Points but executes only one
+     * inversion on all of them. Inversion is very slow operation,
+     * so this improves performance massively.
+     * Optimization: converts a list of projective points to a list of identical points with Z=1.
+     */
+    static normalizeZ(points) {
+      const toInv = Fp2.invertBatch(points.map((p2) => p2.pz));
+      return points.map((p2, i2) => p2.toAffine(toInv[i2])).map(Point2.fromAffine);
+    }
+    /**
+     * Converts hash string or Uint8Array to Point.
+     * @param hex short/long ECDSA hex
+     */
+    static fromHex(hex2) {
+      const P = Point2.fromAffine(fromBytes(ensureBytes("pointHex", hex2)));
+      P.assertValidity();
+      return P;
+    }
+    // Multiplies generator point by privateKey.
+    static fromPrivateKey(privateKey) {
+      return Point2.BASE.multiply(normPrivateKeyToScalar(privateKey));
+    }
+    // "Private method", don't use it directly
+    _setWindowSize(windowSize) {
+      this._WINDOW_SIZE = windowSize;
+      pointPrecomputes.delete(this);
+    }
+    // A point on curve is valid if it conforms to equation.
+    assertValidity() {
+      if (this.is0()) {
+        if (CURVE.allowInfinityPoint && !Fp2.is0(this.py))
+          return;
+        throw new Error("bad point: ZERO");
+      }
+      const { x, y } = this.toAffine();
+      if (!Fp2.isValid(x) || !Fp2.isValid(y))
+        throw new Error("bad point: x or y not FE");
+      const left = Fp2.sqr(y);
+      const right = weierstrassEquation(x);
+      if (!Fp2.eql(left, right))
+        throw new Error("bad point: equation left != right");
+      if (!this.isTorsionFree())
+        throw new Error("bad point: not in prime-order subgroup");
+    }
+    hasEvenY() {
+      const { y } = this.toAffine();
+      if (Fp2.isOdd)
+        return !Fp2.isOdd(y);
+      throw new Error("Field doesn't support isOdd");
+    }
+    /**
+     * Compare one point to another.
+     */
+    equals(other) {
+      assertPrjPoint(other);
+      const { px: X1, py: Y1, pz: Z1 } = this;
+      const { px: X2, py: Y2, pz: Z2 } = other;
+      const U1 = Fp2.eql(Fp2.mul(X1, Z2), Fp2.mul(X2, Z1));
+      const U2 = Fp2.eql(Fp2.mul(Y1, Z2), Fp2.mul(Y2, Z1));
+      return U1 && U2;
+    }
+    /**
+     * Flips point to one corresponding to (x, -y) in Affine coordinates.
+     */
+    negate() {
+      return new Point2(this.px, Fp2.neg(this.py), this.pz);
+    }
+    // Renes-Costello-Batina exception-free doubling formula.
+    // There is 30% faster Jacobian formula, but it is not complete.
+    // https://eprint.iacr.org/2015/1060, algorithm 3
+    // Cost: 8M + 3S + 3*a + 2*b3 + 15add.
+    double() {
+      const { a, b } = CURVE;
+      const b3 = Fp2.mul(b, _3n);
+      const { px: X1, py: Y1, pz: Z1 } = this;
+      let X3 = Fp2.ZERO, Y3 = Fp2.ZERO, Z3 = Fp2.ZERO;
+      let t0 = Fp2.mul(X1, X1);
+      let t1 = Fp2.mul(Y1, Y1);
+      let t2 = Fp2.mul(Z1, Z1);
+      let t3 = Fp2.mul(X1, Y1);
+      t3 = Fp2.add(t3, t3);
+      Z3 = Fp2.mul(X1, Z1);
+      Z3 = Fp2.add(Z3, Z3);
+      X3 = Fp2.mul(a, Z3);
+      Y3 = Fp2.mul(b3, t2);
+      Y3 = Fp2.add(X3, Y3);
+      X3 = Fp2.sub(t1, Y3);
+      Y3 = Fp2.add(t1, Y3);
+      Y3 = Fp2.mul(X3, Y3);
+      X3 = Fp2.mul(t3, X3);
+      Z3 = Fp2.mul(b3, Z3);
+      t2 = Fp2.mul(a, t2);
+      t3 = Fp2.sub(t0, t2);
+      t3 = Fp2.mul(a, t3);
+      t3 = Fp2.add(t3, Z3);
+      Z3 = Fp2.add(t0, t0);
+      t0 = Fp2.add(Z3, t0);
+      t0 = Fp2.add(t0, t2);
+      t0 = Fp2.mul(t0, t3);
+      Y3 = Fp2.add(Y3, t0);
+      t2 = Fp2.mul(Y1, Z1);
+      t2 = Fp2.add(t2, t2);
+      t0 = Fp2.mul(t2, t3);
+      X3 = Fp2.sub(X3, t0);
+      Z3 = Fp2.mul(t2, t1);
+      Z3 = Fp2.add(Z3, Z3);
+      Z3 = Fp2.add(Z3, Z3);
+      return new Point2(X3, Y3, Z3);
+    }
+    // Renes-Costello-Batina exception-free addition formula.
+    // There is 30% faster Jacobian formula, but it is not complete.
+    // https://eprint.iacr.org/2015/1060, algorithm 1
+    // Cost: 12M + 0S + 3*a + 3*b3 + 23add.
+    add(other) {
+      assertPrjPoint(other);
+      const { px: X1, py: Y1, pz: Z1 } = this;
+      const { px: X2, py: Y2, pz: Z2 } = other;
+      let X3 = Fp2.ZERO, Y3 = Fp2.ZERO, Z3 = Fp2.ZERO;
+      const a = CURVE.a;
+      const b3 = Fp2.mul(CURVE.b, _3n);
+      let t0 = Fp2.mul(X1, X2);
+      let t1 = Fp2.mul(Y1, Y2);
+      let t2 = Fp2.mul(Z1, Z2);
+      let t3 = Fp2.add(X1, Y1);
+      let t4 = Fp2.add(X2, Y2);
+      t3 = Fp2.mul(t3, t4);
+      t4 = Fp2.add(t0, t1);
+      t3 = Fp2.sub(t3, t4);
+      t4 = Fp2.add(X1, Z1);
+      let t5 = Fp2.add(X2, Z2);
+      t4 = Fp2.mul(t4, t5);
+      t5 = Fp2.add(t0, t2);
+      t4 = Fp2.sub(t4, t5);
+      t5 = Fp2.add(Y1, Z1);
+      X3 = Fp2.add(Y2, Z2);
+      t5 = Fp2.mul(t5, X3);
+      X3 = Fp2.add(t1, t2);
+      t5 = Fp2.sub(t5, X3);
+      Z3 = Fp2.mul(a, t4);
+      X3 = Fp2.mul(b3, t2);
+      Z3 = Fp2.add(X3, Z3);
+      X3 = Fp2.sub(t1, Z3);
+      Z3 = Fp2.add(t1, Z3);
+      Y3 = Fp2.mul(X3, Z3);
+      t1 = Fp2.add(t0, t0);
+      t1 = Fp2.add(t1, t0);
+      t2 = Fp2.mul(a, t2);
+      t4 = Fp2.mul(b3, t4);
+      t1 = Fp2.add(t1, t2);
+      t2 = Fp2.sub(t0, t2);
+      t2 = Fp2.mul(a, t2);
+      t4 = Fp2.add(t4, t2);
+      t0 = Fp2.mul(t1, t4);
+      Y3 = Fp2.add(Y3, t0);
+      t0 = Fp2.mul(t5, t4);
+      X3 = Fp2.mul(t3, X3);
+      X3 = Fp2.sub(X3, t0);
+      t0 = Fp2.mul(t3, t1);
+      Z3 = Fp2.mul(t5, Z3);
+      Z3 = Fp2.add(Z3, t0);
+      return new Point2(X3, Y3, Z3);
+    }
+    subtract(other) {
+      return this.add(other.negate());
+    }
+    is0() {
+      return this.equals(Point2.ZERO);
+    }
+    wNAF(n) {
+      return wnaf.wNAFCached(this, pointPrecomputes, n, (comp) => {
+        const toInv = Fp2.invertBatch(comp.map((p2) => p2.pz));
+        return comp.map((p2, i2) => p2.toAffine(toInv[i2])).map(Point2.fromAffine);
+      });
+    }
+    /**
+     * Non-constant-time multiplication. Uses double-and-add algorithm.
+     * It's faster, but should only be used when you don't care about
+     * an exposed private key e.g. sig verification, which works over *public* keys.
+     */
+    multiplyUnsafe(n) {
+      const I = Point2.ZERO;
+      if (n === _0n$1)
+        return I;
+      assertGE(n);
+      if (n === _1n$1)
+        return this;
+      const { endo } = CURVE;
+      if (!endo)
+        return wnaf.unsafeLadder(this, n);
+      let { k1neg, k1, k2neg, k2 } = endo.splitScalar(n);
+      let k1p = I;
+      let k2p = I;
+      let d = this;
+      while (k1 > _0n$1 || k2 > _0n$1) {
+        if (k1 & _1n$1)
+          k1p = k1p.add(d);
+        if (k2 & _1n$1)
+          k2p = k2p.add(d);
+        d = d.double();
+        k1 >>= _1n$1;
+        k2 >>= _1n$1;
+      }
+      if (k1neg)
+        k1p = k1p.negate();
+      if (k2neg)
+        k2p = k2p.negate();
+      k2p = new Point2(Fp2.mul(k2p.px, endo.beta), k2p.py, k2p.pz);
+      return k1p.add(k2p);
+    }
+    /**
+     * Constant time multiplication.
+     * Uses wNAF method. Windowed method may be 10% faster,
+     * but takes 2x longer to generate and consumes 2x memory.
+     * Uses precomputes when available.
+     * Uses endomorphism for Koblitz curves.
+     * @param scalar by which the point would be multiplied
+     * @returns New point
+     */
+    multiply(scalar) {
+      assertGE(scalar);
+      let n = scalar;
+      let point, fake;
+      const { endo } = CURVE;
+      if (endo) {
+        const { k1neg, k1, k2neg, k2 } = endo.splitScalar(n);
+        let { p: k1p, f: f1p } = this.wNAF(k1);
+        let { p: k2p, f: f2p } = this.wNAF(k2);
+        k1p = wnaf.constTimeNegate(k1neg, k1p);
+        k2p = wnaf.constTimeNegate(k2neg, k2p);
+        k2p = new Point2(Fp2.mul(k2p.px, endo.beta), k2p.py, k2p.pz);
+        point = k1p.add(k2p);
+        fake = f1p.add(f2p);
+      } else {
+        const { p: p2, f } = this.wNAF(n);
+        point = p2;
+        fake = f;
+      }
+      return Point2.normalizeZ([point, fake])[0];
+    }
+    /**
+     * Efficiently calculate `aP + bQ`. Unsafe, can expose private key, if used incorrectly.
+     * Not using Strauss-Shamir trick: precomputation tables are faster.
+     * The trick could be useful if both P and Q are not G (not in our case).
+     * @returns non-zero affine point
+     */
+    multiplyAndAddUnsafe(Q, a, b) {
+      const G = Point2.BASE;
+      const mul3 = (P, a2) => a2 === _0n$1 || a2 === _1n$1 || !P.equals(G) ? P.multiplyUnsafe(a2) : P.multiply(a2);
+      const sum = mul3(this, a).add(mul3(Q, b));
+      return sum.is0() ? void 0 : sum;
+    }
+    // Converts Projective point to affine (x, y) coordinates.
+    // Can accept precomputed Z^-1 - for example, from invertBatch.
+    // (x, y, z) ∋ (x=x/z, y=y/z)
+    toAffine(iz) {
+      const { px: x, py: y, pz: z } = this;
+      const is0 = this.is0();
+      if (iz == null)
+        iz = is0 ? Fp2.ONE : Fp2.inv(z);
+      const ax = Fp2.mul(x, iz);
+      const ay = Fp2.mul(y, iz);
+      const zz = Fp2.mul(z, iz);
+      if (is0)
+        return { x: Fp2.ZERO, y: Fp2.ZERO };
+      if (!Fp2.eql(zz, Fp2.ONE))
+        throw new Error("invZ was invalid");
+      return { x: ax, y: ay };
+    }
+    isTorsionFree() {
+      const { h: cofactor, isTorsionFree } = CURVE;
+      if (cofactor === _1n$1)
+        return true;
+      if (isTorsionFree)
+        return isTorsionFree(Point2, this);
+      throw new Error("isTorsionFree() has not been declared for the elliptic curve");
+    }
+    clearCofactor() {
+      const { h: cofactor, clearCofactor } = CURVE;
+      if (cofactor === _1n$1)
+        return this;
+      if (clearCofactor)
+        return clearCofactor(Point2, this);
+      return this.multiplyUnsafe(CURVE.h);
+    }
+    toRawBytes(isCompressed = true) {
+      this.assertValidity();
+      return toBytes2(Point2, this, isCompressed);
+    }
+    toHex(isCompressed = true) {
+      return bytesToHex$2(this.toRawBytes(isCompressed));
+    }
+  }
+  Point2.BASE = new Point2(CURVE.Gx, CURVE.Gy, Fp2.ONE);
+  Point2.ZERO = new Point2(Fp2.ZERO, Fp2.ONE, Fp2.ZERO);
+  const _bits = CURVE.nBitLength;
+  const wnaf = wNAF(Point2, CURVE.endo ? Math.ceil(_bits / 2) : _bits);
+  return {
+    CURVE,
+    ProjectivePoint: Point2,
+    normPrivateKeyToScalar,
+    weierstrassEquation,
+    isWithinCurveOrder
+  };
+}
+function validateOpts(curve) {
+  const opts = validateBasic(curve);
+  validateObject(opts, {
+    hash: "hash",
+    hmac: "function",
+    randomBytes: "function"
+  }, {
+    bits2int: "function",
+    bits2int_modN: "function",
+    lowS: "boolean"
+  });
+  return Object.freeze({ lowS: true, ...opts });
+}
+function weierstrass(curveDef) {
+  const CURVE = validateOpts(curveDef);
+  const { Fp: Fp2, n: CURVE_ORDER } = CURVE;
+  const compressedLen = Fp2.BYTES + 1;
+  const uncompressedLen = 2 * Fp2.BYTES + 1;
+  function isValidFieldElement(num) {
+    return _0n$1 < num && num < Fp2.ORDER;
+  }
+  function modN2(a) {
+    return mod(a, CURVE_ORDER);
+  }
+  function invN(a) {
+    return invert(a, CURVE_ORDER);
+  }
+  const { ProjectivePoint: Point2, normPrivateKeyToScalar, weierstrassEquation, isWithinCurveOrder } = weierstrassPoints({
+    ...CURVE,
+    toBytes(_c, point, isCompressed) {
+      const a = point.toAffine();
+      const x = Fp2.toBytes(a.x);
+      const cat = concatBytes$1;
+      if (isCompressed) {
+        return cat(Uint8Array.from([point.hasEvenY() ? 2 : 3]), x);
+      } else {
+        return cat(Uint8Array.from([4]), x, Fp2.toBytes(a.y));
+      }
+    },
+    fromBytes(bytes2) {
+      const len = bytes2.length;
+      const head = bytes2[0];
+      const tail = bytes2.subarray(1);
+      if (len === compressedLen && (head === 2 || head === 3)) {
+        const x = bytesToNumberBE(tail);
+        if (!isValidFieldElement(x))
+          throw new Error("Point is not on curve");
+        const y2 = weierstrassEquation(x);
+        let y = Fp2.sqrt(y2);
+        const isYOdd = (y & _1n$1) === _1n$1;
+        const isHeadOdd = (head & 1) === 1;
+        if (isHeadOdd !== isYOdd)
+          y = Fp2.neg(y);
+        return { x, y };
+      } else if (len === uncompressedLen && head === 4) {
+        const x = Fp2.fromBytes(tail.subarray(0, Fp2.BYTES));
+        const y = Fp2.fromBytes(tail.subarray(Fp2.BYTES, 2 * Fp2.BYTES));
+        return { x, y };
+      } else {
+        throw new Error(`Point of length ${len} was invalid. Expected ${compressedLen} compressed bytes or ${uncompressedLen} uncompressed bytes`);
+      }
+    }
+  });
+  const numToNByteStr = (num) => bytesToHex$2(numberToBytesBE(num, CURVE.nByteLength));
+  function isBiggerThanHalfOrder(number2) {
+    const HALF = CURVE_ORDER >> _1n$1;
+    return number2 > HALF;
+  }
+  function normalizeS(s) {
+    return isBiggerThanHalfOrder(s) ? modN2(-s) : s;
+  }
+  const slcNum = (b, from, to) => bytesToNumberBE(b.slice(from, to));
+  class Signature {
+    constructor(r, s, recovery) {
+      this.r = r;
+      this.s = s;
+      this.recovery = recovery;
+      this.assertValidity();
+    }
+    // pair (bytes of r, bytes of s)
+    static fromCompact(hex2) {
+      const l = CURVE.nByteLength;
+      hex2 = ensureBytes("compactSignature", hex2, l * 2);
+      return new Signature(slcNum(hex2, 0, l), slcNum(hex2, l, 2 * l));
+    }
+    // DER encoded ECDSA signature
+    // https://bitcoin.stackexchange.com/questions/57644/what-are-the-parts-of-a-bitcoin-transaction-input-script
+    static fromDER(hex2) {
+      const { r, s } = DER.toSig(ensureBytes("DER", hex2));
+      return new Signature(r, s);
+    }
+    assertValidity() {
+      if (!isWithinCurveOrder(this.r))
+        throw new Error("r must be 0 < r < CURVE.n");
+      if (!isWithinCurveOrder(this.s))
+        throw new Error("s must be 0 < s < CURVE.n");
+    }
+    addRecoveryBit(recovery) {
+      return new Signature(this.r, this.s, recovery);
+    }
+    recoverPublicKey(msgHash) {
+      const { r, s, recovery: rec } = this;
+      const h2 = bits2int_modN(ensureBytes("msgHash", msgHash));
+      if (rec == null || ![0, 1, 2, 3].includes(rec))
+        throw new Error("recovery id invalid");
+      const radj = rec === 2 || rec === 3 ? r + CURVE.n : r;
+      if (radj >= Fp2.ORDER)
+        throw new Error("recovery id 2 or 3 invalid");
+      const prefix = (rec & 1) === 0 ? "02" : "03";
+      const R = Point2.fromHex(prefix + numToNByteStr(radj));
+      const ir = invN(radj);
+      const u1 = modN2(-h2 * ir);
+      const u2 = modN2(s * ir);
+      const Q = Point2.BASE.multiplyAndAddUnsafe(R, u1, u2);
+      if (!Q)
+        throw new Error("point at infinify");
+      Q.assertValidity();
+      return Q;
+    }
+    // Signatures should be low-s, to prevent malleability.
+    hasHighS() {
+      return isBiggerThanHalfOrder(this.s);
+    }
+    normalizeS() {
+      return this.hasHighS() ? new Signature(this.r, modN2(-this.s), this.recovery) : this;
+    }
+    // DER-encoded
+    toDERRawBytes() {
+      return hexToBytes$2(this.toDERHex());
+    }
+    toDERHex() {
+      return DER.hexFromSig({ r: this.r, s: this.s });
+    }
+    // padded bytes of r, then padded bytes of s
+    toCompactRawBytes() {
+      return hexToBytes$2(this.toCompactHex());
+    }
+    toCompactHex() {
+      return numToNByteStr(this.r) + numToNByteStr(this.s);
+    }
+  }
+  const utils = {
+    isValidPrivateKey(privateKey) {
+      try {
+        normPrivateKeyToScalar(privateKey);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    normPrivateKeyToScalar,
+    /**
+     * Produces cryptographically secure private key from random of size
+     * (groupLen + ceil(groupLen / 2)) with modulo bias being negligible.
+     */
+    randomPrivateKey: () => {
+      const length = getMinHashLength(CURVE.n);
+      return mapHashToField(CURVE.randomBytes(length), CURVE.n);
+    },
+    /**
+     * Creates precompute table for an arbitrary EC point. Makes point "cached".
+     * Allows to massively speed-up `point.multiply(scalar)`.
+     * @returns cached point
+     * @example
+     * const fast = utils.precompute(8, ProjectivePoint.fromHex(someonesPubKey));
+     * fast.multiply(privKey); // much faster ECDH now
+     */
+    precompute(windowSize = 8, point = Point2.BASE) {
+      point._setWindowSize(windowSize);
+      point.multiply(BigInt(3));
+      return point;
+    }
+  };
+  function getPublicKey2(privateKey, isCompressed = true) {
+    return Point2.fromPrivateKey(privateKey).toRawBytes(isCompressed);
+  }
+  function isProbPub(item) {
+    const arr = item instanceof Uint8Array;
+    const str = typeof item === "string";
+    const len = (arr || str) && item.length;
+    if (arr)
+      return len === compressedLen || len === uncompressedLen;
+    if (str)
+      return len === 2 * compressedLen || len === 2 * uncompressedLen;
+    if (item instanceof Point2)
+      return true;
+    return false;
+  }
+  function getSharedSecret(privateA, publicB, isCompressed = true) {
+    if (isProbPub(privateA))
+      throw new Error("first arg must be private key");
+    if (!isProbPub(publicB))
+      throw new Error("second arg must be public key");
+    const b = Point2.fromHex(publicB);
+    return b.multiply(normPrivateKeyToScalar(privateA)).toRawBytes(isCompressed);
+  }
+  const bits2int = CURVE.bits2int || function(bytes2) {
+    const num = bytesToNumberBE(bytes2);
+    const delta = bytes2.length * 8 - CURVE.nBitLength;
+    return delta > 0 ? num >> BigInt(delta) : num;
+  };
+  const bits2int_modN = CURVE.bits2int_modN || function(bytes2) {
+    return modN2(bits2int(bytes2));
+  };
+  const ORDER_MASK = bitMask(CURVE.nBitLength);
+  function int2octets(num) {
+    if (typeof num !== "bigint")
+      throw new Error("bigint expected");
+    if (!(_0n$1 <= num && num < ORDER_MASK))
+      throw new Error(`bigint expected < 2^${CURVE.nBitLength}`);
+    return numberToBytesBE(num, CURVE.nByteLength);
+  }
+  function prepSig(msgHash, privateKey, opts = defaultSigOpts) {
+    if (["recovered", "canonical"].some((k) => k in opts))
+      throw new Error("sign() legacy options not supported");
+    const { hash: hash2, randomBytes: randomBytes2 } = CURVE;
+    let { lowS, prehash, extraEntropy: ent } = opts;
+    if (lowS == null)
+      lowS = true;
+    msgHash = ensureBytes("msgHash", msgHash);
+    if (prehash)
+      msgHash = ensureBytes("prehashed msgHash", hash2(msgHash));
+    const h1int = bits2int_modN(msgHash);
+    const d = normPrivateKeyToScalar(privateKey);
+    const seedArgs = [int2octets(d), int2octets(h1int)];
+    if (ent != null) {
+      const e = ent === true ? randomBytes2(Fp2.BYTES) : ent;
+      seedArgs.push(ensureBytes("extraEntropy", e));
+    }
+    const seed = concatBytes$1(...seedArgs);
+    const m = h1int;
+    function k2sig(kBytes) {
+      const k = bits2int(kBytes);
+      if (!isWithinCurveOrder(k))
+        return;
+      const ik = invN(k);
+      const q = Point2.BASE.multiply(k).toAffine();
+      const r = modN2(q.x);
+      if (r === _0n$1)
+        return;
+      const s = modN2(ik * modN2(m + r * d));
+      if (s === _0n$1)
+        return;
+      let recovery = (q.x === r ? 0 : 2) | Number(q.y & _1n$1);
+      let normS = s;
+      if (lowS && isBiggerThanHalfOrder(s)) {
+        normS = normalizeS(s);
+        recovery ^= 1;
+      }
+      return new Signature(r, normS, recovery);
+    }
+    return { seed, k2sig };
+  }
+  const defaultSigOpts = { lowS: CURVE.lowS, prehash: false };
+  const defaultVerOpts = { lowS: CURVE.lowS, prehash: false };
+  function sign(msgHash, privKey, opts = defaultSigOpts) {
+    const { seed, k2sig } = prepSig(msgHash, privKey, opts);
+    const C = CURVE;
+    const drbg = createHmacDrbg(C.hash.outputLen, C.nByteLength, C.hmac);
+    return drbg(seed, k2sig);
+  }
+  Point2.BASE._setWindowSize(8);
+  function verify(signature, msgHash, publicKey, opts = defaultVerOpts) {
+    var _a;
+    const sg = signature;
+    msgHash = ensureBytes("msgHash", msgHash);
+    publicKey = ensureBytes("publicKey", publicKey);
+    if ("strict" in opts)
+      throw new Error("options.strict was renamed to lowS");
+    const { lowS, prehash } = opts;
+    let _sig = void 0;
+    let P;
+    try {
+      if (typeof sg === "string" || sg instanceof Uint8Array) {
+        try {
+          _sig = Signature.fromDER(sg);
+        } catch (derError) {
+          if (!(derError instanceof DER.Err))
+            throw derError;
+          _sig = Signature.fromCompact(sg);
+        }
+      } else if (typeof sg === "object" && typeof sg.r === "bigint" && typeof sg.s === "bigint") {
+        const { r: r2, s: s2 } = sg;
+        _sig = new Signature(r2, s2);
+      } else {
+        throw new Error("PARSE");
+      }
+      P = Point2.fromHex(publicKey);
+    } catch (error) {
+      if (error.message === "PARSE")
+        throw new Error(`signature must be Signature instance, Uint8Array or hex string`);
+      return false;
+    }
+    if (lowS && _sig.hasHighS())
+      return false;
+    if (prehash)
+      msgHash = CURVE.hash(msgHash);
+    const { r, s } = _sig;
+    const h2 = bits2int_modN(msgHash);
+    const is = invN(s);
+    const u1 = modN2(h2 * is);
+    const u2 = modN2(r * is);
+    const R = (_a = Point2.BASE.multiplyAndAddUnsafe(P, u1, u2)) == null ? void 0 : _a.toAffine();
+    if (!R)
+      return false;
+    const v = modN2(R.x);
+    return v === r;
+  }
+  return {
+    CURVE,
+    getPublicKey: getPublicKey2,
+    getSharedSecret,
+    sign,
+    verify,
+    ProjectivePoint: Point2,
+    Signature,
+    utils
+  };
+}
+let HMAC$1 = class HMAC extends Hash$2 {
+  constructor(hash2, _key) {
+    super();
+    this.finished = false;
+    this.destroyed = false;
+    hash$1(hash2);
+    const key = toBytes$2(_key);
+    this.iHash = hash2.create();
+    if (typeof this.iHash.update !== "function")
+      throw new Error("Expected instance of class which extends utils.Hash");
+    this.blockLen = this.iHash.blockLen;
+    this.outputLen = this.iHash.outputLen;
+    const blockLen = this.blockLen;
+    const pad2 = new Uint8Array(blockLen);
+    pad2.set(key.length > blockLen ? hash2.create().update(key).digest() : key);
+    for (let i2 = 0; i2 < pad2.length; i2++)
+      pad2[i2] ^= 54;
+    this.iHash.update(pad2);
+    this.oHash = hash2.create();
+    for (let i2 = 0; i2 < pad2.length; i2++)
+      pad2[i2] ^= 54 ^ 92;
+    this.oHash.update(pad2);
+    pad2.fill(0);
+  }
+  update(buf) {
+    exists$2(this);
+    this.iHash.update(buf);
+    return this;
+  }
+  digestInto(out) {
+    exists$2(this);
+    bytes$3(out, this.outputLen);
+    this.finished = true;
+    this.iHash.digestInto(out);
+    this.oHash.update(out);
+    this.oHash.digestInto(out);
+    this.destroy();
+  }
+  digest() {
+    const out = new Uint8Array(this.oHash.outputLen);
+    this.digestInto(out);
+    return out;
+  }
+  _cloneInto(to) {
+    to || (to = Object.create(Object.getPrototypeOf(this), {}));
+    const { oHash, iHash, finished, destroyed, blockLen, outputLen } = this;
+    to = to;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    to.blockLen = blockLen;
+    to.outputLen = outputLen;
+    to.oHash = oHash._cloneInto(to.oHash);
+    to.iHash = iHash._cloneInto(to.iHash);
+    return to;
+  }
+  destroy() {
+    this.destroyed = true;
+    this.oHash.destroy();
+    this.iHash.destroy();
+  }
+};
+const hmac$1 = (hash2, key, message) => new HMAC$1(hash2, key).update(message).digest();
+hmac$1.create = (hash2, key) => new HMAC$1(hash2, key);
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+function getHash(hash2) {
+  return {
+    hash: hash2,
+    hmac: (key, ...msgs) => hmac$1(hash2, key, concatBytes$2(...msgs)),
+    randomBytes: randomBytes$1
+  };
+}
+function createCurve(curveDef, defHash) {
+  const create = (hash2) => weierstrass({ ...curveDef, ...getHash(hash2) });
+  return Object.freeze({ ...create(defHash), create });
+}
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const secp256k1P = BigInt("0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f");
+const secp256k1N = BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+const _1n = BigInt(1);
+const _2n = BigInt(2);
+const divNearest = (a, b) => (a + b / _2n) / b;
+function sqrtMod(y) {
+  const P = secp256k1P;
+  const _3n2 = BigInt(3), _6n = BigInt(6), _11n = BigInt(11), _22n = BigInt(22);
+  const _23n = BigInt(23), _44n = BigInt(44), _88n = BigInt(88);
+  const b2 = y * y * y % P;
+  const b3 = b2 * b2 * y % P;
+  const b6 = pow2(b3, _3n2, P) * b3 % P;
+  const b9 = pow2(b6, _3n2, P) * b3 % P;
+  const b11 = pow2(b9, _2n, P) * b2 % P;
+  const b22 = pow2(b11, _11n, P) * b11 % P;
+  const b44 = pow2(b22, _22n, P) * b22 % P;
+  const b88 = pow2(b44, _44n, P) * b44 % P;
+  const b176 = pow2(b88, _88n, P) * b88 % P;
+  const b220 = pow2(b176, _44n, P) * b44 % P;
+  const b223 = pow2(b220, _3n2, P) * b3 % P;
+  const t1 = pow2(b223, _23n, P) * b22 % P;
+  const t2 = pow2(t1, _6n, P) * b2 % P;
+  const root = pow2(t2, _2n, P);
+  if (!Fp.eql(Fp.sqr(root), y))
+    throw new Error("Cannot find square root");
+  return root;
+}
+const Fp = Field(secp256k1P, void 0, void 0, { sqrt: sqrtMod });
+const secp256k1 = createCurve({
+  a: BigInt(0),
+  b: BigInt(7),
+  Fp,
+  n: secp256k1N,
+  // Base point (x, y) aka generator point
+  Gx: BigInt("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
+  Gy: BigInt("32670510020758816978083085130507043184471273380659243275938904335757337482424"),
+  h: BigInt(1),
+  lowS: true,
+  /**
+   * secp256k1 belongs to Koblitz curves: it has efficiently computable endomorphism.
+   * Endomorphism uses 2x less RAM, speeds up precomputation by 2x and ECDH / key recovery by 20%.
+   * For precomputed wNAF it trades off 1/2 init time & 1/3 ram for 20% perf hit.
+   * Explanation: https://gist.github.com/paulmillr/eb670806793e84df628a7c434a873066
+   */
+  endo: {
+    beta: BigInt("0x7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee"),
+    splitScalar: (k) => {
+      const n = secp256k1N;
+      const a1 = BigInt("0x3086d221a7d46bcde86c90e49284eb15");
+      const b1 = -_1n * BigInt("0xe4437ed6010e88286f547fa90abfe4c3");
+      const a2 = BigInt("0x114ca50f7a8e2f3f657c1108d9d44cfd8");
+      const b2 = a1;
+      const POW_2_128 = BigInt("0x100000000000000000000000000000000");
+      const c1 = divNearest(b2 * k, n);
+      const c2 = divNearest(-b1 * k, n);
+      let k1 = mod(k - c1 * a1 - c2 * a2, n);
+      let k2 = mod(-c1 * b1 - c2 * b2, n);
+      const k1neg = k1 > POW_2_128;
+      const k2neg = k2 > POW_2_128;
+      if (k1neg)
+        k1 = n - k1;
+      if (k2neg)
+        k2 = n - k2;
+      if (k1 > POW_2_128 || k2 > POW_2_128) {
+        throw new Error("splitScalar: Endomorphism failed, k=" + k);
+      }
+      return { k1neg, k1, k2neg, k2 };
+    }
+  }
+}, sha256$2);
+const _0n = BigInt(0);
+const fe = (x) => typeof x === "bigint" && _0n < x && x < secp256k1P;
+const ge = (x) => typeof x === "bigint" && _0n < x && x < secp256k1N;
+const TAGGED_HASH_PREFIXES = {};
+function taggedHash(tag, ...messages) {
+  let tagP = TAGGED_HASH_PREFIXES[tag];
+  if (tagP === void 0) {
+    const tagH = sha256$2(Uint8Array.from(tag, (c) => c.charCodeAt(0)));
+    tagP = concatBytes$1(tagH, tagH);
+    TAGGED_HASH_PREFIXES[tag] = tagP;
+  }
+  return sha256$2(concatBytes$1(tagP, ...messages));
+}
+const pointToBytes = (point) => point.toRawBytes(true).slice(1);
+const numTo32b = (n) => numberToBytesBE(n, 32);
+const modP = (x) => mod(x, secp256k1P);
+const modN = (x) => mod(x, secp256k1N);
+const Point = secp256k1.ProjectivePoint;
+const GmulAdd = (Q, a, b) => Point.BASE.multiplyAndAddUnsafe(Q, a, b);
+function schnorrGetExtPubKey(priv) {
+  let d_ = secp256k1.utils.normPrivateKeyToScalar(priv);
+  let p2 = Point.fromPrivateKey(d_);
+  const scalar = p2.hasEvenY() ? d_ : modN(-d_);
+  return { scalar, bytes: pointToBytes(p2) };
+}
+function lift_x(x) {
+  if (!fe(x))
+    throw new Error("bad x: need 0 < x < p");
+  const xx = modP(x * x);
+  const c = modP(xx * x + BigInt(7));
+  let y = sqrtMod(c);
+  if (y % _2n !== _0n)
+    y = modP(-y);
+  const p2 = new Point(x, y, _1n);
+  p2.assertValidity();
+  return p2;
+}
+function challenge(...args) {
+  return modN(bytesToNumberBE(taggedHash("BIP0340/challenge", ...args)));
+}
+function schnorrGetPublicKey(privateKey) {
+  return schnorrGetExtPubKey(privateKey).bytes;
+}
+function schnorrSign(message, privateKey, auxRand = randomBytes$1(32)) {
+  const m = ensureBytes("message", message);
+  const { bytes: px, scalar: d } = schnorrGetExtPubKey(privateKey);
+  const a = ensureBytes("auxRand", auxRand, 32);
+  const t = numTo32b(d ^ bytesToNumberBE(taggedHash("BIP0340/aux", a)));
+  const rand = taggedHash("BIP0340/nonce", t, px, m);
+  const k_ = modN(bytesToNumberBE(rand));
+  if (k_ === _0n)
+    throw new Error("sign failed: k is zero");
+  const { bytes: rx, scalar: k } = schnorrGetExtPubKey(k_);
+  const e = challenge(rx, px, m);
+  const sig = new Uint8Array(64);
+  sig.set(rx, 0);
+  sig.set(numTo32b(modN(k + e * d)), 32);
+  if (!schnorrVerify(sig, m, px))
+    throw new Error("sign: Invalid signature produced");
+  return sig;
+}
+function schnorrVerify(signature, message, publicKey) {
+  const sig = ensureBytes("signature", signature, 64);
+  const m = ensureBytes("message", message);
+  const pub = ensureBytes("publicKey", publicKey, 32);
+  try {
+    const P = lift_x(bytesToNumberBE(pub));
+    const r = bytesToNumberBE(sig.subarray(0, 32));
+    if (!fe(r))
+      return false;
+    const s = bytesToNumberBE(sig.subarray(32, 64));
+    if (!ge(s))
+      return false;
+    const e = challenge(numTo32b(r), pointToBytes(P), m);
+    const R = GmulAdd(P, s, modN(-e));
+    if (!R || !R.hasEvenY() || R.toAffine().x !== r)
+      return false;
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+const schnorr = /* @__PURE__ */ (() => ({
+  getPublicKey: schnorrGetPublicKey,
+  sign: schnorrSign,
+  verify: schnorrVerify,
+  utils: {
+    randomPrivateKey: secp256k1.utils.randomPrivateKey,
+    lift_x,
+    pointToBytes,
+    numberToBytesBE,
+    bytesToNumberBE,
+    taggedHash,
+    mod
+  }
+}))();
+const crypto$1 = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
+/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const u8a = (a) => a instanceof Uint8Array;
+const createView$1 = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+const rotr$1 = (word, shift) => word << 32 - shift | word >>> shift;
+const isLE$1 = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+if (!isLE$1)
+  throw new Error("Non little-endian hardware is not supported");
+const hexes$1 = Array.from({ length: 256 }, (v, i2) => i2.toString(16).padStart(2, "0"));
+function bytesToHex$1(bytes2) {
+  if (!u8a(bytes2))
+    throw new Error("Uint8Array expected");
+  let hex2 = "";
+  for (let i2 = 0; i2 < bytes2.length; i2++) {
+    hex2 += hexes$1[bytes2[i2]];
+  }
+  return hex2;
+}
+function hexToBytes$1(hex2) {
+  if (typeof hex2 !== "string")
+    throw new Error("hex string expected, got " + typeof hex2);
+  const len = hex2.length;
+  if (len % 2)
+    throw new Error("padded hex string expected, got unpadded hex of length " + len);
+  const array = new Uint8Array(len / 2);
+  for (let i2 = 0; i2 < array.length; i2++) {
+    const j = i2 * 2;
+    const hexByte = hex2.slice(j, j + 2);
+    const byte = Number.parseInt(hexByte, 16);
+    if (Number.isNaN(byte) || byte < 0)
+      throw new Error("Invalid byte sequence");
+    array[i2] = byte;
+  }
+  return array;
+}
+function utf8ToBytes$1(str) {
+  if (typeof str !== "string")
+    throw new Error(`utf8ToBytes expected string, got ${typeof str}`);
+  return new Uint8Array(new TextEncoder().encode(str));
+}
+function toBytes$1(data) {
+  if (typeof data === "string")
+    data = utf8ToBytes$1(data);
+  if (!u8a(data))
+    throw new Error(`expected Uint8Array, got ${typeof data}`);
+  return data;
+}
+function concatBytes(...arrays) {
+  const r = new Uint8Array(arrays.reduce((sum, a) => sum + a.length, 0));
+  let pad2 = 0;
+  arrays.forEach((a) => {
+    if (!u8a(a))
+      throw new Error("Uint8Array expected");
+    r.set(a, pad2);
+    pad2 += a.length;
+  });
+  return r;
+}
+let Hash$1 = class Hash2 {
+  // Safe version that clones internal state
+  clone() {
+    return this._cloneInto();
+  }
+};
+function wrapConstructor$1(hashCons) {
+  const hashC = (msg) => hashCons().update(toBytes$1(msg)).digest();
+  const tmp = hashCons();
+  hashC.outputLen = tmp.outputLen;
+  hashC.blockLen = tmp.blockLen;
+  hashC.create = () => hashCons();
+  return hashC;
+}
+function randomBytes(bytesLength = 32) {
+  if (crypto$1 && typeof crypto$1.getRandomValues === "function") {
+    return crypto$1.getRandomValues(new Uint8Array(bytesLength));
+  }
+  throw new Error("crypto.getRandomValues must be defined");
+}
+function number$1(n) {
+  if (!Number.isSafeInteger(n) || n < 0)
+    throw new Error(`Wrong positive integer: ${n}`);
+}
+function bool$1(b) {
+  if (typeof b !== "boolean")
+    throw new Error(`Expected boolean, not ${b}`);
+}
+function bytes$2(b, ...lengths) {
+  if (!(b instanceof Uint8Array))
+    throw new Error("Expected Uint8Array");
+  if (lengths.length > 0 && !lengths.includes(b.length))
+    throw new Error(`Expected Uint8Array of length ${lengths}, not of length=${b.length}`);
+}
+function hash(hash2) {
+  if (typeof hash2 !== "function" || typeof hash2.create !== "function")
+    throw new Error("Hash should be wrapped by utils.wrapConstructor");
+  number$1(hash2.outputLen);
+  number$1(hash2.blockLen);
+}
+function exists$1(instance, checkFinished = true) {
+  if (instance.destroyed)
+    throw new Error("Hash instance has been destroyed");
+  if (checkFinished && instance.finished)
+    throw new Error("Hash#digest() has already been called");
+}
+function output$1(out, instance) {
+  bytes$2(out);
+  const min = instance.outputLen;
+  if (out.length < min) {
+    throw new Error(`digestInto() expects output buffer of length at least ${min}`);
+  }
+}
+const assert = {
+  number: number$1,
+  bool: bool$1,
+  bytes: bytes$2,
+  hash,
+  exists: exists$1,
+  output: output$1
+};
+function setBigUint64$1(view, byteOffset, value, isLE2) {
+  if (typeof view.setBigUint64 === "function")
+    return view.setBigUint64(byteOffset, value, isLE2);
+  const _32n = BigInt(32);
+  const _u32_max = BigInt(4294967295);
+  const wh = Number(value >> _32n & _u32_max);
+  const wl = Number(value & _u32_max);
+  const h2 = isLE2 ? 4 : 0;
+  const l = isLE2 ? 0 : 4;
+  view.setUint32(byteOffset + h2, wh, isLE2);
+  view.setUint32(byteOffset + l, wl, isLE2);
+}
+class SHA22 extends Hash$1 {
+  constructor(blockLen, outputLen, padOffset, isLE2) {
+    super();
+    this.blockLen = blockLen;
+    this.outputLen = outputLen;
+    this.padOffset = padOffset;
+    this.isLE = isLE2;
+    this.finished = false;
+    this.length = 0;
+    this.pos = 0;
+    this.destroyed = false;
+    this.buffer = new Uint8Array(blockLen);
+    this.view = createView$1(this.buffer);
+  }
+  update(data) {
+    assert.exists(this);
+    const { view, buffer, blockLen } = this;
+    data = toBytes$1(data);
+    const len = data.length;
+    for (let pos = 0; pos < len; ) {
+      const take = Math.min(blockLen - this.pos, len - pos);
+      if (take === blockLen) {
+        const dataView = createView$1(data);
+        for (; blockLen <= len - pos; pos += blockLen)
+          this.process(dataView, pos);
+        continue;
+      }
+      buffer.set(data.subarray(pos, pos + take), this.pos);
+      this.pos += take;
+      pos += take;
+      if (this.pos === blockLen) {
+        this.process(view, 0);
+        this.pos = 0;
+      }
+    }
+    this.length += data.length;
+    this.roundClean();
+    return this;
+  }
+  digestInto(out) {
+    assert.exists(this);
+    assert.output(out, this);
+    this.finished = true;
+    const { buffer, view, blockLen, isLE: isLE2 } = this;
+    let { pos } = this;
+    buffer[pos++] = 128;
+    this.buffer.subarray(pos).fill(0);
+    if (this.padOffset > blockLen - pos) {
+      this.process(view, 0);
+      pos = 0;
+    }
+    for (let i2 = pos; i2 < blockLen; i2++)
+      buffer[i2] = 0;
+    setBigUint64$1(view, blockLen - 8, BigInt(this.length * 8), isLE2);
+    this.process(view, 0);
+    const oview = createView$1(out);
+    const len = this.outputLen;
+    if (len % 4)
+      throw new Error("_sha2: outputLen should be aligned to 32bit");
+    const outLen = len / 4;
+    const state = this.get();
+    if (outLen > state.length)
+      throw new Error("_sha2: outputLen bigger than state");
+    for (let i2 = 0; i2 < outLen; i2++)
+      oview.setUint32(4 * i2, state[i2], isLE2);
+  }
+  digest() {
+    const { buffer, outputLen } = this;
+    this.digestInto(buffer);
+    const res = buffer.slice(0, outputLen);
+    this.destroy();
+    return res;
+  }
+  _cloneInto(to) {
+    to || (to = new this.constructor());
+    to.set(...this.get());
+    const { blockLen, buffer, length, finished, destroyed, pos } = this;
+    to.length = length;
+    to.pos = pos;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    if (length % blockLen)
+      to.buffer.set(buffer);
+    return to;
+  }
+}
+const Chi$1 = (a, b, c) => a & b ^ ~a & c;
+const Maj$1 = (a, b, c) => a & b ^ a & c ^ b & c;
+const SHA256_K$1 = new Uint32Array([
+  1116352408,
+  1899447441,
+  3049323471,
+  3921009573,
+  961987163,
+  1508970993,
+  2453635748,
+  2870763221,
+  3624381080,
+  310598401,
+  607225278,
+  1426881987,
+  1925078388,
+  2162078206,
+  2614888103,
+  3248222580,
+  3835390401,
+  4022224774,
+  264347078,
+  604807628,
+  770255983,
+  1249150122,
+  1555081692,
+  1996064986,
+  2554220882,
+  2821834349,
+  2952996808,
+  3210313671,
+  3336571891,
+  3584528711,
+  113926993,
+  338241895,
+  666307205,
+  773529912,
+  1294757372,
+  1396182291,
+  1695183700,
+  1986661051,
+  2177026350,
+  2456956037,
+  2730485921,
+  2820302411,
+  3259730800,
+  3345764771,
+  3516065817,
+  3600352804,
+  4094571909,
+  275423344,
+  430227734,
+  506948616,
+  659060556,
+  883997877,
+  958139571,
+  1322822218,
+  1537002063,
+  1747873779,
+  1955562222,
+  2024104815,
+  2227730452,
+  2361852424,
+  2428436474,
+  2756734187,
+  3204031479,
+  3329325298
+]);
+const IV = new Uint32Array([
+  1779033703,
+  3144134277,
+  1013904242,
+  2773480762,
+  1359893119,
+  2600822924,
+  528734635,
+  1541459225
+]);
+const SHA256_W$1 = new Uint32Array(64);
+let SHA256$1 = class SHA2562 extends SHA22 {
+  constructor() {
+    super(64, 32, 8, false);
+    this.A = IV[0] | 0;
+    this.B = IV[1] | 0;
+    this.C = IV[2] | 0;
+    this.D = IV[3] | 0;
+    this.E = IV[4] | 0;
+    this.F = IV[5] | 0;
+    this.G = IV[6] | 0;
+    this.H = IV[7] | 0;
+  }
+  get() {
+    const { A, B, C, D, E, F, G, H } = this;
+    return [A, B, C, D, E, F, G, H];
+  }
+  // prettier-ignore
+  set(A, B, C, D, E, F, G, H) {
+    this.A = A | 0;
+    this.B = B | 0;
+    this.C = C | 0;
+    this.D = D | 0;
+    this.E = E | 0;
+    this.F = F | 0;
+    this.G = G | 0;
+    this.H = H | 0;
+  }
+  process(view, offset) {
+    for (let i2 = 0; i2 < 16; i2++, offset += 4)
+      SHA256_W$1[i2] = view.getUint32(offset, false);
+    for (let i2 = 16; i2 < 64; i2++) {
+      const W15 = SHA256_W$1[i2 - 15];
+      const W2 = SHA256_W$1[i2 - 2];
+      const s0 = rotr$1(W15, 7) ^ rotr$1(W15, 18) ^ W15 >>> 3;
+      const s1 = rotr$1(W2, 17) ^ rotr$1(W2, 19) ^ W2 >>> 10;
+      SHA256_W$1[i2] = s1 + SHA256_W$1[i2 - 7] + s0 + SHA256_W$1[i2 - 16] | 0;
+    }
+    let { A, B, C, D, E, F, G, H } = this;
+    for (let i2 = 0; i2 < 64; i2++) {
+      const sigma1 = rotr$1(E, 6) ^ rotr$1(E, 11) ^ rotr$1(E, 25);
+      const T1 = H + sigma1 + Chi$1(E, F, G) + SHA256_K$1[i2] + SHA256_W$1[i2] | 0;
+      const sigma0 = rotr$1(A, 2) ^ rotr$1(A, 13) ^ rotr$1(A, 22);
+      const T2 = sigma0 + Maj$1(A, B, C) | 0;
+      H = G;
+      G = F;
+      F = E;
+      E = D + T1 | 0;
+      D = C;
+      C = B;
+      B = A;
+      A = T1 + T2 | 0;
+    }
+    A = A + this.A | 0;
+    B = B + this.B | 0;
+    C = C + this.C | 0;
+    D = D + this.D | 0;
+    E = E + this.E | 0;
+    F = F + this.F | 0;
+    G = G + this.G | 0;
+    H = H + this.H | 0;
+    this.set(A, B, C, D, E, F, G, H);
+  }
+  roundClean() {
+    SHA256_W$1.fill(0);
+  }
+  destroy() {
+    this.set(0, 0, 0, 0, 0, 0, 0, 0);
+    this.buffer.fill(0);
+  }
+};
+class SHA224 extends SHA256$1 {
+  constructor() {
+    super();
+    this.A = 3238371032 | 0;
+    this.B = 914150663 | 0;
+    this.C = 812702999 | 0;
+    this.D = 4144912697 | 0;
+    this.E = 4290775857 | 0;
+    this.F = 1750603025 | 0;
+    this.G = 1694076839 | 0;
+    this.H = 3204075428 | 0;
+    this.outputLen = 28;
+  }
+}
+const sha256$1 = wrapConstructor$1(() => new SHA256$1());
+wrapConstructor$1(() => new SHA224());
+/*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+function assertNumber(n) {
+  if (!Number.isSafeInteger(n))
+    throw new Error(`Wrong integer: ${n}`);
+}
+function chain(...args) {
+  const wrap = (a, b) => (c) => a(b(c));
+  const encode = Array.from(args).reverse().reduce((acc, i2) => acc ? wrap(acc, i2.encode) : i2.encode, void 0);
+  const decode2 = args.reduce((acc, i2) => acc ? wrap(acc, i2.decode) : i2.decode, void 0);
+  return { encode, decode: decode2 };
+}
+function alphabet(alphabet2) {
+  return {
+    encode: (digits) => {
+      if (!Array.isArray(digits) || digits.length && typeof digits[0] !== "number")
+        throw new Error("alphabet.encode input should be an array of numbers");
+      return digits.map((i2) => {
+        assertNumber(i2);
+        if (i2 < 0 || i2 >= alphabet2.length)
+          throw new Error(`Digit index outside alphabet: ${i2} (alphabet: ${alphabet2.length})`);
+        return alphabet2[i2];
+      });
+    },
+    decode: (input) => {
+      if (!Array.isArray(input) || input.length && typeof input[0] !== "string")
+        throw new Error("alphabet.decode input should be array of strings");
+      return input.map((letter) => {
+        if (typeof letter !== "string")
+          throw new Error(`alphabet.decode: not string element=${letter}`);
+        const index = alphabet2.indexOf(letter);
+        if (index === -1)
+          throw new Error(`Unknown letter: "${letter}". Allowed: ${alphabet2}`);
+        return index;
+      });
+    }
+  };
+}
+function join(separator = "") {
+  if (typeof separator !== "string")
+    throw new Error("join separator should be string");
+  return {
+    encode: (from) => {
+      if (!Array.isArray(from) || from.length && typeof from[0] !== "string")
+        throw new Error("join.encode input should be array of strings");
+      for (let i2 of from)
+        if (typeof i2 !== "string")
+          throw new Error(`join.encode: non-string input=${i2}`);
+      return from.join(separator);
+    },
+    decode: (to) => {
+      if (typeof to !== "string")
+        throw new Error("join.decode input should be string");
+      return to.split(separator);
+    }
+  };
+}
+function padding(bits, chr = "=") {
+  assertNumber(bits);
+  if (typeof chr !== "string")
+    throw new Error("padding chr should be string");
+  return {
+    encode(data) {
+      if (!Array.isArray(data) || data.length && typeof data[0] !== "string")
+        throw new Error("padding.encode input should be array of strings");
+      for (let i2 of data)
+        if (typeof i2 !== "string")
+          throw new Error(`padding.encode: non-string input=${i2}`);
+      while (data.length * bits % 8)
+        data.push(chr);
+      return data;
+    },
+    decode(input) {
+      if (!Array.isArray(input) || input.length && typeof input[0] !== "string")
+        throw new Error("padding.encode input should be array of strings");
+      for (let i2 of input)
+        if (typeof i2 !== "string")
+          throw new Error(`padding.decode: non-string input=${i2}`);
+      let end = input.length;
+      if (end * bits % 8)
+        throw new Error("Invalid padding: string should have whole number of bytes");
+      for (; end > 0 && input[end - 1] === chr; end--) {
+        if (!((end - 1) * bits % 8))
+          throw new Error("Invalid padding: string has too much padding");
+      }
+      return input.slice(0, end);
+    }
+  };
+}
+function normalize(fn) {
+  if (typeof fn !== "function")
+    throw new Error("normalize fn should be function");
+  return { encode: (from) => from, decode: (to) => fn(to) };
+}
+function convertRadix(data, from, to) {
+  if (from < 2)
+    throw new Error(`convertRadix: wrong from=${from}, base cannot be less than 2`);
+  if (to < 2)
+    throw new Error(`convertRadix: wrong to=${to}, base cannot be less than 2`);
+  if (!Array.isArray(data))
+    throw new Error("convertRadix: data should be array");
+  if (!data.length)
+    return [];
+  let pos = 0;
+  const res = [];
+  const digits = Array.from(data);
+  digits.forEach((d) => {
+    assertNumber(d);
+    if (d < 0 || d >= from)
+      throw new Error(`Wrong integer: ${d}`);
+  });
+  while (true) {
+    let carry = 0;
+    let done = true;
+    for (let i2 = pos; i2 < digits.length; i2++) {
+      const digit = digits[i2];
+      const digitBase = from * carry + digit;
+      if (!Number.isSafeInteger(digitBase) || from * carry / from !== carry || digitBase - digit !== from * carry) {
+        throw new Error("convertRadix: carry overflow");
+      }
+      carry = digitBase % to;
+      digits[i2] = Math.floor(digitBase / to);
+      if (!Number.isSafeInteger(digits[i2]) || digits[i2] * to + carry !== digitBase)
+        throw new Error("convertRadix: carry overflow");
+      if (!done)
+        continue;
+      else if (!digits[i2])
+        pos = i2;
+      else
+        done = false;
+    }
+    res.push(carry);
+    if (done)
+      break;
+  }
+  for (let i2 = 0; i2 < data.length - 1 && data[i2] === 0; i2++)
+    res.push(0);
+  return res.reverse();
+}
+const gcd = (a, b) => !b ? a : gcd(b, a % b);
+const radix2carry = (from, to) => from + (to - gcd(from, to));
+function convertRadix2(data, from, to, padding2) {
+  if (!Array.isArray(data))
+    throw new Error("convertRadix2: data should be array");
+  if (from <= 0 || from > 32)
+    throw new Error(`convertRadix2: wrong from=${from}`);
+  if (to <= 0 || to > 32)
+    throw new Error(`convertRadix2: wrong to=${to}`);
+  if (radix2carry(from, to) > 32) {
+    throw new Error(`convertRadix2: carry overflow from=${from} to=${to} carryBits=${radix2carry(from, to)}`);
+  }
+  let carry = 0;
+  let pos = 0;
+  const mask = 2 ** to - 1;
+  const res = [];
+  for (const n of data) {
+    assertNumber(n);
+    if (n >= 2 ** from)
+      throw new Error(`convertRadix2: invalid data word=${n} from=${from}`);
+    carry = carry << from | n;
+    if (pos + from > 32)
+      throw new Error(`convertRadix2: carry overflow pos=${pos} from=${from}`);
+    pos += from;
+    for (; pos >= to; pos -= to)
+      res.push((carry >> pos - to & mask) >>> 0);
+    carry &= 2 ** pos - 1;
+  }
+  carry = carry << to - pos & mask;
+  if (!padding2 && pos >= from)
+    throw new Error("Excess padding");
+  if (!padding2 && carry)
+    throw new Error(`Non-zero padding: ${carry}`);
+  if (padding2 && pos > 0)
+    res.push(carry >>> 0);
+  return res;
+}
+function radix(num) {
+  assertNumber(num);
+  return {
+    encode: (bytes2) => {
+      if (!(bytes2 instanceof Uint8Array))
+        throw new Error("radix.encode input should be Uint8Array");
+      return convertRadix(Array.from(bytes2), 2 ** 8, num);
+    },
+    decode: (digits) => {
+      if (!Array.isArray(digits) || digits.length && typeof digits[0] !== "number")
+        throw new Error("radix.decode input should be array of strings");
+      return Uint8Array.from(convertRadix(digits, num, 2 ** 8));
+    }
+  };
+}
+function radix2(bits, revPadding = false) {
+  assertNumber(bits);
+  if (bits <= 0 || bits > 32)
+    throw new Error("radix2: bits should be in (0..32]");
+  if (radix2carry(8, bits) > 32 || radix2carry(bits, 8) > 32)
+    throw new Error("radix2: carry overflow");
+  return {
+    encode: (bytes2) => {
+      if (!(bytes2 instanceof Uint8Array))
+        throw new Error("radix2.encode input should be Uint8Array");
+      return convertRadix2(Array.from(bytes2), 8, bits, !revPadding);
+    },
+    decode: (digits) => {
+      if (!Array.isArray(digits) || digits.length && typeof digits[0] !== "number")
+        throw new Error("radix2.decode input should be array of strings");
+      return Uint8Array.from(convertRadix2(digits, bits, 8, revPadding));
+    }
+  };
+}
+function unsafeWrapper(fn) {
+  if (typeof fn !== "function")
+    throw new Error("unsafeWrapper fn should be function");
+  return function(...args) {
+    try {
+      return fn.apply(null, args);
+    } catch (e) {
+    }
+  };
+}
+const base16 = chain(radix2(4), alphabet("0123456789ABCDEF"), join(""));
+const base32 = chain(radix2(5), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"), padding(5), join(""));
+chain(radix2(5), alphabet("0123456789ABCDEFGHIJKLMNOPQRSTUV"), padding(5), join(""));
+chain(radix2(5), alphabet("0123456789ABCDEFGHJKMNPQRSTVWXYZ"), join(""), normalize((s) => s.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1")));
+const base64 = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"), padding(6), join(""));
+const base64url = chain(radix2(6), alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"), padding(6), join(""));
+const genBase58 = (abc) => chain(radix(58), alphabet(abc), join(""));
+const base58 = genBase58("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+genBase58("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ");
+genBase58("rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz");
+const XMR_BLOCK_LEN = [0, 2, 3, 5, 6, 7, 9, 10, 11];
+const base58xmr = {
+  encode(data) {
+    let res = "";
+    for (let i2 = 0; i2 < data.length; i2 += 8) {
+      const block = data.subarray(i2, i2 + 8);
+      res += base58.encode(block).padStart(XMR_BLOCK_LEN[block.length], "1");
+    }
+    return res;
+  },
+  decode(str) {
+    let res = [];
+    for (let i2 = 0; i2 < str.length; i2 += 11) {
+      const slice = str.slice(i2, i2 + 11);
+      const blockLen = XMR_BLOCK_LEN.indexOf(slice.length);
+      const block = base58.decode(slice);
+      for (let j = 0; j < block.length - blockLen; j++) {
+        if (block[j] !== 0)
+          throw new Error("base58xmr: wrong padding");
+      }
+      res = res.concat(Array.from(block.slice(block.length - blockLen)));
+    }
+    return Uint8Array.from(res);
+  }
+};
+const BECH_ALPHABET = chain(alphabet("qpzry9x8gf2tvdw0s3jn54khce6mua7l"), join(""));
+const POLYMOD_GENERATORS = [996825010, 642813549, 513874426, 1027748829, 705979059];
+function bech32Polymod(pre) {
+  const b = pre >> 25;
+  let chk = (pre & 33554431) << 5;
+  for (let i2 = 0; i2 < POLYMOD_GENERATORS.length; i2++) {
+    if ((b >> i2 & 1) === 1)
+      chk ^= POLYMOD_GENERATORS[i2];
+  }
+  return chk;
+}
+function bechChecksum(prefix, words, encodingConst = 1) {
+  const len = prefix.length;
+  let chk = 1;
+  for (let i2 = 0; i2 < len; i2++) {
+    const c = prefix.charCodeAt(i2);
+    if (c < 33 || c > 126)
+      throw new Error(`Invalid prefix (${prefix})`);
+    chk = bech32Polymod(chk) ^ c >> 5;
+  }
+  chk = bech32Polymod(chk);
+  for (let i2 = 0; i2 < len; i2++)
+    chk = bech32Polymod(chk) ^ prefix.charCodeAt(i2) & 31;
+  for (let v of words)
+    chk = bech32Polymod(chk) ^ v;
+  for (let i2 = 0; i2 < 6; i2++)
+    chk = bech32Polymod(chk);
+  chk ^= encodingConst;
+  return BECH_ALPHABET.encode(convertRadix2([chk % 2 ** 30], 30, 5, false));
+}
+function genBech32(encoding) {
+  const ENCODING_CONST = encoding === "bech32" ? 1 : 734539939;
+  const _words = radix2(5);
+  const fromWords = _words.decode;
+  const toWords = _words.encode;
+  const fromWordsUnsafe = unsafeWrapper(fromWords);
+  function encode(prefix, words, limit = 90) {
+    if (typeof prefix !== "string")
+      throw new Error(`bech32.encode prefix should be string, not ${typeof prefix}`);
+    if (!Array.isArray(words) || words.length && typeof words[0] !== "number")
+      throw new Error(`bech32.encode words should be array of numbers, not ${typeof words}`);
+    const actualLength = prefix.length + 7 + words.length;
+    if (limit !== false && actualLength > limit)
+      throw new TypeError(`Length ${actualLength} exceeds limit ${limit}`);
+    prefix = prefix.toLowerCase();
+    return `${prefix}1${BECH_ALPHABET.encode(words)}${bechChecksum(prefix, words, ENCODING_CONST)}`;
+  }
+  function decode2(str, limit = 90) {
+    if (typeof str !== "string")
+      throw new Error(`bech32.decode input should be string, not ${typeof str}`);
+    if (str.length < 8 || limit !== false && str.length > limit)
+      throw new TypeError(`Wrong string length: ${str.length} (${str}). Expected (8..${limit})`);
+    const lowered = str.toLowerCase();
+    if (str !== lowered && str !== str.toUpperCase())
+      throw new Error(`String must be lowercase or uppercase`);
+    str = lowered;
+    const sepIndex = str.lastIndexOf("1");
+    if (sepIndex === 0 || sepIndex === -1)
+      throw new Error(`Letter "1" must be present between prefix and data only`);
+    const prefix = str.slice(0, sepIndex);
+    const _words2 = str.slice(sepIndex + 1);
+    if (_words2.length < 6)
+      throw new Error("Data must be at least 6 characters long");
+    const words = BECH_ALPHABET.decode(_words2).slice(0, -6);
+    const sum = bechChecksum(prefix, words, ENCODING_CONST);
+    if (!_words2.endsWith(sum))
+      throw new Error(`Invalid checksum in ${str}: expected "${sum}"`);
+    return { prefix, words };
+  }
+  const decodeUnsafe = unsafeWrapper(decode2);
+  function decodeToBytes(str) {
+    const { prefix, words } = decode2(str, false);
+    return { prefix, words, bytes: fromWords(words) };
+  }
+  return { encode, decode: decode2, decodeToBytes, decodeUnsafe, fromWords, fromWordsUnsafe, toWords };
+}
+const bech32 = genBech32("bech32");
+genBech32("bech32m");
+const utf8 = {
+  encode: (data) => new TextDecoder().decode(data),
+  decode: (str) => new TextEncoder().encode(str)
+};
+const hex = chain(radix2(4), alphabet("0123456789abcdef"), join(""), normalize((s) => {
+  if (typeof s !== "string" || s.length % 2)
+    throw new TypeError(`hex.decode: expected string, got ${typeof s} with length ${s.length}`);
+  return s.toLowerCase();
+}));
+const CODERS = {
+  utf8,
+  hex,
+  base16,
+  base32,
+  base64,
+  base64url,
+  base58,
+  base58xmr
+};
+`Invalid encoding type. Available types: ${Object.keys(CODERS).join(", ")}`;
+function number(n) {
+  if (!Number.isSafeInteger(n) || n < 0)
+    throw new Error(`positive integer expected, not ${n}`);
+}
+function bool(b) {
+  if (typeof b !== "boolean")
+    throw new Error(`boolean expected, not ${b}`);
+}
+function isBytes$1(a) {
+  return a instanceof Uint8Array || a != null && typeof a === "object" && a.constructor.name === "Uint8Array";
+}
+function bytes$1(b, ...lengths) {
+  if (!isBytes$1(b))
+    throw new Error("Uint8Array expected");
+  if (lengths.length > 0 && !lengths.includes(b.length))
+    throw new Error(`Uint8Array expected of length ${lengths}, not of length=${b.length}`);
+}
+/*! noble-ciphers - MIT License (c) 2023 Paul Miller (paulmillr.com) */
+const u32 = (arr) => new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
+const isLE = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+if (!isLE)
+  throw new Error("Non little-endian hardware is not supported");
+function checkOpts(defaults, opts) {
+  if (opts == null || typeof opts !== "object")
+    throw new Error("options must be defined");
+  const merged = Object.assign(defaults, opts);
+  return merged;
+}
+function equalBytes(a, b) {
+  if (a.length !== b.length)
+    return false;
+  let diff = 0;
+  for (let i2 = 0; i2 < a.length; i2++)
+    diff |= a[i2] ^ b[i2];
+  return diff === 0;
+}
+const wrapCipher = /* @__NO_SIDE_EFFECTS__ */ (params, c) => {
+  Object.assign(c, params);
+  return c;
+};
+const BLOCK_SIZE = 16;
+const POLY = 283;
+function mul2(n) {
+  return n << 1 ^ POLY & -(n >> 7);
+}
+function mul(a, b) {
+  let res = 0;
+  for (; b > 0; b >>= 1) {
+    res ^= a & -(b & 1);
+    a = mul2(a);
+  }
+  return res;
+}
+const sbox = /* @__PURE__ */ (() => {
+  let t = new Uint8Array(256);
+  for (let i2 = 0, x = 1; i2 < 256; i2++, x ^= mul2(x))
+    t[i2] = x;
+  const box = new Uint8Array(256);
+  box[0] = 99;
+  for (let i2 = 0; i2 < 255; i2++) {
+    let x = t[255 - i2];
+    x |= x << 8;
+    box[t[i2]] = (x ^ x >> 4 ^ x >> 5 ^ x >> 6 ^ x >> 7 ^ 99) & 255;
+  }
+  return box;
+})();
+const invSbox = /* @__PURE__ */ sbox.map((_, j) => sbox.indexOf(j));
+const rotr32_8 = (n) => n << 24 | n >>> 8;
+const rotl32_8 = (n) => n << 8 | n >>> 24;
+function genTtable(sbox2, fn) {
+  if (sbox2.length !== 256)
+    throw new Error("Wrong sbox length");
+  const T0 = new Uint32Array(256).map((_, j) => fn(sbox2[j]));
+  const T1 = T0.map(rotl32_8);
+  const T2 = T1.map(rotl32_8);
+  const T3 = T2.map(rotl32_8);
+  const T01 = new Uint32Array(256 * 256);
+  const T23 = new Uint32Array(256 * 256);
+  const sbox22 = new Uint16Array(256 * 256);
+  for (let i2 = 0; i2 < 256; i2++) {
+    for (let j = 0; j < 256; j++) {
+      const idx = i2 * 256 + j;
+      T01[idx] = T0[i2] ^ T1[j];
+      T23[idx] = T2[i2] ^ T3[j];
+      sbox22[idx] = sbox2[i2] << 8 | sbox2[j];
+    }
+  }
+  return { sbox: sbox2, sbox2: sbox22, T0, T1, T2, T3, T01, T23 };
+}
+const tableEncoding = /* @__PURE__ */ genTtable(sbox, (s) => mul(s, 3) << 24 | s << 16 | s << 8 | mul(s, 2));
+const tableDecoding = /* @__PURE__ */ genTtable(invSbox, (s) => mul(s, 11) << 24 | mul(s, 13) << 16 | mul(s, 9) << 8 | mul(s, 14));
+const xPowers = /* @__PURE__ */ (() => {
+  const p2 = new Uint8Array(16);
+  for (let i2 = 0, x = 1; i2 < 16; i2++, x = mul2(x))
+    p2[i2] = x;
+  return p2;
+})();
+function expandKeyLE(key) {
+  bytes$1(key);
+  const len = key.length;
+  if (![16, 24, 32].includes(len))
+    throw new Error(`aes: wrong key size: should be 16, 24 or 32, got: ${len}`);
+  const { sbox2 } = tableEncoding;
+  const k32 = u32(key);
+  const Nk = k32.length;
+  const subByte = (n) => applySbox(sbox2, n, n, n, n);
+  const xk = new Uint32Array(len + 28);
+  xk.set(k32);
+  for (let i2 = Nk; i2 < xk.length; i2++) {
+    let t = xk[i2 - 1];
+    if (i2 % Nk === 0)
+      t = subByte(rotr32_8(t)) ^ xPowers[i2 / Nk - 1];
+    else if (Nk > 6 && i2 % Nk === 4)
+      t = subByte(t);
+    xk[i2] = xk[i2 - Nk] ^ t;
+  }
+  return xk;
+}
+function expandKeyDecLE(key) {
+  const encKey = expandKeyLE(key);
+  const xk = encKey.slice();
+  const Nk = encKey.length;
+  const { sbox2 } = tableEncoding;
+  const { T0, T1, T2, T3 } = tableDecoding;
+  for (let i2 = 0; i2 < Nk; i2 += 4) {
+    for (let j = 0; j < 4; j++)
+      xk[i2 + j] = encKey[Nk - i2 - 4 + j];
+  }
+  encKey.fill(0);
+  for (let i2 = 4; i2 < Nk - 4; i2++) {
+    const x = xk[i2];
+    const w = applySbox(sbox2, x, x, x, x);
+    xk[i2] = T0[w & 255] ^ T1[w >>> 8 & 255] ^ T2[w >>> 16 & 255] ^ T3[w >>> 24];
+  }
+  return xk;
+}
+function apply0123(T01, T23, s0, s1, s2, s3) {
+  return T01[s0 << 8 & 65280 | s1 >>> 8 & 255] ^ T23[s2 >>> 8 & 65280 | s3 >>> 24 & 255];
+}
+function applySbox(sbox2, s0, s1, s2, s3) {
+  return sbox2[s0 & 255 | s1 & 65280] | sbox2[s2 >>> 16 & 255 | s3 >>> 16 & 65280] << 16;
+}
+function encrypt$1(xk, s0, s1, s2, s3) {
+  const { sbox2, T01, T23 } = tableEncoding;
+  let k = 0;
+  s0 ^= xk[k++], s1 ^= xk[k++], s2 ^= xk[k++], s3 ^= xk[k++];
+  const rounds = xk.length / 4 - 2;
+  for (let i2 = 0; i2 < rounds; i2++) {
+    const t02 = xk[k++] ^ apply0123(T01, T23, s0, s1, s2, s3);
+    const t12 = xk[k++] ^ apply0123(T01, T23, s1, s2, s3, s0);
+    const t22 = xk[k++] ^ apply0123(T01, T23, s2, s3, s0, s1);
+    const t32 = xk[k++] ^ apply0123(T01, T23, s3, s0, s1, s2);
+    s0 = t02, s1 = t12, s2 = t22, s3 = t32;
+  }
+  const t0 = xk[k++] ^ applySbox(sbox2, s0, s1, s2, s3);
+  const t1 = xk[k++] ^ applySbox(sbox2, s1, s2, s3, s0);
+  const t2 = xk[k++] ^ applySbox(sbox2, s2, s3, s0, s1);
+  const t3 = xk[k++] ^ applySbox(sbox2, s3, s0, s1, s2);
+  return { s0: t0, s1: t1, s2: t2, s3: t3 };
+}
+function decrypt$1(xk, s0, s1, s2, s3) {
+  const { sbox2, T01, T23 } = tableDecoding;
+  let k = 0;
+  s0 ^= xk[k++], s1 ^= xk[k++], s2 ^= xk[k++], s3 ^= xk[k++];
+  const rounds = xk.length / 4 - 2;
+  for (let i2 = 0; i2 < rounds; i2++) {
+    const t02 = xk[k++] ^ apply0123(T01, T23, s0, s3, s2, s1);
+    const t12 = xk[k++] ^ apply0123(T01, T23, s1, s0, s3, s2);
+    const t22 = xk[k++] ^ apply0123(T01, T23, s2, s1, s0, s3);
+    const t32 = xk[k++] ^ apply0123(T01, T23, s3, s2, s1, s0);
+    s0 = t02, s1 = t12, s2 = t22, s3 = t32;
+  }
+  const t0 = xk[k++] ^ applySbox(sbox2, s0, s3, s2, s1);
+  const t1 = xk[k++] ^ applySbox(sbox2, s1, s0, s3, s2);
+  const t2 = xk[k++] ^ applySbox(sbox2, s2, s1, s0, s3);
+  const t3 = xk[k++] ^ applySbox(sbox2, s3, s2, s1, s0);
+  return { s0: t0, s1: t1, s2: t2, s3: t3 };
+}
+function getDst(len, dst) {
+  if (!dst)
+    return new Uint8Array(len);
+  bytes$1(dst);
+  if (dst.length < len)
+    throw new Error(`aes: wrong destination length, expected at least ${len}, got: ${dst.length}`);
+  return dst;
+}
+function validateBlockDecrypt(data) {
+  bytes$1(data);
+  if (data.length % BLOCK_SIZE !== 0) {
+    throw new Error(`aes/(cbc-ecb).decrypt ciphertext should consist of blocks with size ${BLOCK_SIZE}`);
+  }
+}
+function validateBlockEncrypt(plaintext, pcks5, dst) {
+  let outLen = plaintext.length;
+  const remaining = outLen % BLOCK_SIZE;
+  if (!pcks5 && remaining !== 0)
+    throw new Error("aec/(cbc-ecb): unpadded plaintext with disabled padding");
+  const b = u32(plaintext);
+  if (pcks5) {
+    let left = BLOCK_SIZE - remaining;
+    if (!left)
+      left = BLOCK_SIZE;
+    outLen = outLen + left;
+  }
+  const out = getDst(outLen, dst);
+  const o = u32(out);
+  return { b, o, out };
+}
+function validatePCKS(data, pcks5) {
+  if (!pcks5)
+    return data;
+  const len = data.length;
+  if (!len)
+    throw new Error(`aes/pcks5: empty ciphertext not allowed`);
+  const lastByte = data[len - 1];
+  if (lastByte <= 0 || lastByte > 16)
+    throw new Error(`aes/pcks5: wrong padding byte: ${lastByte}`);
+  const out = data.subarray(0, -lastByte);
+  for (let i2 = 0; i2 < lastByte; i2++)
+    if (data[len - i2 - 1] !== lastByte)
+      throw new Error(`aes/pcks5: wrong padding`);
+  return out;
+}
+function padPCKS(left) {
+  const tmp = new Uint8Array(16);
+  const tmp32 = u32(tmp);
+  tmp.set(left);
+  const paddingByte = BLOCK_SIZE - left.length;
+  for (let i2 = BLOCK_SIZE - paddingByte; i2 < BLOCK_SIZE; i2++)
+    tmp[i2] = paddingByte;
+  return tmp32;
+}
+const cbc = /* @__PURE__ */ wrapCipher({ blockSize: 16, nonceLength: 16 }, function cbc2(key, iv, opts = {}) {
+  bytes$1(key);
+  bytes$1(iv, 16);
+  const pcks5 = !opts.disablePadding;
+  return {
+    encrypt: (plaintext, dst) => {
+      const xk = expandKeyLE(key);
+      const { b, o, out: _out } = validateBlockEncrypt(plaintext, pcks5, dst);
+      const n32 = u32(iv);
+      let s0 = n32[0], s1 = n32[1], s2 = n32[2], s3 = n32[3];
+      let i2 = 0;
+      for (; i2 + 4 <= b.length; ) {
+        s0 ^= b[i2 + 0], s1 ^= b[i2 + 1], s2 ^= b[i2 + 2], s3 ^= b[i2 + 3];
+        ({ s0, s1, s2, s3 } = encrypt$1(xk, s0, s1, s2, s3));
+        o[i2++] = s0, o[i2++] = s1, o[i2++] = s2, o[i2++] = s3;
+      }
+      if (pcks5) {
+        const tmp32 = padPCKS(plaintext.subarray(i2 * 4));
+        s0 ^= tmp32[0], s1 ^= tmp32[1], s2 ^= tmp32[2], s3 ^= tmp32[3];
+        ({ s0, s1, s2, s3 } = encrypt$1(xk, s0, s1, s2, s3));
+        o[i2++] = s0, o[i2++] = s1, o[i2++] = s2, o[i2++] = s3;
+      }
+      xk.fill(0);
+      return _out;
+    },
+    decrypt: (ciphertext, dst) => {
+      validateBlockDecrypt(ciphertext);
+      const xk = expandKeyDecLE(key);
+      const n32 = u32(iv);
+      const out = getDst(ciphertext.length, dst);
+      const b = u32(ciphertext);
+      const o = u32(out);
+      let s0 = n32[0], s1 = n32[1], s2 = n32[2], s3 = n32[3];
+      for (let i2 = 0; i2 + 4 <= b.length; ) {
+        const ps0 = s0, ps1 = s1, ps2 = s2, ps3 = s3;
+        s0 = b[i2 + 0], s1 = b[i2 + 1], s2 = b[i2 + 2], s3 = b[i2 + 3];
+        const { s0: o0, s1: o1, s2: o2, s3: o3 } = decrypt$1(xk, s0, s1, s2, s3);
+        o[i2++] = o0 ^ ps0, o[i2++] = o1 ^ ps1, o[i2++] = o2 ^ ps2, o[i2++] = o3 ^ ps3;
+      }
+      xk.fill(0);
+      return validatePCKS(out, pcks5);
+    }
+  };
+});
+const _utf8ToBytes = (str) => Uint8Array.from(str.split("").map((c) => c.charCodeAt(0)));
+const sigma16 = _utf8ToBytes("expand 16-byte k");
+const sigma32 = _utf8ToBytes("expand 32-byte k");
+const sigma16_32 = u32(sigma16);
+const sigma32_32 = u32(sigma32);
+sigma32_32.slice();
+function rotl(a, b) {
+  return a << b | a >>> 32 - b;
+}
+function isAligned32(b) {
+  return b.byteOffset % 4 === 0;
+}
+const BLOCK_LEN = 64;
+const BLOCK_LEN32 = 16;
+const MAX_COUNTER = 2 ** 32 - 1;
+const U32_EMPTY = new Uint32Array();
+function runCipher(core, sigma, key, nonce, data, output2, counter, rounds) {
+  const len = data.length;
+  const block = new Uint8Array(BLOCK_LEN);
+  const b32 = u32(block);
+  const isAligned = isAligned32(data) && isAligned32(output2);
+  const d32 = isAligned ? u32(data) : U32_EMPTY;
+  const o32 = isAligned ? u32(output2) : U32_EMPTY;
+  for (let pos = 0; pos < len; counter++) {
+    core(sigma, key, nonce, b32, counter, rounds);
+    if (counter >= MAX_COUNTER)
+      throw new Error("arx: counter overflow");
+    const take = Math.min(BLOCK_LEN, len - pos);
+    if (isAligned && take === BLOCK_LEN) {
+      const pos32 = pos / 4;
+      if (pos % 4 !== 0)
+        throw new Error("arx: invalid block position");
+      for (let j = 0, posj; j < BLOCK_LEN32; j++) {
+        posj = pos32 + j;
+        o32[posj] = d32[posj] ^ b32[j];
+      }
+      pos += BLOCK_LEN;
+      continue;
+    }
+    for (let j = 0, posj; j < take; j++) {
+      posj = pos + j;
+      output2[posj] = data[posj] ^ block[j];
+    }
+    pos += take;
+  }
+}
+function createCipher(core, opts) {
+  const { allowShortKeys, extendNonceFn, counterLength, counterRight, rounds } = checkOpts({ allowShortKeys: false, counterLength: 8, counterRight: false, rounds: 20 }, opts);
+  if (typeof core !== "function")
+    throw new Error("core must be a function");
+  number(counterLength);
+  number(rounds);
+  bool(counterRight);
+  bool(allowShortKeys);
+  return (key, nonce, data, output2, counter = 0) => {
+    bytes$1(key);
+    bytes$1(nonce);
+    bytes$1(data);
+    const len = data.length;
+    if (!output2)
+      output2 = new Uint8Array(len);
+    bytes$1(output2);
+    number(counter);
+    if (counter < 0 || counter >= MAX_COUNTER)
+      throw new Error("arx: counter overflow");
+    if (output2.length < len)
+      throw new Error(`arx: output (${output2.length}) is shorter than data (${len})`);
+    const toClean = [];
+    let l = key.length, k, sigma;
+    if (l === 32) {
+      k = key.slice();
+      toClean.push(k);
+      sigma = sigma32_32;
+    } else if (l === 16 && allowShortKeys) {
+      k = new Uint8Array(32);
+      k.set(key);
+      k.set(key, 16);
+      sigma = sigma16_32;
+      toClean.push(k);
+    } else {
+      throw new Error(`arx: invalid 32-byte key, got length=${l}`);
+    }
+    if (!isAligned32(nonce)) {
+      nonce = nonce.slice();
+      toClean.push(nonce);
+    }
+    const k32 = u32(k);
+    if (extendNonceFn) {
+      if (nonce.length !== 24)
+        throw new Error(`arx: extended nonce must be 24 bytes`);
+      extendNonceFn(sigma, k32, u32(nonce.subarray(0, 16)), k32);
+      nonce = nonce.subarray(16);
+    }
+    const nonceNcLen = 16 - counterLength;
+    if (nonceNcLen !== nonce.length)
+      throw new Error(`arx: nonce must be ${nonceNcLen} or 16 bytes`);
+    if (nonceNcLen !== 12) {
+      const nc = new Uint8Array(12);
+      nc.set(nonce, counterRight ? 0 : 12 - nonce.length);
+      nonce = nc;
+      toClean.push(nonce);
+    }
+    const n32 = u32(nonce);
+    runCipher(core, sigma, k32, n32, data, output2, counter, rounds);
+    while (toClean.length > 0)
+      toClean.pop().fill(0);
+    return output2;
+  };
+}
+function chachaCore(s, k, n, out, cnt, rounds = 20) {
+  let y00 = s[0], y01 = s[1], y02 = s[2], y03 = s[3], y04 = k[0], y05 = k[1], y06 = k[2], y07 = k[3], y08 = k[4], y09 = k[5], y10 = k[6], y11 = k[7], y12 = cnt, y13 = n[0], y14 = n[1], y15 = n[2];
+  let x00 = y00, x01 = y01, x02 = y02, x03 = y03, x04 = y04, x05 = y05, x06 = y06, x07 = y07, x08 = y08, x09 = y09, x10 = y10, x11 = y11, x12 = y12, x13 = y13, x14 = y14, x15 = y15;
+  for (let r = 0; r < rounds; r += 2) {
+    x00 = x00 + x04 | 0;
+    x12 = rotl(x12 ^ x00, 16);
+    x08 = x08 + x12 | 0;
+    x04 = rotl(x04 ^ x08, 12);
+    x00 = x00 + x04 | 0;
+    x12 = rotl(x12 ^ x00, 8);
+    x08 = x08 + x12 | 0;
+    x04 = rotl(x04 ^ x08, 7);
+    x01 = x01 + x05 | 0;
+    x13 = rotl(x13 ^ x01, 16);
+    x09 = x09 + x13 | 0;
+    x05 = rotl(x05 ^ x09, 12);
+    x01 = x01 + x05 | 0;
+    x13 = rotl(x13 ^ x01, 8);
+    x09 = x09 + x13 | 0;
+    x05 = rotl(x05 ^ x09, 7);
+    x02 = x02 + x06 | 0;
+    x14 = rotl(x14 ^ x02, 16);
+    x10 = x10 + x14 | 0;
+    x06 = rotl(x06 ^ x10, 12);
+    x02 = x02 + x06 | 0;
+    x14 = rotl(x14 ^ x02, 8);
+    x10 = x10 + x14 | 0;
+    x06 = rotl(x06 ^ x10, 7);
+    x03 = x03 + x07 | 0;
+    x15 = rotl(x15 ^ x03, 16);
+    x11 = x11 + x15 | 0;
+    x07 = rotl(x07 ^ x11, 12);
+    x03 = x03 + x07 | 0;
+    x15 = rotl(x15 ^ x03, 8);
+    x11 = x11 + x15 | 0;
+    x07 = rotl(x07 ^ x11, 7);
+    x00 = x00 + x05 | 0;
+    x15 = rotl(x15 ^ x00, 16);
+    x10 = x10 + x15 | 0;
+    x05 = rotl(x05 ^ x10, 12);
+    x00 = x00 + x05 | 0;
+    x15 = rotl(x15 ^ x00, 8);
+    x10 = x10 + x15 | 0;
+    x05 = rotl(x05 ^ x10, 7);
+    x01 = x01 + x06 | 0;
+    x12 = rotl(x12 ^ x01, 16);
+    x11 = x11 + x12 | 0;
+    x06 = rotl(x06 ^ x11, 12);
+    x01 = x01 + x06 | 0;
+    x12 = rotl(x12 ^ x01, 8);
+    x11 = x11 + x12 | 0;
+    x06 = rotl(x06 ^ x11, 7);
+    x02 = x02 + x07 | 0;
+    x13 = rotl(x13 ^ x02, 16);
+    x08 = x08 + x13 | 0;
+    x07 = rotl(x07 ^ x08, 12);
+    x02 = x02 + x07 | 0;
+    x13 = rotl(x13 ^ x02, 8);
+    x08 = x08 + x13 | 0;
+    x07 = rotl(x07 ^ x08, 7);
+    x03 = x03 + x04 | 0;
+    x14 = rotl(x14 ^ x03, 16);
+    x09 = x09 + x14 | 0;
+    x04 = rotl(x04 ^ x09, 12);
+    x03 = x03 + x04 | 0;
+    x14 = rotl(x14 ^ x03, 8);
+    x09 = x09 + x14 | 0;
+    x04 = rotl(x04 ^ x09, 7);
+  }
+  let oi = 0;
+  out[oi++] = y00 + x00 | 0;
+  out[oi++] = y01 + x01 | 0;
+  out[oi++] = y02 + x02 | 0;
+  out[oi++] = y03 + x03 | 0;
+  out[oi++] = y04 + x04 | 0;
+  out[oi++] = y05 + x05 | 0;
+  out[oi++] = y06 + x06 | 0;
+  out[oi++] = y07 + x07 | 0;
+  out[oi++] = y08 + x08 | 0;
+  out[oi++] = y09 + x09 | 0;
+  out[oi++] = y10 + x10 | 0;
+  out[oi++] = y11 + x11 | 0;
+  out[oi++] = y12 + x12 | 0;
+  out[oi++] = y13 + x13 | 0;
+  out[oi++] = y14 + x14 | 0;
+  out[oi++] = y15 + x15 | 0;
+}
+const chacha20 = /* @__PURE__ */ createCipher(chachaCore, {
+  counterRight: false,
+  counterLength: 4,
+  allowShortKeys: false
+});
+class HMAC2 extends Hash$1 {
+  constructor(hash2, _key) {
+    super();
+    this.finished = false;
+    this.destroyed = false;
+    assert.hash(hash2);
+    const key = toBytes$1(_key);
+    this.iHash = hash2.create();
+    if (typeof this.iHash.update !== "function")
+      throw new Error("Expected instance of class which extends utils.Hash");
+    this.blockLen = this.iHash.blockLen;
+    this.outputLen = this.iHash.outputLen;
+    const blockLen = this.blockLen;
+    const pad2 = new Uint8Array(blockLen);
+    pad2.set(key.length > blockLen ? hash2.create().update(key).digest() : key);
+    for (let i2 = 0; i2 < pad2.length; i2++)
+      pad2[i2] ^= 54;
+    this.iHash.update(pad2);
+    this.oHash = hash2.create();
+    for (let i2 = 0; i2 < pad2.length; i2++)
+      pad2[i2] ^= 54 ^ 92;
+    this.oHash.update(pad2);
+    pad2.fill(0);
+  }
+  update(buf) {
+    assert.exists(this);
+    this.iHash.update(buf);
+    return this;
+  }
+  digestInto(out) {
+    assert.exists(this);
+    assert.bytes(out, this.outputLen);
+    this.finished = true;
+    this.iHash.digestInto(out);
+    this.oHash.update(out);
+    this.oHash.digestInto(out);
+    this.destroy();
+  }
+  digest() {
+    const out = new Uint8Array(this.oHash.outputLen);
+    this.digestInto(out);
+    return out;
+  }
+  _cloneInto(to) {
+    to || (to = Object.create(Object.getPrototypeOf(this), {}));
+    const { oHash, iHash, finished, destroyed, blockLen, outputLen } = this;
+    to = to;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    to.blockLen = blockLen;
+    to.outputLen = outputLen;
+    to.oHash = oHash._cloneInto(to.oHash);
+    to.iHash = iHash._cloneInto(to.iHash);
+    return to;
+  }
+  destroy() {
+    this.destroyed = true;
+    this.oHash.destroy();
+    this.iHash.destroy();
+  }
+}
+const hmac = (hash2, key, message) => new HMAC2(hash2, key).update(message).digest();
+hmac.create = (hash2, key) => new HMAC2(hash2, key);
+function extract(hash2, ikm, salt) {
+  assert.hash(hash2);
+  if (salt === void 0)
+    salt = new Uint8Array(hash2.outputLen);
+  return hmac(hash2, toBytes$1(salt), toBytes$1(ikm));
+}
+const HKDF_COUNTER = new Uint8Array([0]);
+const EMPTY_BUFFER = new Uint8Array();
+function expand(hash2, prk, info, length = 32) {
+  assert.hash(hash2);
+  assert.number(length);
+  if (length > 255 * hash2.outputLen)
+    throw new Error("Length should be <= 255*HashLen");
+  const blocks = Math.ceil(length / hash2.outputLen);
+  if (info === void 0)
+    info = EMPTY_BUFFER;
+  const okm = new Uint8Array(blocks * hash2.outputLen);
+  const HMAC3 = hmac.create(hash2, prk);
+  const HMACTmp = HMAC3._cloneInto();
+  const T = new Uint8Array(HMAC3.outputLen);
+  for (let counter = 0; counter < blocks; counter++) {
+    HKDF_COUNTER[0] = counter + 1;
+    HMACTmp.update(counter === 0 ? EMPTY_BUFFER : T).update(info).update(HKDF_COUNTER).digestInto(T);
+    okm.set(T, hash2.outputLen * counter);
+    HMAC3._cloneInto(HMACTmp);
+  }
+  HMAC3.destroy();
+  HMACTmp.destroy();
+  T.fill(0);
+  HKDF_COUNTER.fill(0);
+  return okm.slice(0, length);
+}
+var __defProp2 = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp2(target, name, { get: all[name], enumerable: true });
+};
+var verifiedSymbol = Symbol("verified");
+var isRecord = (obj) => obj instanceof Object;
+function validateEvent(event) {
+  if (!isRecord(event))
+    return false;
+  if (typeof event.kind !== "number")
+    return false;
+  if (typeof event.content !== "string")
+    return false;
+  if (typeof event.created_at !== "number")
+    return false;
+  if (typeof event.pubkey !== "string")
+    return false;
+  if (!event.pubkey.match(/^[a-f0-9]{64}$/))
+    return false;
+  if (!Array.isArray(event.tags))
+    return false;
+  for (let i2 = 0; i2 < event.tags.length; i2++) {
+    let tag = event.tags[i2];
+    if (!Array.isArray(tag))
+      return false;
+    for (let j = 0; j < tag.length; j++) {
+      if (typeof tag[j] === "object")
+        return false;
+    }
+  }
+  return true;
+}
+var utils_exports = {};
+__export(utils_exports, {
+  Queue: () => Queue,
+  QueueNode: () => QueueNode,
+  binarySearch: () => binarySearch,
+  insertEventIntoAscendingList: () => insertEventIntoAscendingList,
+  insertEventIntoDescendingList: () => insertEventIntoDescendingList,
+  normalizeURL: () => normalizeURL$2,
+  utf8Decoder: () => utf8Decoder,
+  utf8Encoder: () => utf8Encoder
+});
+var utf8Decoder = new TextDecoder("utf-8");
+var utf8Encoder = new TextEncoder();
+function normalizeURL$2(url) {
+  if (url.indexOf("://") === -1)
+    url = "wss://" + url;
+  let p2 = new URL(url);
+  p2.pathname = p2.pathname.replace(/\/+/g, "/");
+  if (p2.pathname.endsWith("/"))
+    p2.pathname = p2.pathname.slice(0, -1);
+  if (p2.port === "80" && p2.protocol === "ws:" || p2.port === "443" && p2.protocol === "wss:")
+    p2.port = "";
+  p2.searchParams.sort();
+  p2.hash = "";
+  return p2.toString();
+}
+function insertEventIntoDescendingList(sortedArray, event) {
+  const [idx, found] = binarySearch(sortedArray, (b) => {
+    if (event.id === b.id)
+      return 0;
+    if (event.created_at === b.created_at)
+      return -1;
+    return b.created_at - event.created_at;
+  });
+  if (!found) {
+    sortedArray.splice(idx, 0, event);
+  }
+  return sortedArray;
+}
+function insertEventIntoAscendingList(sortedArray, event) {
+  const [idx, found] = binarySearch(sortedArray, (b) => {
+    if (event.id === b.id)
+      return 0;
+    if (event.created_at === b.created_at)
+      return -1;
+    return event.created_at - b.created_at;
+  });
+  if (!found) {
+    sortedArray.splice(idx, 0, event);
+  }
+  return sortedArray;
+}
+function binarySearch(arr, compare) {
+  let start = 0;
+  let end = arr.length - 1;
+  while (start <= end) {
+    const mid = Math.floor((start + end) / 2);
+    const cmp = compare(arr[mid]);
+    if (cmp === 0) {
+      return [mid, true];
+    }
+    if (cmp < 0) {
+      end = mid - 1;
+    } else {
+      start = mid + 1;
+    }
+  }
+  return [start, false];
+}
+var QueueNode = class {
+  constructor(message) {
+    __publicField(this, "value");
+    __publicField(this, "next", null);
+    __publicField(this, "prev", null);
+    this.value = message;
+  }
+};
+var Queue = class {
+  constructor() {
+    __publicField(this, "first");
+    __publicField(this, "last");
+    this.first = null;
+    this.last = null;
+  }
+  enqueue(value) {
+    const newNode = new QueueNode(value);
+    if (!this.last) {
+      this.first = newNode;
+      this.last = newNode;
+    } else if (this.last === this.first) {
+      this.last = newNode;
+      this.last.prev = this.first;
+      this.first.next = newNode;
+    } else {
+      newNode.prev = this.last;
+      this.last.next = newNode;
+      this.last = newNode;
+    }
+    return true;
+  }
+  dequeue() {
+    if (!this.first)
+      return null;
+    if (this.first === this.last) {
+      const target2 = this.first;
+      this.first = null;
+      this.last = null;
+      return target2.value;
+    }
+    const target = this.first;
+    this.first = target.next;
+    return target.value;
+  }
+};
+var JS = class {
+  generateSecretKey() {
+    return schnorr.utils.randomPrivateKey();
+  }
+  getPublicKey(secretKey) {
+    return bytesToHex$1(schnorr.getPublicKey(secretKey));
+  }
+  finalizeEvent(t, secretKey) {
+    const event = t;
+    event.pubkey = bytesToHex$1(schnorr.getPublicKey(secretKey));
+    event.id = getEventHash(event);
+    event.sig = bytesToHex$1(schnorr.sign(getEventHash(event), secretKey));
+    event[verifiedSymbol] = true;
+    return event;
+  }
+  verifyEvent(event) {
+    if (typeof event[verifiedSymbol] === "boolean")
+      return event[verifiedSymbol];
+    const hash2 = getEventHash(event);
+    if (hash2 !== event.id) {
+      event[verifiedSymbol] = false;
+      return false;
+    }
+    try {
+      const valid = schnorr.verify(event.sig, hash2, event.pubkey);
+      event[verifiedSymbol] = valid;
+      return valid;
+    } catch (err) {
+      event[verifiedSymbol] = false;
+      return false;
+    }
+  }
+};
+function serializeEvent(evt) {
+  if (!validateEvent(evt))
+    throw new Error("can't serialize event with wrong or missing properties");
+  return JSON.stringify([0, evt.pubkey, evt.created_at, evt.kind, evt.tags, evt.content]);
+}
+function getEventHash(event) {
+  let eventHash = sha256$1(utf8Encoder.encode(serializeEvent(event)));
+  return bytesToHex$1(eventHash);
+}
+var i = new JS();
+var generateSecretKey = i.generateSecretKey;
+var getPublicKey = i.getPublicKey;
+var finalizeEvent = i.finalizeEvent;
+var verifyEvent = i.verifyEvent;
+var kinds_exports = {};
+__export(kinds_exports, {
+  Application: () => Application,
+  BadgeAward: () => BadgeAward,
+  BadgeDefinition: () => BadgeDefinition,
+  BlockedRelaysList: () => BlockedRelaysList,
+  BookmarkList: () => BookmarkList,
+  Bookmarksets: () => Bookmarksets,
+  Calendar: () => Calendar,
+  CalendarEventRSVP: () => CalendarEventRSVP,
+  ChannelCreation: () => ChannelCreation,
+  ChannelHideMessage: () => ChannelHideMessage,
+  ChannelMessage: () => ChannelMessage,
+  ChannelMetadata: () => ChannelMetadata,
+  ChannelMuteUser: () => ChannelMuteUser,
+  ClassifiedListing: () => ClassifiedListing,
+  ClientAuth: () => ClientAuth,
+  CommunitiesList: () => CommunitiesList,
+  CommunityDefinition: () => CommunityDefinition,
+  CommunityPostApproval: () => CommunityPostApproval,
+  Contacts: () => Contacts,
+  CreateOrUpdateProduct: () => CreateOrUpdateProduct,
+  CreateOrUpdateStall: () => CreateOrUpdateStall,
+  Curationsets: () => Curationsets,
+  Date: () => Date2,
+  DraftClassifiedListing: () => DraftClassifiedListing,
+  DraftLong: () => DraftLong,
+  Emojisets: () => Emojisets,
+  EncryptedDirectMessage: () => EncryptedDirectMessage,
+  EncryptedDirectMessages: () => EncryptedDirectMessages,
+  EventDeletion: () => EventDeletion,
+  FileMetadata: () => FileMetadata,
+  FileServerPreference: () => FileServerPreference,
+  Followsets: () => Followsets,
+  GenericRepost: () => GenericRepost,
+  Genericlists: () => Genericlists,
+  HTTPAuth: () => HTTPAuth,
+  Handlerinformation: () => Handlerinformation,
+  Handlerrecommendation: () => Handlerrecommendation,
+  Highlights: () => Highlights,
+  InterestsList: () => InterestsList,
+  Interestsets: () => Interestsets,
+  JobFeedback: () => JobFeedback,
+  JobRequest: () => JobRequest,
+  JobResult: () => JobResult,
+  Label: () => Label,
+  LightningPubRPC: () => LightningPubRPC,
+  LiveChatMessage: () => LiveChatMessage,
+  LiveEvent: () => LiveEvent,
+  LongFormArticle: () => LongFormArticle,
+  Metadata: () => Metadata,
+  Mutelist: () => Mutelist,
+  NWCWalletInfo: () => NWCWalletInfo,
+  NWCWalletRequest: () => NWCWalletRequest,
+  NWCWalletResponse: () => NWCWalletResponse,
+  NostrConnect: () => NostrConnect,
+  OpenTimestamps: () => OpenTimestamps,
+  Pinlist: () => Pinlist,
+  ProblemTracker: () => ProblemTracker,
+  ProfileBadges: () => ProfileBadges,
+  PublicChatsList: () => PublicChatsList,
+  Reaction: () => Reaction,
+  RecommendRelay: () => RecommendRelay,
+  RelayList: () => RelayList,
+  Relaysets: () => Relaysets,
+  Report: () => Report,
+  Reporting: () => Reporting,
+  Repost: () => Repost,
+  SearchRelaysList: () => SearchRelaysList,
+  ShortTextNote: () => ShortTextNote,
+  Time: () => Time,
+  UserEmojiList: () => UserEmojiList,
+  UserStatuses: () => UserStatuses,
+  Zap: () => Zap,
+  ZapGoal: () => ZapGoal,
+  ZapRequest: () => ZapRequest,
+  classifyKind: () => classifyKind,
+  isEphemeralKind: () => isEphemeralKind,
+  isParameterizedReplaceableKind: () => isParameterizedReplaceableKind,
+  isRegularKind: () => isRegularKind,
+  isReplaceableKind: () => isReplaceableKind
+});
+function isRegularKind(kind) {
+  return 1e3 <= kind && kind < 1e4 || [1, 2, 4, 5, 6, 7, 8, 16, 40, 41, 42, 43, 44].includes(kind);
+}
+function isReplaceableKind(kind) {
+  return [0, 3].includes(kind) || 1e4 <= kind && kind < 2e4;
+}
+function isEphemeralKind(kind) {
+  return 2e4 <= kind && kind < 3e4;
+}
+function isParameterizedReplaceableKind(kind) {
+  return 3e4 <= kind && kind < 4e4;
+}
+function classifyKind(kind) {
+  if (isRegularKind(kind))
+    return "regular";
+  if (isReplaceableKind(kind))
+    return "replaceable";
+  if (isEphemeralKind(kind))
+    return "ephemeral";
+  if (isParameterizedReplaceableKind(kind))
+    return "parameterized";
+  return "unknown";
+}
+var Metadata = 0;
+var ShortTextNote = 1;
+var RecommendRelay = 2;
+var Contacts = 3;
+var EncryptedDirectMessage = 4;
+var EncryptedDirectMessages = 4;
+var EventDeletion = 5;
+var Repost = 6;
+var Reaction = 7;
+var BadgeAward = 8;
+var GenericRepost = 16;
+var ChannelCreation = 40;
+var ChannelMetadata = 41;
+var ChannelMessage = 42;
+var ChannelHideMessage = 43;
+var ChannelMuteUser = 44;
+var OpenTimestamps = 1040;
+var FileMetadata = 1063;
+var LiveChatMessage = 1311;
+var ProblemTracker = 1971;
+var Report = 1984;
+var Reporting = 1984;
+var Label = 1985;
+var CommunityPostApproval = 4550;
+var JobRequest = 5999;
+var JobResult = 6999;
+var JobFeedback = 7e3;
+var ZapGoal = 9041;
+var ZapRequest = 9734;
+var Zap = 9735;
+var Highlights = 9802;
+var Mutelist = 1e4;
+var Pinlist = 10001;
+var RelayList = 10002;
+var BookmarkList = 10003;
+var CommunitiesList = 10004;
+var PublicChatsList = 10005;
+var BlockedRelaysList = 10006;
+var SearchRelaysList = 10007;
+var InterestsList = 10015;
+var UserEmojiList = 10030;
+var FileServerPreference = 10096;
+var NWCWalletInfo = 13194;
+var LightningPubRPC = 21e3;
+var ClientAuth = 22242;
+var NWCWalletRequest = 23194;
+var NWCWalletResponse = 23195;
+var NostrConnect = 24133;
+var HTTPAuth = 27235;
+var Followsets = 3e4;
+var Genericlists = 30001;
+var Relaysets = 30002;
+var Bookmarksets = 30003;
+var Curationsets = 30004;
+var ProfileBadges = 30008;
+var BadgeDefinition = 30009;
+var Interestsets = 30015;
+var CreateOrUpdateStall = 30017;
+var CreateOrUpdateProduct = 30018;
+var LongFormArticle = 30023;
+var DraftLong = 30024;
+var Emojisets = 30030;
+var Application = 30078;
+var LiveEvent = 30311;
+var UserStatuses = 30315;
+var ClassifiedListing = 30402;
+var DraftClassifiedListing = 30403;
+var Date2 = 31922;
+var Time = 31923;
+var Calendar = 31924;
+var CalendarEventRSVP = 31925;
+var Handlerrecommendation = 31989;
+var Handlerinformation = 31990;
+var CommunityDefinition = 34550;
+function matchFilter(filter, event) {
+  if (filter.ids && filter.ids.indexOf(event.id) === -1) {
+    return false;
+  }
+  if (filter.kinds && filter.kinds.indexOf(event.kind) === -1) {
+    return false;
+  }
+  if (filter.authors && filter.authors.indexOf(event.pubkey) === -1) {
+    return false;
+  }
+  for (let f in filter) {
+    if (f[0] === "#") {
+      let tagName = f.slice(1);
+      let values = filter[`#${tagName}`];
+      if (values && !event.tags.find(([t, v]) => t === f.slice(1) && values.indexOf(v) !== -1))
+        return false;
+    }
+  }
+  if (filter.since && event.created_at < filter.since)
+    return false;
+  if (filter.until && event.created_at > filter.until)
+    return false;
+  return true;
+}
+function matchFilters(filters, event) {
+  for (let i2 = 0; i2 < filters.length; i2++) {
+    if (matchFilter(filters[i2], event)) {
+      return true;
+    }
+  }
+  return false;
+}
+var fakejson_exports = {};
+__export(fakejson_exports, {
+  getHex64: () => getHex64,
+  getInt: () => getInt,
+  getSubscriptionId: () => getSubscriptionId,
+  matchEventId: () => matchEventId,
+  matchEventKind: () => matchEventKind,
+  matchEventPubkey: () => matchEventPubkey
+});
+function getHex64(json, field) {
+  let len = field.length + 3;
+  let idx = json.indexOf(`"${field}":`) + len;
+  let s = json.slice(idx).indexOf(`"`) + idx + 1;
+  return json.slice(s, s + 64);
+}
+function getInt(json, field) {
+  let len = field.length;
+  let idx = json.indexOf(`"${field}":`) + len + 3;
+  let sliced = json.slice(idx);
+  let end = Math.min(sliced.indexOf(","), sliced.indexOf("}"));
+  return parseInt(sliced.slice(0, end), 10);
+}
+function getSubscriptionId(json) {
+  let idx = json.slice(0, 22).indexOf(`"EVENT"`);
+  if (idx === -1)
+    return null;
+  let pstart = json.slice(idx + 7 + 1).indexOf(`"`);
+  if (pstart === -1)
+    return null;
+  let start = idx + 7 + 1 + pstart;
+  let pend = json.slice(start + 1, 80).indexOf(`"`);
+  if (pend === -1)
+    return null;
+  let end = start + 1 + pend;
+  return json.slice(start + 1, end);
+}
+function matchEventId(json, id) {
+  return id === getHex64(json, "id");
+}
+function matchEventPubkey(json, pubkey) {
+  return pubkey === getHex64(json, "pubkey");
+}
+function matchEventKind(json, kind) {
+  return kind === getInt(json, "kind");
+}
+var nip42_exports = {};
+__export(nip42_exports, {
+  makeAuthEvent: () => makeAuthEvent
+});
+function makeAuthEvent(relayURL, challenge2) {
+  return {
+    kind: ClientAuth,
+    created_at: Math.floor(Date.now() / 1e3),
+    tags: [
+      ["relay", relayURL],
+      ["challenge", challenge2]
+    ],
+    content: ""
+  };
+}
+async function yieldThread() {
+  return new Promise((resolve2) => {
+    const ch = new MessageChannel();
+    const handler = () => {
+      ch.port1.removeEventListener("message", handler);
+      resolve2();
+    };
+    ch.port1.addEventListener("message", handler);
+    ch.port2.postMessage(0);
+    ch.port1.start();
+  });
+}
+var alwaysTrue = (t) => {
+  t[verifiedSymbol] = true;
+  return true;
+};
+var AbstractRelay = class {
+  constructor(url, opts) {
+    __publicField(this, "url");
+    __publicField(this, "_connected", false);
+    __publicField(this, "onclose", null);
+    __publicField(this, "onnotice", (msg) => console.debug(`NOTICE from ${this.url}: ${msg}`));
+    __publicField(this, "_onauth", null);
+    __publicField(this, "baseEoseTimeout", 4400);
+    __publicField(this, "connectionTimeout", 4400);
+    __publicField(this, "openSubs", /* @__PURE__ */ new Map());
+    __publicField(this, "connectionTimeoutHandle");
+    __publicField(this, "connectionPromise");
+    __publicField(this, "openCountRequests", /* @__PURE__ */ new Map());
+    __publicField(this, "openEventPublishes", /* @__PURE__ */ new Map());
+    __publicField(this, "ws");
+    __publicField(this, "incomingMessageQueue", new Queue());
+    __publicField(this, "queueRunning", false);
+    __publicField(this, "challenge");
+    __publicField(this, "serial", 0);
+    __publicField(this, "verifyEvent");
+    __publicField(this, "_WebSocket");
+    this.url = normalizeURL$2(url);
+    this.verifyEvent = opts.verifyEvent;
+    this._WebSocket = opts.websocketImplementation || WebSocket;
+  }
+  static async connect(url, opts) {
+    const relay = new AbstractRelay(url, opts);
+    await relay.connect();
+    return relay;
+  }
+  closeAllSubscriptions(reason) {
+    for (let [_, sub] of this.openSubs) {
+      sub.close(reason);
+    }
+    this.openSubs.clear();
+    for (let [_, ep] of this.openEventPublishes) {
+      ep.reject(new Error(reason));
+    }
+    this.openEventPublishes.clear();
+    for (let [_, cr] of this.openCountRequests) {
+      cr.reject(new Error(reason));
+    }
+    this.openCountRequests.clear();
+  }
+  get connected() {
+    return this._connected;
+  }
+  async connect() {
+    if (this.connectionPromise)
+      return this.connectionPromise;
+    this.challenge = void 0;
+    this.connectionPromise = new Promise((resolve2, reject) => {
+      this.connectionTimeoutHandle = setTimeout(() => {
+        var _a;
+        reject("connection timed out");
+        this.connectionPromise = void 0;
+        (_a = this.onclose) == null ? void 0 : _a.call(this);
+        this.closeAllSubscriptions("relay connection timed out");
+      }, this.connectionTimeout);
+      try {
+        this.ws = new this._WebSocket(this.url);
+      } catch (err) {
+        reject(err);
+        return;
+      }
+      this.ws.onopen = () => {
+        clearTimeout(this.connectionTimeoutHandle);
+        this._connected = true;
+        resolve2();
+      };
+      this.ws.onerror = (ev) => {
+        var _a;
+        reject(ev.message || "websocket error");
+        if (this._connected) {
+          this._connected = false;
+          this.connectionPromise = void 0;
+          (_a = this.onclose) == null ? void 0 : _a.call(this);
+          this.closeAllSubscriptions("relay connection errored");
+        }
+      };
+      this.ws.onclose = async () => {
+        var _a;
+        if (this._connected) {
+          this._connected = false;
+          this.connectionPromise = void 0;
+          (_a = this.onclose) == null ? void 0 : _a.call(this);
+          this.closeAllSubscriptions("relay connection closed");
+        }
+      };
+      this.ws.onmessage = this._onmessage.bind(this);
+    });
+    return this.connectionPromise;
+  }
+  async runQueue() {
+    this.queueRunning = true;
+    while (true) {
+      if (false === this.handleNext()) {
+        break;
+      }
+      await yieldThread();
+    }
+    this.queueRunning = false;
+  }
+  handleNext() {
+    var _a, _b, _c;
+    const json = this.incomingMessageQueue.dequeue();
+    if (!json) {
+      return false;
+    }
+    const subid = getSubscriptionId(json);
+    if (subid) {
+      const so = this.openSubs.get(subid);
+      if (!so) {
+        return;
+      }
+      const id = getHex64(json, "id");
+      const alreadyHave = (_a = so.alreadyHaveEvent) == null ? void 0 : _a.call(so, id);
+      (_b = so.receivedEvent) == null ? void 0 : _b.call(so, this, id);
+      if (alreadyHave) {
+        return;
+      }
+    }
+    try {
+      let data = JSON.parse(json);
+      switch (data[0]) {
+        case "EVENT": {
+          const so = this.openSubs.get(data[1]);
+          const event = data[2];
+          if (this.verifyEvent(event) && matchFilters(so.filters, event)) {
+            so.onevent(event);
+          }
+          return;
+        }
+        case "COUNT": {
+          const id = data[1];
+          const payload = data[2];
+          const cr = this.openCountRequests.get(id);
+          if (cr) {
+            cr.resolve(payload.count);
+            this.openCountRequests.delete(id);
+          }
+          return;
+        }
+        case "EOSE": {
+          const so = this.openSubs.get(data[1]);
+          if (!so)
+            return;
+          so.receivedEose();
+          return;
+        }
+        case "OK": {
+          const id = data[1];
+          const ok = data[2];
+          const reason = data[3];
+          const ep = this.openEventPublishes.get(id);
+          if (ok)
+            ep.resolve(reason);
+          else
+            ep.reject(new Error(reason));
+          this.openEventPublishes.delete(id);
+          return;
+        }
+        case "CLOSED": {
+          const id = data[1];
+          const so = this.openSubs.get(id);
+          if (!so)
+            return;
+          so.closed = true;
+          so.close(data[2]);
+          return;
+        }
+        case "NOTICE":
+          this.onnotice(data[1]);
+          return;
+        case "AUTH": {
+          this.challenge = data[1];
+          (_c = this._onauth) == null ? void 0 : _c.call(this, data[1]);
+          return;
+        }
+      }
+    } catch (err) {
+      return;
+    }
+  }
+  async send(message) {
+    if (!this.connectionPromise)
+      throw new Error("sending on closed connection");
+    this.connectionPromise.then(() => {
+      var _a;
+      (_a = this.ws) == null ? void 0 : _a.send(message);
+    });
+  }
+  async auth(signAuthEvent) {
+    if (!this.challenge)
+      throw new Error("can't perform auth, no challenge was received");
+    const evt = await signAuthEvent(makeAuthEvent(this.url, this.challenge));
+    const ret = new Promise((resolve2, reject) => {
+      this.openEventPublishes.set(evt.id, { resolve: resolve2, reject });
+    });
+    this.send('["AUTH",' + JSON.stringify(evt) + "]");
+    return ret;
+  }
+  async publish(event) {
+    const ret = new Promise((resolve2, reject) => {
+      this.openEventPublishes.set(event.id, { resolve: resolve2, reject });
+    });
+    this.send('["EVENT",' + JSON.stringify(event) + "]");
+    return ret;
+  }
+  async count(filters, params) {
+    this.serial++;
+    const id = (params == null ? void 0 : params.id) || "count:" + this.serial;
+    const ret = new Promise((resolve2, reject) => {
+      this.openCountRequests.set(id, { resolve: resolve2, reject });
+    });
+    this.send('["COUNT","' + id + '",' + JSON.stringify(filters).substring(1));
+    return ret;
+  }
+  subscribe(filters, params) {
+    const subscription = this.prepareSubscription(filters, params);
+    subscription.fire();
+    return subscription;
+  }
+  prepareSubscription(filters, params) {
+    this.serial++;
+    const id = params.id || "sub:" + this.serial;
+    const subscription = new Subscription(this, id, filters, params);
+    this.openSubs.set(id, subscription);
+    return subscription;
+  }
+  close() {
+    var _a;
+    this.closeAllSubscriptions("relay connection closed by us");
+    this._connected = false;
+    (_a = this.ws) == null ? void 0 : _a.close();
+  }
+  _onmessage(ev) {
+    this.incomingMessageQueue.enqueue(ev.data);
+    if (!this.queueRunning) {
+      this.runQueue();
+    }
+  }
+};
+var Subscription = class {
+  constructor(relay, id, filters, params) {
+    __publicField(this, "relay");
+    __publicField(this, "id");
+    __publicField(this, "closed", false);
+    __publicField(this, "eosed", false);
+    __publicField(this, "filters");
+    __publicField(this, "alreadyHaveEvent");
+    __publicField(this, "receivedEvent");
+    __publicField(this, "onevent");
+    __publicField(this, "oneose");
+    __publicField(this, "onclose");
+    __publicField(this, "eoseTimeout");
+    __publicField(this, "eoseTimeoutHandle");
+    this.relay = relay;
+    this.filters = filters;
+    this.id = id;
+    this.alreadyHaveEvent = params.alreadyHaveEvent;
+    this.receivedEvent = params.receivedEvent;
+    this.eoseTimeout = params.eoseTimeout || relay.baseEoseTimeout;
+    this.oneose = params.oneose;
+    this.onclose = params.onclose;
+    this.onevent = params.onevent || ((event) => {
+      console.warn(
+        `onevent() callback not defined for subscription '${this.id}' in relay ${this.relay.url}. event received:`,
+        event
+      );
+    });
+  }
+  fire() {
+    this.relay.send('["REQ","' + this.id + '",' + JSON.stringify(this.filters).substring(1));
+    this.eoseTimeoutHandle = setTimeout(this.receivedEose.bind(this), this.eoseTimeout);
+  }
+  receivedEose() {
+    var _a;
+    if (this.eosed)
+      return;
+    clearTimeout(this.eoseTimeoutHandle);
+    this.eosed = true;
+    (_a = this.oneose) == null ? void 0 : _a.call(this);
+  }
+  close(reason = "closed by caller") {
+    var _a;
+    if (!this.closed && this.relay.connected) {
+      this.relay.send('["CLOSE",' + JSON.stringify(this.id) + "]");
+      this.closed = true;
+    }
+    this.relay.openSubs.delete(this.id);
+    (_a = this.onclose) == null ? void 0 : _a.call(this, reason);
+  }
+};
+var _WebSocket;
+try {
+  _WebSocket = WebSocket;
+} catch {
+}
+var Relay = class extends AbstractRelay {
+  constructor(url) {
+    super(url, { verifyEvent, websocketImplementation: _WebSocket });
+  }
+  static async connect(url) {
+    const relay = new Relay(url);
+    await relay.connect();
+    return relay;
+  }
+};
+var AbstractSimplePool = class {
+  constructor(opts) {
+    __publicField(this, "relays", /* @__PURE__ */ new Map());
+    __publicField(this, "seenOn", /* @__PURE__ */ new Map());
+    __publicField(this, "trackRelays", false);
+    __publicField(this, "verifyEvent");
+    __publicField(this, "trustedRelayURLs", /* @__PURE__ */ new Set());
+    __publicField(this, "_WebSocket");
+    this.verifyEvent = opts.verifyEvent;
+    this._WebSocket = opts.websocketImplementation;
+  }
+  async ensureRelay(url, params) {
+    url = normalizeURL$2(url);
+    let relay = this.relays.get(url);
+    if (!relay) {
+      relay = new AbstractRelay(url, {
+        verifyEvent: this.trustedRelayURLs.has(url) ? alwaysTrue : this.verifyEvent,
+        websocketImplementation: this._WebSocket
+      });
+      if (params == null ? void 0 : params.connectionTimeout)
+        relay.connectionTimeout = params.connectionTimeout;
+      this.relays.set(url, relay);
+    }
+    await relay.connect();
+    return relay;
+  }
+  close(relays) {
+    relays.map(normalizeURL$2).forEach((url) => {
+      var _a;
+      (_a = this.relays.get(url)) == null ? void 0 : _a.close();
+    });
+  }
+  subscribeMany(relays, filters, params) {
+    return this.subscribeManyMap(Object.fromEntries(relays.map((url) => [url, filters])), params);
+  }
+  subscribeManyMap(requests, params) {
+    if (this.trackRelays) {
+      params.receivedEvent = (relay, id) => {
+        let set2 = this.seenOn.get(id);
+        if (!set2) {
+          set2 = /* @__PURE__ */ new Set();
+          this.seenOn.set(id, set2);
+        }
+        set2.add(relay);
+      };
+    }
+    const _knownIds = /* @__PURE__ */ new Set();
+    const subs = [];
+    const relaysLength = Object.keys(requests).length;
+    const eosesReceived = [];
+    let handleEose = (i2) => {
+      var _a;
+      eosesReceived[i2] = true;
+      if (eosesReceived.filter((a) => a).length === relaysLength) {
+        (_a = params.oneose) == null ? void 0 : _a.call(params);
+        handleEose = () => {
+        };
+      }
+    };
+    const closesReceived = [];
+    let handleClose = (i2, reason) => {
+      var _a;
+      handleEose(i2);
+      closesReceived[i2] = reason;
+      if (closesReceived.filter((a) => a).length === relaysLength) {
+        (_a = params.onclose) == null ? void 0 : _a.call(params, closesReceived);
+        handleClose = () => {
+        };
+      }
+    };
+    const localAlreadyHaveEventHandler = (id) => {
+      var _a;
+      if ((_a = params.alreadyHaveEvent) == null ? void 0 : _a.call(params, id)) {
+        return true;
+      }
+      const have = _knownIds.has(id);
+      _knownIds.add(id);
+      return have;
+    };
+    const allOpened = Promise.all(
+      Object.entries(requests).map(async (req, i2, arr) => {
+        if (arr.indexOf(req) !== i2) {
+          handleClose(i2, "duplicate url");
+          return;
+        }
+        let [url, filters] = req;
+        url = normalizeURL$2(url);
+        let relay;
+        try {
+          relay = await this.ensureRelay(url, {
+            connectionTimeout: params.maxWait ? Math.max(params.maxWait * 0.8, params.maxWait - 1e3) : void 0
+          });
+        } catch (err) {
+          handleClose(i2, (err == null ? void 0 : err.message) || String(err));
+          return;
+        }
+        let subscription = relay.subscribe(filters, {
+          ...params,
+          oneose: () => handleEose(i2),
+          onclose: (reason) => handleClose(i2, reason),
+          alreadyHaveEvent: localAlreadyHaveEventHandler,
+          eoseTimeout: params.maxWait
+        });
+        subs.push(subscription);
+      })
+    );
+    return {
+      async close() {
+        await allOpened;
+        subs.forEach((sub) => {
+          sub.close();
+        });
+      }
+    };
+  }
+  subscribeManyEose(relays, filters, params) {
+    const subcloser = this.subscribeMany(relays, filters, {
+      ...params,
+      oneose() {
+        subcloser.close();
+      }
+    });
+    return subcloser;
+  }
+  async querySync(relays, filter, params) {
+    return new Promise(async (resolve2) => {
+      const events = [];
+      this.subscribeManyEose(relays, [filter], {
+        ...params,
+        onevent(event) {
+          events.push(event);
+        },
+        onclose(_) {
+          resolve2(events);
+        }
+      });
+    });
+  }
+  async get(relays, filter, params) {
+    filter.limit = 1;
+    const events = await this.querySync(relays, filter, params);
+    events.sort((a, b) => b.created_at - a.created_at);
+    return events[0] || null;
+  }
+  publish(relays, event) {
+    return relays.map(normalizeURL$2).map(async (url, i2, arr) => {
+      if (arr.indexOf(url) !== i2) {
+        return Promise.reject("duplicate url");
+      }
+      let r = await this.ensureRelay(url);
+      return r.publish(event);
+    });
+  }
+  listConnectionStatus() {
+    const map = /* @__PURE__ */ new Map();
+    this.relays.forEach((relay, url) => map.set(url, relay.connected));
+    return map;
+  }
+  destroy() {
+    this.relays.forEach((conn) => conn.close());
+    this.relays = /* @__PURE__ */ new Map();
+  }
+};
+var _WebSocket2;
+try {
+  _WebSocket2 = WebSocket;
+} catch {
+}
+var SimplePool = class extends AbstractSimplePool {
+  constructor() {
+    super({ verifyEvent, websocketImplementation: _WebSocket2 });
+  }
+};
+var nip19_exports = {};
+__export(nip19_exports, {
+  BECH32_REGEX: () => BECH32_REGEX,
+  Bech32MaxSize: () => Bech32MaxSize,
+  decode: () => decode,
+  encodeBytes: () => encodeBytes,
+  naddrEncode: () => naddrEncode,
+  neventEncode: () => neventEncode,
+  noteEncode: () => noteEncode,
+  nprofileEncode: () => nprofileEncode,
+  npubEncode: () => npubEncode,
+  nrelayEncode: () => nrelayEncode,
+  nsecEncode: () => nsecEncode
+});
+var Bech32MaxSize = 5e3;
+var BECH32_REGEX = /[\x21-\x7E]{1,83}1[023456789acdefghjklmnpqrstuvwxyz]{6,}/;
+function integerToUint8Array(number2) {
+  const uint8Array = new Uint8Array(4);
+  uint8Array[0] = number2 >> 24 & 255;
+  uint8Array[1] = number2 >> 16 & 255;
+  uint8Array[2] = number2 >> 8 & 255;
+  uint8Array[3] = number2 & 255;
+  return uint8Array;
+}
+function decode(nip19) {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
+  let { prefix, words } = bech32.decode(nip19, Bech32MaxSize);
+  let data = new Uint8Array(bech32.fromWords(words));
+  switch (prefix) {
+    case "nprofile": {
+      let tlv = parseTLV(data);
+      if (!((_a = tlv[0]) == null ? void 0 : _a[0]))
+        throw new Error("missing TLV 0 for nprofile");
+      if (tlv[0][0].length !== 32)
+        throw new Error("TLV 0 should be 32 bytes");
+      return {
+        type: "nprofile",
+        data: {
+          pubkey: bytesToHex$1(tlv[0][0]),
+          relays: tlv[1] ? tlv[1].map((d) => utf8Decoder.decode(d)) : []
+        }
+      };
+    }
+    case "nevent": {
+      let tlv = parseTLV(data);
+      if (!((_b = tlv[0]) == null ? void 0 : _b[0]))
+        throw new Error("missing TLV 0 for nevent");
+      if (tlv[0][0].length !== 32)
+        throw new Error("TLV 0 should be 32 bytes");
+      if (tlv[2] && tlv[2][0].length !== 32)
+        throw new Error("TLV 2 should be 32 bytes");
+      if (tlv[3] && tlv[3][0].length !== 4)
+        throw new Error("TLV 3 should be 4 bytes");
+      return {
+        type: "nevent",
+        data: {
+          id: bytesToHex$1(tlv[0][0]),
+          relays: tlv[1] ? tlv[1].map((d) => utf8Decoder.decode(d)) : [],
+          author: ((_c = tlv[2]) == null ? void 0 : _c[0]) ? bytesToHex$1(tlv[2][0]) : void 0,
+          kind: ((_d = tlv[3]) == null ? void 0 : _d[0]) ? parseInt(bytesToHex$1(tlv[3][0]), 16) : void 0
+        }
+      };
+    }
+    case "naddr": {
+      let tlv = parseTLV(data);
+      if (!((_e = tlv[0]) == null ? void 0 : _e[0]))
+        throw new Error("missing TLV 0 for naddr");
+      if (!((_f = tlv[2]) == null ? void 0 : _f[0]))
+        throw new Error("missing TLV 2 for naddr");
+      if (tlv[2][0].length !== 32)
+        throw new Error("TLV 2 should be 32 bytes");
+      if (!((_g = tlv[3]) == null ? void 0 : _g[0]))
+        throw new Error("missing TLV 3 for naddr");
+      if (tlv[3][0].length !== 4)
+        throw new Error("TLV 3 should be 4 bytes");
+      return {
+        type: "naddr",
+        data: {
+          identifier: utf8Decoder.decode(tlv[0][0]),
+          pubkey: bytesToHex$1(tlv[2][0]),
+          kind: parseInt(bytesToHex$1(tlv[3][0]), 16),
+          relays: tlv[1] ? tlv[1].map((d) => utf8Decoder.decode(d)) : []
+        }
+      };
+    }
+    case "nrelay": {
+      let tlv = parseTLV(data);
+      if (!((_h = tlv[0]) == null ? void 0 : _h[0]))
+        throw new Error("missing TLV 0 for nrelay");
+      return {
+        type: "nrelay",
+        data: utf8Decoder.decode(tlv[0][0])
+      };
+    }
+    case "nsec":
+      return { type: prefix, data };
+    case "npub":
+    case "note":
+      return { type: prefix, data: bytesToHex$1(data) };
+    default:
+      throw new Error(`unknown prefix ${prefix}`);
+  }
+}
+function parseTLV(data) {
+  let result = {};
+  let rest = data;
+  while (rest.length > 0) {
+    let t = rest[0];
+    let l = rest[1];
+    let v = rest.slice(2, 2 + l);
+    rest = rest.slice(2 + l);
+    if (v.length < l)
+      throw new Error(`not enough data to read on TLV ${t}`);
+    result[t] = result[t] || [];
+    result[t].push(v);
+  }
+  return result;
+}
+function nsecEncode(key) {
+  return encodeBytes("nsec", key);
+}
+function npubEncode(hex2) {
+  return encodeBytes("npub", hexToBytes$1(hex2));
+}
+function noteEncode(hex2) {
+  return encodeBytes("note", hexToBytes$1(hex2));
+}
+function encodeBech32(prefix, data) {
+  let words = bech32.toWords(data);
+  return bech32.encode(prefix, words, Bech32MaxSize);
+}
+function encodeBytes(prefix, bytes2) {
+  return encodeBech32(prefix, bytes2);
+}
+function nprofileEncode(profile) {
+  let data = encodeTLV({
+    0: [hexToBytes$1(profile.pubkey)],
+    1: (profile.relays || []).map((url) => utf8Encoder.encode(url))
+  });
+  return encodeBech32("nprofile", data);
+}
+function neventEncode(event) {
+  let kindArray;
+  if (event.kind !== void 0) {
+    kindArray = integerToUint8Array(event.kind);
+  }
+  let data = encodeTLV({
+    0: [hexToBytes$1(event.id)],
+    1: (event.relays || []).map((url) => utf8Encoder.encode(url)),
+    2: event.author ? [hexToBytes$1(event.author)] : [],
+    3: kindArray ? [new Uint8Array(kindArray)] : []
+  });
+  return encodeBech32("nevent", data);
+}
+function naddrEncode(addr) {
+  let kind = new ArrayBuffer(4);
+  new DataView(kind).setUint32(0, addr.kind, false);
+  let data = encodeTLV({
+    0: [utf8Encoder.encode(addr.identifier)],
+    1: (addr.relays || []).map((url) => utf8Encoder.encode(url)),
+    2: [hexToBytes$1(addr.pubkey)],
+    3: [new Uint8Array(kind)]
+  });
+  return encodeBech32("naddr", data);
+}
+function nrelayEncode(url) {
+  let data = encodeTLV({
+    0: [utf8Encoder.encode(url)]
+  });
+  return encodeBech32("nrelay", data);
+}
+function encodeTLV(tlv) {
+  let entries = [];
+  Object.entries(tlv).reverse().forEach(([t, vs]) => {
+    vs.forEach((v) => {
+      let entry = new Uint8Array(v.length + 2);
+      entry.set([parseInt(t)], 0);
+      entry.set([v.length], 1);
+      entry.set(v, 2);
+      entries.push(entry);
+    });
+  });
+  return concatBytes(...entries);
+}
+var mentionRegex = /\bnostr:((note|npub|naddr|nevent|nprofile)1\w+)\b|#\[(\d+)\]/g;
+function parseReferences(evt) {
+  let references = [];
+  for (let ref2 of evt.content.matchAll(mentionRegex)) {
+    if (ref2[2]) {
+      try {
+        let { type, data } = decode(ref2[1]);
+        switch (type) {
+          case "npub": {
+            references.push({
+              text: ref2[0],
+              profile: { pubkey: data, relays: [] }
+            });
+            break;
+          }
+          case "nprofile": {
+            references.push({
+              text: ref2[0],
+              profile: data
+            });
+            break;
+          }
+          case "note": {
+            references.push({
+              text: ref2[0],
+              event: { id: data, relays: [] }
+            });
+            break;
+          }
+          case "nevent": {
+            references.push({
+              text: ref2[0],
+              event: data
+            });
+            break;
+          }
+          case "naddr": {
+            references.push({
+              text: ref2[0],
+              address: data
+            });
+            break;
+          }
+        }
+      } catch (err) {
+      }
+    } else if (ref2[3]) {
+      let idx = parseInt(ref2[3], 10);
+      let tag = evt.tags[idx];
+      if (!tag)
+        continue;
+      switch (tag[0]) {
+        case "p": {
+          references.push({
+            text: ref2[0],
+            profile: { pubkey: tag[1], relays: tag[2] ? [tag[2]] : [] }
+          });
+          break;
+        }
+        case "e": {
+          references.push({
+            text: ref2[0],
+            event: { id: tag[1], relays: tag[2] ? [tag[2]] : [] }
+          });
+          break;
+        }
+        case "a": {
+          try {
+            let [kind, pubkey, identifier] = tag[1].split(":");
+            references.push({
+              text: ref2[0],
+              address: {
+                identifier,
+                pubkey,
+                kind: parseInt(kind, 10),
+                relays: tag[2] ? [tag[2]] : []
+              }
+            });
+          } catch (err) {
+          }
+          break;
+        }
+      }
+    }
+  }
+  return references;
+}
+var nip04_exports = {};
+__export(nip04_exports, {
+  decrypt: () => decrypt,
+  encrypt: () => encrypt
+});
+async function encrypt(secretKey, pubkey, text) {
+  const privkey = secretKey instanceof Uint8Array ? bytesToHex$1(secretKey) : secretKey;
+  const key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
+  const normalizedKey = getNormalizedX(key);
+  let iv = Uint8Array.from(randomBytes(16));
+  let plaintext = utf8Encoder.encode(text);
+  let ciphertext = cbc(normalizedKey, iv).encrypt(plaintext);
+  let ctb64 = base64.encode(new Uint8Array(ciphertext));
+  let ivb64 = base64.encode(new Uint8Array(iv.buffer));
+  return `${ctb64}?iv=${ivb64}`;
+}
+async function decrypt(secretKey, pubkey, data) {
+  const privkey = secretKey instanceof Uint8Array ? bytesToHex$1(secretKey) : secretKey;
+  let [ctb64, ivb64] = data.split("?iv=");
+  let key = secp256k1.getSharedSecret(privkey, "02" + pubkey);
+  let normalizedKey = getNormalizedX(key);
+  let iv = base64.decode(ivb64);
+  let ciphertext = base64.decode(ctb64);
+  let plaintext = cbc(normalizedKey, iv).decrypt(ciphertext);
+  return utf8Decoder.decode(plaintext);
+}
+function getNormalizedX(key) {
+  return key.slice(1, 33);
+}
+var nip05_exports = {};
+__export(nip05_exports, {
+  NIP05_REGEX: () => NIP05_REGEX,
+  isValid: () => isValid,
+  queryProfile: () => queryProfile,
+  searchDomain: () => searchDomain,
+  useFetchImplementation: () => useFetchImplementation
+});
+var NIP05_REGEX = /^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/;
+var _fetch;
+try {
+  _fetch = fetch;
+} catch {
+}
+function useFetchImplementation(fetchImplementation) {
+  _fetch = fetchImplementation;
+}
+async function searchDomain(domain, query = "") {
+  try {
+    const url = `https://${domain}/.well-known/nostr.json?name=${query}`;
+    const res = await _fetch(url, { redirect: "error" });
+    const json = await res.json();
+    return json.names;
+  } catch (_) {
+    return {};
+  }
+}
+async function queryProfile(fullname) {
+  var _a;
+  const match = fullname.match(NIP05_REGEX);
+  if (!match)
+    return null;
+  const [_, name = "_", domain] = match;
+  try {
+    const url = `https://${domain}/.well-known/nostr.json?name=${name}`;
+    const res = await (await _fetch(url, { redirect: "error" })).json();
+    let pubkey = res.names[name];
+    return pubkey ? { pubkey, relays: (_a = res.relays) == null ? void 0 : _a[pubkey] } : null;
+  } catch (_e) {
+    return null;
+  }
+}
+async function isValid(pubkey, nip05) {
+  let res = await queryProfile(nip05);
+  return res ? res.pubkey === pubkey : false;
+}
+var nip10_exports = {};
+__export(nip10_exports, {
+  parse: () => parse
+});
+function parse(event) {
+  const result = {
+    reply: void 0,
+    root: void 0,
+    mentions: [],
+    profiles: []
+  };
+  const eTags = [];
+  for (const tag of event.tags) {
+    if (tag[0] === "e" && tag[1]) {
+      eTags.push(tag);
+    }
+    if (tag[0] === "p" && tag[1]) {
+      result.profiles.push({
+        pubkey: tag[1],
+        relays: tag[2] ? [tag[2]] : []
+      });
+    }
+  }
+  for (let eTagIndex = 0; eTagIndex < eTags.length; eTagIndex++) {
+    const eTag = eTags[eTagIndex];
+    const [_, eTagEventId, eTagRelayUrl, eTagMarker] = eTag;
+    const eventPointer = {
+      id: eTagEventId,
+      relays: eTagRelayUrl ? [eTagRelayUrl] : []
+    };
+    const isFirstETag = eTagIndex === 0;
+    const isLastETag = eTagIndex === eTags.length - 1;
+    if (eTagMarker === "root") {
+      result.root = eventPointer;
+      continue;
+    }
+    if (eTagMarker === "reply") {
+      result.reply = eventPointer;
+      continue;
+    }
+    if (eTagMarker === "mention") {
+      result.mentions.push(eventPointer);
+      continue;
+    }
+    if (isFirstETag) {
+      result.root = eventPointer;
+      continue;
+    }
+    if (isLastETag) {
+      result.reply = eventPointer;
+      continue;
+    }
+    result.mentions.push(eventPointer);
+  }
+  return result;
+}
+var nip11_exports = {};
+__export(nip11_exports, {
+  fetchRelayInformation: () => fetchRelayInformation,
+  useFetchImplementation: () => useFetchImplementation2
+});
+var _fetch2;
+try {
+  _fetch2 = fetch;
+} catch {
+}
+function useFetchImplementation2(fetchImplementation) {
+  _fetch2 = fetchImplementation;
+}
+async function fetchRelayInformation(url) {
+  return await (await fetch(url.replace("ws://", "http://").replace("wss://", "https://"), {
+    headers: { Accept: "application/nostr+json" }
+  })).json();
+}
+var nip13_exports = {};
+__export(nip13_exports, {
+  getPow: () => getPow,
+  minePow: () => minePow
+});
+function getPow(hex2) {
+  let count = 0;
+  for (let i2 = 0; i2 < hex2.length; i2++) {
+    const nibble = parseInt(hex2[i2], 16);
+    if (nibble === 0) {
+      count += 4;
+    } else {
+      count += Math.clz32(nibble) - 28;
+      break;
+    }
+  }
+  return count;
+}
+function minePow(unsigned, difficulty) {
+  let count = 0;
+  const event = unsigned;
+  const tag = ["nonce", count.toString(), difficulty.toString()];
+  event.tags.push(tag);
+  while (true) {
+    const now2 = Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3);
+    if (now2 !== event.created_at) {
+      count = 0;
+      event.created_at = now2;
+    }
+    tag[1] = (++count).toString();
+    event.id = getEventHash(event);
+    if (getPow(event.id) >= difficulty) {
+      break;
+    }
+  }
+  return event;
+}
+var nip18_exports = {};
+__export(nip18_exports, {
+  finishRepostEvent: () => finishRepostEvent,
+  getRepostedEvent: () => getRepostedEvent,
+  getRepostedEventPointer: () => getRepostedEventPointer
+});
+function finishRepostEvent(t, reposted, relayUrl, privateKey) {
+  return finalizeEvent(
+    {
+      kind: Repost,
+      tags: [...t.tags ?? [], ["e", reposted.id, relayUrl], ["p", reposted.pubkey]],
+      content: t.content === "" ? "" : JSON.stringify(reposted),
+      created_at: t.created_at
+    },
+    privateKey
+  );
+}
+function getRepostedEventPointer(event) {
+  if (event.kind !== Repost) {
+    return void 0;
+  }
+  let lastETag;
+  let lastPTag;
+  for (let i2 = event.tags.length - 1; i2 >= 0 && (lastETag === void 0 || lastPTag === void 0); i2--) {
+    const tag = event.tags[i2];
+    if (tag.length >= 2) {
+      if (tag[0] === "e" && lastETag === void 0) {
+        lastETag = tag;
+      } else if (tag[0] === "p" && lastPTag === void 0) {
+        lastPTag = tag;
+      }
+    }
+  }
+  if (lastETag === void 0) {
+    return void 0;
+  }
+  return {
+    id: lastETag[1],
+    relays: [lastETag[2], lastPTag == null ? void 0 : lastPTag[2]].filter((x) => typeof x === "string"),
+    author: lastPTag == null ? void 0 : lastPTag[1]
+  };
+}
+function getRepostedEvent(event, { skipVerification } = {}) {
+  const pointer = getRepostedEventPointer(event);
+  if (pointer === void 0 || event.content === "") {
+    return void 0;
+  }
+  let repostedEvent;
+  try {
+    repostedEvent = JSON.parse(event.content);
+  } catch (error) {
+    return void 0;
+  }
+  if (repostedEvent.id !== pointer.id) {
+    return void 0;
+  }
+  if (!skipVerification && !verifyEvent(repostedEvent)) {
+    return void 0;
+  }
+  return repostedEvent;
+}
+var nip21_exports = {};
+__export(nip21_exports, {
+  NOSTR_URI_REGEX: () => NOSTR_URI_REGEX,
+  parse: () => parse2,
+  test: () => test
+});
+var NOSTR_URI_REGEX = new RegExp(`nostr:(${BECH32_REGEX.source})`);
+function test(value) {
+  return typeof value === "string" && new RegExp(`^${NOSTR_URI_REGEX.source}$`).test(value);
+}
+function parse2(uri) {
+  const match = uri.match(new RegExp(`^${NOSTR_URI_REGEX.source}$`));
+  if (!match)
+    throw new Error(`Invalid Nostr URI: ${uri}`);
+  return {
+    uri: match[0],
+    value: match[1],
+    decoded: decode(match[1])
+  };
+}
+var nip25_exports = {};
+__export(nip25_exports, {
+  finishReactionEvent: () => finishReactionEvent,
+  getReactedEventPointer: () => getReactedEventPointer
+});
+function finishReactionEvent(t, reacted, privateKey) {
+  const inheritedTags = reacted.tags.filter((tag) => tag.length >= 2 && (tag[0] === "e" || tag[0] === "p"));
+  return finalizeEvent(
+    {
+      ...t,
+      kind: Reaction,
+      tags: [...t.tags ?? [], ...inheritedTags, ["e", reacted.id], ["p", reacted.pubkey]],
+      content: t.content ?? "+"
+    },
+    privateKey
+  );
+}
+function getReactedEventPointer(event) {
+  if (event.kind !== Reaction) {
+    return void 0;
+  }
+  let lastETag;
+  let lastPTag;
+  for (let i2 = event.tags.length - 1; i2 >= 0 && (lastETag === void 0 || lastPTag === void 0); i2--) {
+    const tag = event.tags[i2];
+    if (tag.length >= 2) {
+      if (tag[0] === "e" && lastETag === void 0) {
+        lastETag = tag;
+      } else if (tag[0] === "p" && lastPTag === void 0) {
+        lastPTag = tag;
+      }
+    }
+  }
+  if (lastETag === void 0 || lastPTag === void 0) {
+    return void 0;
+  }
+  return {
+    id: lastETag[1],
+    relays: [lastETag[2], lastPTag[2]].filter((x) => x !== void 0),
+    author: lastPTag[1]
+  };
+}
+var nip27_exports = {};
+__export(nip27_exports, {
+  matchAll: () => matchAll,
+  regex: () => regex,
+  replaceAll: () => replaceAll
+});
+var regex = () => new RegExp(`\\b${NOSTR_URI_REGEX.source}\\b`, "g");
+function* matchAll(content) {
+  const matches = content.matchAll(regex());
+  for (const match of matches) {
+    try {
+      const [uri, value] = match;
+      yield {
+        uri,
+        value,
+        decoded: decode(value),
+        start: match.index,
+        end: match.index + uri.length
+      };
+    } catch (_e) {
+    }
+  }
+}
+function replaceAll(content, replacer2) {
+  return content.replaceAll(regex(), (uri, value) => {
+    return replacer2({
+      uri,
+      value,
+      decoded: decode(value)
+    });
+  });
+}
+var nip28_exports = {};
+__export(nip28_exports, {
+  channelCreateEvent: () => channelCreateEvent,
+  channelHideMessageEvent: () => channelHideMessageEvent,
+  channelMessageEvent: () => channelMessageEvent,
+  channelMetadataEvent: () => channelMetadataEvent,
+  channelMuteUserEvent: () => channelMuteUserEvent
+});
+var channelCreateEvent = (t, privateKey) => {
+  let content;
+  if (typeof t.content === "object") {
+    content = JSON.stringify(t.content);
+  } else if (typeof t.content === "string") {
+    content = t.content;
+  } else {
+    return void 0;
+  }
+  return finalizeEvent(
+    {
+      kind: ChannelCreation,
+      tags: [...t.tags ?? []],
+      content,
+      created_at: t.created_at
+    },
+    privateKey
+  );
+};
+var channelMetadataEvent = (t, privateKey) => {
+  let content;
+  if (typeof t.content === "object") {
+    content = JSON.stringify(t.content);
+  } else if (typeof t.content === "string") {
+    content = t.content;
+  } else {
+    return void 0;
+  }
+  return finalizeEvent(
+    {
+      kind: ChannelMetadata,
+      tags: [["e", t.channel_create_event_id], ...t.tags ?? []],
+      content,
+      created_at: t.created_at
+    },
+    privateKey
+  );
+};
+var channelMessageEvent = (t, privateKey) => {
+  const tags = [["e", t.channel_create_event_id, t.relay_url, "root"]];
+  if (t.reply_to_channel_message_event_id) {
+    tags.push(["e", t.reply_to_channel_message_event_id, t.relay_url, "reply"]);
+  }
+  return finalizeEvent(
+    {
+      kind: ChannelMessage,
+      tags: [...tags, ...t.tags ?? []],
+      content: t.content,
+      created_at: t.created_at
+    },
+    privateKey
+  );
+};
+var channelHideMessageEvent = (t, privateKey) => {
+  let content;
+  if (typeof t.content === "object") {
+    content = JSON.stringify(t.content);
+  } else if (typeof t.content === "string") {
+    content = t.content;
+  } else {
+    return void 0;
+  }
+  return finalizeEvent(
+    {
+      kind: ChannelHideMessage,
+      tags: [["e", t.channel_message_event_id], ...t.tags ?? []],
+      content,
+      created_at: t.created_at
+    },
+    privateKey
+  );
+};
+var channelMuteUserEvent = (t, privateKey) => {
+  let content;
+  if (typeof t.content === "object") {
+    content = JSON.stringify(t.content);
+  } else if (typeof t.content === "string") {
+    content = t.content;
+  } else {
+    return void 0;
+  }
+  return finalizeEvent(
+    {
+      kind: ChannelMuteUser,
+      tags: [["p", t.pubkey_to_mute], ...t.tags ?? []],
+      content,
+      created_at: t.created_at
+    },
+    privateKey
+  );
+};
+var nip30_exports = {};
+__export(nip30_exports, {
+  EMOJI_SHORTCODE_REGEX: () => EMOJI_SHORTCODE_REGEX,
+  matchAll: () => matchAll2,
+  regex: () => regex2,
+  replaceAll: () => replaceAll2
+});
+var EMOJI_SHORTCODE_REGEX = /:(\w+):/;
+var regex2 = () => new RegExp(`\\B${EMOJI_SHORTCODE_REGEX.source}\\B`, "g");
+function* matchAll2(content) {
+  const matches = content.matchAll(regex2());
+  for (const match of matches) {
+    try {
+      const [shortcode, name] = match;
+      yield {
+        shortcode,
+        name,
+        start: match.index,
+        end: match.index + shortcode.length
+      };
+    } catch (_e) {
+    }
+  }
+}
+function replaceAll2(content, replacer2) {
+  return content.replaceAll(regex2(), (shortcode, name) => {
+    return replacer2({
+      shortcode,
+      name
+    });
+  });
+}
+var nip39_exports = {};
+__export(nip39_exports, {
+  useFetchImplementation: () => useFetchImplementation3,
+  validateGithub: () => validateGithub
+});
+var _fetch3;
+try {
+  _fetch3 = fetch;
+} catch {
+}
+function useFetchImplementation3(fetchImplementation) {
+  _fetch3 = fetchImplementation;
+}
+async function validateGithub(pubkey, username, proof) {
+  try {
+    let res = await (await _fetch3(`https://gist.github.com/${username}/${proof}/raw`)).text();
+    return res === `Verifying that I control the following Nostr public key: ${pubkey}`;
+  } catch (_) {
+    return false;
+  }
+}
+var nip44_exports = {};
+__export(nip44_exports, {
+  decrypt: () => decrypt2,
+  encrypt: () => encrypt2,
+  getConversationKey: () => getConversationKey,
+  v2: () => v2
+});
+var minPlaintextSize = 1;
+var maxPlaintextSize = 65535;
+function getConversationKey(privkeyA, pubkeyB) {
+  const sharedX = secp256k1.getSharedSecret(privkeyA, "02" + pubkeyB).subarray(1, 33);
+  return extract(sha256$1, sharedX, "nip44-v2");
+}
+function getMessageKeys(conversationKey, nonce) {
+  const keys = expand(sha256$1, conversationKey, nonce, 76);
+  return {
+    chacha_key: keys.subarray(0, 32),
+    chacha_nonce: keys.subarray(32, 44),
+    hmac_key: keys.subarray(44, 76)
+  };
+}
+function calcPaddedLen(len) {
+  if (!Number.isSafeInteger(len) || len < 1)
+    throw new Error("expected positive integer");
+  if (len <= 32)
+    return 32;
+  const nextPower = 1 << Math.floor(Math.log2(len - 1)) + 1;
+  const chunk = nextPower <= 256 ? 32 : nextPower / 8;
+  return chunk * (Math.floor((len - 1) / chunk) + 1);
+}
+function writeU16BE(num) {
+  if (!Number.isSafeInteger(num) || num < minPlaintextSize || num > maxPlaintextSize)
+    throw new Error("invalid plaintext size: must be between 1 and 65535 bytes");
+  const arr = new Uint8Array(2);
+  new DataView(arr.buffer).setUint16(0, num, false);
+  return arr;
+}
+function pad(plaintext) {
+  const unpadded = utf8Encoder.encode(plaintext);
+  const unpaddedLen = unpadded.length;
+  const prefix = writeU16BE(unpaddedLen);
+  const suffix = new Uint8Array(calcPaddedLen(unpaddedLen) - unpaddedLen);
+  return concatBytes(prefix, unpadded, suffix);
+}
+function unpad(padded) {
+  const unpaddedLen = new DataView(padded.buffer).getUint16(0);
+  const unpadded = padded.subarray(2, 2 + unpaddedLen);
+  if (unpaddedLen < minPlaintextSize || unpaddedLen > maxPlaintextSize || unpadded.length !== unpaddedLen || padded.length !== 2 + calcPaddedLen(unpaddedLen))
+    throw new Error("invalid padding");
+  return utf8Decoder.decode(unpadded);
+}
+function hmacAad(key, message, aad) {
+  if (aad.length !== 32)
+    throw new Error("AAD associated data must be 32 bytes");
+  const combined = concatBytes(aad, message);
+  return hmac(sha256$1, key, combined);
+}
+function decodePayload(payload) {
+  if (typeof payload !== "string")
+    throw new Error("payload must be a valid string");
+  const plen = payload.length;
+  if (plen < 132 || plen > 87472)
+    throw new Error("invalid payload length: " + plen);
+  if (payload[0] === "#")
+    throw new Error("unknown encryption version");
+  let data;
+  try {
+    data = base64.decode(payload);
+  } catch (error) {
+    throw new Error("invalid base64: " + error.message);
+  }
+  const dlen = data.length;
+  if (dlen < 99 || dlen > 65603)
+    throw new Error("invalid data length: " + dlen);
+  const vers = data[0];
+  if (vers !== 2)
+    throw new Error("unknown encryption version " + vers);
+  return {
+    nonce: data.subarray(1, 33),
+    ciphertext: data.subarray(33, -32),
+    mac: data.subarray(-32)
+  };
+}
+function encrypt2(plaintext, conversationKey, nonce = randomBytes(32)) {
+  const { chacha_key, chacha_nonce, hmac_key } = getMessageKeys(conversationKey, nonce);
+  const padded = pad(plaintext);
+  const ciphertext = chacha20(chacha_key, chacha_nonce, padded);
+  const mac = hmacAad(hmac_key, ciphertext, nonce);
+  return base64.encode(concatBytes(new Uint8Array([2]), nonce, ciphertext, mac));
+}
+function decrypt2(payload, conversationKey) {
+  const { nonce, ciphertext, mac } = decodePayload(payload);
+  const { chacha_key, chacha_nonce, hmac_key } = getMessageKeys(conversationKey, nonce);
+  const calculatedMac = hmacAad(hmac_key, ciphertext, nonce);
+  if (!equalBytes(calculatedMac, mac))
+    throw new Error("invalid MAC");
+  const padded = chacha20(chacha_key, chacha_nonce, ciphertext);
+  return unpad(padded);
+}
+var v2 = {
+  utils: {
+    getConversationKey,
+    calcPaddedLen
+  },
+  encrypt: encrypt2,
+  decrypt: decrypt2
+};
+var nip47_exports = {};
+__export(nip47_exports, {
+  makeNwcRequestEvent: () => makeNwcRequestEvent,
+  parseConnectionString: () => parseConnectionString
+});
+function parseConnectionString(connectionString) {
+  const { pathname, searchParams } = new URL(connectionString);
+  const pubkey = pathname;
+  const relay = searchParams.get("relay");
+  const secret = searchParams.get("secret");
+  if (!pubkey || !relay || !secret) {
+    throw new Error("invalid connection string");
+  }
+  return { pubkey, relay, secret };
+}
+async function makeNwcRequestEvent(pubkey, secretKey, invoice) {
+  const content = {
+    method: "pay_invoice",
+    params: {
+      invoice
+    }
+  };
+  const encryptedContent = await encrypt(secretKey, pubkey, JSON.stringify(content));
+  const eventTemplate = {
+    kind: NWCWalletRequest,
+    created_at: Math.round(Date.now() / 1e3),
+    content: encryptedContent,
+    tags: [["p", pubkey]]
+  };
+  return finalizeEvent(eventTemplate, secretKey);
+}
+var nip57_exports = {};
+__export(nip57_exports, {
+  getZapEndpoint: () => getZapEndpoint,
+  makeZapReceipt: () => makeZapReceipt,
+  makeZapRequest: () => makeZapRequest,
+  useFetchImplementation: () => useFetchImplementation4,
+  validateZapRequest: () => validateZapRequest
+});
+var _fetch4;
+try {
+  _fetch4 = fetch;
+} catch {
+}
+function useFetchImplementation4(fetchImplementation) {
+  _fetch4 = fetchImplementation;
+}
+async function getZapEndpoint(metadata) {
+  try {
+    let lnurl = "";
+    let { lud06, lud16 } = JSON.parse(metadata.content);
+    if (lud06) {
+      let { words } = bech32.decode(lud06, 1e3);
+      let data = bech32.fromWords(words);
+      lnurl = utf8Decoder.decode(data);
+    } else if (lud16) {
+      let [name, domain] = lud16.split("@");
+      lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString();
+    } else {
+      return null;
+    }
+    let res = await _fetch4(lnurl);
+    let body = await res.json();
+    if (body.allowsNostr && body.nostrPubkey) {
+      return body.callback;
+    }
+  } catch (err) {
+  }
+  return null;
+}
+function makeZapRequest({
+  profile,
+  event,
+  amount,
+  relays,
+  comment = ""
+}) {
+  if (!amount)
+    throw new Error("amount not given");
+  if (!profile)
+    throw new Error("profile not given");
+  let zr = {
+    kind: 9734,
+    created_at: Math.round(Date.now() / 1e3),
+    content: comment,
+    tags: [
+      ["p", profile],
+      ["amount", amount.toString()],
+      ["relays", ...relays]
+    ]
+  };
+  if (event) {
+    zr.tags.push(["e", event]);
+  }
+  return zr;
+}
+function validateZapRequest(zapRequestString) {
+  let zapRequest;
+  try {
+    zapRequest = JSON.parse(zapRequestString);
+  } catch (err) {
+    return "Invalid zap request JSON.";
+  }
+  if (!validateEvent(zapRequest))
+    return "Zap request is not a valid Nostr event.";
+  if (!verifyEvent(zapRequest))
+    return "Invalid signature on zap request.";
+  let p2 = zapRequest.tags.find(([t, v]) => t === "p" && v);
+  if (!p2)
+    return "Zap request doesn't have a 'p' tag.";
+  if (!p2[1].match(/^[a-f0-9]{64}$/))
+    return "Zap request 'p' tag is not valid hex.";
+  let e = zapRequest.tags.find(([t, v]) => t === "e" && v);
+  if (e && !e[1].match(/^[a-f0-9]{64}$/))
+    return "Zap request 'e' tag is not valid hex.";
+  let relays = zapRequest.tags.find(([t, v]) => t === "relays" && v);
+  if (!relays)
+    return "Zap request doesn't have a 'relays' tag.";
+  return null;
+}
+function makeZapReceipt({
+  zapRequest,
+  preimage,
+  bolt11,
+  paidAt
+}) {
+  let zr = JSON.parse(zapRequest);
+  let tagsFromZapRequest = zr.tags.filter(([t]) => t === "e" || t === "p" || t === "a");
+  let zap = {
+    kind: 9735,
+    created_at: Math.round(paidAt.getTime() / 1e3),
+    content: "",
+    tags: [...tagsFromZapRequest, ["P", zr.pubkey], ["bolt11", bolt11], ["description", zapRequest]]
+  };
+  if (preimage) {
+    zap.tags.push(["preimage", preimage]);
+  }
+  return zap;
+}
+var nip98_exports = {};
+__export(nip98_exports, {
+  getToken: () => getToken,
+  hashPayload: () => hashPayload,
+  unpackEventFromToken: () => unpackEventFromToken,
+  validateEvent: () => validateEvent2,
+  validateEventKind: () => validateEventKind,
+  validateEventMethodTag: () => validateEventMethodTag,
+  validateEventPayloadTag: () => validateEventPayloadTag,
+  validateEventTimestamp: () => validateEventTimestamp,
+  validateEventUrlTag: () => validateEventUrlTag,
+  validateToken: () => validateToken
+});
+var _authorizationScheme = "Nostr ";
+async function getToken(loginUrl, httpMethod, sign, includeAuthorizationScheme = false, payload) {
+  const event = {
+    kind: HTTPAuth,
+    tags: [
+      ["u", loginUrl],
+      ["method", httpMethod]
+    ],
+    created_at: Math.round((/* @__PURE__ */ new Date()).getTime() / 1e3),
+    content: ""
+  };
+  if (payload) {
+    event.tags.push(["payload", hashPayload(payload)]);
+  }
+  const signedEvent = await sign(event);
+  const authorizationScheme = includeAuthorizationScheme ? _authorizationScheme : "";
+  return authorizationScheme + base64.encode(utf8Encoder.encode(JSON.stringify(signedEvent)));
+}
+async function validateToken(token, url, method) {
+  const event = await unpackEventFromToken(token).catch((error) => {
+    throw error;
+  });
+  const valid = await validateEvent2(event, url, method).catch((error) => {
+    throw error;
+  });
+  return valid;
+}
+async function unpackEventFromToken(token) {
+  if (!token) {
+    throw new Error("Missing token");
+  }
+  token = token.replace(_authorizationScheme, "");
+  const eventB64 = utf8Decoder.decode(base64.decode(token));
+  if (!eventB64 || eventB64.length === 0 || !eventB64.startsWith("{")) {
+    throw new Error("Invalid token");
+  }
+  const event = JSON.parse(eventB64);
+  return event;
+}
+function validateEventTimestamp(event) {
+  if (!event.created_at) {
+    return false;
+  }
+  return Math.round((/* @__PURE__ */ new Date()).getTime() / 1e3) - event.created_at < 60;
+}
+function validateEventKind(event) {
+  return event.kind === HTTPAuth;
+}
+function validateEventUrlTag(event, url) {
+  const urlTag = event.tags.find((t) => t[0] === "u");
+  if (!urlTag) {
+    return false;
+  }
+  return urlTag.length > 0 && urlTag[1] === url;
+}
+function validateEventMethodTag(event, method) {
+  const methodTag = event.tags.find((t) => t[0] === "method");
+  if (!methodTag) {
+    return false;
+  }
+  return methodTag.length > 0 && methodTag[1].toLowerCase() === method.toLowerCase();
+}
+function hashPayload(payload) {
+  const hash2 = sha256$1(utf8Encoder.encode(JSON.stringify(payload)));
+  return bytesToHex$1(hash2);
+}
+function validateEventPayloadTag(event, payload) {
+  const payloadTag = event.tags.find((t) => t[0] === "payload");
+  if (!payloadTag) {
+    return false;
+  }
+  const payloadHash = hashPayload(payload);
+  return payloadTag.length > 0 && payloadTag[1] === payloadHash;
+}
+async function validateEvent2(event, url, method, body) {
+  if (!verifyEvent(event)) {
+    throw new Error("Invalid nostr event, signature invalid");
+  }
+  if (!validateEventKind(event)) {
+    throw new Error("Invalid nostr event, kind invalid");
+  }
+  if (!validateEventTimestamp(event)) {
+    throw new Error("Invalid nostr event, created_at timestamp invalid");
+  }
+  if (!validateEventUrlTag(event, url)) {
+    throw new Error("Invalid nostr event, url tag invalid");
+  }
+  if (!validateEventMethodTag(event, method)) {
+    throw new Error("Invalid nostr event, method tag invalid");
+  }
+  if (Boolean(body) && typeof body === "object" && Object.keys(body).length > 0) {
+    if (!validateEventPayloadTag(event, body)) {
+      throw new Error("Invalid nostr event, payload tag does not match request body hash");
+    }
+  }
+  return true;
+}
+const EVENT_KIND = {
+  META: 0,
+  TEXT_NOTE: 1,
+  REPLY: 1,
+  // in fact, the same as TEXT_NOTE
+  LIKE: 7,
+  REPOST: 6,
+  DM_RELAYS: 10050,
+  GIFT_WRAP: 1059,
+  RELAY_LIST_META: 10002,
+  FOLLOW_LIST: 3
+};
+const PURPLEPAG_RELAY_URL = "wss://purplepag.es/";
+const markNotesAsRoot = (posts) => {
+  posts.forEach((post) => post.isRoot = true);
+};
+const markNotesAsNotRoot = (posts) => {
+  posts.forEach((post) => post.isRoot = false);
+};
+const injectRootLikesRepostsRepliesCount = (post, events = []) => {
+  if (!events || !events.length) {
+    events = [];
+  }
+  const { likes, reposts, replies } = sortByLikesRepostsReplies(events);
+  injectLikesToNote(post, likes);
+  injectRepostsToNote(post, reposts);
+  injectRootRepliesToNote(post, replies);
+};
+const injectNotRootLikesRepostsRepliesCount = (post, events = []) => {
+  if (!events || !events.length) {
+    events = [];
+  }
+  const { likes, reposts, replies } = sortByLikesRepostsReplies(events);
+  injectLikesToNote(post, likes);
+  injectRepostsToNote(post, reposts);
+  injectNotRootRepliesToNote(post, replies);
+};
+const sortByLikesRepostsReplies = (events) => {
+  if (!events || !events.length) {
+    return { likes: [], reposts: [], replies: [] };
+  }
+  const likes = [];
+  const reposts = [];
+  const replies = [];
+  for (const event of events) {
+    switch (event.kind) {
+      case EVENT_KIND.LIKE:
+        likes.push(event);
+        break;
+      case EVENT_KIND.REPOST:
+        reposts.push(event);
+        break;
+      case EVENT_KIND.REPLY:
+        replies.push(event);
+        break;
+    }
+  }
+  return { likes, reposts, replies };
+};
+const injectReplyingToDataToNotes = (replyingToEvent, postsEvents) => {
+  for (const event of postsEvents) {
+    event.replyingTo = {
+      user: replyingToEvent.author,
+      pubkey: replyingToEvent.pubkey,
+      event: replyingToEvent
+    };
+  }
+};
+const injectRootRepliesToNote = (postEvent, repliesEvents) => {
+  let replies = 0;
+  for (const reply of repliesEvents) {
+    if (nip10IsFirstLevelReplyForEvent(postEvent.id, reply)) {
+      replies++;
+    }
+  }
+  postEvent.replies = replies;
+};
+const injectNotRootRepliesToNote = (postEvent, repliesEvents) => {
+  let replies = 0;
+  for (const reply of repliesEvents) {
+    if (nip10IsReplyForEvent(postEvent.id, reply)) {
+      replies++;
+    }
+  }
+  postEvent.replies = replies;
+};
+const injectAuthorsToNotes = (postsEvents, authorsEvents) => {
+  const tempPostsEvents = [...postsEvents];
+  const postsWithAuthor = [];
+  tempPostsEvents.forEach((pe) => {
+    let isAuthorAddedToPost = false;
+    authorsEvents.forEach((ae) => {
+      if (!isAuthorAddedToPost && pe.pubkey === (ae == null ? void 0 : ae.pubkey)) {
+        const tempEventWithAuthor = pe;
+        tempEventWithAuthor.author = JSON.parse(ae.content);
+        tempEventWithAuthor.authorEvent = ae;
+        postsWithAuthor.push(tempEventWithAuthor);
+        isAuthorAddedToPost = true;
+      }
+    });
+    if (!isAuthorAddedToPost) {
+      postsWithAuthor.push(pe);
+    }
+  });
+  return postsWithAuthor;
+};
+const getNoteReferences = (postEvent) => {
+  if (!contentHasMentions(postEvent.content)) {
+    return [];
+  }
+  const allReferencesPubkeys = /* @__PURE__ */ new Set();
+  const references = parseReferences(postEvent);
+  for (let i2 = 0; i2 < references.length; i2++) {
+    let { profile } = references[i2];
+    if (!(profile == null ? void 0 : profile.pubkey))
+      continue;
+    allReferencesPubkeys.add(profile.pubkey);
+  }
+  if (!allReferencesPubkeys.size) {
+    return [];
+  }
+  return [...allReferencesPubkeys];
+};
+const injectReferencesToNote = (postEvent, referencesMetas) => {
+  if (!referencesMetas.length) {
+    postEvent.references = [];
+    return;
+  }
+  const references = parseReferences(postEvent);
+  const referencesToInject = [];
+  for (let i2 = 0; i2 < references.length; i2++) {
+    let { profile } = references[i2];
+    if (!(profile == null ? void 0 : profile.pubkey))
+      continue;
+    referencesMetas.forEach((meta) => {
+      if ((meta == null ? void 0 : meta.pubkey) === (profile == null ? void 0 : profile.pubkey)) {
+        const referenceWithProfile = references[i2];
+        referenceWithProfile.profile_details = JSON.parse((meta == null ? void 0 : meta.content) || "{}");
+        referencesToInject.push(referenceWithProfile);
+      }
+    });
+  }
+  postEvent.references = referencesToInject;
+};
+const dedupByPubkeyAndSortEvents = (events) => {
+  const cache = /* @__PURE__ */ new Set();
+  const result = [];
+  const sorted = events.sort((a, b) => b.created_at - a.created_at);
+  sorted.forEach((event) => {
+    const { pubkey } = event;
+    if (cache.has(pubkey))
+      return;
+    cache.add(pubkey);
+    result.push(event);
+  });
+  return result;
+};
+const injectLikesToNote = (postEvent, likesEvents) => {
+  let likes = 0;
+  likesEvents.forEach((likedEvent) => {
+    var _a;
+    const likedEventId = (_a = likedEvent.tags.reverse().find((tag) => tag[0] === "e")) == null ? void 0 : _a[1];
+    if (likedEventId && likedEventId === postEvent.id && likedEvent.content && isLike(likedEvent.content)) {
+      likes++;
+    }
+  });
+  postEvent.likes = likes;
+};
+const injectRepostsToNote = (postEvent, repostEvents) => {
+  let reposts = 0;
+  repostEvents.forEach((repostEvent) => {
+    var _a;
+    const repostEventId = (_a = repostEvent.tags.find((tag) => tag[0] === "e")) == null ? void 0 : _a[1];
+    if (repostEventId && repostEventId === postEvent.id) {
+      reposts++;
+    }
+  });
+  postEvent.reposts = reposts;
+};
+const filterRootEventReplies = (event, replies) => {
+  return replies.filter((reply) => {
+    var _a;
+    const nip10Data = nip10_exports.parse(reply);
+    return !nip10Data.reply && ((_a = nip10Data == null ? void 0 : nip10Data.root) == null ? void 0 : _a.id) === event.id;
+  });
+};
+const filterReplyEventReplies = (event, replies) => {
+  return replies.filter((reply) => {
+    var _a, _b;
+    const nip10Data = nip10_exports.parse(reply);
+    return ((_a = nip10Data == null ? void 0 : nip10Data.reply) == null ? void 0 : _a.id) === event.id || ((_b = nip10Data == null ? void 0 : nip10Data.root) == null ? void 0 : _b.id) === event.id;
+  });
+};
+const contentHasMentions = (content) => {
+  return content.indexOf("nostr:npub") !== -1 || content.indexOf("nostr:nprofile1") !== -1;
+};
+const isLike = (content) => {
+  if (["-", "👎"].includes(content)) {
+    return false;
+  }
+  return true;
+};
+const isWsAvailable = (url, timeout2 = 5e3) => {
+  try {
+    return new Promise((resolve2) => {
+      const socket = new WebSocket(url);
+      const timer = setTimeout(() => {
+        socket.close();
+        resolve2(false);
+      }, timeout2);
+      socket.onopen = () => {
+        clearTimeout(timer);
+        socket.close();
+        resolve2(true);
+      };
+      socket.onerror = () => {
+        clearTimeout(timer);
+        socket.close();
+        resolve2(false);
+      };
+    });
+  } catch (error) {
+    return Promise.resolve(false);
+  }
+};
+const isSHA256Hex = (hex2) => {
+  return /^[a-f0-9]{64}$/.test(hex2);
+};
+const relayGet = (relay, filters, timeout2) => {
+  const timout = new Promise((resolve2) => {
+    setTimeout(() => {
+      resolve2(null);
+    }, timeout2);
+  });
+  const connection = new Promise((resolve2) => {
+    const sub = relay.subscribe(filters, {
+      onevent(event) {
+        resolve2(event);
+      },
+      oneose() {
+        sub.close();
+      }
+    });
+  });
+  return Promise.race([connection, timout]);
+};
+const parseRelaysNip65 = (event) => {
+  const { tags } = event;
+  const relays = { read: [], write: [], all: [] };
+  if (!tags.length)
+    return relays;
+  tags.forEach((tag) => {
+    const isRelay = tag[0] === "r";
+    if (isRelay) {
+      const relayUrl = utils_exports.normalizeURL(tag[1]);
+      const relayType = tag[2];
+      if (!relayType) {
+        relays.read.push(relayUrl);
+        relays.write.push(relayUrl);
+      } else if (relayType === "read") {
+        relays.read.push(relayUrl);
+      } else if (relayType === "write") {
+        relays.write.push(relayUrl);
+      }
+      relays.all.push({ url: relayUrl, type: relayType || "write" });
+    }
+  });
+  return relays;
+};
+const publishEventToRelays = async (relays, pool, event) => {
+  const promises = relays.map(async (relay) => {
+    const promises2 = pool.publish([relay], event);
+    const result = (await Promise.allSettled(promises2))[0];
+    return {
+      relay,
+      success: result.status === "fulfilled"
+    };
+  });
+  return await Promise.all(promises);
+};
+const formatedDate = (date) => {
+  return new Date(date * 1e3).toLocaleString("default", {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "numeric"
+  });
+};
+const formatedDateYear = (date) => {
+  return new Date(date * 1e3).toLocaleString("default", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric"
+  });
+};
+const racePromises = (promises, handleSuccess, handleError2) => {
+  if (promises.length === 0)
+    return;
+  const wrappedPromises = promises.map(
+    (p2) => p2.then((result) => ({ result, isFulfilled: true, originalPromise: p2 })).catch((error) => ({ result: error, isFulfilled: false, originalPromise: p2 }))
+  );
+  Promise.race(wrappedPromises).then(({ result, isFulfilled, originalPromise }) => {
+    if (isFulfilled) {
+      handleSuccess(result);
+    } else {
+      handleError2(result);
+    }
+    const remainingPromises = promises.filter((p2) => p2 !== originalPromise);
+    racePromises(remainingPromises, handleSuccess, handleError2);
+  });
+};
+const nip10IsFirstLevelReplyForEvent = (eventId, reply) => {
+  var _a;
+  const nip10Data = nip10_exports.parse(reply);
+  return !nip10Data.reply && ((_a = nip10Data == null ? void 0 : nip10Data.root) == null ? void 0 : _a.id) === eventId;
+};
+const nip10IsReplyForEvent = (eventId, reply) => {
+  var _a, _b;
+  const nip10Data = nip10_exports.parse(reply);
+  return ((_a = nip10Data == null ? void 0 : nip10Data.reply) == null ? void 0 : _a.id) === eventId || ((_b = nip10Data == null ? void 0 : nip10Data.root) == null ? void 0 : _b.id) === eventId;
+};
+const loadAndInjectDataToPosts = async (posts, replyingToEvent, userRelaysMap = {}, fallBackRelays = [], metasCacheStore, pool, isRootPosts, onPostProcessed = () => {
+}) => {
+  var _a;
+  const postPromises = [];
+  const cachedMetasPubkeys = /* @__PURE__ */ new Set();
+  let relays = fallBackRelays;
+  let usePurple = false;
+  for (const post of posts) {
+    const author = post.pubkey;
+    if (Object.keys(userRelaysMap).length && ((_a = userRelaysMap[author]) == null ? void 0 : _a.length)) {
+      relays = userRelaysMap[author];
+      usePurple = relays.includes(PURPLEPAG_RELAY_URL);
+    }
+    let metasPromise = null;
+    let metaAuthorPromise = null;
+    const allPubkeysToGet = getNoteReferences(post);
+    if (!usePurple && !allPubkeysToGet.includes(author)) {
+      allPubkeysToGet.push(author);
+    }
+    if (usePurple && !metasCacheStore.hasPubkey(author) && !cachedMetasPubkeys.has(author)) {
+      metaAuthorPromise = pool.get([PURPLEPAG_RELAY_URL], { kinds: [0], authors: [author] });
+      cachedMetasPubkeys.add(author);
+    }
+    const pubkeysForRequest = [];
+    allPubkeysToGet.forEach((pubkey) => {
+      if (!metasCacheStore.hasPubkey(author) && !cachedMetasPubkeys.has(pubkey)) {
+        pubkeysForRequest.push(pubkey);
+      }
+      cachedMetasPubkeys.add(pubkey);
+    });
+    if (pubkeysForRequest.length) {
+      metasPromise = pool.querySync(relays, { kinds: [0], authors: pubkeysForRequest });
+    }
+    const likesRepostsRepliesPromise = pool.querySync(relays, { kinds: [1, 6, 7], "#e": [post.id] });
+    const postPromise = Promise.all([
+      post,
+      metasPromise,
+      likesRepostsRepliesPromise,
+      metaAuthorPromise
+    ]);
+    postPromises.push(postPromise);
+  }
+  for (const promise of postPromises) {
+    const result = await promise;
+    const post = result[0];
+    const metas = result[1] || [];
+    const likesRepostsReplies = result[2] || [];
+    let authorMeta = result[3];
+    const referencesMetas = [];
+    const refsPubkeys = [];
+    if (authorMeta) {
+      metasCacheStore.addMeta(authorMeta);
+      referencesMetas.push(authorMeta);
+      refsPubkeys.push(authorMeta.pubkey);
+    }
+    const filteredMetas = dedupByPubkeyAndSortEvents(metas);
+    filteredMetas.forEach((meta) => {
+      const ref2 = meta;
+      metasCacheStore.addMeta(meta);
+      referencesMetas.push(ref2);
+      refsPubkeys.push(ref2.pubkey);
+      if (meta.pubkey === post.pubkey) {
+        authorMeta = meta;
+      }
+    });
+    cachedMetasPubkeys.forEach((pubkey) => {
+      if (refsPubkeys.includes(pubkey))
+        return;
+      if (!metasCacheStore.hasPubkey(pubkey)) {
+        metasCacheStore.setMetaValue(pubkey, null);
+      }
+      const ref2 = metasCacheStore.getMeta(pubkey);
+      referencesMetas.push(ref2);
+      if (pubkey === post.pubkey) {
+        authorMeta = ref2;
+      }
+    });
+    injectReferencesToNote(post, referencesMetas);
+    injectAuthorsToNotes([post], [authorMeta]);
+    if (isRootPosts) {
+      injectRootLikesRepostsRepliesCount(post, likesRepostsReplies);
+      markNotesAsRoot([post]);
+    } else {
+      injectNotRootLikesRepostsRepliesCount(post, likesRepostsReplies);
+      markNotesAsNotRoot([post]);
+      if (replyingToEvent) {
+        injectReplyingToDataToNotes(replyingToEvent, [post]);
+      }
+    }
+    onPostProcessed(post);
+  }
+};
+const getEventWithAuthorById = async (eventId, relays, pool) => {
+  const event = await pool.get(relays, { kinds: [1], ids: [eventId] });
+  if (event) {
+    const authorMeta = await pool.get(relays, { kinds: [0], authors: [event.pubkey] });
+    if (authorMeta) {
+      injectAuthorsToNotes([event], [authorMeta]);
+    }
+  }
+  return event;
+};
+const isReply = (event) => {
+  const { reply, root } = nip10_exports.parse(event);
+  return !!reply || !!root;
+};
+const listRootEvents = (pool, relays, filters) => {
+  return new Promise((resolve2) => {
+    const events = [];
+    let filtersLimit;
+    let newFilters = filters;
+    if (filters && filters.length && filters[0].limit) {
+      const { limit, ...restFilters } = filters[0];
+      newFilters = [restFilters];
+      filtersLimit = limit;
+    }
+    let subClosed = false;
+    const sub = pool.subscribeMany(relays, newFilters, {
+      onevent(event) {
+        if (subClosed)
+          return;
+        const nip10Data = nip10_exports.parse(event);
+        if (nip10Data.reply || nip10Data.root)
+          return;
+        events.push(event);
+        if (filtersLimit && events.length >= filtersLimit) {
+          sub.close();
+          subClosed = true;
+          resolve2(events.slice(0, filtersLimit));
+        }
+      },
+      oneose() {
+        sub.close();
+        const result = filtersLimit ? events.slice(0, filtersLimit) : events;
+        resolve2(result);
+      }
+    });
+  });
+};
+const getDisplayUsername = (author, pubkey) => {
+  const { username, name, display_name } = author;
+  const usernameToShow = username || name || display_name;
+  if (usernameToShow.length) {
+    return usernameToShow;
+  }
+  return nip19_exports.npubEncode(pubkey).slice(0, 10) + "...";
+};
+const getUserUrlPath = (pubkey) => {
+  return `/user/${nip19_exports.npubEncode(pubkey)}`;
+};
+const getNip19FromSearch = (query) => {
+  if (!query.length) {
+    throw new Error("Public key or event id is required.");
+  }
+  const queryError = "Public key or event id should be in npub or note format, or hex.";
+  let nip19data;
+  try {
+    nip19data = nip19_exports.decode(query);
+  } catch (e) {
+    throw new Error(queryError);
+  }
+  const { type } = nip19data;
+  if (type !== "npub" && type !== "note") {
+    throw new Error(queryError);
+  }
+  return nip19data;
+};
+const _withScopeId$e = (n) => (pushScopeId("data-v-393546d0"), n = n(), popScopeId(), n);
+const _hoisted_1$E = { class: "event-details" };
+const _hoisted_2$B = { key: 0 };
+const _hoisted_3$v = { class: "highlight" };
+const _hoisted_4$m = { key: 1 };
+const _hoisted_5$f = {
+  key: 0,
+  class: "highlight"
+};
+const _hoisted_6$c = {
+  key: 1,
+  class: "event-details__no-user"
+};
+const _hoisted_7$9 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
+const _hoisted_8$9 = { class: "highlight" };
+const _hoisted_9$8 = { key: 2 };
+const _hoisted_10$8 = {
+  key: 0,
+  class: "highlight"
+};
+const _hoisted_11$7 = {
+  key: 1,
+  class: "event-details__no-user"
+};
+const _hoisted_12$7 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
+const _hoisted_13$5 = { class: "highlight" };
+const _sfc_main$I = /* @__PURE__ */ defineComponent({
+  __name: "RawData",
+  props: {
+    event: {},
+    authorEvent: {},
+    isUserEvent: {}
+  },
+  setup(__props) {
+    const props = __props;
+    const rawDataActiveTab = ref(1);
+    const showAuthorTab = ref(true);
+    const clearEvent = ref();
+    const clearAuthorEvent = ref({});
+    onMounted(() => {
+      const { event, authorEvent } = props;
+      clearEvent.value = sanitizeEvent(event);
+      if (authorEvent) {
+        clearAuthorEvent.value = sanitizeEvent(authorEvent);
+      }
+      if (!props.authorEvent)
+        return;
+      showAuthorTab.value = props.event.id !== props.authorEvent.id;
+    });
+    const sanitizeEvent = (event) => {
+      const { id, pubkey, created_at, kind, tags, content, sig } = event;
+      return { id, pubkey, created_at, kind, tags, content, sig };
+    };
+    const handleRawDataTabClick = (tab) => {
+      rawDataActiveTab.value = tab;
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$E, [
+        createBaseVNode("div", {
+          class: normalizeClass(["event-details__header", { "event-details__header_user": _ctx.isUserEvent }])
+        }, [
+          createBaseVNode("span", {
+            onClick: _cache[0] || (_cache[0] = () => handleRawDataTabClick(1)),
+            class: normalizeClass(["event-details__tab", { "event-details__tab_active": rawDataActiveTab.value === 1 }])
+          }, "Note", 2),
+          showAuthorTab.value ? (openBlock(), createElementBlock("span", {
+            key: 0,
+            onClick: _cache[1] || (_cache[1] = () => handleRawDataTabClick(2)),
+            class: normalizeClass(["event-details__tab", { "event-details__tab_active": rawDataActiveTab.value === 2 }])
+          }, "Author", 2)) : createCommentVNode("", true),
+          createBaseVNode("span", {
+            onClick: _cache[2] || (_cache[2] = () => handleRawDataTabClick(3)),
+            class: normalizeClass(["event-details__tab", { "event-details__tab_active": rawDataActiveTab.value === 3 }])
+          }, "Author content", 2)
+        ], 2),
+        rawDataActiveTab.value === 1 ? (openBlock(), createElementBlock("div", _hoisted_2$B, [
+          createBaseVNode("pre", _hoisted_3$v, toDisplayString(JSON.stringify(clearEvent.value, null, 2)), 1)
+        ])) : createCommentVNode("", true),
+        showAuthorTab.value && rawDataActiveTab.value === 2 ? (openBlock(), createElementBlock("div", _hoisted_4$m, [
+          _ctx.authorEvent ? (openBlock(), createElementBlock("pre", _hoisted_5$f, toDisplayString(JSON.stringify(clearAuthorEvent.value, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_6$c, [
+            _hoisted_7$9,
+            createBaseVNode("pre", _hoisted_8$9, "pubkey: " + toDisplayString(_ctx.event.pubkey) + " \nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
+          ]))
+        ])) : createCommentVNode("", true),
+        rawDataActiveTab.value === 3 ? (openBlock(), createElementBlock("div", _hoisted_9$8, [
+          _ctx.event.author ? (openBlock(), createElementBlock("pre", _hoisted_10$8, toDisplayString(JSON.stringify(_ctx.event.author, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_11$7, [
+            _hoisted_12$7,
+            createBaseVNode("pre", _hoisted_13$5, "pubkey: " + toDisplayString(_ctx.event.pubkey) + "\nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
+          ]))
+        ])) : createCommentVNode("", true)
+      ]);
+    };
+  }
+});
+const RawData_vue_vue_type_style_index_0_scoped_393546d0_lang = "";
+const _export_sfc = (sfc, props) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props) {
+    target[key] = val;
+  }
+  return target;
+};
+const RawData = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["__scopeId", "data-v-393546d0"]]);
+const _sfc_main$H = {};
+const _hoisted_1$D = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-heart",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$A = /* @__PURE__ */ createBaseVNode("path", { d: "m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" }, null, -1);
+const _hoisted_3$u = [
+  _hoisted_2$A
+];
+function _sfc_render$c(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$D, _hoisted_3$u);
+}
+const EmptyHeartIcon = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["render", _sfc_render$c]]);
+const _sfc_main$G = {};
+const _hoisted_1$C = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-repeat",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$z = /* @__PURE__ */ createBaseVNode("path", { d: "M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" }, null, -1);
+const _hoisted_3$t = [
+  _hoisted_2$z
+];
+function _sfc_render$b(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$C, _hoisted_3$t);
+}
+const ArrowRepeatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$b]]);
+const _sfc_main$F = {};
+const _hoisted_1$B = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "22",
+  height: "22",
+  fill: "currentColor",
+  class: "bi bi-reply",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$y = /* @__PURE__ */ createBaseVNode("path", { d: "M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z" }, null, -1);
+const _hoisted_3$s = [
+  _hoisted_2$y
+];
+function _sfc_render$a(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$B, _hoisted_3$s);
+}
+const ReplyIcon = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$a]]);
+const _sfc_main$E = {};
+const _hoisted_1$A = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-chat",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$x = /* @__PURE__ */ createBaseVNode("path", { d: "M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105" }, null, -1);
+const _hoisted_3$r = [
+  _hoisted_2$x
+];
+function _sfc_render$9(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$A, _hoisted_3$r);
+}
+const ChatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$9]]);
+const _hoisted_1$z = { class: "actions-bar" };
+const _hoisted_2$w = { class: "actions-bar__action actions-bar__num" };
+const _hoisted_3$q = { class: "actions_bar-number" };
+const _hoisted_4$l = { class: "actions-bar__action actions-bar__num" };
+const _hoisted_5$e = { class: "actions_bar-number" };
+const _hoisted_6$b = { class: "actions_bar-number" };
+const _sfc_main$D = /* @__PURE__ */ defineComponent({
+  __name: "EventActionsBar",
+  props: {
+    likes: {},
+    reposts: {},
+    replies: {},
+    hasReplyBtn: { type: Boolean }
+  },
+  emits: ["showReplyField", "handleShowReplies", "handleHideReplies"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const handleShowReplyField = () => {
+      emit2("showReplyField");
+    };
+    const handleShowReplies = () => {
+      emit2("handleShowReplies");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$z, [
+        createBaseVNode("span", _hoisted_2$w, [
+          createVNode(EmptyHeartIcon, { class: "actions-bar__icon" }),
+          createBaseVNode("span", _hoisted_3$q, toDisplayString(_ctx.likes), 1)
+        ]),
+        createBaseVNode("span", _hoisted_4$l, [
+          createVNode(ArrowRepeatIcon, { class: "actions-bar__icon" }),
+          createBaseVNode("span", _hoisted_5$e, toDisplayString(_ctx.reposts), 1)
+        ]),
+        _ctx.hasReplyBtn ? (openBlock(), createElementBlock("span", {
+          key: 0,
+          onClick: handleShowReplies,
+          class: "actions-bar__action actions-bar__num actions-bar__replies"
+        }, [
+          createVNode(ChatIcon, { class: "actions-bar__icon" }),
+          createBaseVNode("span", _hoisted_6$b, toDisplayString(_ctx.replies), 1)
+        ])) : createCommentVNode("", true),
+        _ctx.hasReplyBtn ? (openBlock(), createElementBlock("span", {
+          key: 1,
+          onClick: handleShowReplyField,
+          class: "actions-bar__action actions-bar__reply"
+        }, [
+          createVNode(ReplyIcon, { class: "actions-bar__icon" })
+        ])) : createCommentVNode("", true)
+      ]);
+    };
+  }
+});
+const EventActionsBar_vue_vue_type_style_index_0_lang = "";
+const useNpub = defineStore("npub", () => {
+  const npubInput = ref("");
+  const cachedUrlNpub = ref("");
+  const error = ref("");
+  function updateNpubInput(value) {
+    npubInput.value = value;
+  }
+  function updateCachedUrl(value) {
+    cachedUrlNpub.value = value;
+  }
+  function setError(value) {
+    error.value = value;
+  }
+  return {
+    npubInput,
+    cachedUrlNpub,
+    updateNpubInput,
+    updateCachedUrl,
+    setError,
+    error
+  };
+});
+const useUser = defineStore("user", () => {
+  const isRoutingUser = ref(false);
+  const isSearchUsed = ref(false);
+  function updateRoutingStatus(value) {
+    isRoutingUser.value = value;
+  }
+  function updateSearchStatus(value) {
+    isSearchUsed.value = value;
+  }
+  return { isRoutingUser, updateRoutingStatus, updateSearchStatus, isSearchUsed };
+});
+const _hoisted_1$y = { class: "event-content" };
+const _hoisted_2$v = { key: 0 };
+const _hoisted_3$p = { key: 1 };
+const _hoisted_4$k = ["onClick"];
+const _sfc_main$C = /* @__PURE__ */ defineComponent({
+  __name: "EventText",
+  props: {
+    event: {},
+    slice: {}
+  },
+  setup(__props) {
+    const props = __props;
+    const router2 = useRouter();
+    const npubStore = useNpub();
+    const userStore = useUser();
+    const contentParts = ref([]);
+    onMounted(() => {
+      contentParts.value = updateContentParts(props.event, props.slice);
+    });
+    onBeforeUpdate(() => {
+      contentParts.value = updateContentParts(props.event, props.slice);
+    });
+    const sliceParts = (parts, sliceCount) => {
+      let slicedParts = [];
+      let str = "";
+      for (const p2 of parts) {
+        const startLength = str.length;
+        str += p2.value;
+        if (str.length <= sliceCount) {
+          slicedParts.push(p2);
+        } else {
+          if (p2.type === "text") {
+            const difference = sliceCount - startLength;
+            p2.value = p2.value.slice(0, difference);
+          }
+          slicedParts.push(p2);
+          slicedParts.push({ type: "text", value: "..." });
+          break;
+        }
+      }
+      return slicedParts;
+    };
+    const updateContentParts = (event, sliceContent) => {
+      const rawContent = event.content;
+      const references = event.references;
+      let parts = [];
+      if (!(references == null ? void 0 : references.length)) {
+        parts.push({ type: "text", value: rawContent });
+        return parts;
+      }
+      const cachedIndexes = [];
+      references.forEach((ref2) => {
+        let index = rawContent.indexOf(ref2.text);
+        if (cachedIndexes.includes(index)) {
+          for (const ci of cachedIndexes) {
+            if (!cachedIndexes.includes(index))
+              break;
+            index = rawContent.indexOf(ref2.text, index + ref2.text.length);
+          }
+        }
+        ref2.textIndex = index;
+        cachedIndexes.push(index);
+      });
+      references.sort((a, b) => {
+        return a.textIndex - b.textIndex;
+      });
+      let currentTextPart = rawContent;
+      references.forEach((ref2) => {
+        const currIndex = currentTextPart.indexOf(ref2.text);
+        const part1 = currentTextPart.slice(0, currIndex);
+        const part2 = currentTextPart.slice(currIndex + ref2.text.length);
+        const name = getReferenceName(ref2);
+        parts.push({ type: "text", value: part1 });
+        parts.push({ type: "profile", value: name, npub: getNpub(ref2.profile.pubkey) });
+        currentTextPart = part2;
+      });
+      parts.push({ type: "text", value: currentTextPart });
+      if (sliceContent) {
+        parts = sliceParts(parts, sliceContent);
+      }
+      return parts;
+    };
+    const getReferenceName = (reference) => {
+      const details = reference.profile_details;
+      const npub = getNpub(reference.profile.pubkey);
+      const name = details.name || details.username || details.display_name || `${npub.slice(0, 15)}...`;
+      return `@${name}`;
+    };
+    const getNpub = (pubkey) => {
+      return nip19_exports.npubEncode(pubkey);
+    };
+    const handleClickMention = (mentionNpub) => {
+      if (!mentionNpub)
+        return;
+      npubStore.updateNpubInput(mentionNpub);
+      userStore.updateRoutingStatus(true);
+      router2.push({ path: `/user/${mentionNpub}` });
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$y, [
+        (openBlock(true), createElementBlock(Fragment, null, renderList(contentParts.value, (part) => {
+          return openBlock(), createElementBlock("span", null, [
+            part.type === "text" ? (openBlock(), createElementBlock("span", _hoisted_2$v, toDisplayString(part.value), 1)) : createCommentVNode("", true),
+            part.type === "profile" ? (openBlock(), createElementBlock("span", _hoisted_3$p, [
+              createBaseVNode("a", {
+                onClick: withModifiers(() => handleClickMention(part.npub), ["prevent"]),
+                href: "#"
+              }, toDisplayString(part.value), 9, _hoisted_4$k)
+            ])) : createCommentVNode("", true)
+          ]);
+        }), 256))
+      ]);
+    };
+  }
+});
+const EventText_vue_vue_type_style_index_0_scoped_2c0eedfd_lang = "";
+const EventText = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["__scopeId", "data-v-2c0eedfd"]]);
+function isBytes(a) {
+  return a instanceof Uint8Array || a != null && typeof a === "object" && a.constructor.name === "Uint8Array";
+}
+function bytes(b, ...lengths) {
+  if (!isBytes(b))
+    throw new Error("Uint8Array expected");
+  if (lengths.length > 0 && !lengths.includes(b.length))
+    throw new Error(`Uint8Array expected of length ${lengths}, not of length=${b.length}`);
+}
+function exists(instance, checkFinished = true) {
+  if (instance.destroyed)
+    throw new Error("Hash instance has been destroyed");
+  if (checkFinished && instance.finished)
+    throw new Error("Hash#digest() has already been called");
+}
+function output(out, instance) {
+  bytes(out);
+  const min = instance.outputLen;
+  if (out.length < min) {
+    throw new Error(`digestInto() expects output buffer of length at least ${min}`);
+  }
+}
+/*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+const createView = (arr) => new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+const rotr = (word, shift) => word << 32 - shift | word >>> shift;
+new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+const hexes = /* @__PURE__ */ Array.from({ length: 256 }, (_, i2) => i2.toString(16).padStart(2, "0"));
+function bytesToHex(bytes$12) {
+  bytes(bytes$12);
+  let hex2 = "";
+  for (let i2 = 0; i2 < bytes$12.length; i2++) {
+    hex2 += hexes[bytes$12[i2]];
+  }
+  return hex2;
+}
+const asciis = { _0: 48, _9: 57, _A: 65, _F: 70, _a: 97, _f: 102 };
+function asciiToBase16(char) {
+  if (char >= asciis._0 && char <= asciis._9)
+    return char - asciis._0;
+  if (char >= asciis._A && char <= asciis._F)
+    return char - (asciis._A - 10);
+  if (char >= asciis._a && char <= asciis._f)
+    return char - (asciis._a - 10);
+  return;
+}
+function hexToBytes(hex2) {
+  if (typeof hex2 !== "string")
+    throw new Error("hex string expected, got " + typeof hex2);
+  const hl = hex2.length;
+  const al = hl / 2;
+  if (hl % 2)
+    throw new Error("padded hex string expected, got unpadded hex of length " + hl);
+  const array = new Uint8Array(al);
+  for (let ai = 0, hi = 0; ai < al; ai++, hi += 2) {
+    const n1 = asciiToBase16(hex2.charCodeAt(hi));
+    const n2 = asciiToBase16(hex2.charCodeAt(hi + 1));
+    if (n1 === void 0 || n2 === void 0) {
+      const char = hex2[hi] + hex2[hi + 1];
+      throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
+    }
+    array[ai] = n1 * 16 + n2;
+  }
+  return array;
+}
+function utf8ToBytes(str) {
+  if (typeof str !== "string")
+    throw new Error(`utf8ToBytes expected string, got ${typeof str}`);
+  return new Uint8Array(new TextEncoder().encode(str));
+}
+function toBytes(data) {
+  if (typeof data === "string")
+    data = utf8ToBytes(data);
+  bytes(data);
+  return data;
+}
+class Hash3 {
+  // Safe version that clones internal state
+  clone() {
+    return this._cloneInto();
+  }
+}
+function wrapConstructor(hashCons) {
+  const hashC = (msg) => hashCons().update(toBytes(msg)).digest();
+  const tmp = hashCons();
+  hashC.outputLen = tmp.outputLen;
+  hashC.blockLen = tmp.blockLen;
+  hashC.create = () => hashCons();
+  return hashC;
+}
+const useNsec = defineStore("nsec", () => {
+  const nsec = ref("");
+  const rememberMe = ref(false);
+  const cachedNsec = ref("");
+  function updateNsec(value) {
+    nsec.value = value;
+  }
+  function updateCachedNsec(value) {
+    cachedNsec.value = value;
+  }
+  function setRememberMe(value) {
+    rememberMe.value = value;
+  }
+  function getPubkey() {
+    try {
+      const privKeyBytes = getPrivkeyBytes();
+      if (!privKeyBytes) {
+        throw new Error("Invalid private key");
+      }
+      return getPublicKey(privKeyBytes);
+    } catch (e) {
+      return "";
+    }
+  }
+  function getPrivkeyBytes() {
+    try {
+      const isHex = nsec.value.indexOf("nsec") === -1;
+      return isHex ? hexToBytes(nsec.value) : nip19_exports.decode(nsec.value).data;
+    } catch (e) {
+      return null;
+    }
+  }
+  function getPrivkeyHex() {
+    const bytes2 = getPrivkeyBytes();
+    if (!bytes2) {
+      return "";
+    }
+    try {
+      return bytesToHex(bytes2);
+    } catch (e) {
+      return "";
+    }
+  }
+  function getPrivkey() {
+    try {
+      const isHex = nsec.value.indexOf("nsec") === -1;
+      return isHex ? nip19_exports.nsecEncode(hexToBytes(nsec.value)) : nsec.value;
+    } catch (e) {
+      return "";
+    }
+  }
+  function isValidNsecPresented() {
+    return nsec.value.length > 0 && isNsecValid();
+  }
+  function isNotValidNsecPresented() {
+    return nsec.value.length > 0 && !isNsecValid();
+  }
+  function isNsecValid() {
+    if (nsec.value.length === 0)
+      return false;
+    return getPubkey().length > 0;
+  }
+  const isNsecValidTemp = computed(() => {
+    return isNsecValid();
+  });
+  return {
+    nsec,
+    updateNsec,
+    rememberMe,
+    setRememberMe,
+    isNsecValid,
+    isValidNsecPresented,
+    isNotValidNsecPresented,
+    getPubkey,
+    cachedNsec,
+    updateCachedNsec,
+    getPrivkeyBytes,
+    getPrivkeyHex,
+    getPrivkey,
+    isNsecValidTemp
+  };
+});
+const useImages = defineStore("images", () => {
+  const showImages = ref(false);
+  function updateShowImages(value) {
+    showImages.value = value;
+  }
+  return { showImages, updateShowImages };
+});
+const { normalizeURL: normalizeURL$1 } = utils_exports;
+const useRelay = defineStore("relay", () => {
+  const currentRelay = ref({});
+  const isConnectingToRelay = ref(false);
+  const selectInputRelayUrl = ref("");
+  const selectInputCustomRelayUrl = ref("");
+  const additionalRelaysCountForSignedEvent = ref(0);
+  const additionalRelaysUrlsForSignedEvent = ref([]);
+  const connectedUserReadRelayUrls = ref([]);
+  const connectedUserWriteRelaysUrls = ref([]);
+  const reedRelays = ref([]);
+  const writeRelays = ref([]);
+  const isConnectingToReadWriteRelays = ref(false);
+  const isConnectedToReadWriteRelays = ref(false);
+  const connectedFeedRelaysUrls = ref([]);
+  const userDMRelaysUrls = ref([]);
+  const userReadWriteRelays = computed(() => {
+    const unique = /* @__PURE__ */ new Set([...reedRelays.value, ...writeRelays.value]);
+    const read = [];
+    const write = [];
+    unique.forEach((r) => {
+      if (reedRelays.value.includes(r) && !writeRelays.value.includes(r)) {
+        read.push({ url: r, type: "read" });
+      } else {
+        write.push({ url: r, type: "write" });
+      }
+    });
+    return [...read, ...write].sort((a, b) => a.url.localeCompare(b.url));
+  });
+  const connectedUserReadWriteUrlsWithSelectedRelay = computed(() => {
+    const urls = /* @__PURE__ */ new Set([
+      ...connectedUserReadRelayUrls.value,
+      ...connectedUserWriteRelaysUrls.value
+    ]);
+    if (currentRelay.value.connected) {
+      urls.add(currentRelay.value.url);
+    }
+    return [...urls];
+  });
+  const userChatRelaysUrls = computed(() => {
+    return userDMRelaysUrls.value.length ? userDMRelaysUrls.value : connectedUserReadWriteUrlsWithSelectedRelay.value;
+  });
+  const userReadWriteRelaysUrls = computed(() => userReadWriteRelays.value.map((r) => r.url));
+  const allRelaysUrlsWithSelectedRelay = computed(() => {
+    const connected = currentRelay.value.url;
+    const userRelays = userReadWriteRelaysUrls.value;
+    return userRelays.includes(connected) ? userRelays : [connected, ...userRelays];
+  });
+  const connectedUserReadRelayUrlsWithSelectedRelay = computed(() => {
+    const relays = connectedUserReadRelayUrls.value;
+    const curRelay = currentRelay.value;
+    if (curRelay.connected && !relays.includes(curRelay.url)) {
+      relays.push(curRelay.url);
+    }
+    return relays;
+  });
+  const nip65Tags = computed(() => {
+    const read = reedRelays.value;
+    const write = writeRelays.value;
+    const unique = /* @__PURE__ */ new Set([...read, ...write]);
+    const tags = [];
+    unique.forEach((r) => {
+      if (read.includes(r) && write.includes(r)) {
+        tags.push(["r", r]);
+      } else if (read.includes(r)) {
+        tags.push(["r", r, "read"]);
+      } else if (write.includes(r)) {
+        tags.push(["r", r, "write"]);
+      }
+    });
+    return tags;
+  });
+  const connectedFeedRelaysPrettyStr = computed(() => {
+    return connectedFeedRelaysUrls.value.map((r) => r.replace("wss://", "").replace("/", "")).join(", ");
+  });
+  const isConnectedToRelay = computed(() => {
+    return currentRelay.value.connected;
+  });
+  function updateCurrentRelay(value) {
+    currentRelay.value = value;
+  }
+  function setConnectionToRelayStatus(value) {
+    isConnectingToRelay.value = value;
+  }
+  function setConnectedUserReadRelayUrls(value) {
+    connectedUserReadRelayUrls.value = value.map((r) => normalizeURL$1(r));
+  }
+  function addConnectedUserReadRelay(value) {
+    const url = normalizeURL$1(value);
+    if (!url)
+      return;
+    if (connectedUserReadRelayUrls.value.includes(url))
+      return;
+    connectedUserReadRelayUrls.value.push(url);
+  }
+  function setConnectedUserWriteRelayUrls(value) {
+    connectedUserWriteRelaysUrls.value = value.map((r) => normalizeURL$1(r));
+  }
+  function addConnectedUserWriteRelay(value) {
+    const url = normalizeURL$1(value);
+    if (!url)
+      return;
+    if (connectedUserWriteRelaysUrls.value.includes(url))
+      return;
+    connectedUserWriteRelaysUrls.value.push(url);
+  }
+  function removeConnectedUserWriteRelay(value) {
+    connectedUserWriteRelaysUrls.value = connectedUserWriteRelaysUrls.value.filter(
+      (r) => r !== value
+    );
+  }
+  function setConnectedFeedRelayUrls(value) {
+    connectedFeedRelaysUrls.value = value.map((r) => normalizeURL$1(r));
+  }
+  function setReedRelays(value) {
+    reedRelays.value = value.map((r) => normalizeURL$1(r));
+  }
+  function setWriteRelays(value) {
+    writeRelays.value = value.map((r) => normalizeURL$1(r));
+  }
+  function addWriteRelay(value) {
+    if (writeRelays.value.includes(value))
+      return;
+    writeRelays.value.push(normalizeURL$1(value));
+  }
+  function removeWriteRelay(value) {
+    writeRelays.value = writeRelays.value.filter((r) => r !== value);
+  }
+  function addUserRelay(relay) {
+    const url = normalizeURL$1(relay);
+    if (!url)
+      return false;
+    if (userReadWriteRelaysUrls.value.includes(url))
+      return false;
+    reedRelays.value.push(url);
+  }
+  function removeUserRelay(value) {
+    reedRelays.value = reedRelays.value.filter((r) => r !== value);
+    writeRelays.value = writeRelays.value.filter((r) => r !== value);
+    connectedUserReadRelayUrls.value = connectedUserReadRelayUrls.value.filter((r) => r !== value);
+    connectedUserWriteRelaysUrls.value = connectedUserWriteRelaysUrls.value.filter(
+      (r) => r !== value
+    );
+  }
+  function setSelectedRelay(value) {
+    selectInputRelayUrl.value = value === "custom" ? "custom" : normalizeURL$1(value);
+  }
+  function updateAdditionalRelaysCountForSignedEvent(value) {
+    additionalRelaysCountForSignedEvent.value = value;
+  }
+  function updateRelayAdditionalRelaysUrlsForSignedEvent(index, value) {
+    additionalRelaysUrlsForSignedEvent.value[index] = value.length ? normalizeURL$1(value) : "";
+  }
+  function setIsConnectingToReadWriteRelaysStatus(value) {
+    isConnectingToReadWriteRelays.value = value;
+  }
+  function setIsConnectedToReadWriteRelaysStatus(value) {
+    isConnectedToReadWriteRelays.value = value;
+  }
+  function setUserDMRelaysUrls(value) {
+    userDMRelaysUrls.value = value.map((r) => normalizeURL$1(r));
+  }
+  function clear2() {
+    currentRelay.value = {};
+    connectedUserReadRelayUrls.value = [];
+    connectedUserWriteRelaysUrls.value = [];
+    reedRelays.value = [];
+    writeRelays.value = [];
+    isConnectingToReadWriteRelays.value = false;
+    isConnectedToReadWriteRelays.value = false;
+    connectedFeedRelaysUrls.value = [];
+    userDMRelaysUrls.value = [];
+  }
+  return {
+    isConnectingToRelay,
+    setConnectionToRelayStatus,
+    connectedUserReadRelayUrls,
+    setConnectedUserReadRelayUrls,
+    selectInputRelayUrl,
+    setSelectedRelay,
+    selectInputCustomRelayUrl,
+    currentRelay,
+    updateCurrentRelay,
+    additionalRelaysCountForSignedEvent,
+    updateAdditionalRelaysCountForSignedEvent,
+    additionalRelaysUrlsForSignedEvent,
+    updateRelayAdditionalRelaysUrlsForSignedEvent,
+    connectedFeedRelaysPrettyStr,
+    reedRelays,
+    writeRelays,
+    setReedRelays,
+    setWriteRelays,
+    isConnectedToRelay,
+    userReadWriteRelays,
+    removeWriteRelay,
+    addWriteRelay,
+    removeUserRelay,
+    addUserRelay,
+    nip65Tags,
+    userReadWriteRelaysUrls,
+    allRelaysUrlsWithSelectedRelay,
+    connectedFeedRelaysUrls,
+    setConnectedFeedRelayUrls,
+    connectedUserReadRelayUrlsWithSelectedRelay,
+    isConnectingToReadWriteRelays,
+    setIsConnectingToReadWriteRelaysStatus,
+    setConnectedUserWriteRelayUrls,
+    connectedUserWriteRelaysUrls,
+    connectedUserReadWriteUrlsWithSelectedRelay,
+    setIsConnectedToReadWriteRelaysStatus,
+    isConnectedToReadWriteRelays,
+    userChatRelaysUrls,
+    setUserDMRelaysUrls,
+    clear: clear2,
+    addConnectedUserReadRelay,
+    addConnectedUserWriteRelay,
+    removeConnectedUserWriteRelay
+  };
+});
+const useMetasCache = defineStore("metasCache", () => {
+  const metas = ref({});
+  function addMeta(event) {
+    metas.value[event.pubkey] = event;
+  }
+  function getMeta(pubkey) {
+    return metas.value[pubkey] || null;
+  }
+  function setMetaValue(pubkey, value) {
+    metas.value[pubkey] = value;
+  }
+  function hasMeta(pubkey) {
+    return !!metas.value[pubkey];
+  }
+  function hasPubkey(pubkey) {
+    return metas.value.hasOwnProperty(pubkey);
+  }
+  return {
+    metas,
+    addMeta,
+    getMeta,
+    hasMeta,
+    hasPubkey,
+    setMetaValue
+  };
+});
+const _sfc_main$B = {};
+const _hoisted_1$x = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "22",
+  height: "22",
+  fill: "currentColor",
+  class: "bi bi-link-45deg",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$u = /* @__PURE__ */ createBaseVNode("path", { d: "M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" }, null, -1);
+const _hoisted_3$o = /* @__PURE__ */ createBaseVNode("path", { d: "M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" }, null, -1);
+const _hoisted_4$j = [
+  _hoisted_2$u,
+  _hoisted_3$o
+];
+function _sfc_render$8(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$x, _hoisted_4$j);
+}
+const LinkIcon = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$8]]);
+const _sfc_main$A = {};
+const _hoisted_1$w = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "22",
+  height: "22",
+  fill: "currentColor",
+  class: "bi bi-check2",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$t = /* @__PURE__ */ createBaseVNode("path", { d: "M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" }, null, -1);
+const _hoisted_3$n = [
+  _hoisted_2$t
+];
+function _sfc_render$7(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$w, _hoisted_3$n);
+}
+const CheckIcon = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$7]]);
+const _sfc_main$z = {};
+const _hoisted_1$v = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "18",
+  height: "18",
+  fill: "currentColor",
+  class: "bi bi-check-square",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$s = /* @__PURE__ */ createBaseVNode("path", { d: "M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" }, null, -1);
+const _hoisted_3$m = /* @__PURE__ */ createBaseVNode("path", { d: "M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" }, null, -1);
+const _hoisted_4$i = [
+  _hoisted_2$s,
+  _hoisted_3$m
+];
+function _sfc_render$6(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$v, _hoisted_4$i);
+}
+const CheckSquareIcon = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$6]]);
+const _sfc_main$y = {};
+const _hoisted_1$u = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-diagram-2-fill",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$r = /* @__PURE__ */ createBaseVNode("path", {
+  "fill-rule": "evenodd",
+  d: "M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 5 7h2.5V6A1.5 1.5 0 0 1 6 4.5zm-3 8A1.5 1.5 0 0 1 4.5 10h1A1.5 1.5 0 0 1 7 11.5v1A1.5 1.5 0 0 1 5.5 14h-1A1.5 1.5 0 0 1 3 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 9 12.5z"
+}, null, -1);
+const _hoisted_3$l = [
+  _hoisted_2$r
+];
+function _sfc_render$5(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$u, _hoisted_3$l);
+}
+const ThreadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$5]]);
+const _sfc_main$x = {};
+const _hoisted_1$t = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "18",
+  height: "18",
+  fill: "currentColor",
+  class: "bi bi-exclamation-octagon",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$q = /* @__PURE__ */ createBaseVNode("path", { d: "M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z" }, null, -1);
+const _hoisted_3$k = /* @__PURE__ */ createBaseVNode("path", { d: "M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" }, null, -1);
+const _hoisted_4$h = [
+  _hoisted_2$q,
+  _hoisted_3$k
+];
+function _sfc_render$4(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$t, _hoisted_4$h);
+}
+const InvalidSignatureIcon = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$4]]);
+const _hoisted_1$s = { class: "thread" };
+const _hoisted_2$p = {
+  key: 0,
+  class: "loading-thread"
+};
+const _hoisted_3$j = { class: "event-card" };
+const _hoisted_4$g = {
+  key: 0,
+  class: "event-img"
+};
+const _hoisted_5$d = ["src", "title"];
+const _hoisted_6$a = {
+  key: 1,
+  class: "bi bi-person-circle author-pic__alternate"
+};
+const _hoisted_7$8 = { class: "event-content" };
+const _hoisted_8$8 = { class: "event-header" };
+const _hoisted_9$7 = ["href"];
+const _hoisted_10$7 = { class: "event-username-text" };
+const _hoisted_11$6 = {
+  key: 0,
+  class: "event-replying-to"
+};
+const _hoisted_12$6 = {
+  key: 1,
+  class: "replying-to-separator"
+};
+const _hoisted_13$4 = ["href"];
+const _hoisted_14$4 = { class: "event-body" };
+const _hoisted_15$4 = { class: "event-footer" };
+const _hoisted_16$4 = { class: "event-footer__right-actions" };
+const _hoisted_17$4 = { class: "event-footer__link-wrapper" };
+const _hoisted_18$3 = { class: "event__raw-data" };
+const _hoisted_19$3 = { class: "event-footer-code-wrapper" };
+const _hoisted_20$3 = { class: "event-footer__signature-text" };
+const _hoisted_21$3 = { class: "event-footer__right-actions" };
+const _hoisted_22$2 = { class: "event-footer__link-wrapper" };
+const _hoisted_23$2 = {
+  key: 0,
+  class: "reply-field"
+};
+const _hoisted_24$2 = { class: "reply-field__actions" };
+const _hoisted_25$2 = { class: "reply-field__error" };
+const _hoisted_26$2 = ["disabled"];
+const _hoisted_27$2 = {
+  key: 1,
+  class: "loading-replies"
+};
+const _hoisted_28$2 = {
+  key: 2,
+  class: "replies"
+};
+const _sfc_main$w = /* @__PURE__ */ defineComponent({
+  __name: "EventContent",
+  props: {
+    event: {},
+    pool: {},
+    pubKey: {},
+    index: {},
+    hasReplyBtn: { type: Boolean },
+    isMainEvent: { type: Boolean },
+    currentReadRelays: {},
+    threadDescender: {}
+  },
+  emits: [
+    "toggleRawData",
+    "showReplyField",
+    "loadRootReplies",
+    "resetSentStatus",
+    "loadMoreReplies"
+  ],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const replyText = ref("");
+    const msgErr = ref("");
+    const props = __props;
+    const router2 = useRouter();
+    const npubStore = useNpub();
+    const nsecStore = useNsec();
+    const userStore = useUser();
+    const imagesStore = useImages();
+    const relayStore = useRelay();
+    const metasCacheStore = useMetasCache();
+    const showReplyField = ref(false);
+    const isPublishingReply = ref(false);
+    const eventReplies = ref([]);
+    const showReplies = ref(false);
+    const isCopiedEventLink = ref(false);
+    const isSigVerified = ref(false);
+    const isLoadingReplies = ref(false);
+    const ancestorsEvents = ref([]);
+    const isLoadingThread = ref(false);
+    const handleToggleRawData = (eventId) => {
+      if (props.isMainEvent) {
+        return emit2("toggleRawData", eventId);
+      }
+      props.event.showRawData = !props.event.showRawData;
+    };
+    onMounted(() => {
+      if (Object.keys(props.event).length === 0)
+        return;
+      isSigVerified.value = verifyEvent(props.event);
+    });
+    const displayName = (author, pubkey) => {
+      if (author) {
+        let name = "";
+        if (author.name) {
+          name = author.name;
+        } else if (author.username) {
+          name = author.username;
+        } else {
+          name = author.display_name;
+        }
+        if (name.length) {
+          return name;
+        }
+      }
+      return nip19_exports.npubEncode(pubkey).slice(0, 10) + "...";
+    };
+    const handleToggleReplyField = () => {
+      showReplyField.value = !showReplyField.value;
+      emit2("showReplyField");
+    };
+    const handleSendReply = async () => {
+      if (isPublishingReply.value)
+        return;
+      if (!nsecStore.isValidNsecPresented()) {
+        msgErr.value = "Please login with your private key to send a reply.";
+        return;
+      }
+      const messageValue = replyText.value.trim();
+      if (!messageValue.length) {
+        msgErr.value = "Please provide message to broadcast.";
+        return;
+      }
+      let privkey;
+      let pubkey;
+      try {
+        privkey = nsecStore.getPrivkeyBytes();
+        if (!privkey) {
+          throw new Error();
+        }
+        pubkey = nsecStore.getPubkey();
+        if (!pubkey.length) {
+          throw new Error();
+        }
+      } catch (e) {
+        msgErr.value = `Invalid private key. Please check it and try again.`;
+        return;
+      }
+      const writeRelays = relayStore.connectedUserWriteRelaysUrls;
+      if (!writeRelays.length) {
+        msgErr.value = "Please provide your write relays to broadcast event";
+        return;
+      }
+      const event = {
+        kind: 1,
+        pubkey,
+        created_at: Math.floor(Date.now() / 1e3),
+        content: messageValue,
+        tags: [],
+        id: "",
+        sig: ""
+      };
+      const existedETags = [];
+      const existedPTags = [];
+      props.event.tags.forEach((tag) => {
+        const tempTag = [tag[0], tag[1]];
+        if (tag[2])
+          tempTag.push(tag[2]);
+        if (tag[3])
+          tempTag.push(tag[3]);
+        if (tempTag[0] === "e") {
+          existedETags.push(tempTag);
+        } else if (tempTag[0] === "p") {
+          existedPTags.push(tempTag);
+        }
+      });
+      const eTagsForReply = [];
+      if (existedETags.length) {
+        const root = existedETags.find((tag) => tag[3] === "root");
+        if (root) {
+          eTagsForReply.push(root);
+        } else {
+          eTagsForReply.push(existedETags[0]);
+        }
+        eTagsForReply.push(["e", props.event.id, "", "reply"]);
+      } else {
+        eTagsForReply.push(["e", props.event.id, "", "root"]);
+      }
+      const msgReferences = parseReferences(event);
+      const existedPubKeys = existedPTags.map((tag) => tag[1]);
+      const pTagsFromOurMsg = [];
+      msgReferences.forEach((ref2) => {
+        var _a;
+        const refPubkey = (_a = ref2 == null ? void 0 : ref2.profile) == null ? void 0 : _a.pubkey;
+        if (refPubkey && !existedPubKeys.includes(refPubkey)) {
+          pTagsFromOurMsg.push(["p", refPubkey]);
+          existedPubKeys.push(refPubkey);
+        }
+      });
+      const pTagsForReply = [...pTagsFromOurMsg, ...existedPTags];
+      if (!existedPubKeys.includes(props.event.pubkey)) {
+        pTagsForReply.push(["p", props.event.pubkey]);
+      }
+      event.tags = [...pTagsForReply, ...eTagsForReply];
+      const signedEvent = finalizeEvent(event, privkey);
+      msgErr.value = "";
+      isPublishingReply.value = true;
+      const pubkeysMentions = pTagsForReply.filter((tag) => tag[1] !== pubkey).map((tag) => tag[1]);
+      let additionalRelays = [];
+      const { pool } = props;
+      if (pubkeysMentions.length) {
+        const allRelays = [
+          ...relayStore.reedRelays,
+          ...relayStore.writeRelays,
+          relayStore.currentRelay.url
+        ];
+        const relays = [...new Set(allRelays)];
+        const metaEvents = await pool.querySync(relays, { kinds: [10002], authors: pubkeysMentions });
+        const mentionsReadRelays = /* @__PURE__ */ new Set();
+        metaEvents.forEach((event2) => {
+          if (event2.tags.length) {
+            const { read } = parseRelaysNip65(event2);
+            read.forEach((r) => {
+              if (relayStore.writeRelays.includes(r))
+                return;
+              mentionsReadRelays.add(r);
+            });
+          }
+        });
+        additionalRelays = [...mentionsReadRelays];
+      }
+      const result = await publishEventToRelays(writeRelays, pool, signedEvent);
+      const hasSuccess = result.some((data) => data.success);
+      if (!hasSuccess) {
+        msgErr.value = "Failed to broadcast reply";
+        return;
+      }
+      if (additionalRelays.length) {
+        try {
+          await pool.publish(additionalRelays, signedEvent);
+        } catch (e) {
+          console.error("Failed to broadcast reply to some additional relays");
+        }
+      }
+      isPublishingReply.value = false;
+      showReplyField.value = false;
+      replyText.value = "";
+      if (props.isMainEvent) {
+        return emit2("loadRootReplies");
+      }
+      handleLoadReplies();
+    };
+    const handleLoadReplies = async () => {
+      const { event, currentReadRelays, pool } = props;
+      if (!(currentReadRelays == null ? void 0 : currentReadRelays.length) || !pool)
+        return;
+      if (props.isMainEvent) {
+        return emit2("loadMoreReplies");
+      }
+      isLoadingReplies.value = true;
+      let replies = await pool.querySync(currentReadRelays, { kinds: [1], "#e": [event.id] });
+      if (event.isRoot) {
+        replies = filterRootEventReplies(event, replies);
+      } else {
+        replies = filterReplyEventReplies(event, replies);
+      }
+      const descender = props.threadDescender;
+      if (replies.length == 1 && (descender == null ? void 0 : descender.id) === replies[0].id) {
+        isLoadingReplies.value = false;
+        return;
+      }
+      const isRootPosts = false;
+      await loadAndInjectDataToPosts(
+        replies,
+        event,
+        {},
+        currentReadRelays,
+        metasCacheStore,
+        pool,
+        isRootPosts
+      );
+      eventReplies.value = replies;
+      showReplies.value = true;
+      isLoadingReplies.value = false;
+    };
+    const handleHideReplies = () => {
+      showReplies.value = false;
+    };
+    const handleCopyEventLink = () => {
+      const { origin, pathname } = window.location;
+      let noteId = nip19_exports.noteEncode(props.event.id);
+      const eventLink = `${origin}${pathname}#/event/${noteId}`;
+      navigator.clipboard.writeText(eventLink);
+      isCopiedEventLink.value = true;
+      setTimeout(() => {
+        isCopiedEventLink.value = false;
+      }, 2e3);
+    };
+    const handleUserClick = (pubkey) => {
+      const urlNpub = nip19_exports.npubEncode(pubkey);
+      npubStore.updateNpubInput(urlNpub);
+      userStore.updateRoutingStatus(true);
+      router2.push({ path: getUserUrlPath(pubkey) });
+    };
+    const getAncestorsEventsChain = async (event, parentEvent = null) => {
+      var _a, _b;
+      const { currentReadRelays, pool } = props;
+      if (!(currentReadRelays == null ? void 0 : currentReadRelays.length) || !pool)
+        return [];
+      const nip10Data = nip10_exports.parse(event);
+      if (!nip10Data.root && !nip10Data.reply)
+        return [];
+      if (nip10Data.root && !nip10Data.reply) {
+        let rootEvent = parentEvent;
+        if (!rootEvent) {
+          rootEvent = await pool.get(currentReadRelays, { kinds: [1], ids: [nip10Data.root.id] });
+        }
+        if (!rootEvent)
+          return [];
+        const isRootPosts = true;
+        await loadAndInjectDataToPosts(
+          [rootEvent],
+          null,
+          {},
+          currentReadRelays,
+          metasCacheStore,
+          pool,
+          isRootPosts
+        );
+        return [rootEvent];
+      }
+      if (nip10Data.reply) {
+        if (!parentEvent) {
+          parentEvent = await pool.get(currentReadRelays, {
+            kinds: [1],
+            ids: [nip10Data.reply.id]
+          });
+        }
+        if (!parentEvent)
+          return [];
+        const nip10DataParentReplyingTo = nip10_exports.parse(parentEvent);
+        const parentReplyingToId = ((_a = nip10DataParentReplyingTo == null ? void 0 : nip10DataParentReplyingTo.reply) == null ? void 0 : _a.id) || ((_b = nip10DataParentReplyingTo == null ? void 0 : nip10DataParentReplyingTo.root) == null ? void 0 : _b.id);
+        const parentReplyingToEvent = await getEventWithAuthorById(
+          parentReplyingToId || "",
+          currentReadRelays,
+          pool
+        );
+        const isRootPosts = false;
+        await loadAndInjectDataToPosts(
+          [parentEvent],
+          parentReplyingToEvent,
+          {},
+          currentReadRelays,
+          metasCacheStore,
+          pool,
+          isRootPosts
+        );
+        const ancestors = await getAncestorsEventsChain(
+          parentEvent,
+          parentReplyingToEvent
+        );
+        return [parentEvent, ...ancestors];
+      }
+      return [];
+    };
+    const loadEventThread = async () => {
+      const { event, pool, currentReadRelays } = props;
+      if (!(currentReadRelays == null ? void 0 : currentReadRelays.length) || !pool)
+        return;
+      if (isLoadingThread.value)
+        return;
+      isLoadingThread.value = true;
+      const ancestorsChain = await getAncestorsEventsChain(
+        event,
+        event.replyingTo.event
+      );
+      const ancestors = ancestorsChain.reverse();
+      isLoadingThread.value = false;
+      ancestorsEvents.value = ancestors;
+    };
+    return (_ctx, _cache) => {
+      const _component_EventContent = resolveComponent("EventContent", true);
+      return openBlock(), createElementBlock(Fragment, null, [
+        createBaseVNode("div", _hoisted_1$s, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(ancestorsEvents.value, (aEvent, i2) => {
+            return openBlock(), createElementBlock("div", {
+              class: "ancestor",
+              key: _ctx.event.id
+            }, [
+              createVNode(_component_EventContent, {
+                onToggleRawData: () => handleToggleRawData(aEvent.id),
+                event: aEvent,
+                currentReadRelays: _ctx.currentReadRelays,
+                pool: _ctx.pool,
+                hasReplyBtn: _ctx.hasReplyBtn,
+                threadDescender: ancestorsEvents.value[i2 + 1] ? ancestorsEvents.value[i2 + 1] : _ctx.event
+              }, null, 8, ["onToggleRawData", "event", "currentReadRelays", "pool", "hasReplyBtn", "threadDescender"])
+            ]);
+          }), 128)),
+          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_2$p, "Loading thread...")) : createCommentVNode("", true)
+        ]),
+        createBaseVNode("div", _hoisted_3$j, [
+          createBaseVNode("div", {
+            class: normalizeClass(["event-card__content", { flipped: _ctx.event.showRawData }])
+          }, [
+            createBaseVNode("div", {
+              class: normalizeClass([
+                "event-card__front",
+                "event__presentable-date",
+                { "event-card__front_custom": _ctx.pubKey === _ctx.event.pubkey }
+              ])
+            }, [
+              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_4$g, [
+                _ctx.event.author ? (openBlock(), createElementBlock("img", {
+                  key: 0,
+                  class: normalizeClass(["author-pic", { "author-pic__squared": !_ctx.event.author.picture }]),
+                  src: _ctx.event.author.picture,
+                  title: `Avatar for ${_ctx.event.author.name}`,
+                  alt: "user's avatar"
+                }, null, 10, _hoisted_5$d)) : (openBlock(), createElementBlock("i", _hoisted_6$a))
+              ])) : createCommentVNode("", true),
+              createBaseVNode("div", _hoisted_7$8, [
+                createBaseVNode("div", _hoisted_8$8, [
+                  createBaseVNode("div", null, [
+                    createBaseVNode("a", {
+                      class: "event-username-link",
+                      onClick: _cache[0] || (_cache[0] = withModifiers(() => handleUserClick(_ctx.event.pubkey), ["prevent"])),
+                      href: unref(getUserUrlPath)(_ctx.event.pubkey)
+                    }, [
+                      createBaseVNode("b", _hoisted_10$7, toDisplayString(displayName(_ctx.event.author, _ctx.event.pubkey)), 1)
+                    ], 8, _hoisted_9$7)
+                  ]),
+                  createBaseVNode("div", null, toDisplayString(unref(formatedDate)(_ctx.event.created_at)), 1)
+                ]),
+                _ctx.event.replyingTo ? (openBlock(), createElementBlock("div", _hoisted_11$6, [
+                  _ctx.isMainEvent ? (openBlock(), createElementBlock("span", {
+                    key: 0,
+                    onClick: loadEventThread,
+                    class: "view-thread event-username-link event-username-text"
+                  }, [
+                    createVNode(ThreadIcon),
+                    createTextVNode(" View thread ")
+                  ])) : createCommentVNode("", true),
+                  _ctx.isMainEvent ? (openBlock(), createElementBlock("span", _hoisted_12$6, "  |  ")) : createCommentVNode("", true),
+                  createBaseVNode("span", null, [
+                    createTextVNode(" Replying to "),
+                    createBaseVNode("a", {
+                      onClick: _cache[1] || (_cache[1] = withModifiers(() => handleUserClick(_ctx.event.replyingTo.pubkey), ["prevent"])),
+                      href: unref(getUserUrlPath)(_ctx.event.replyingTo.pubkey),
+                      class: "event-username-link event-username-text"
+                    }, "@" + toDisplayString(displayName(_ctx.event.replyingTo.user, _ctx.event.replyingTo.pubkey)), 9, _hoisted_13$4)
+                  ])
+                ])) : createCommentVNode("", true),
+                createBaseVNode("div", _hoisted_14$4, [
+                  createVNode(EventText, { event: _ctx.event }, null, 8, ["event"])
+                ]),
+                createBaseVNode("div", _hoisted_15$4, [
+                  createVNode(_sfc_main$D, {
+                    onShowReplyField: handleToggleReplyField,
+                    onHandleShowReplies: handleLoadReplies,
+                    onHandleHideReplies: handleHideReplies,
+                    hasReplyBtn: _ctx.hasReplyBtn,
+                    likes: _ctx.event.likes,
+                    reposts: _ctx.event.reposts,
+                    replies: _ctx.event.replies
+                  }, null, 8, ["hasReplyBtn", "likes", "reposts", "replies"]),
+                  createBaseVNode("div", _hoisted_16$4, [
+                    createBaseVNode("div", _hoisted_17$4, [
+                      isCopiedEventLink.value ? (openBlock(), createBlock(CheckIcon, {
+                        key: 0,
+                        class: "event-footer-copy-icon event-footer-copy-icon_check"
+                      })) : createCommentVNode("", true),
+                      !isCopiedEventLink.value ? (openBlock(), createBlock(LinkIcon, {
+                        key: 1,
+                        onClick: handleCopyEventLink,
+                        title: "Copy link",
+                        class: "event-footer-copy-icon"
+                      })) : createCommentVNode("", true)
+                    ]),
+                    createBaseVNode("span", {
+                      onClick: _cache[2] || (_cache[2] = () => handleToggleRawData(_ctx.event.id)),
+                      title: "See raw data",
+                      class: "event-footer-code"
+                    }, " {...} ")
+                  ])
+                ])
+              ])
+            ], 2),
+            createBaseVNode("div", {
+              class: normalizeClass([
+                "event-card__back",
+                {
+                  "event-card__back_custom": _ctx.pubKey === _ctx.event.pubkey,
+                  "event-details-first": _ctx.index === 0
+                }
+              ])
+            }, [
+              createBaseVNode("div", _hoisted_18$3, [
+                createVNode(RawData, {
+                  event: _ctx.event,
+                  authorEvent: _ctx.event.authorEvent
+                }, null, 8, ["event", "authorEvent"])
+              ]),
+              createBaseVNode("div", _hoisted_19$3, [
+                createBaseVNode("div", {
+                  class: normalizeClass([
+                    "event-footer__signature",
+                    { "event-footer__signature_invalid": !isSigVerified.value }
+                  ])
+                }, [
+                  isSigVerified.value ? (openBlock(), createBlock(CheckSquareIcon, { key: 0 })) : createCommentVNode("", true),
+                  !isSigVerified.value ? (openBlock(), createBlock(InvalidSignatureIcon, { key: 1 })) : createCommentVNode("", true),
+                  createBaseVNode("span", _hoisted_20$3, toDisplayString(isSigVerified.value ? "Signature is valid" : "Invalid signature"), 1)
+                ], 2),
+                createBaseVNode("div", _hoisted_21$3, [
+                  createBaseVNode("div", _hoisted_22$2, [
+                    isCopiedEventLink.value ? (openBlock(), createBlock(CheckIcon, {
+                      key: 0,
+                      class: "event-footer-copy-icon event-footer-copy-icon_check"
+                    })) : createCommentVNode("", true),
+                    !isCopiedEventLink.value ? (openBlock(), createBlock(LinkIcon, {
+                      key: 1,
+                      onClick: handleCopyEventLink,
+                      title: "Copy link",
+                      class: "event-footer-copy-icon"
+                    })) : createCommentVNode("", true)
+                  ]),
+                  createBaseVNode("span", {
+                    onClick: _cache[3] || (_cache[3] = () => handleToggleRawData(_ctx.event.id)),
+                    title: "See raw data",
+                    class: "event-footer-code"
+                  }, " {...} ")
+                ])
+              ])
+            ], 2)
+          ], 2)
+        ]),
+        showReplyField.value ? (openBlock(), createElementBlock("div", _hoisted_23$2, [
+          withDirectives(createBaseVNode("textarea", {
+            "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => replyText.value = $event),
+            rows: "4",
+            class: "reply-field__textarea",
+            placeholder: "Write a reply..."
+          }, null, 512), [
+            [vModelText, replyText.value]
+          ]),
+          createBaseVNode("div", _hoisted_24$2, [
+            createBaseVNode("div", _hoisted_25$2, toDisplayString(msgErr.value), 1),
+            createBaseVNode("button", {
+              disabled: isPublishingReply.value,
+              onClick: handleSendReply,
+              class: "reply-field__btn"
+            }, toDisplayString(isPublishingReply.value ? "Sending reply..." : "Reply"), 9, _hoisted_26$2)
+          ])
+        ])) : createCommentVNode("", true),
+        isLoadingReplies.value ? (openBlock(), createElementBlock("div", _hoisted_27$2, "Loading replies...")) : createCommentVNode("", true),
+        showReplies.value && eventReplies.value.length ? (openBlock(), createElementBlock("div", _hoisted_28$2, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(eventReplies.value, (reply) => {
+            return openBlock(), createElementBlock("div", {
+              class: "reply",
+              key: reply.id
+            }, [
+              createVNode(_component_EventContent, {
+                onToggleRawData: _cache[5] || (_cache[5] = () => handleToggleRawData(_ctx.event.id)),
+                event: reply,
+                currentReadRelays: _ctx.currentReadRelays,
+                pool: _ctx.pool,
+                hasReplyBtn: _ctx.hasReplyBtn
+              }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"])
+            ]);
+          }), 128))
+        ])) : createCommentVNode("", true)
+      ], 64);
+    };
+  }
+});
+const EventContent_vue_vue_type_style_index_0_scoped_48e6ed81_lang = "";
+const EventContent = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["__scopeId", "data-v-48e6ed81"]]);
+const _sfc_main$v = {};
+const _hoisted_1$r = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-arrows-expand",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$o = /* @__PURE__ */ createBaseVNode("path", {
+  "fill-rule": "evenodd",
+  d: "M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8ZM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2ZM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10Z"
+}, null, -1);
+const _hoisted_3$i = [
+  _hoisted_2$o
+];
+function _sfc_render$3(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$r, _hoisted_3$i);
+}
+const ExpandArrow = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$3]]);
+const usePool = defineStore("pool", () => {
+  const pool = ref(new SimplePool());
+  function resetPool() {
+    pool.value = new SimplePool();
+  }
+  return { pool, resetPool };
+});
+const _withScopeId$d = (n) => (pushScopeId("data-v-5f3cf145"), n = n(), popScopeId(), n);
+const _hoisted_1$q = { class: "event" };
+const _hoisted_2$n = { key: 0 };
+const _hoisted_3$h = {
+  key: 1,
+  class: "replies"
+};
+const _hoisted_4$f = { class: "replies__other-link" };
+const _hoisted_5$c = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("span", { class: "replies__other-text" }, " Show more replies ", -1));
+const _hoisted_6$9 = {
+  key: 1,
+  class: "replies__other"
+};
+const _hoisted_7$7 = {
+  key: 2,
+  class: "replies__other"
+};
+const _hoisted_8$7 = { class: "replies__other-text" };
+const _hoisted_9$6 = { key: 4 };
+const _hoisted_10$6 = {
+  key: 5,
+  class: "replies__list"
+};
+const _hoisted_11$5 = { class: "replies__list-item" };
+const _hoisted_12$5 = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("div", { class: "replies__list-item-line-horizontal" }, null, -1));
+const _sfc_main$u = /* @__PURE__ */ defineComponent({
+  __name: "ParentEventView",
+  props: {
+    event: {},
+    pubKey: {},
+    index: {},
+    hasReplyBtn: { type: Boolean },
+    showRootReplies: { type: Boolean },
+    currentReadRelays: {}
+  },
+  emits: ["toggleRawData"],
+  setup(__props, { emit: __emit }) {
+    const metasCacheStore = useMetasCache();
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const emit2 = __emit;
+    const props = __props;
+    const showReplyField = ref(false);
+    const showMoreRepliesBtn = ref(false);
+    const showAllReplies = ref(false);
+    const isLoadingThread = ref(false);
+    const isLoadingFirstReply = ref(false);
+    const replyEvent = ref(null);
+    const eventReplies = ref([]);
+    onMounted(async () => {
+      await loadRepliesPreiew();
+    });
+    const loadRepliesPreiew = async () => {
+      const { event, currentReadRelays } = props;
+      if (!currentReadRelays.length)
+        return;
+      let replies = await pool.querySync(currentReadRelays, { kinds: [1], "#e": [event.id] });
+      if (props.showRootReplies) {
+        replies = replies.filter((reply2) => nip10IsFirstLevelReplyForEvent(event.id, reply2));
+      } else {
+        replies = replies.filter((reply2) => nip10IsReplyForEvent(event.id, reply2));
+      }
+      if (!replies.length)
+        return;
+      isLoadingFirstReply.value = true;
+      showMoreRepliesBtn.value = replies.length > 1;
+      const reply = replies[0];
+      const isRootPosts = false;
+      await loadAndInjectDataToPosts(
+        [reply],
+        event,
+        {},
+        currentReadRelays,
+        metasCacheStore,
+        pool,
+        isRootPosts,
+        (reply2) => {
+          replyEvent.value = reply2;
+          isLoadingFirstReply.value = false;
+        }
+      );
+    };
+    const handleToggleRawData = (eventId, isMainEvent = false) => {
+      if (isMainEvent) {
+        return emit2("toggleRawData", eventId);
+      }
+    };
+    const handleToggleReplyField = () => {
+      showReplyField.value = !showReplyField.value;
+    };
+    const handleLoadMoreReplies = async () => {
+      const { event, currentReadRelays } = props;
+      if (!currentReadRelays.length)
+        return;
+      isLoadingThread.value = true;
+      let replies = await pool.querySync(currentReadRelays, { kinds: [1], "#e": [event.id] });
+      if (event.isRoot) {
+        replies = filterRootEventReplies(event, replies);
+      } else {
+        replies = filterReplyEventReplies(event, replies);
+      }
+      if (!replies.length) {
+        isLoadingThread.value = false;
+        return;
+      }
+      const isRootPosts = false;
+      await loadAndInjectDataToPosts(
+        replies,
+        event,
+        {},
+        currentReadRelays,
+        metasCacheStore,
+        pool,
+        isRootPosts
+      );
+      eventReplies.value = replies;
+      showAllReplies.value = true;
+      isLoadingThread.value = false;
+    };
+    const loadRootReplies = async () => {
+      showReplyField.value = false;
+      if (showAllReplies.value) {
+        await handleLoadMoreReplies();
+      } else {
+        await loadRepliesPreiew();
+      }
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$q, [
+        (openBlock(), createBlock(EventContent, {
+          key: _ctx.event.id,
+          onLoadRootReplies: loadRootReplies,
+          onShowReplyField: handleToggleReplyField,
+          onToggleRawData: _cache[0] || (_cache[0] = (eventId) => handleToggleRawData(eventId, true)),
+          onLoadMoreReplies: handleLoadMoreReplies,
+          event: _ctx.event,
+          pubKey: _ctx.pubKey,
+          isMainEvent: true,
+          currentReadRelays: _ctx.currentReadRelays,
+          pool: unref(pool),
+          hasReplyBtn: _ctx.hasReplyBtn
+        }, null, 8, ["event", "pubKey", "currentReadRelays", "pool", "hasReplyBtn"])),
+        isLoadingFirstReply.value ? (openBlock(), createElementBlock("div", _hoisted_2$n, "Loading replies...")) : createCommentVNode("", true),
+        replyEvent.value ? (openBlock(), createElementBlock("div", _hoisted_3$h, [
+          !showAllReplies.value && showMoreRepliesBtn.value && !isLoadingThread.value ? (openBlock(), createElementBlock("div", {
+            key: 0,
+            onClick: handleLoadMoreReplies,
+            class: "replies__other"
+          }, [
+            createBaseVNode("span", _hoisted_4$f, [
+              _hoisted_5$c,
+              createVNode(ExpandArrow)
+            ])
+          ])) : createCommentVNode("", true),
+          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_6$9, "Loading replies...")) : createCommentVNode("", true),
+          showAllReplies.value && showMoreRepliesBtn.value ? (openBlock(), createElementBlock("div", _hoisted_7$7, [
+            createBaseVNode("span", _hoisted_8$7, " Loaded " + toDisplayString(eventReplies.value.length) + " replies ", 1)
+          ])) : createCommentVNode("", true),
+          createBaseVNode("div", {
+            class: normalizeClass([
+              "line-vertical",
+              {
+                "line-vertical_long": showMoreRepliesBtn.value,
+                "line-vertical_reply-field": showReplyField.value && !showMoreRepliesBtn.value,
+                "line-vertical_reply-field_long": showReplyField.value && showMoreRepliesBtn.value
+              }
+            ])
+          }, null, 2),
+          !showAllReplies.value ? (openBlock(), createElementBlock("div", {
+            key: 3,
+            class: normalizeClass(["line-horizontal", { "line-horizontal_height": showMoreRepliesBtn.value }])
+          }, null, 2)) : createCommentVNode("", true),
+          !showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_9$6, [
+            (openBlock(), createBlock(EventContent, {
+              key: replyEvent.value.id,
+              event: replyEvent.value,
+              currentReadRelays: _ctx.currentReadRelays,
+              pool: unref(pool),
+              hasReplyBtn: _ctx.hasReplyBtn
+            }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"]))
+          ])) : createCommentVNode("", true),
+          showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_10$6, [
+            (openBlock(true), createElementBlock(Fragment, null, renderList(eventReplies.value, (reply, i2) => {
+              return openBlock(), createElementBlock("div", _hoisted_11$5, [
+                _hoisted_12$5,
+                createBaseVNode("div", {
+                  class: normalizeClass([
+                    "replies__list-item-line-vertical",
+                    { "replies__list-item-line-vertical_short": i2 === eventReplies.value.length - 1 }
+                  ])
+                }, null, 2),
+                (openBlock(), createBlock(EventContent, {
+                  key: reply.id,
+                  event: reply,
+                  currentReadRelays: _ctx.currentReadRelays,
+                  pool: unref(pool),
+                  hasReplyBtn: _ctx.hasReplyBtn
+                }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"]))
+              ]);
+            }), 256))
+          ])) : createCommentVNode("", true)
+        ])) : createCommentVNode("", true)
+      ]);
+    };
+  }
+});
+const ParentEventView_vue_vue_type_style_index_0_scoped_5f3cf145_lang = "";
+const ParentEventView = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["__scopeId", "data-v-5f3cf145"]]);
+const _sfc_main$t = /* @__PURE__ */ defineComponent({
+  __name: "RelayEventsList",
+  props: {
+    events: {},
+    pubKey: {},
+    currentReadRelays: {}
+  },
+  emits: ["toggleRawData"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const handleToggleRawData = (eventId) => {
+      emit2("toggleRawData", eventId);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", null, [
+        (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.events, (event, i2) => {
+          return openBlock(), createBlock(ParentEventView, {
+            key: event.id,
+            class: "event",
+            onToggleRawData: handleToggleRawData,
+            currentReadRelays: _ctx.currentReadRelays,
+            event,
+            pubKey: _ctx.pubKey,
+            index: i2,
+            showRootReplies: true,
+            hasReplyBtn: true
+          }, null, 8, ["currentReadRelays", "event", "pubKey", "index"]);
+        }), 128))
+      ]);
+    };
+  }
+});
+const RelayEventsList_vue_vue_type_style_index_0_scoped_421078f4_lang = "";
+const RelayEventsList = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["__scopeId", "data-v-421078f4"]]);
+const _hoisted_1$p = {
+  key: 0,
+  class: "pagination"
+};
+const _hoisted_2$m = { key: 0 };
+const _hoisted_3$g = { key: 1 };
+const _hoisted_4$e = { key: 1 };
+const _hoisted_5$b = { key: 4 };
+const _sfc_main$s = /* @__PURE__ */ defineComponent({
+  __name: "Pagination",
+  props: {
+    pagesCount: {},
+    currentPage: {}
+  },
+  emits: ["showPage"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const route = useRoute();
+    const paginate = (page) => {
+      return {
+        path: route.path,
+        query: {
+          ...route.query,
+          page
+        }
+      };
+    };
+    watch(
+      () => route.query.page,
+      async (page) => {
+        const p2 = parseInt(page);
+        if (p2)
+          emit2("showPage", p2);
+      }
+    );
+    return (_ctx, _cache) => {
+      const _component_router_link = resolveComponent("router-link");
+      return _ctx.pagesCount > 1 ? (openBlock(), createElementBlock("div", _hoisted_1$p, [
+        createTextVNode(" Pages: "),
+        _ctx.pagesCount < 5 ? (openBlock(), createElementBlock("span", _hoisted_2$m, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.pagesCount, (page) => {
+            return openBlock(), createBlock(_component_router_link, {
+              key: page,
+              class: normalizeClass(["pagination__link", { pagination__link_active: _ctx.currentPage == page }]),
+              to: paginate(page)
+            }, {
+              default: withCtx(() => [
+                createTextVNode(toDisplayString(page), 1)
+              ]),
+              _: 2
+            }, 1032, ["class", "to"]);
+          }), 128))
+        ])) : createCommentVNode("", true),
+        _ctx.pagesCount >= 5 ? (openBlock(), createElementBlock("span", _hoisted_3$g, [
+          _ctx.currentPage >= 3 ? (openBlock(), createBlock(_component_router_link, {
+            key: 1,
+            class: normalizeClass(["pagination__link"]),
+            to: paginate(1)
+          }, {
+            default: withCtx(() => [
+              createTextVNode(toDisplayString(1))
+            ]),
+            _: 1
+          }, 8, ["to"])) : createCommentVNode("", true),
+          _ctx.currentPage > 3 ? (openBlock(), createElementBlock("span", _hoisted_4$e, "...")) : createCommentVNode("", true),
+          _ctx.currentPage != 1 ? (openBlock(), createBlock(_component_router_link, {
+            key: _ctx.currentPage - 1,
+            class: normalizeClass(["pagination__link"]),
+            to: paginate(_ctx.currentPage - 1)
+          }, {
+            default: withCtx(() => [
+              createTextVNode(toDisplayString(_ctx.currentPage - 1), 1)
+            ]),
+            _: 1
+          }, 8, ["to"])) : createCommentVNode("", true),
+          (openBlock(), createBlock(_component_router_link, {
+            key: _ctx.currentPage,
+            class: normalizeClass(["pagination__link pagination__link_active"]),
+            to: paginate(_ctx.currentPage)
+          }, {
+            default: withCtx(() => [
+              createTextVNode(toDisplayString(_ctx.currentPage), 1)
+            ]),
+            _: 1
+          }, 8, ["to"])),
+          _ctx.currentPage != _ctx.pagesCount ? (openBlock(), createBlock(_component_router_link, {
+            key: _ctx.currentPage + 1,
+            class: normalizeClass(["pagination__link"]),
+            to: paginate(_ctx.currentPage + 1)
+          }, {
+            default: withCtx(() => [
+              createTextVNode(toDisplayString(_ctx.currentPage + 1), 1)
+            ]),
+            _: 1
+          }, 8, ["to"])) : createCommentVNode("", true),
+          _ctx.currentPage < _ctx.pagesCount - 2 ? (openBlock(), createElementBlock("span", _hoisted_5$b, "...")) : createCommentVNode("", true),
+          _ctx.currentPage <= _ctx.pagesCount - 2 ? (openBlock(), createBlock(_component_router_link, {
+            key: _ctx.pagesCount,
+            class: normalizeClass(["pagination__link"]),
+            to: paginate(_ctx.pagesCount)
+          }, {
+            default: withCtx(() => [
+              createTextVNode(toDisplayString(_ctx.pagesCount), 1)
+            ]),
+            _: 1
+          }, 8, ["to"])) : createCommentVNode("", true)
+        ])) : createCommentVNode("", true)
+      ])) : createCommentVNode("", true);
+    };
+  }
+});
+const Pagination_vue_vue_type_style_index_0_scoped_6b61b6ba_lang = "";
+const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["__scopeId", "data-v-6b61b6ba"]]);
+const useFeed = defineStore("feed", () => {
+  const events = ref([]);
+  const showNewEventsBadge = ref(false);
+  const newEventsBadgeImageUrls = ref([]);
+  const newEventsBadgeCount = ref(0);
+  const newEventsToShow = ref([]);
+  const paginationEventsIds = ref([]);
+  const messageToBroadcast = ref("");
+  const signedJson = ref("");
+  const newEventsBadgeUpdateInterval = ref(0);
+  const selectedFeedSource = ref("network");
+  const eventsId = computed(() => events.value.map((e) => e.id));
+  const isFollowsSource = computed(() => selectedFeedSource.value === "follows");
+  const isNetworkSource = computed(() => selectedFeedSource.value === "network");
+  const isLoadingFeedSource = ref(false);
+  const isLoadingNewEvents = ref(false);
+  const isLoadingMore = ref(false);
+  const isMountAfterLogin = ref(false);
+  const toRemountFeed = ref(false);
+  const pool = ref(new SimplePool());
+  function clear2() {
+    clearNewEventsBadgeUpdateInterval();
+    events.value = [];
+    showNewEventsBadge.value = false;
+    newEventsToShow.value = [];
+    paginationEventsIds.value = [];
+    selectedFeedSource.value = "network";
+    isLoadingFeedSource.value = false;
+    isLoadingNewEvents.value = false;
+    isLoadingMore.value = false;
+  }
+  function updateEvents(value) {
+    events.value = value;
+  }
+  function pushToEvents(value) {
+    events.value.push(value);
+  }
+  function toggleEventRawData(id) {
+    const event = events.value.find((e) => e.id === id);
+    if (event) {
+      event.showRawData = !event.showRawData;
+    }
+  }
+  function setShowNewEventsBadge(value) {
+    showNewEventsBadge.value = value;
+  }
+  function setNewEventsBadgeImageUrls(value) {
+    newEventsBadgeImageUrls.value = value;
+  }
+  function setNewEventsBadgeCount(value) {
+    newEventsBadgeCount.value = value;
+  }
+  function updateNewEventsToShow(value) {
+    newEventsToShow.value = value;
+  }
+  function pushToNewEventsToShow(value) {
+    newEventsToShow.value.push(value);
+  }
+  function updatePaginationEventsIds(value) {
+    paginationEventsIds.value = value;
+  }
+  function pushToPaginationEventsIds(value) {
+    paginationEventsIds.value.push(value);
+  }
+  function updateMessageToBroadcast(value) {
+    messageToBroadcast.value = value;
+  }
+  function updateSignedJson(value) {
+    signedJson.value = value;
+  }
+  function setLoadingFeedSourceStatus(value) {
+    isLoadingFeedSource.value = value;
+  }
+  function setLoadingMoreStatus(value) {
+    isLoadingMore.value = value;
+  }
+  function setLoadingNewEventsStatus(value) {
+    isLoadingNewEvents.value = value;
+  }
+  function setSelectedFeedSource(value) {
+    selectedFeedSource.value = value === "follows" ? value : "network";
+  }
+  function setMountAfterLogin(value) {
+    isMountAfterLogin.value = value;
+  }
+  function clearNewEventsBadgeUpdateInterval() {
+    clearInterval(newEventsBadgeUpdateInterval.value);
+    newEventsBadgeUpdateInterval.value = 0;
+  }
+  function resetPool() {
+    pool.value = new SimplePool();
+  }
+  function setToRemountFeed(value) {
+    toRemountFeed.value = value;
+  }
+  return {
+    events,
+    updateEvents,
+    toggleEventRawData,
+    showNewEventsBadge,
+    setShowNewEventsBadge,
+    newEventsBadgeImageUrls,
+    setNewEventsBadgeImageUrls,
+    newEventsBadgeCount,
+    setNewEventsBadgeCount,
+    newEventsToShow,
+    updateNewEventsToShow,
+    pushToNewEventsToShow,
+    paginationEventsIds,
+    updatePaginationEventsIds,
+    pushToPaginationEventsIds,
+    messageToBroadcast,
+    updateMessageToBroadcast,
+    signedJson,
+    updateSignedJson,
+    selectedFeedSource,
+    setSelectedFeedSource,
+    isFollowsSource,
+    isNetworkSource,
+    isLoadingFeedSource,
+    setLoadingFeedSourceStatus,
+    setLoadingNewEventsStatus,
+    isLoadingNewEvents,
+    pushToEvents,
+    setLoadingMoreStatus,
+    isLoadingMore,
+    isMountAfterLogin,
+    setMountAfterLogin,
+    eventsId,
+    newEventsBadgeUpdateInterval,
+    clearNewEventsBadgeUpdateInterval,
+    clear: clear2,
+    pool,
+    resetPool,
+    toRemountFeed,
+    setToRemountFeed
+  };
+});
+const _withScopeId$c = (n) => (pushScopeId("data-v-2d4fce59"), n = n(), popScopeId(), n);
+const _hoisted_1$o = ["disabled", "rows"];
+const _hoisted_2$l = { class: "message-footer" };
+const _hoisted_3$f = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-braces presigned-icon" }, null, -1));
+const _hoisted_4$d = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("span", null, "Send presigned message", -1));
+const _hoisted_5$a = [
+  _hoisted_3$f,
+  _hoisted_4$d
+];
+const _hoisted_6$8 = ["disabled"];
+const _hoisted_7$6 = { class: "error" };
+const _hoisted_8$6 = { class: "warning" };
+const _sfc_main$r = /* @__PURE__ */ defineComponent({
+  __name: "MessageInput",
+  props: {
+    sentEventIds: {},
+    isSendingMessage: { type: Boolean }
+  },
+  emits: ["broadcastEvent", "toggleMessageType", "clearBroadcastError"],
+  setup(__props, { emit: __emit }) {
+    const props = __props;
+    const emit2 = __emit;
+    const nsecStore = useNsec();
+    const feedStore = useFeed();
+    const relayStore = useRelay();
+    const msgErr = ref("");
+    const msgNotice = ref("");
+    const isFocused = ref(false);
+    const rows = ref(3);
+    watch(
+      () => msgErr.value,
+      (newValue) => {
+        if (newValue.length) {
+          setTimeout(() => {
+            msgErr.value = "";
+          }, 5e3);
+        }
+      }
+    );
+    const handleSendMessage = async () => {
+      emit2("clearBroadcastError");
+      msgNotice.value = "";
+      if (!nsecStore.isValidNsecPresented()) {
+        msgErr.value = "Please login with your private key or generate random key in settings.";
+        return;
+      }
+      const messageValue = feedStore.messageToBroadcast;
+      if (!messageValue.length) {
+        msgErr.value = "Please provide message to broadcast.";
+        return;
+      }
+      let privkey;
+      let pubkey;
+      try {
+        privkey = nsecStore.getPrivkeyBytes();
+        if (!privkey) {
+          throw new Error();
+        }
+        pubkey = nsecStore.getPubkey();
+        if (!pubkey.length) {
+          throw new Error();
+        }
+      } catch (e) {
+        msgErr.value = `Invalid private key. Please check it and try again.`;
+        return;
+      }
+      const event = {
+        kind: 1,
+        pubkey,
+        created_at: Math.floor(Date.now() / 1e3),
+        content: messageValue,
+        tags: [],
+        id: "",
+        sig: ""
+      };
+      const signedEvent = finalizeEvent(event, privkey);
+      if (props.sentEventIds.has(signedEvent.id)) {
+        msgErr.value = "The same event can't be sent twice (same id, signature).";
+        return;
+      }
+      msgErr.value = "";
+      emit2("broadcastEvent", signedEvent, "text");
+    };
+    const handleInput = () => {
+      const text = feedStore.messageToBroadcast;
+      if (!text.length)
+        return;
+      let lines = text.split("\n").length;
+      if (lines < 3)
+        lines = 3;
+      rows.value = lines;
+    };
+    const handleFocus = () => {
+      isFocused.value = true;
+      if (!msgErr.value.length && !nsecStore.isValidNsecPresented()) {
+        msgNotice.value = "Please login to broadcast the message. Or send a presigned message.";
+      }
+    };
+    const handleBlur = () => {
+      isFocused.value = false;
+      msgNotice.value = "";
+    };
+    const toggleMessageType = () => {
+      emit2("toggleMessageType");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        createBaseVNode("div", {
+          class: normalizeClass(["message-field", { active: isFocused.value }])
+        }, [
+          withDirectives(createBaseVNode("textarea", {
+            disabled: !unref(relayStore).isConnectedToRelay,
+            class: "message-input",
+            name: "message",
+            id: "message",
+            rows: rows.value,
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => unref(feedStore).messageToBroadcast = $event),
+            onInput: handleInput,
+            onFocus: handleFocus,
+            onBlur: handleBlur,
+            placeholder: "What do you want to say?"
+          }, null, 40, _hoisted_1$o), [
+            [
+              vModelText,
+              unref(feedStore).messageToBroadcast,
+              void 0,
+              { trim: true }
+            ]
+          ]),
+          createBaseVNode("div", _hoisted_2$l, [
+            createBaseVNode("button", {
+              onClick: toggleMessageType,
+              class: "send-presigned-btn"
+            }, _hoisted_5$a),
+            createBaseVNode("button", {
+              disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay,
+              class: normalizeClass(["send-btn", { disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay }]),
+              onClick: handleSendMessage
+            }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_6$8)
+          ])
+        ], 2),
+        createBaseVNode("div", _hoisted_7$6, toDisplayString(msgErr.value), 1),
+        createBaseVNode("div", _hoisted_8$6, toDisplayString(msgNotice.value), 1)
+      ], 64);
+    };
+  }
+});
+const MessageInput_vue_vue_type_style_index_0_scoped_2d4fce59_lang = "";
+const MessageInput = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["__scopeId", "data-v-2d4fce59"]]);
+const _withScopeId$b = (n) => (pushScopeId("data-v-7a0c8f52"), n = n(), popScopeId(), n);
+const _hoisted_1$n = { class: "signed-message-desc" };
+const _hoisted_2$k = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("p", { class: "signed-message-desc_p" }, [
+  /* @__PURE__ */ createTextVNode(" Event should be signed with your private key in advance. More details about events and signatures are "),
+  /* @__PURE__ */ createBaseVNode("a", {
+    target: "_blank",
+    href: "https://github.com/nostr-protocol/nips/blob/master/01.md#events-and-signatures"
+  }, "here"),
+  /* @__PURE__ */ createTextVNode(". ")
+], -1));
+const _hoisted_3$e = { class: "signed-message-desc_p" };
+const _hoisted_4$c = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("br", null, null, -1));
+const _hoisted_5$9 = { class: "warning" };
+const _hoisted_6$7 = {
+  key: 0,
+  class: "additional-relays"
+};
+const _hoisted_7$5 = { class: "additional-relay-field" };
+const _hoisted_8$5 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("span", { class: "aditinal-relay-num" }, "1.", -1));
+const _hoisted_9$5 = ["value"];
+const _hoisted_10$5 = { class: "additional-relay-field" };
+const _hoisted_11$4 = { class: "aditinal-relay-num" };
+const _hoisted_12$4 = ["onInput"];
+const _hoisted_13$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("div", { class: "message-field-label" }, [
+  /* @__PURE__ */ createBaseVNode("label", { for: "signed_json" }, [
+    /* @__PURE__ */ createBaseVNode("strong", null, "JSON of a signed event")
+  ])
+], -1));
+const _hoisted_14$3 = ["disabled"];
+const _hoisted_15$3 = { class: "message-footer" };
+const _hoisted_16$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-pencil-square post-icon" }, null, -1));
+const _hoisted_17$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("span", null, "New post within your profile", -1));
+const _hoisted_18$2 = [
+  _hoisted_16$3,
+  _hoisted_17$3
+];
+const _hoisted_19$2 = ["disabled"];
+const _hoisted_20$2 = { class: "error" };
+const _hoisted_21$2 = { class: "warning" };
+const _sfc_main$q = /* @__PURE__ */ defineComponent({
+  __name: "SignedEventInput",
+  props: {
+    isSendingMessage: { type: Boolean },
+    sentEventIds: {}
+  },
+  emits: ["broadcastEvent", "toggleMessageType", "clearBroadcastError"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const relayStore = useRelay();
+    const feedStore = useFeed();
+    const jsonErr = ref("");
+    const msgNotice = ref("");
+    const addRelayNotice = ref("");
+    const isFocused = ref(false);
+    const handleSendSignedEvent = () => {
+      emit2("clearBroadcastError");
+      if (!feedStore.signedJson.length) {
+        jsonErr.value = "Please provide a signed event.";
+        return;
+      }
+      let event;
+      try {
+        event = JSON.parse(feedStore.signedJson);
+      } catch (e) {
+        jsonErr.value = "Invalid JSON. Please check it and try again.";
+        return;
+      }
+      if (!relayStore.isConnectedToRelay) {
+        jsonErr.value = "Please connect to broadcast the message.";
+        return;
+      }
+      jsonErr.value = "";
+      emit2("broadcastEvent", event, "json");
+    };
+    const handleClickAddNewField = () => {
+      if (!relayStore.isConnectedToRelay) {
+        addRelayNotice.value = "Please connect first to add relays and broadcast the message.";
+        setTimeout(() => {
+          addRelayNotice.value = "";
+        }, 5e3);
+        return;
+      }
+      const newCount = relayStore.additionalRelaysCountForSignedEvent + 1;
+      relayStore.updateAdditionalRelaysCountForSignedEvent(newCount);
+    };
+    const handleRelayInput = (event, index) => {
+      var _a;
+      const value = (_a = event == null ? void 0 : event.target) == null ? void 0 : _a.value.trim();
+      relayStore.updateRelayAdditionalRelaysUrlsForSignedEvent(index, value);
+    };
+    const toggleMessageType = () => {
+      emit2("toggleMessageType");
+    };
+    const handleFocus = () => {
+      isFocused.value = true;
+    };
+    const handleBlur = () => {
+      isFocused.value = false;
+      msgNotice.value = "";
+    };
+    return (_ctx, _cache) => {
+      var _a, _b;
+      return openBlock(), createElementBlock(Fragment, null, [
+        createBaseVNode("div", _hoisted_1$n, [
+          _hoisted_2$k,
+          createBaseVNode("p", _hoisted_3$e, [
+            createTextVNode(" Event will be broadcasted to a selected relay("),
+            createBaseVNode("em", null, toDisplayString(unref(relayStore).isConnectedToRelay ? unref(relayStore).currentRelay.url : "available after connect"), 1),
+            createTextVNode("). You can add more relays to retransmit the event. "),
+            _hoisted_4$c
+          ]),
+          createBaseVNode("p", { class: "signed-message-desc_p" }, [
+            createBaseVNode("button", {
+              class: "additional-relay-btn button",
+              onClick: handleClickAddNewField
+            }, "Add relay")
+          ]),
+          createBaseVNode("div", _hoisted_5$9, toDisplayString(addRelayNotice.value), 1),
+          unref(relayStore).additionalRelaysCountForSignedEvent > 0 ? (openBlock(), createElementBlock("div", _hoisted_6$7, [
+            createBaseVNode("div", _hoisted_7$5, [
+              _hoisted_8$5,
+              createBaseVNode("input", {
+                class: "additional-relay-input",
+                readonly: "",
+                value: ((_a = unref(relayStore).currentRelay) == null ? void 0 : _a.url) ? `${(_b = unref(relayStore).currentRelay) == null ? void 0 : _b.url} (selected)` : "Firstly connect to default relay",
+                type: "text"
+              }, null, 8, _hoisted_9$5)
+            ]),
+            (openBlock(true), createElementBlock(Fragment, null, renderList(unref(relayStore).additionalRelaysCountForSignedEvent, (i2) => {
+              return openBlock(), createElementBlock("div", { key: i2 }, [
+                createBaseVNode("div", _hoisted_10$5, [
+                  createBaseVNode("span", _hoisted_11$4, toDisplayString(i2 + 1) + ".", 1),
+                  createBaseVNode("input", {
+                    class: "additional-relay-input",
+                    onInput: (event) => handleRelayInput(event, i2),
+                    placeholder: "[wss://]relay.example.com",
+                    type: "text"
+                  }, null, 40, _hoisted_12$4)
+                ])
+              ]);
+            }), 128))
+          ])) : createCommentVNode("", true)
+        ]),
+        _hoisted_13$3,
+        createBaseVNode("div", {
+          class: normalizeClass(["message-field", { active: isFocused.value }])
+        }, [
+          withDirectives(createBaseVNode("textarea", {
+            disabled: !unref(relayStore).isConnectedToRelay,
+            class: "message-input",
+            name: "signed_json",
+            id: "signed_json",
+            cols: "30",
+            rows: "5",
+            onFocus: handleFocus,
+            onBlur: handleBlur,
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => unref(feedStore).signedJson = $event),
+            placeholder: '{"kind":1,"pubkey":"5486dbb083512982669fa180aa02d722ce35054233cea724061fbc5f39f81aa3","created_at":1685664152,"content":"Test message 👋","tags":[],"id":"89adae408121ba6d721203365becff4d312292a9dd9b7a35ffa230a1483b09a2","sig":"b2592ae88ba1040c928e458dd6822413f148c8cc4f478d992e024e8c9d9648b96e6ce6dc564ab5815675007f824d9e9f634f8dbde554afeb6e594bcaac4389dd"}'
+          }, null, 40, _hoisted_14$3), [
+            [
+              vModelText,
+              unref(feedStore).signedJson,
+              void 0,
+              { trim: true }
+            ]
+          ]),
+          createBaseVNode("div", _hoisted_15$3, [
+            createBaseVNode("button", {
+              onClick: toggleMessageType,
+              class: "send-presigned-btn"
+            }, _hoisted_18$2),
+            createBaseVNode("button", {
+              disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay,
+              class: normalizeClass(["button send-btn", { disabled: !unref(relayStore).isConnectedToRelay }]),
+              onClick: handleSendSignedEvent
+            }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_19$2)
+          ])
+        ], 2),
+        createBaseVNode("div", _hoisted_20$2, toDisplayString(jsonErr.value), 1),
+        createBaseVNode("div", _hoisted_21$2, toDisplayString(msgNotice.value), 1)
+      ], 64);
+    };
+  }
+});
+const SignedEventInput_vue_vue_type_style_index_0_scoped_7a0c8f52_lang = "";
+const SignedEventInput = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["__scopeId", "data-v-7a0c8f52"]]);
+const _hoisted_1$m = { class: "message-field-wrapper" };
+const _hoisted_2$j = { class: "error" };
+const _sfc_main$p = /* @__PURE__ */ defineComponent({
+  __name: "MessageWrapper",
+  props: {
+    newEvents: {}
+  },
+  emits: ["loadNewRelayEvents"],
+  setup(__props, { emit: __emit }) {
+    const relayStore = useRelay();
+    const feedStore = useFeed();
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const emit2 = __emit;
+    const props = __props;
+    const sentEventIds = ref(/* @__PURE__ */ new Set());
+    const isPresignedMessage = ref(false);
+    const isSendingMessage = ref(false);
+    const broadcastMsgError = ref("");
+    const toggleMessageType = () => {
+      isPresignedMessage.value = !isPresignedMessage.value;
+    };
+    const broadcastEvent = async (event, type) => {
+      let writeRelays = [];
+      if (isSendingMessage.value)
+        return;
+      isSendingMessage.value = true;
+      if (type === "json") {
+        const rawAdditionalUrls = relayStore.additionalRelaysUrlsForSignedEvent;
+        let connectedJsonRelays = [];
+        if (rawAdditionalUrls.length) {
+          let error = "Message was not sent. Can't connect to the next relays: \n";
+          let isError = false;
+          for (const url of rawAdditionalUrls) {
+            if (!(url == null ? void 0 : url.length))
+              continue;
+            if (!await isWsAvailable(url)) {
+              isError = true;
+              error += `- ${url} 
+`;
+              continue;
+            }
+            connectedJsonRelays.push(url);
+          }
+          const connectedRelayUrl = relayStore.currentRelay.url;
+          if (!await isWsAvailable(connectedRelayUrl)) {
+            isError = true;
+            error += `- ${connectedRelayUrl} 
+`;
+          }
+          if (isError) {
+            error += `Relays are unavailable or you are offline. Please try again or change the list of relays.`;
+            broadcastMsgError.value = error;
+            isSendingMessage.value = false;
+            return;
+          }
+        }
+        writeRelays = [relayStore.currentRelay.url, ...connectedJsonRelays];
+        writeRelays = [...new Set(writeRelays)];
+      }
+      if (type === "text") {
+        writeRelays = relayStore.connectedUserWriteRelaysUrls;
+      }
+      if (!writeRelays.length) {
+        const error = "No relays to broadcast the message. Please provide the list of write relays in settings.";
+        return handleBroadcastError(null, error);
+      }
+      const relaysToWatch = relayStore.connectedFeedRelaysUrls;
+      let userSub = null;
+      let interval;
+      const toWatchForUpadtes = relaysToWatch.some((r) => writeRelays.includes(r));
+      if (toWatchForUpadtes) {
+        const userNewEventOptions = [{ ids: [event.id] }];
+        userSub = pool.subscribeMany(relaysToWatch, userNewEventOptions, {
+          onevent(event2) {
+            interval = setInterval(() => {
+              if (props.newEvents.some((e) => e.id === event2.id)) {
+                emit2("loadNewRelayEvents");
+                userSub == null ? void 0 : userSub.close();
+              }
+            }, 100);
+          },
+          onclose() {
+            clearInterval(interval);
+          }
+        });
+      }
+      const networkResult = await publishEventToRelays(writeRelays, pool, event);
+      const isAllError = networkResult.every((r) => r.success === false);
+      if (isAllError) {
+        const error = "Failed to broadcast the message. Please check the connection or there may be a problem on the all provided relays. Also please try again.";
+        return handleBroadcastError(userSub, error);
+      }
+      if (type === "json" && writeRelays.length > 1) {
+        const relayResults = await Promise.all(
+          writeRelays.map(async (relay) => {
+            const note = await pool.get([relay], { ids: [event.id] });
+            return { relay, success: !!note };
+          })
+        );
+        const isError = relayResults.some((r) => r.success === false);
+        if (isError) {
+          let error = "Event was sent, but the next relay(s) were not accepted event for some reason: \n";
+          relayResults.forEach((r) => {
+            if (!r.success) {
+              error += `- ${r.relay} 
+`;
+            }
+          });
+          const allError = relayResults.every((r) => r.success === false);
+          if (allError) {
+            return handleBroadcastError(userSub, error);
+          }
+        }
+        const successfullRelays = relayResults.filter((r) => r.success).map((r) => r.relay);
+        const toUpdateFeed = relaysToWatch.some((r) => successfullRelays.includes(r));
+        if (toUpdateFeed) {
+          emit2("loadNewRelayEvents");
+          userSub == null ? void 0 : userSub.close();
+        }
+      } else {
+        const publishedEvent = await pool.querySync(writeRelays, { ids: [event.id] });
+        if (!publishedEvent.length) {
+          const error = `Failed to broadcast the message. Please check the connection or there may be a problem with relay(s).`;
+          return handleBroadcastError(userSub, error);
+        } else {
+          emit2("loadNewRelayEvents");
+          userSub == null ? void 0 : userSub.close();
+        }
+      }
+      if (type === "text") {
+        feedStore.updateMessageToBroadcast("");
+      }
+      if (type === "json") {
+        feedStore.updateSignedJson("");
+      }
+      sentEventIds.value.add(event.id);
+      isSendingMessage.value = false;
+    };
+    const handleBroadcastError = (eventSub, error) => {
+      broadcastMsgError.value = error;
+      eventSub == null ? void 0 : eventSub.close();
+      isSendingMessage.value = false;
+    };
+    const clearBroadcastError = () => {
+      broadcastMsgError.value = "";
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$m, [
+        isPresignedMessage.value ? (openBlock(), createBlock(SignedEventInput, {
+          key: 0,
+          onBroadcastEvent: broadcastEvent,
+          onToggleMessageType: toggleMessageType,
+          onClearBroadcastError: clearBroadcastError,
+          sentEventIds: sentEventIds.value,
+          isSendingMessage: isSendingMessage.value
+        }, null, 8, ["sentEventIds", "isSendingMessage"])) : (openBlock(), createBlock(MessageInput, {
+          key: 1,
+          onBroadcastEvent: broadcastEvent,
+          onToggleMessageType: toggleMessageType,
+          onClearBroadcastError: clearBroadcastError,
+          sentEventIds: sentEventIds.value,
+          isSendingMessage: isSendingMessage.value
+        }, null, 8, ["sentEventIds", "isSendingMessage"])),
+        createBaseVNode("div", _hoisted_2$j, toDisplayString(broadcastMsgError.value), 1)
+      ]);
+    };
+  }
+});
+const MessageWrapper_vue_vue_type_style_index_0_scoped_be88706d_lang = "";
+const MessageWrapper = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["__scopeId", "data-v-be88706d"]]);
+const _hoisted_1$l = { class: "dropdown" };
+const _hoisted_2$i = ["data-value"];
+const _sfc_main$o = /* @__PURE__ */ defineComponent({
+  __name: "Dropdown",
+  props: {
+    listItems: {},
+    simpleStyling: { type: Boolean },
+    disabled: { type: Boolean },
+    selectedKey: {}
+  },
+  emits: ["handleSelect"],
+  setup(__props, { emit: __emit }) {
+    const items = ref(null);
+    const selectBtn = ref(null);
+    const prevSelectedListItem = ref(null);
+    const emit2 = __emit;
+    const props = __props;
+    const selectedIndex = ref(0);
+    onMounted(() => {
+      prevSelectedListItem.value = document.querySelector(".active");
+      document.addEventListener("click", (evt) => {
+        const target = evt.target;
+        const { classList } = target;
+        if (classList.contains("item") || classList.contains("select-button") || classList.contains("items")) {
+          return;
+        }
+        hideList();
+      });
+      document.addEventListener("keydown", (evt) => {
+        if (evt.key === "Escape") {
+          hideList();
+        }
+      });
+      if (props.selectedKey) {
+        const index = props.listItems.findIndex((item) => item.key === props.selectedKey);
+        if (index !== -1) {
+          selectedIndex.value = index;
+        }
+      }
+    });
+    const handleSelectClick = () => {
+      if (props.disabled)
+        return;
+      if (!items.value)
+        return;
+      items.value.classList.toggle("open");
+    };
+    const handleItemClick = (e) => {
+      if (!items.value || !selectBtn.value)
+        return;
+      const target = e.target;
+      if (!target.classList.contains("item"))
+        return;
+      updateSelectedView(target);
+      hideList();
+      const selectedValue = target.dataset.value;
+      emit2("handleSelect", selectedValue);
+    };
+    const updateSelectedView = (selectedListItem) => {
+      if (!selectBtn.value)
+        return;
+      selectBtn.value.textContent = selectedListItem.textContent;
+      if (prevSelectedListItem.value) {
+        prevSelectedListItem.value.classList.remove("active");
+      }
+      selectedListItem.classList.add("active");
+      prevSelectedListItem.value = selectedListItem;
+    };
+    const hideList = () => {
+      if (!items.value)
+        return;
+      items.value.classList.remove("open");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$l, [
+        createBaseVNode("button", {
+          ref_key: "selectBtn",
+          ref: selectBtn,
+          onClick: handleSelectClick,
+          class: normalizeClass(["select-button", { simple: _ctx.simpleStyling, disabled: _ctx.disabled }])
+        }, toDisplayString(_ctx.listItems[selectedIndex.value].value), 3),
+        createBaseVNode("ul", {
+          ref_key: "items",
+          ref: items,
+          class: "items",
+          onClick: handleItemClick
+        }, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.listItems, (item, i2) => {
+            return openBlock(), createElementBlock("li", {
+              key: `item-${i2}`,
+              "data-value": item.key,
+              class: normalizeClass(["item", { active: i2 === selectedIndex.value }])
+            }, toDisplayString(item.value), 11, _hoisted_2$i);
+          }), 128))
+        ], 512)
+      ]);
+    };
+  }
+});
+const Dropdown_vue_vue_type_style_index_0_scoped_206086dd_lang = "";
+const Dropdown = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["__scopeId", "data-v-206086dd"]]);
+const _sfc_main$n = /* @__PURE__ */ defineComponent({
+  __name: "FeedSourceSelect",
+  props: {
+    disabled: { type: Boolean }
+  },
+  emits: ["showFeedNotice"],
+  setup(__props, { emit: __emit }) {
+    const props = __props;
+    const emit2 = __emit;
+    const nsecStore = useNsec();
+    const feedStore = useFeed();
+    const relayStore = useRelay();
+    const feedSourceList = [
+      { key: "network", value: "Network" },
+      { key: "follows", value: "Follows" }
+    ];
+    const handleSelect = (value) => {
+      if (!relayStore.isConnectedToRelay) {
+        return emit2(
+          "showFeedNotice",
+          "Please connect and login to load posts from people you follow."
+        );
+      }
+      if (!nsecStore.isValidNsecPresented() && value === "follows") {
+        return emit2("showFeedNotice", "Please login to load posts from people you follow.");
+      }
+      emit2("showFeedNotice", "");
+      feedStore.setSelectedFeedSource(value);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createBlock(Dropdown, {
+        disabled: props.disabled,
+        simpleStyling: true,
+        listItems: feedSourceList,
+        selectedKey: unref(feedStore).selectedFeedSource,
+        onHandleSelect: handleSelect
+      }, null, 8, ["disabled", "selectedKey"]);
+    };
+  }
+});
+const _withScopeId$a = (n) => (pushScopeId("data-v-1cc3595f"), n = n(), popScopeId(), n);
+const _hoisted_1$k = { class: "custom-checkbox" };
+const _hoisted_2$h = ["checked"];
+const _hoisted_3$d = /* @__PURE__ */ _withScopeId$a(() => /* @__PURE__ */ createBaseVNode("span", { class: "checkmark" }, null, -1));
+const _hoisted_4$b = {
+  class: "label-text",
+  for: "checkbox"
+};
+const _sfc_main$m = /* @__PURE__ */ defineComponent({
+  __name: "Checkbox",
+  props: {
+    label: {},
+    checked: { type: Boolean }
+  },
+  emits: ["onChange"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const onChange = () => {
+      emit2("onChange");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$k, [
+        createBaseVNode("label", null, [
+          createBaseVNode("input", {
+            id: "checkbox",
+            onChange,
+            checked: _ctx.checked,
+            type: "checkbox"
+          }, null, 40, _hoisted_2$h),
+          _hoisted_3$d,
+          createBaseVNode("span", _hoisted_4$b, toDisplayString(_ctx.label), 1)
+        ])
+      ]);
+    };
+  }
+});
+const Checkbox_vue_vue_type_style_index_0_scoped_1cc3595f_lang = "";
+const Checkbox = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["__scopeId", "data-v-1cc3595f"]]);
+const _hoisted_1$j = { class: "wrapper" };
+const _sfc_main$l = /* @__PURE__ */ defineComponent({
+  __name: "ShowImagesCheckbox",
+  setup(__props) {
+    const imagesStore = useImages();
+    const toggleImages = () => {
+      imagesStore.updateShowImages(!imagesStore.showImages);
+    };
+    return (_ctx, _cache) => {
+      const _component_router_link = resolveComponent("router-link");
+      return openBlock(), createElementBlock("div", _hoisted_1$j, [
+        createVNode(Checkbox, {
+          onOnChange: toggleImages,
+          checked: unref(imagesStore).showImages,
+          label: "Show avatars"
+        }, null, 8, ["checked"]),
+        createBaseVNode("small", null, [
+          createTextVNode(" ("),
+          createVNode(_component_router_link, { to: { path: "/help", hash: "#privacy" } }, {
+            default: withCtx(() => [
+              createTextVNode("Exposes your IP")
+            ]),
+            _: 1
+          }),
+          createTextVNode(") ")
+        ])
+      ]);
+    };
+  }
+});
+const ShowImagesCheckbox_vue_vue_type_style_index_0_lang = "";
+const _hoisted_1$i = { class: "feed-header" };
+const _hoisted_2$g = {
+  key: 0,
+  class: "warning"
+};
+const _sfc_main$k = /* @__PURE__ */ defineComponent({
+  __name: "FeedHeader",
+  props: {
+    isDisabledSourceSelect: { type: Boolean }
+  },
+  setup(__props) {
+    const props = __props;
+    const notice = ref("");
+    const showFeedNotice = (value) => {
+      notice.value = value;
+      setTimeout(() => {
+        notice.value = "";
+      }, 5e3);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        createBaseVNode("div", _hoisted_1$i, [
+          createVNode(_sfc_main$n, {
+            class: "dropdown",
+            disabled: props.isDisabledSourceSelect,
+            onShowFeedNotice: showFeedNotice
+          }, null, 8, ["disabled"]),
+          createVNode(_sfc_main$l)
+        ]),
+        notice.value.length ? (openBlock(), createElementBlock("div", _hoisted_2$g, toDisplayString(notice.value), 1)) : createCommentVNode("", true)
+      ], 64);
+    };
+  }
+});
+const FeedHeader_vue_vue_type_style_index_0_scoped_03f1c3ab_lang = "";
+const FeedHeader = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["__scopeId", "data-v-03f1c3ab"]]);
+const DEFAULT_RELAY = "wss://nos.lol";
+const DEFAULT_RELAYS = [
+  "wss://nos.lol",
+  // USA
+  "wss://relay.damus.io",
+  // Cannada
+  "wss://relay.snort.social",
+  // France
+  "wss://relay.nostr.band",
+  // Finland
+  "wss://eden.nostr.land"
+  // USA
+];
+const fallbackRelays = [
+  "wss://nos.lol",
+  // USA
+  "wss://relay.damus.io",
+  // Cannada
+  "wss://relay.nostr.band",
+  // Finland
+  "wss://relay.snort.social",
+  // France
+  "wss://relay.primal.net",
+  // Cannada
+  "wss://eden.nostr.land",
+  // USA
+  "wss://nostr.wine",
+  // USA
+  "wss://offchain.pub",
+  // USA
+  "wss://relay.nostr.bg",
+  // Germany
+  "wss://relay.mostr.pub"
+  // Cannada
+];
+const DEFAULT_EVENTS_COUNT = 20;
+const timeout = (ms) => {
+  return new Promise((resolve2) => setTimeout(resolve2, ms));
+};
+const connectToSelectedRelay = async (relayUrl) => {
+  let relay;
+  try {
+    try {
+      relay = await Relay.connect(relayUrl);
+    } catch (e) {
+      await timeout(500);
+      relay = await Relay.connect(relayUrl);
+    }
+  } catch (e) {
+    let error = `WebSocket connection to "${relayUrl}" failed. You can try again `;
+    if (!navigator.onLine) {
+      error += `or check your internet connection.`;
+    } else {
+      error += `Check WebSocket address. Relay address should be a correct WebSocket URL. Maybe the relay is unavailable or you are offline.`;
+    }
+    throw new Error(error);
+  }
+  return relay;
+};
+const getConnectedReadWriteRelays = async (readAndWriteRelays) => {
+  const userConnectedReadRelays = [];
+  const userConnectedWriteRelays = [];
+  if (readAndWriteRelays.length) {
+    const result = await Promise.all(
+      readAndWriteRelays.map(async (relay) => {
+        const isConnected = await isWsAvailable(relay.url);
+        return { url: relay.url, connected: isConnected, type: relay.type };
+      })
+    );
+    result.forEach((r) => {
+      if (r.connected) {
+        userConnectedReadRelays.push(r.url);
+        if (r.type === "write") {
+          userConnectedWriteRelays.push(r.url);
+        }
+      }
+    });
+  }
+  return { userConnectedReadRelays, userConnectedWriteRelays };
+};
+const getFollowsConnectedRelaysMap = async (follows, connectedUserRelays, pool) => {
+  const followsRelaysMap = {};
+  let followsPubkeys = [];
+  if (follows.tags.length) {
+    followsPubkeys = follows.tags.map((f) => f[1]);
+    const followsMeta = await pool.querySync(connectedUserRelays, {
+      kinds: [10002],
+      authors: followsPubkeys
+    });
+    const followsRelaysUrlsExceptUserRelays = /* @__PURE__ */ new Set();
+    followsMeta.forEach((event) => {
+      event.tags.forEach((tag) => {
+        if (tag[0] !== "r")
+          return;
+        const relayUrl = utils_exports.normalizeURL(tag[1]);
+        if (connectedUserRelays.includes(relayUrl))
+          return;
+        followsRelaysUrlsExceptUserRelays.add(relayUrl);
+      });
+    });
+    const followsSortedRelays = await Promise.all(
+      Array.from(followsRelaysUrlsExceptUserRelays).map(async (relayUrl) => {
+        const isConnected = await isWsAvailable(relayUrl);
+        return { url: relayUrl, connected: isConnected };
+      })
+    );
+    const followsConnectedRelaysUrls = followsSortedRelays.filter((r) => r.connected).map((r) => r.url);
+    followsMeta.forEach((event) => {
+      const normalizedUrls = [];
+      event.tags.forEach((tag) => {
+        if (tag[0] !== "r")
+          return;
+        const relayUrl = utils_exports.normalizeURL(tag[1]);
+        if (followsConnectedRelaysUrls.includes(relayUrl) || connectedUserRelays.includes(relayUrl)) {
+          normalizedUrls.push(relayUrl);
+        }
+      });
+      followsRelaysMap[event.pubkey] = normalizedUrls;
+    });
+  }
+  return followsRelaysMap;
+};
+const closeWebSocket = (webSocket) => {
+  return new Promise((resolve2, reject) => {
+    if (webSocket.readyState === WebSocket.CLOSING || webSocket.readyState === WebSocket.CLOSED) {
+      resolve2(true);
+      return;
+    }
+    webSocket.onclose = function() {
+      resolve2(true);
+    };
+    webSocket.onerror = function() {
+      reject(false);
+    };
+    webSocket.close();
+  });
+};
+const closePoolSockets = async (pool) => {
+  try {
+    const closingSockets = [];
+    pool.relays.forEach((r) => {
+      if (!r.connected)
+        return;
+      closingSockets.push(closeWebSocket(r.ws));
+    });
+    await Promise.all(closingSockets);
+  } catch (e) {
+    console.error("Error while closing websocket:", e);
+  }
+};
+const _withScopeId$9 = (n) => (pushScopeId("data-v-fd8ac58c"), n = n(), popScopeId(), n);
+const _hoisted_1$h = { id: "feed" };
+const _hoisted_2$f = { class: "columns" };
+const _hoisted_3$c = {
+  key: 0,
+  class: "connecting-notice"
+};
+const _hoisted_4$a = {
+  key: 1,
+  class: "connecting-notice"
+};
+const _hoisted_5$8 = {
+  key: 0,
+  class: "new-events__imgs"
+};
+const _hoisted_6$6 = ["src"];
+const _hoisted_7$4 = ["src"];
+const _hoisted_8$4 = { class: "new-events__text" };
+const _hoisted_9$4 = /* @__PURE__ */ _withScopeId$9(() => /* @__PURE__ */ createBaseVNode("b", { class: "new-events__arrow" }, "↑", -1));
+const _hoisted_10$4 = {
+  key: 3,
+  class: "loading-more"
+};
+const _sfc_main$j = /* @__PURE__ */ defineComponent({
+  __name: "Feed",
+  props: {
+    eventsLog: {}
+  },
+  setup(__props) {
+    const relayStore = useRelay();
+    const imagesStore = useImages();
+    const feedStore = useFeed();
+    const nsecStore = useNsec();
+    const poolStore = usePool();
+    const metasCacheStore = useMetasCache();
+    const newAuthorImg1 = computed(() => feedStore.newEventsBadgeImageUrls[0]);
+    const newAuthorImg2 = computed(() => feedStore.newEventsBadgeImageUrls[1]);
+    const route = useRoute();
+    const router2 = useRouter();
+    const currentPage = ref(1);
+    const pagesCount = computed(
+      () => Math.ceil(feedStore.paginationEventsIds.length / DEFAULT_EVENTS_COUNT)
+    );
+    const currPath = computed(() => route.path);
+    let newEvents = ref([]);
+    const pool = poolStore.pool;
+    const isDisabledSourceSelect = ref(false);
+    watch(
+      () => route.path,
+      () => {
+        if (currentPage.value > 1) {
+          showFeedPage(1);
+        }
+      }
+    );
+    watch(
+      () => feedStore.selectedFeedSource,
+      async () => {
+        if (relayStore.currentRelay.connected && nsecStore.isValidNsecPresented()) {
+          await changeFeedSource();
+        }
+      }
+    );
+    watch(
+      () => feedStore.isMountAfterLogin,
+      () => {
+        if (!feedStore.isMountAfterLogin)
+          return;
+        feedStore.setMountAfterLogin(false);
+        mountFeed();
+      },
+      { immediate: true }
+    );
+    onMounted(() => {
+      if (pagesCount.value > 1) {
+        showFeedPage(1);
+      }
+      if (feedStore.toRemountFeed) {
+        feedStore.setToRemountFeed(false);
+        remountFeed();
+      }
+    });
+    const changeFeedSource = async () => {
+      await remountFeed();
+    };
+    const remountFeed = async () => {
+      isDisabledSourceSelect.value = true;
+      if (feedStore.newEventsBadgeUpdateInterval) {
+        feedStore.clearNewEventsBadgeUpdateInterval();
+      }
+      if (feedStore.pool) {
+        try {
+          await closePoolSockets(feedStore.pool);
+          feedStore.resetPool();
+        } catch (e) {
+          console.error("Error while closing websocket:", e);
+        }
+      }
+      feedStore.setShowNewEventsBadge(false);
+      feedStore.updateNewEventsToShow([]);
+      feedStore.updatePaginationEventsIds([]);
+      feedStore.updateEvents([]);
+      await mountFeed();
+    };
+    async function mountFeed() {
+      isDisabledSourceSelect.value = true;
+      feedStore.setLoadingFeedSourceStatus(true);
+      const pubkey = nsecStore.getPubkey();
+      let feedRelays = relayStore.connectedUserReadRelayUrls.length ? relayStore.connectedUserReadRelayUrls : [relayStore.currentRelay.url];
+      let followsRelaysMap = {};
+      const folowsRelaysSet = /* @__PURE__ */ new Set();
+      let followsPubkeys = [];
+      if (feedStore.isFollowsSource && pubkey.length) {
+        const follows = await pool.get(feedRelays, {
+          kinds: [EVENT_KIND.FOLLOW_LIST],
+          limit: 1,
+          authors: [pubkey]
+        });
+        if (follows) {
+          followsPubkeys = follows.tags.map((f) => f[1]);
+          followsRelaysMap = await getFollowsConnectedRelaysMap(
+            follows,
+            feedRelays,
+            pool
+          );
+          for (const relays of Object.values(followsRelaysMap)) {
+            relays.forEach((r) => folowsRelaysSet.add(r));
+          }
+        }
+      }
+      if (folowsRelaysSet.size) {
+        feedRelays = Array.from(folowsRelaysSet);
+      }
+      relayStore.setConnectedFeedRelayUrls(feedRelays);
+      let postsFilter = { kinds: [1], limit: DEFAULT_EVENTS_COUNT };
+      if (followsPubkeys.length) {
+        postsFilter.authors = followsPubkeys;
+      }
+      let posts = await listRootEvents(pool, feedRelays, [postsFilter]);
+      posts = posts.sort((a, b) => b.created_at - a.created_at);
+      const isRootPosts = true;
+      await loadAndInjectDataToPosts(
+        posts,
+        null,
+        followsRelaysMap,
+        feedRelays,
+        metasCacheStore,
+        pool,
+        isRootPosts,
+        (post) => {
+          feedStore.pushToEvents(post);
+          if (feedStore.isLoadingFeedSource) {
+            feedStore.setLoadingFeedSourceStatus(false);
+            feedStore.setLoadingMoreStatus(true);
+          }
+          feedStore.pushToPaginationEventsIds(post.id);
+        }
+      );
+      feedStore.setLoadingMoreStatus(false);
+      let subscribePostsFilter = { kinds: [1], limit: 1 };
+      if (followsPubkeys.length) {
+        subscribePostsFilter.authors = followsPubkeys;
+      }
+      await subscibeFeedForUpdates(feedRelays, subscribePostsFilter);
+      feedStore.newEventsBadgeUpdateInterval = setInterval(updateNewEventsElement, 3e3);
+      isDisabledSourceSelect.value = false;
+    }
+    async function subscibeFeedForUpdates(feedRelays, subscribePostsFilter) {
+      var _a;
+      await ((_a = feedStore.pool) == null ? void 0 : _a.subscribeMany(feedRelays, [subscribePostsFilter], {
+        onevent(event) {
+          if (feedStore.eventsId.includes(event.id))
+            return;
+          const nip10Data = nip10_exports.parse(event);
+          if (nip10Data.reply || nip10Data.root)
+            return;
+          newEvents.value.push({ id: event.id, pubkey: event.pubkey });
+          feedStore.pushToNewEventsToShow({ id: event.id, pubkey: event.pubkey });
+        },
+        onclose(r) {
+          console.warn("Subscription closed", r);
+        }
+      }));
+    }
+    async function updateNewEventsElement() {
+      var _a, _b;
+      const relays = relayStore.connectedFeedRelaysUrls;
+      if (!relays.length)
+        return;
+      const eventsToShow = feedStore.newEventsToShow;
+      if (eventsToShow.length < 2)
+        return;
+      if (!feedStore.newEventsBadgeUpdateInterval)
+        return;
+      feedStore.setNewEventsBadgeCount(eventsToShow.length);
+      feedStore.setShowNewEventsBadge(true);
+      const pub1 = eventsToShow[eventsToShow.length - 1].pubkey;
+      const pub2 = eventsToShow[eventsToShow.length - 2].pubkey;
+      const eventsListOptions1 = { kinds: [0], authors: [pub1], limit: 1 };
+      const eventsListOptions2 = { kinds: [0], authors: [pub2], limit: 1 };
+      const author1 = await pool.querySync(relays, eventsListOptions1);
+      const author2 = await pool.querySync(relays, eventsListOptions2);
+      if (!feedStore.newEventsBadgeUpdateInterval)
+        return;
+      if (!((_a = author1[0]) == null ? void 0 : _a.content) || !((_b = author2[0]) == null ? void 0 : _b.content))
+        return;
+      const authorImg1 = JSON.parse(author1[0].content).picture;
+      const authorImg2 = JSON.parse(author2[0].content).picture;
+      feedStore.setNewEventsBadgeImageUrls([authorImg1, authorImg2]);
+    }
+    const showFeedPage = async (page) => {
+      if (feedStore.isLoadingNewEvents)
+        return;
+      feedStore.setLoadingNewEventsStatus(true);
+      const relays = relayStore.connectedFeedRelaysUrls;
+      if (!relays.length)
+        return;
+      const limit = DEFAULT_EVENTS_COUNT;
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      const reversedIds = feedStore.paginationEventsIds.slice().reverse();
+      const idsToShow = reversedIds.slice(start, end);
+      const postsEvents = await pool.querySync(relays, { ids: idsToShow });
+      let posts = postsEvents.sort((a, b) => b.created_at - a.created_at);
+      const isRootPosts = true;
+      await loadAndInjectDataToPosts(
+        posts,
+        null,
+        {},
+        relays,
+        metasCacheStore,
+        pool,
+        isRootPosts
+      );
+      feedStore.updateEvents(posts);
+      feedStore.setLoadingNewEventsStatus(false);
+      currentPage.value = page;
+    };
+    const loadNewRelayEvents = async () => {
+      if (feedStore.isLoadingNewEvents)
+        return;
+      feedStore.setLoadingNewEventsStatus(true);
+      feedStore.setShowNewEventsBadge(false);
+      const relays = relayStore.connectedFeedRelaysUrls;
+      if (!relays.length)
+        return;
+      router2.push({ path: `${route.path}` });
+      let eventsToShow = feedStore.newEventsToShow;
+      feedStore.updateNewEventsToShow(
+        feedStore.newEventsToShow.filter((item) => !eventsToShow.includes(item))
+      );
+      const ids = eventsToShow.map((e) => e.id);
+      const limit = DEFAULT_EVENTS_COUNT;
+      feedStore.updatePaginationEventsIds(feedStore.paginationEventsIds.concat(ids));
+      const firstPageIds = feedStore.paginationEventsIds.slice(-limit);
+      const postsEvents = await pool.querySync(relays, { ids: firstPageIds });
+      let posts = postsEvents.sort((a, b) => b.created_at - a.created_at);
+      const isRootPosts = true;
+      await loadAndInjectDataToPosts(
+        posts,
+        null,
+        {},
+        relays,
+        metasCacheStore,
+        pool,
+        isRootPosts
+      );
+      feedStore.updateEvents(posts);
+      feedStore.setLoadingNewEventsStatus(false);
+      currentPage.value = 1;
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$h, [
+        createVNode(MessageWrapper, {
+          onLoadNewRelayEvents: loadNewRelayEvents,
+          newEvents: unref(newEvents)
+        }, null, 8, ["newEvents"]),
+        createVNode(FeedHeader, { isDisabledSourceSelect: isDisabledSourceSelect.value }, null, 8, ["isDisabledSourceSelect"]),
+        createBaseVNode("div", _hoisted_2$f, [
+          createBaseVNode("div", {
+            class: normalizeClass(["events", { events_hidden: currPath.value === "/log" }])
+          }, [
+            unref(feedStore).isLoadingFeedSource ? (openBlock(), createElementBlock("div", _hoisted_3$c, " Loading feed from " + toDisplayString(unref(feedStore).selectedFeedSource) + "... ", 1)) : createCommentVNode("", true),
+            unref(feedStore).isLoadingNewEvents ? (openBlock(), createElementBlock("div", _hoisted_4$a, " Loading new notes... ")) : createCommentVNode("", true),
+            unref(feedStore).showNewEventsBadge ? (openBlock(), createElementBlock("div", {
+              key: 2,
+              onClick: loadNewRelayEvents,
+              class: normalizeClass(["new-events", { "new-events_top-shifted": unref(feedStore).isLoadingNewEvents }])
+            }, [
+              unref(imagesStore).showImages && unref(feedStore).newEventsBadgeImageUrls.length ? (openBlock(), createElementBlock("div", _hoisted_5$8, [
+                createBaseVNode("img", {
+                  class: "new-events__img",
+                  src: newAuthorImg1.value,
+                  alt: "user's avatar"
+                }, null, 8, _hoisted_6$6),
+                createBaseVNode("img", {
+                  class: "new-events__img",
+                  src: newAuthorImg2.value,
+                  alt: "user's avatar"
+                }, null, 8, _hoisted_7$4)
+              ])) : createCommentVNode("", true),
+              createBaseVNode("span", _hoisted_8$4, toDisplayString(unref(feedStore).newEventsBadgeCount) + " new notes", 1),
+              _hoisted_9$4
+            ], 2)) : createCommentVNode("", true),
+            createVNode(RelayEventsList, {
+              events: unref(feedStore).events,
+              pubKey: unref(nsecStore).getPubkey(),
+              showImages: unref(imagesStore).showImages,
+              currentReadRelays: unref(relayStore).connectedFeedRelaysUrls,
+              onToggleRawData: unref(feedStore).toggleEventRawData
+            }, null, 8, ["events", "pubKey", "showImages", "currentReadRelays", "onToggleRawData"]),
+            unref(feedStore).isLoadingMore ? (openBlock(), createElementBlock("div", _hoisted_10$4, "Loading more posts...")) : createCommentVNode("", true),
+            createVNode(Pagination, {
+              pagesCount: pagesCount.value,
+              currentPage: currentPage.value,
+              onShowPage: showFeedPage
+            }, null, 8, ["pagesCount", "currentPage"])
+          ], 2)
+        ])
+      ]);
+    };
+  }
+});
+const Feed_vue_vue_type_style_index_0_scoped_fd8ac58c_lang = "";
+const Feed = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["__scopeId", "data-v-fd8ac58c"]]);
+const _hoisted_1$g = /* @__PURE__ */ createStaticVNode('<h3>Slightly Private App</h3><p><a href="https://nostr.com">nostr</a> is public, censorship-resistant social network. It&#39;s simple: <ol><li>Select a relay from the list, or specify a <a href="https://nostr.watch/" target="_blank">custom URL</a></li><li><em>Optionally</em>, set your private key, to create new messages</li></ol></p><p> Traditional social networks can suppress certain posts or users. In nostr, every message is signed by user&#39;s <em>private key</em> and broadcasted to <em>relays</em>. <strong>Messages are tamper-resistant</strong>: no one can edit them, or the signature will become invalid. <strong>Users can&#39;t be blocked</strong>: even if a relay blocks someone, it&#39;s always possible to switch to a different one, or create up a personal relay. </p><p> The app is available at <a href="http://nostr.spa">nostr.spa</a>. You can: <ul><li><em>Connect</em> and see relay&#39;s global feed.</li><li><em>Post</em> new messages to the relay.</li><li><em>Broadcast</em> a pre-signed message. No need to enter a private key.</li><li><em>Search</em> information about a user or an event.</li></ul></p>', 4);
+const _hoisted_5$7 = /* @__PURE__ */ createStaticVNode("<ul><li>No tracking from our end</li><li>Private keys are not sent anywhere. They are stored in RAM of your device</li><li>Relay will see your ip+browser after you click <em>Connect</em> button</li><li>GitHub will see ip+browser of anyone who&#39;s using the app, because it&#39;s hosted on GitHub Pages. They won&#39;t see any nostr-specific interactions you will make</li><li><em>Show avatars</em> feature will leak your ip+browser to random people on the internet. Since there are no centralized servers in nostr, every user can specify their own URL for avatar hosting. Meaning, users can control the hosting webservers and see logs</li><li><em>Remember me</em> feature will write private key you&#39;ve entered to browser&#39;s Local Storage, which is usually stored on your device&#39;s disk</li><li>VPN or TOR usage is advised, <em>as with any nostr client</em>, to prevent ip leakage</li></ul>", 1);
+const _hoisted_6$5 = /* @__PURE__ */ createStaticVNode('<h3>Open source</h3><p> The lightweight nostr client is built to showcase <a href="/noble/">noble</a> cryptography. Signing is done using <a target="_blank" href="https://github.com/paulmillr/noble-curves">noble-curves</a>, while <a target="_blank" href="https://github.com/paulmillr/scure-base">scure-base</a> is used for bech32, <a target="_blank" href="https://github.com/nbd-wtf/nostr-tools">nostr-tools</a> are used for general nostr utilities and Vue.js is utilized for UI. Check out <a target="_blank" href="https://github.com/paulmillr/paulmillr.github.io">the source code</a>. You are welcome to host the client on your personal website. </p>', 2);
+const _sfc_main$i = /* @__PURE__ */ defineComponent({
+  __name: "Help",
+  props: {
+    showPrivacy: {}
+  },
+  setup(__props) {
+    const route = useRoute();
+    const privacyEl = ref(null);
+    onMounted(() => {
+      if (privacyEl.value && route.hash == "#privacy") {
+        privacyEl.value.scrollIntoView();
+      }
+    });
+    onBeforeUpdate(() => {
+      if (privacyEl.value && route.hash == "#privacy") {
+        privacyEl.value.scrollIntoView();
+      }
+    });
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$g,
+        createBaseVNode("p", null, [
+          createBaseVNode("h3", {
+            id: "#privacy",
+            ref_key: "privacyEl",
+            ref: privacyEl
+          }, "Privacy policy", 512),
+          _hoisted_5$7
+        ]),
+        _hoisted_6$5
+      ], 64);
+    };
+  }
+});
+const gettingUserInfoId = reactive({
+  value: 1,
+  update(value) {
+    this.value = value;
+  }
+});
+const useUserNotes = defineStore("user-notes", () => {
+  const notes = ref([]);
+  const allNotesIds = ref([]);
+  function updateNotes(events) {
+    notes.value = events;
+  }
+  function updateIds(value) {
+    allNotesIds.value = value;
+  }
+  function toggleRawData(id) {
+    const event = notes.value.find((e) => e.id === id);
+    if (event) {
+      event.showRawData = !event.showRawData;
+    }
+  }
+  return { notes, allNotesIds, updateNotes, updateIds, toggleRawData };
+});
+const useOwnProfile = defineStore("ownProfile", () => {
+  const contactsEvent = ref({});
+  const metaEvent = ref(null);
+  const metaContent = ref(null);
+  const username = computed(() => {
+    if (!metaContent.value || !metaEvent.value) {
+      return "";
+    }
+    return getDisplayUsername(metaContent.value, metaEvent.value.pubkey);
+  });
+  const pubkey = computed(() => {
+    return metaEvent.value ? metaEvent.value.pubkey : "";
+  });
+  function updateContactsEvent(value) {
+    contactsEvent.value = value;
+  }
+  function updateMeta(value) {
+    metaEvent.value = value;
+    metaContent.value = JSON.parse(value.content);
+  }
+  return { contactsEvent, updateContactsEvent, updateMeta, username, pubkey };
+});
+const _withScopeId$8 = (n) => (pushScopeId("data-v-7d13b372"), n = n(), popScopeId(), n);
+const _hoisted_1$f = { class: "event" };
+const _hoisted_2$e = {
+  key: 0,
+  class: "event__content"
+};
+const _hoisted_3$b = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("hr", null, null, -1));
+const _hoisted_4$9 = { class: "event__code-block" };
+const _hoisted_5$6 = { class: "event__code-title" };
+const _hoisted_6$4 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("b", null, "Author: ", -1));
+const _hoisted_7$3 = { class: "content-col_code" };
+const _hoisted_8$3 = { class: "event__code" };
+const _hoisted_9$3 = { class: "event__code-block" };
+const _hoisted_10$3 = { class: "event__code-title" };
+const _hoisted_11$3 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("b", null, "Meta event id: ", -1));
+const _hoisted_12$3 = { class: "content-col_code" };
+const _hoisted_13$2 = { class: "event__code" };
+const _hoisted_14$2 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("div", { class: "header-col" }, [
+  /* @__PURE__ */ createBaseVNode("b", null, "Created: ")
+], -1));
+const _hoisted_15$2 = { class: "content-col_code" };
+const _hoisted_16$2 = { class: "event__code" };
+const _hoisted_17$2 = { class: "event-footer__signature-text" };
+const _sfc_main$h = /* @__PURE__ */ defineComponent({
+  __name: "UserEvent",
+  props: {
+    event: {},
+    author: {}
+  },
+  setup(__props) {
+    const props = __props;
+    const showRawData = ref(false);
+    const showHexId = ref(false);
+    const showHexPubkey = ref(false);
+    const id = ref("");
+    const sig = ref("");
+    const pubkey = ref("");
+    const created_at = ref(0);
+    const isSigVerified = ref(false);
+    watchEffect(() => {
+      const { event } = props;
+      id.value = event.id;
+      sig.value = event.sig;
+      pubkey.value = event.pubkey;
+      created_at.value = event.created_at;
+    });
+    onMounted(() => {
+      if (Object.keys(props.event).length === 0) {
+        return;
+      }
+      isSigVerified.value = verifyEvent(props.event);
+    });
+    const handleToggleRawData = () => {
+      showRawData.value = !showRawData.value;
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$f, [
+        !showRawData.value ? (openBlock(), createElementBlock("div", _hoisted_2$e, [
+          renderSlot(_ctx.$slots, "default", {}, () => [
+            createTextVNode("No content for event")
+          ], true),
+          _hoisted_3$b,
+          createBaseVNode("div", _hoisted_4$9, [
+            createBaseVNode("div", _hoisted_5$6, [
+              _hoisted_6$4,
+              createBaseVNode("button", {
+                class: "event__code-btn",
+                onClick: _cache[0] || (_cache[0] = ($event) => showHexPubkey.value = !showHexPubkey.value)
+              }, toDisplayString(showHexPubkey.value ? "npub" : "hex"), 1)
+            ]),
+            createBaseVNode("div", _hoisted_7$3, [
+              createBaseVNode("code", _hoisted_8$3, toDisplayString(showHexPubkey.value ? pubkey.value : unref(nip19_exports).npubEncode(pubkey.value)), 1)
+            ])
+          ]),
+          createBaseVNode("div", _hoisted_9$3, [
+            createBaseVNode("div", _hoisted_10$3, [
+              _hoisted_11$3,
+              createBaseVNode("button", {
+                class: "event__code-btn",
+                onClick: _cache[1] || (_cache[1] = ($event) => showHexId.value = !showHexId.value)
+              }, toDisplayString(showHexId.value ? "nevent" : "hex"), 1)
+            ]),
+            createBaseVNode("div", _hoisted_12$3, [
+              createBaseVNode("code", _hoisted_13$2, toDisplayString(showHexId.value ? id.value : unref(nip19_exports).neventEncode({ id: id.value })), 1)
+            ])
+          ]),
+          createBaseVNode("div", null, [
+            _hoisted_14$2,
+            createBaseVNode("div", _hoisted_15$2, [
+              createBaseVNode("code", _hoisted_16$2, toDisplayString(unref(formatedDate)(created_at.value)), 1)
+            ])
+          ])
+        ])) : createCommentVNode("", true),
+        showRawData.value ? (openBlock(), createBlock(RawData, {
+          key: 1,
+          isUserEvent: true,
+          event: _ctx.event,
+          authorEvent: _ctx.event
+        }, null, 8, ["event", "authorEvent"])) : createCommentVNode("", true),
+        createBaseVNode("div", {
+          class: normalizeClass(["event-footer", { "event-footer_flex-end": !showRawData.value }])
+        }, [
+          showRawData.value ? (openBlock(), createElementBlock("div", {
+            key: 0,
+            class: normalizeClass(["event-footer__signature", { "event-footer__signature_invalid": !isSigVerified.value }])
+          }, [
+            isSigVerified.value ? (openBlock(), createBlock(CheckSquareIcon, { key: 0 })) : createCommentVNode("", true),
+            !isSigVerified.value ? (openBlock(), createBlock(InvalidSignatureIcon, { key: 1 })) : createCommentVNode("", true),
+            createBaseVNode("span", _hoisted_17$2, toDisplayString(isSigVerified.value ? "Signature is valid" : "Invalid signature"), 1)
+          ], 2)) : createCommentVNode("", true),
+          createBaseVNode("div", null, [
+            createBaseVNode("span", {
+              class: "event-footer-code",
+              onClick: handleToggleRawData
+            }, "{...}")
+          ])
+        ], 2)
+      ]);
+    };
+  }
+});
+const UserEvent_vue_vue_type_style_index_0_scoped_7d13b372_lang = "";
+const UserEvent = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["__scopeId", "data-v-7d13b372"]]);
+const TWO_DAYS = 2 * 24 * 60 * 60;
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (4294967295 + 1);
+};
+const now = () => Math.round(Date.now() / 1e3);
+const randomNow = () => Math.round(now() - secureRandom() * TWO_DAYS);
+const nip44ConversationKey = (privateKey, publicKey) => nip44_exports.v2.utils.getConversationKey(bytesToHex(privateKey), publicKey);
+const nip44Encrypt = (data, privateKey, publicKey) => nip44_exports.v2.encrypt(JSON.stringify(data), nip44ConversationKey(privateKey, publicKey));
+const nip44Decrypt = (data, privateKey) => JSON.parse(nip44_exports.v2.decrypt(data.content, nip44ConversationKey(privateKey, data.pubkey)));
+const createRumor = (event, privateKey) => {
+  const rumor = {
+    kind: 14,
+    created_at: now(),
+    content: "",
+    tags: [],
+    ...event,
+    pubkey: getPublicKey(privateKey)
+  };
+  rumor.id = getEventHash(rumor);
+  return rumor;
+};
+const createSeal = (rumor, privateKey, recipientPublicKey) => {
+  return finalizeEvent(
+    {
+      kind: 13,
+      content: nip44Encrypt(rumor, privateKey, recipientPublicKey),
+      created_at: randomNow(),
+      tags: []
+    },
+    privateKey
+  );
+};
+const createWrap = (event, recipientPublicKey) => {
+  const randomPrivateKey = generateSecretKey();
+  return finalizeEvent(
+    {
+      kind: 1059,
+      content: nip44Encrypt(event, randomPrivateKey, recipientPublicKey),
+      created_at: randomNow(),
+      tags: [["p", recipientPublicKey]]
+    },
+    randomPrivateKey
+  );
+};
+const loginError = "Please login to follow the user.";
+const relaysError = "Something went wrong, please ensure that your write relays are online.";
+const _sfc_main$g = /* @__PURE__ */ defineComponent({
+  __name: "FollowBtn",
+  props: {
+    isFollowed: { type: Boolean },
+    pubkeyToFollow: {}
+  },
+  emits: ["toggleFollow", "handleFollowError"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const nsecStore = useNsec();
+    const relayStore = useRelay();
+    const ownProfileStore = useOwnProfile();
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const props = __props;
+    const toggleFollow = async () => {
+      const ownPubkey = nsecStore.getPubkey();
+      if (!ownPubkey) {
+        emit2("handleFollowError", loginError);
+        return;
+      }
+      const { isFollowed } = props;
+      const contacts = ownProfileStore.contactsEvent;
+      let tags = (contacts == null ? void 0 : contacts.tags) || [];
+      if (isFollowed) {
+        tags = tags.filter((tag) => tag[0] === "p" && tag[1] !== props.pubkeyToFollow);
+      } else {
+        tags.push(["p", props.pubkeyToFollow]);
+      }
+      const event = prepareContactsEvent(tags);
+      if (!event)
+        return;
+      emit2("toggleFollow");
+      const relays = relayStore.connectedUserWriteRelaysUrls;
+      const result = await publishEventToRelays(relays, pool, event);
+      const isError = result.every((r) => r.success === false);
+      if (isError) {
+        emit2("toggleFollow");
+        emit2("handleFollowError", relaysError);
+        return;
+      }
+      ownProfileStore.updateContactsEvent(event);
+    };
+    const prepareContactsEvent = (tags) => {
+      const privkey = nsecStore.getPrivkeyBytes();
+      if (!privkey)
+        return null;
+      return finalizeEvent(
+        {
+          kind: EVENT_KIND.FOLLOW_LIST,
+          created_at: now(),
+          tags,
+          content: ""
+        },
+        privkey
+      );
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("span", {
+        onClick: toggleFollow,
+        class: normalizeClass(["button", { outline: _ctx.isFollowed }])
+      }, toDisplayString(_ctx.isFollowed ? "unfollow" : "follow"), 3);
+    };
+  }
+});
+const FollowBtn_vue_vue_type_style_index_0_scoped_8646c4c8_lang = "";
+const FollowBtn = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["__scopeId", "data-v-8646c4c8"]]);
+const _sfc_main$f = {};
+const _hoisted_1$e = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-download",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$d = /* @__PURE__ */ createBaseVNode("path", { d: "M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" }, null, -1);
+const _hoisted_3$a = /* @__PURE__ */ createBaseVNode("path", { d: "M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" }, null, -1);
+const _hoisted_4$8 = [
+  _hoisted_2$d,
+  _hoisted_3$a
+];
+function _sfc_render$2(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$e, _hoisted_4$8);
+}
+const DownloadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$2]]);
+const _withScopeId$7 = (n) => (pushScopeId("data-v-f777a106"), n = n(), popScopeId(), n);
+const _hoisted_1$d = {
+  key: 0,
+  class: "loading-notice"
+};
+const _hoisted_2$c = { class: "user" };
+const _hoisted_3$9 = {
+  key: 0,
+  class: "user__avatar-wrapper"
+};
+const _hoisted_4$7 = ["src"];
+const _hoisted_5$5 = { class: "user__info" };
+const _hoisted_6$3 = { class: "user__info__content" };
+const _hoisted_7$2 = { class: "user__nickname-wrapper" };
+const _hoisted_8$2 = { class: "user__nickname" };
+const _hoisted_9$2 = { class: "user-action-error warning" };
+const _hoisted_10$2 = { class: "user__name" };
+const _hoisted_11$2 = {
+  key: 0,
+  class: "user__nip05"
+};
+const _hoisted_12$2 = ["href"];
+const _hoisted_13$1 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("strong", null, "nip05", -1));
+const _hoisted_14$1 = {
+  key: 1,
+  class: "user__contacts"
+};
+const _hoisted_15$1 = { class: "user__contacts-col user__following-cnt" };
+const _hoisted_16$1 = { class: "user__contacts-col user__followers-cnt" };
+const _hoisted_17$1 = { key: 0 };
+const _hoisted_18$1 = {
+  key: 1,
+  class: "user__contacts-download-icon"
+};
+const _hoisted_19$1 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("span", { class: "user__contacts-followers-word" }, " Followers ", -1));
+const _hoisted_20$1 = { class: "user__desc" };
+const _hoisted_21$1 = { key: 2 };
+const _hoisted_22$1 = {
+  key: 3,
+  id: "user-posts"
+};
+const _hoisted_23$1 = { key: 0 };
+const _hoisted_24$1 = { key: 1 };
+const _hoisted_25$1 = {
+  key: 5,
+  class: "not-found"
+};
+const _hoisted_26$1 = { class: "not-found__desc" };
+const _hoisted_27$1 = { key: 0 };
+const _hoisted_28$1 = { key: 1 };
+const _sfc_main$e = /* @__PURE__ */ defineComponent({
+  __name: "User",
+  setup(__props) {
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const npubStore = useNpub();
+    const userNotesStore = useUserNotes();
+    const userStore = useUser();
+    const imagesStore = useImages();
+    const nsecStore = useNsec();
+    const relayStore = useRelay();
+    const metasCacheStore = useMetasCache();
+    const ownProfileStore = useOwnProfile();
+    const userEvent = ref({});
+    const userDetails = ref({});
+    const isUserHasValidNip05 = ref(false);
+    ref("");
+    const showNotFoundError = ref(false);
+    const pubHex = ref("");
+    const showLoadingUser = ref(false);
+    const notFoundFallbackError = ref("");
+    const isLoadingFallback = ref(false);
+    const showLoadingTextNotes = ref(false);
+    const isAutoConnectOnSearch = ref(false);
+    const isOffline = ref(false);
+    const isFollowed = ref(false);
+    const showFollowBtn = ref(false);
+    const userActionError = ref("");
+    const isEventSearch = ref(false);
+    const isRootEventSearch = ref(true);
+    const currentPage = ref(1);
+    const pagesCount = computed(
+      () => Math.ceil(userNotesStore.allNotesIds.length / DEFAULT_EVENTS_COUNT)
+    );
+    const router2 = useRouter();
+    const route = useRoute();
+    const nip05toURL = (identifier) => {
+      const [name, domain] = identifier.split("@");
+      return `https://${domain}/.well-known/nostr.json?name=${name}`;
+    };
+    const currentReadRelays = ref([]);
+    onMounted(() => {
+      var _a, _b, _c, _d;
+      if (((_b = (_a = route.params) == null ? void 0 : _a.id) == null ? void 0 : _b.length) && !relayStore.currentRelay.connected) {
+        npubStore.updateNpubInput(route.params.id);
+        npubStore.updateCachedUrl(route.params.id);
+        if (!relayStore.currentRelay.connected) {
+          isAutoConnectOnSearch.value = true;
+        }
+        isOffline.value = true;
+        handleGetUserInfo();
+        return;
+      }
+      if (userStore.isRoutingUser && npubStore.npubInput.length) {
+        npubStore.updateCachedUrl(npubStore.npubInput);
+        userStore.updateRoutingStatus(false);
+        handleGetUserInfo();
+        return;
+      }
+      if (!npubStore.npubInput.length && ((_d = (_c = route.params) == null ? void 0 : _c.id) == null ? void 0 : _d.length)) {
+        npubStore.updateNpubInput(route.params.id);
+        npubStore.updateCachedUrl(route.params.id);
+        userStore.updateRoutingStatus(false);
+        handleGetUserInfo();
+        return;
+      }
+    });
+    onUnmounted(() => {
+      flushData();
+      if (!userStore.isSearchUsed) {
+        npubStore.updateNpubInput("");
+      }
+      userStore.updateSearchStatus(false);
+    });
+    watch(
+      () => route.params,
+      () => {
+        if (userStore.isRoutingUser) {
+          npubStore.updateCachedUrl(npubStore.npubInput);
+          userStore.updateRoutingStatus(false);
+          handleGetUserInfo();
+        }
+      }
+    );
+    watch(
+      () => route.redirectedFrom,
+      () => {
+        npubStore.updateNpubInput(route.params.id);
+        npubStore.updateCachedUrl(route.params.id);
+        flushData();
+      }
+    );
+    watch(
+      () => relayStore.isConnectingToReadWriteRelays,
+      (value) => {
+        if (value && !isAutoConnectOnSearch.value) {
+          flushData();
+        }
+      }
+    );
+    watch(
+      () => relayStore.isConnectedToReadWriteRelays,
+      (value) => {
+        if (value && !isAutoConnectOnSearch.value) {
+          handleGetUserInfo();
+        }
+      }
+    );
+    const showUserPage = async (page) => {
+      const relays = currentReadRelays.value;
+      if (!relays.length)
+        return;
+      const limit = DEFAULT_EVENTS_COUNT;
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      const idsToShow = userNotesStore.allNotesIds.slice(start, end);
+      const posts = await pool.querySync(relays, { ids: idsToShow });
+      await loadAndInjectDataToRootPosts(posts, relays);
+      userNotesStore.updateNotes(posts);
+      currentPage.value = page;
+    };
+    const flushData = () => {
+      userEvent.value = {};
+      userDetails.value = {};
+      userNotesStore.updateNotes([]);
+      userNotesStore.updateIds([]);
+      isFollowed.value = false;
+      showFollowBtn.value = false;
+      userActionError.value = "";
+    };
+    const handleGetUserInfo = async (isFallbackSearch = false) => {
+      gettingUserInfoId.update(gettingUserInfoId.value + 1);
+      const currentOperationId = gettingUserInfoId.value;
+      const searchVal = npubStore.npubInput;
+      let isHexSearch = false;
+      isEventSearch.value = false;
+      if (isSHA256Hex(searchVal)) {
+        pubHex.value = searchVal;
+        isHexSearch = true;
+      } else {
+        try {
+          const { data, type } = getNip19FromSearch(searchVal);
+          isEventSearch.value = type === "note";
+          pubHex.value = data.toString();
+        } catch (e) {
+          npubStore.setError(e.message);
+          return;
+        }
+      }
+      flushData();
+      if (isFallbackSearch) {
+        isLoadingFallback.value = true;
+      }
+      if (currentOperationId !== gettingUserInfoId.value)
+        return;
+      const relays = isFallbackSearch ? fallbackRelays : relayStore.connectedUserReadWriteUrlsWithSelectedRelay;
+      if (!relays.length) {
+        isOffline.value = true;
+        return;
+      }
+      if (npubStore.error.length) {
+        npubStore.setError("");
+      }
+      if (!isFallbackSearch) {
+        showLoadingUser.value = true;
+      }
+      let notesEvents = [];
+      if (isEventSearch.value || isHexSearch) {
+        const eventId = pubHex.value;
+        notesEvents = await pool.querySync(relays, {
+          kinds: [1],
+          ids: [eventId]
+        });
+        if (currentOperationId !== gettingUserInfoId.value)
+          return;
+        if (notesEvents.length) {
+          const event = notesEvents[0];
+          pubHex.value = event.pubkey;
+          isEventSearch.value = event.kind === 1;
+        }
+      }
+      const authorMeta = await pool.get(relays, { kinds: [0], limit: 1, authors: [pubHex.value] });
+      if (currentOperationId !== gettingUserInfoId.value)
+        return;
+      if (!authorMeta) {
+        if (isFallbackSearch) {
+          isLoadingFallback.value = false;
+          notFoundFallbackError.value = "User or event was not found on listed relays.";
+        } else {
+          showLoadingUser.value = false;
+          showNotFoundError.value = true;
+        }
+        return;
+      }
+      metasCacheStore.addMeta(authorMeta);
+      currentReadRelays.value = relays;
+      const contactsPubkeys = [pubHex.value];
+      const ownPubkey = nsecStore.getPubkey();
+      if (ownPubkey.length && ownPubkey !== pubHex.value) {
+        contactsPubkeys.push(ownPubkey);
+      }
+      let contacts = await pool.querySync(relays, { kinds: [3], authors: contactsPubkeys });
+      if (currentOperationId !== gettingUserInfoId.value)
+        return;
+      contacts = dedupByPubkeyAndSortEvents(contacts);
+      const userContacts = contacts.find((event) => event.pubkey === pubHex.value);
+      if (ownPubkey !== pubHex.value) {
+        const ownContacts = contacts.find((event) => event.pubkey === ownPubkey);
+        if (ownContacts) {
+          isFollowed.value = ownContacts.tags.some((tag) => tag[0] === "p" && tag[1] === pubHex.value) || false;
+          ownProfileStore.updateContactsEvent(ownContacts);
+        }
+        showFollowBtn.value = true;
+      }
+      userEvent.value = authorMeta;
+      userDetails.value = JSON.parse(authorMeta.content);
+      userDetails.value.followingCount = (userContacts == null ? void 0 : userContacts.tags.length) || 0;
+      if (isFallbackSearch) {
+        notFoundFallbackError.value = "";
+        isLoadingFallback.value = false;
+        isOffline.value = false;
+      } else {
+        showLoadingUser.value = false;
+      }
+      isUserHasValidNip05.value = false;
+      showNotFoundError.value = false;
+      routeSearch(searchVal, isEventSearch.value);
+      showLoadingTextNotes.value = true;
+      checkAndShowNip05(currentOperationId);
+      if (!isEventSearch.value) {
+        try {
+          const notes = await loadUserNotes(relays, currentOperationId);
+          if (currentOperationId !== gettingUserInfoId.value)
+            return;
+          notesEvents = notes.viewNotes;
+          userNotesStore.updateIds(notes.allNotes.map((event) => event.id));
+          currentPage.value = 1;
+        } catch (e) {
+          return;
+        }
+      }
+      if (isEventSearch.value) {
+        const event = notesEvents[0];
+        await injectDataToUserEvent(notesEvents[0], relays);
+        if (currentOperationId !== gettingUserInfoId.value)
+          return;
+        userNotesStore.updateIds([event.id]);
+      }
+      userNotesStore.updateNotes(notesEvents);
+      showLoadingTextNotes.value = false;
+    };
+    const routeSearch = (searchVal, isEventSearch2) => {
+      if (isEventSearch2) {
+        router2.push({ path: `/event/${searchVal}` });
+      } else {
+        router2.push({ path: `/user/${searchVal}` });
+      }
+      npubStore.updateCachedUrl(searchVal);
+    };
+    const loadUserNotes = async (relays, currentOperationId = 0) => {
+      let notes = await pool.querySync(relays, {
+        kinds: [1],
+        authors: [pubHex.value]
+      });
+      if (currentOperationId && currentOperationId !== gettingUserInfoId.value) {
+        throw new Error("Operation was canceled");
+      }
+      notes = notes.filter((event) => !isReply(event));
+      notes = notes.sort((a, b) => b.created_at - a.created_at);
+      const allNotes = [...notes];
+      const viewNotes = notes.slice(0, DEFAULT_EVENTS_COUNT);
+      await loadAndInjectDataToRootPosts(viewNotes, relays);
+      return { viewNotes, allNotes };
+    };
+    const injectDataToUserEvent = async (event, relays) => {
+      const nip10Data = nip10_exports.parse(event);
+      const nip10ParentEvent = nip10Data.reply || nip10Data.root;
+      if (nip10ParentEvent) {
+        isRootEventSearch.value = false;
+        const parentEvent = await getEventWithAuthorById(
+          nip10ParentEvent.id,
+          relays,
+          pool
+        );
+        await loadAndInjectDataToReplyPosts([event], parentEvent, relays);
+      } else {
+        await loadAndInjectDataToRootPosts([event], relays);
+      }
+    };
+    const loadAndInjectDataToRootPosts = async (events, relays) => {
+      const isRootPosts = true;
+      const parentEvent = null;
+      const userRelaysMap = {};
+      await loadAndInjectDataToPosts(
+        events,
+        parentEvent,
+        userRelaysMap,
+        relays,
+        metasCacheStore,
+        pool,
+        isRootPosts
+      );
+    };
+    const loadAndInjectDataToReplyPosts = async (events, parentEvent, relays) => {
+      const isRootPosts = false;
+      const userRelaysMap = {};
+      await loadAndInjectDataToPosts(
+        events,
+        parentEvent,
+        userRelaysMap,
+        relays,
+        metasCacheStore,
+        pool,
+        isRootPosts
+      );
+    };
+    const checkAndShowNip05 = async (currentOperationId = 0) => {
+      const nip05Identifier = userDetails.value.nip05;
+      const userPubkey = userEvent.value.pubkey;
+      if (!nip05Identifier || !userPubkey)
+        return;
+      try {
+        const validNip = await isValidNip05(nip05Identifier, userPubkey);
+        if (currentOperationId && currentOperationId !== gettingUserInfoId.value) {
+          return;
+        }
+        isUserHasValidNip05.value = validNip;
+      } catch (e) {
+        console.log("Failed to check nip05");
+      }
+    };
+    const isValidNip05 = async (identifier, metaEventPubkey) => {
+      const profile = await nip05_exports.queryProfile(identifier);
+      return metaEventPubkey === (profile == null ? void 0 : profile.pubkey);
+    };
+    const handleSearchFallback = () => {
+      const isFallbackSearch = true;
+      handleGetUserInfo(isFallbackSearch);
+    };
+    const handleLoadUserFollowers = async () => {
+      const usedPubkeys = /* @__PURE__ */ new Set();
+      userDetails.value.followersCount = 0;
+      const sub = pool.subscribeMany(
+        currentReadRelays.value,
+        [{ "#p": [pubHex.value], kinds: [3] }],
+        {
+          onevent(event) {
+            if (usedPubkeys.has(event.pubkey))
+              return;
+            usedPubkeys.add(event.pubkey);
+            userDetails.value.followersCount = userDetails.value.followersCount + 1;
+          },
+          oneose() {
+            sub.close();
+          }
+        }
+      );
+    };
+    const handleToggleRawData = (eventId) => {
+      userNotesStore.toggleRawData(eventId);
+    };
+    const toggleFollow = () => {
+      isFollowed.value = !isFollowed.value;
+    };
+    const handleUserActionError = (error) => {
+      userActionError.value = error;
+      setTimeout(() => {
+        userActionError.value = "";
+      }, 1e4);
+    };
+    const showDisplayName = (author) => {
+      const { username, name, display_name } = author;
+      return (username == null ? void 0 : username.length) || (name == null ? void 0 : name.length) ? display_name || "" : "";
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        showLoadingUser.value ? (openBlock(), createElementBlock("div", _hoisted_1$d, "Loading profile info...")) : createCommentVNode("", true),
+        userEvent.value.id ? (openBlock(), createBlock(UserEvent, {
+          author: userDetails.value,
+          event: userEvent.value,
+          key: userEvent.value.id
+        }, {
+          default: withCtx(() => [
+            createBaseVNode("div", _hoisted_2$c, [
+              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_3$9, [
+                createBaseVNode("img", {
+                  alt: "user's avatar",
+                  class: "user__avatar",
+                  src: userDetails.value.picture
+                }, null, 8, _hoisted_4$7)
+              ])) : createCommentVNode("", true),
+              createBaseVNode("div", _hoisted_5$5, [
+                createBaseVNode("div", _hoisted_6$3, [
+                  createBaseVNode("div", _hoisted_7$2, [
+                    createBaseVNode("span", _hoisted_8$2, toDisplayString(unref(getDisplayUsername)(userDetails.value, pubHex.value)), 1),
+                    showFollowBtn.value ? (openBlock(), createBlock(FollowBtn, {
+                      key: 0,
+                      pubkeyToFollow: pubHex.value,
+                      isFollowed: isFollowed.value,
+                      onToggleFollow: toggleFollow,
+                      onHandleFollowError: handleUserActionError
+                    }, null, 8, ["pubkeyToFollow", "isFollowed"])) : createCommentVNode("", true)
+                  ]),
+                  createBaseVNode("div", _hoisted_9$2, toDisplayString(userActionError.value), 1),
+                  createBaseVNode("div", _hoisted_10$2, toDisplayString(showDisplayName(userDetails.value)), 1),
+                  isUserHasValidNip05.value ? (openBlock(), createElementBlock("div", _hoisted_11$2, [
+                    createBaseVNode("a", {
+                      target: "_blank",
+                      href: nip05toURL(userDetails.value.nip05)
+                    }, [
+                      _hoisted_13$1,
+                      createTextVNode(": " + toDisplayString(userDetails.value.nip05), 1)
+                    ], 8, _hoisted_12$2)
+                  ])) : createCommentVNode("", true),
+                  userDetails.value.followingCount >= 0 ? (openBlock(), createElementBlock("div", _hoisted_14$1, [
+                    createBaseVNode("span", _hoisted_15$1, [
+                      createBaseVNode("b", null, toDisplayString(userDetails.value.followingCount), 1),
+                      createTextVNode(" Following ")
+                    ]),
+                    createBaseVNode("span", _hoisted_16$1, [
+                      userDetails.value.followersCount ? (openBlock(), createElementBlock("b", _hoisted_17$1, toDisplayString(userDetails.value.followersCount), 1)) : (openBlock(), createElementBlock("span", _hoisted_18$1, [
+                        createVNode(DownloadIcon, { onClick: handleLoadUserFollowers })
+                      ])),
+                      _hoisted_19$1
+                    ])
+                  ])) : createCommentVNode("", true)
+                ])
+              ])
+            ]),
+            createBaseVNode("div", _hoisted_20$1, toDisplayString(userDetails.value.about || ""), 1)
+          ]),
+          _: 1
+        }, 8, ["author", "event"])) : createCommentVNode("", true),
+        showLoadingTextNotes.value ? (openBlock(), createElementBlock("div", _hoisted_21$1, "Loading notes...")) : createCommentVNode("", true),
+        unref(userNotesStore).notes.length > 0 && !showLoadingTextNotes.value ? (openBlock(), createElementBlock("h3", _hoisted_22$1, [
+          isEventSearch.value ? (openBlock(), createElementBlock("span", _hoisted_23$1, "Event info")) : (openBlock(), createElementBlock("span", _hoisted_24$1, "User notes"))
+        ])) : createCommentVNode("", true),
+        (openBlock(true), createElementBlock(Fragment, null, renderList(unref(userNotesStore).notes, (event, i2) => {
+          return openBlock(), createBlock(ParentEventView, {
+            key: event.id,
+            hasReplyBtn: true,
+            showRootReplies: isRootEventSearch.value,
+            currentReadRelays: currentReadRelays.value,
+            index: i2,
+            onToggleRawData: handleToggleRawData,
+            event
+          }, null, 8, ["showRootReplies", "currentReadRelays", "index", "event"]);
+        }), 128)),
+        !showLoadingTextNotes.value && !showLoadingUser.value ? (openBlock(), createBlock(Pagination, {
+          key: 4,
+          pagesCount: pagesCount.value,
+          currentPage: currentPage.value,
+          onShowPage: showUserPage
+        }, null, 8, ["pagesCount", "currentPage"])) : createCommentVNode("", true),
+        showNotFoundError.value || isOffline.value ? (openBlock(), createElementBlock("div", _hoisted_25$1, [
+          createBaseVNode("div", _hoisted_26$1, [
+            showNotFoundError.value ? (openBlock(), createElementBlock("span", _hoisted_27$1, " Data was not found on selected relay. Please try to connect to another one or you can try to load info from the list of popular relays. ")) : createCommentVNode("", true),
+            isOffline.value ? (openBlock(), createElementBlock("span", _hoisted_28$1, "Please connect first or search in the list of popular relays.")) : createCommentVNode("", true)
+          ]),
+          createBaseVNode("div", null, [
+            createBaseVNode("button", {
+              onClick: handleSearchFallback,
+              class: "fallback-search-btn"
+            }, " Search in the listed relays "),
+            createBaseVNode("div", {
+              class: normalizeClass(["not-found__status", { warning: notFoundFallbackError.value.length }])
+            }, toDisplayString(notFoundFallbackError.value) + " " + toDisplayString(isLoadingFallback.value ? "Searching..." : ""), 3),
+            createBaseVNode("ul", null, [
+              (openBlock(true), createElementBlock(Fragment, null, renderList(unref(fallbackRelays), (relay) => {
+                return openBlock(), createElementBlock("li", null, toDisplayString(relay), 1);
+              }), 256))
+            ])
+          ])
+        ])) : createCommentVNode("", true)
+      ], 64);
+    };
+  }
+});
+const User_vue_vue_type_style_index_0_scoped_f777a106_lang = "";
+const User = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["__scopeId", "data-v-f777a106"]]);
+const _sfc_main$d = {};
+const _hoisted_1$c = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-trash",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$b = /* @__PURE__ */ createBaseVNode("path", { d: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" }, null, -1);
+const _hoisted_3$8 = /* @__PURE__ */ createBaseVNode("path", { d: "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" }, null, -1);
+const _hoisted_4$6 = [
+  _hoisted_2$b,
+  _hoisted_3$8
+];
+function _sfc_render$1(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$c, _hoisted_4$6);
+}
+const TrashIcon = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$1]]);
+const _withScopeId$6 = (n) => (pushScopeId("data-v-df6b991a"), n = n(), popScopeId(), n);
+const _hoisted_1$b = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Images:", -1));
+const _hoisted_2$a = { class: "show-images" };
+const _hoisted_3$7 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your relays:", -1));
+const _hoisted_4$5 = { class: "error" };
+const _hoisted_5$4 = { class: "warning" };
+const _hoisted_6$2 = { class: "relays" };
+const _hoisted_7$1 = { class: "actions" };
+const _hoisted_8$1 = ["onChange", "id", "name", "checked"];
+const _hoisted_9$1 = ["for"];
+const _hoisted_10$1 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("span", { class: "actions__delimiter" }, " | ", -1));
+const _hoisted_11$1 = ["onClick"];
+const _hoisted_12$1 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("span", { class: "actions__remove-label" }, "remove", -1));
+const _hoisted_13 = { key: 0 };
+const _hoisted_14 = { key: 1 };
+const _hoisted_15 = { key: 2 };
+const _hoisted_16 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Add relay:", -1));
+const _hoisted_17 = { class: "add-relay" };
+const _hoisted_18 = { class: "error" };
+const _hoisted_19 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your Keys:", -1));
+const _hoisted_20 = { class: "keys" };
+const _hoisted_21 = { class: "key-block" };
+const _hoisted_22 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", null, "Public key:", -1));
+const _hoisted_23 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", { class: "key-block__desc" }, [
+  /* @__PURE__ */ createBaseVNode("small", null, " Public key identifies your Nostr account. Feel free to share it with others. ")
+], -1));
+const _hoisted_24 = {
+  key: 0,
+  class: "key-block__code"
+};
+const _hoisted_25 = { key: 1 };
+const _hoisted_26 = { class: "key-block" };
+const _hoisted_27 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", null, "Private key:", -1));
+const _hoisted_28 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", { class: "key-block__desc" }, [
+  /* @__PURE__ */ createBaseVNode("small", null, [
+    /* @__PURE__ */ createTextVNode(" Private key fully controls your Nostr account and used to cryptographically sign your messages. "),
+    /* @__PURE__ */ createBaseVNode("b", null, "Do not share your private key with anyone and keep it secure.")
+  ])
+], -1));
+const _hoisted_29 = {
+  key: 0,
+  class: "key-block__code"
+};
+const _hoisted_30 = { key: 1 };
+const _hoisted_31 = {
+  key: 3,
+  class: "logout-block"
+};
+const _hoisted_32 = { key: 0 };
+const _hoisted_33 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-door-closed" }, null, -1));
+const _hoisted_34 = { key: 1 };
+const _hoisted_35 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-door-closed" }, null, -1));
+const UPDATING_RELAY_ERROR = "Updating relays error. Please reload the page and try again or write us about the issue.";
+const _sfc_main$c = /* @__PURE__ */ defineComponent({
+  __name: "Settings",
+  emits: ["relayConnect", "relayDisconnect", "clearAppState"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const poolStore = usePool();
+    const nsecStore = useNsec();
+    const feedStore = useFeed();
+    const imagesStore = useImages();
+    const pool = poolStore.pool;
+    const relayStore = useRelay();
+    const newRelayUrl = ref("");
+    const relayUrlError = ref("");
+    const relaysError2 = ref("");
+    const relaysWarning = ref("");
+    const prepareNip65Event = (tags) => {
+      relaysError2.value = "";
+      const nsecValue = nsecStore.nsec ? nsecStore.nsec.trim() : "";
+      if (!nsecValue.length) {
+        relaysError2.value = "Please provide your private key.";
+        return;
+      }
+      let privkey;
+      let pubkey;
+      try {
+        privkey = nsecStore.getPrivkeyBytes();
+        if (!privkey) {
+          throw new Error();
+        }
+        pubkey = nsecStore.getPubkey();
+        if (!pubkey.length) {
+          throw new Error();
+        }
+      } catch (e) {
+        relaysError2.value = `Invalid private key. Please check it and try again.`;
+        return;
+      }
+      const event = {
+        kind: 10002,
+        pubkey,
+        created_at: Math.floor(Date.now() / 1e3),
+        content: "",
+        tags
+      };
+      return finalizeEvent(event, privkey);
+    };
+    const handleWriteClick = async (e, relay) => {
+      relaysError2.value = "";
+      const isChecked = e.target.checked;
+      if (isChecked) {
+        relayStore.addWriteRelay(relay);
+      } else {
+        relayStore.removeWriteRelay(relay);
+      }
+      const tags = relayStore.nip65Tags;
+      const signedEvent = prepareNip65Event(tags);
+      if (!signedEvent) {
+        relaysError2.value = UPDATING_RELAY_ERROR;
+        return;
+      }
+      const result = await publishEventToRelays(
+        relayStore.allRelaysUrlsWithSelectedRelay,
+        pool,
+        signedEvent
+      );
+      const hasSuccess = result.some((data) => data.success);
+      if (!hasSuccess) {
+        relaysError2.value = UPDATING_RELAY_ERROR;
+        return;
+      }
+      feedStore.setToRemountFeed(true);
+      if (isChecked) {
+        relayStore.addConnectedUserWriteRelay(relay);
+      } else {
+        relayStore.removeConnectedUserWriteRelay(relay);
+      }
+    };
+    const handleRemoveClick = async (relay) => {
+      relaysError2.value = "";
+      relayStore.removeUserRelay(relay);
+      const tags = relayStore.nip65Tags;
+      const signedEvent = prepareNip65Event(tags);
+      if (!signedEvent) {
+        relaysError2.value = UPDATING_RELAY_ERROR;
+        return;
+      }
+      const result = await publishEventToRelays(
+        relayStore.allRelaysUrlsWithSelectedRelay,
+        pool,
+        signedEvent
+      );
+      const hasSuccess = result.some((data) => data.success);
+      if (!hasSuccess) {
+        relaysError2.value = UPDATING_RELAY_ERROR;
+      }
+      feedStore.setToRemountFeed(true);
+    };
+    const handleAddRelay = async () => {
+      let relay = "";
+      relaysError2.value = "";
+      relayUrlError.value = "";
+      try {
+        relay = utils_exports.normalizeURL(newRelayUrl.value);
+      } catch (e) {
+        relayUrlError.value = "Invalid relay url.";
+        return;
+      }
+      relayStore.addUserRelay(relay);
+      newRelayUrl.value = "";
+      const tags = relayStore.nip65Tags;
+      const signedEvent = prepareNip65Event(tags);
+      if (!signedEvent) {
+        relaysError2.value = UPDATING_RELAY_ERROR;
+        return;
+      }
+      const result = await publishEventToRelays(
+        relayStore.allRelaysUrlsWithSelectedRelay,
+        pool,
+        signedEvent
+      );
+      const hasSuccess = result.some((data) => data.success);
+      if (!hasSuccess) {
+        relaysError2.value = UPDATING_RELAY_ERROR;
+        relayStore.removeUserRelay(relay);
+        return;
+      }
+      feedStore.setToRemountFeed(true);
+      relayStore.addConnectedUserReadRelay(relay);
+    };
+    const toggleImages = () => {
+      imagesStore.updateShowImages(!imagesStore.showImages);
+    };
+    const handleCopyPubkeyNpub = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      const pubkey = nsecStore.getPubkey();
+      navigator.clipboard.writeText(nip19_exports.npubEncode(pubkey));
+    };
+    const handleCopyPubkeyHex = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      navigator.clipboard.writeText(nsecStore.getPubkey());
+    };
+    const handleCopyPrivkeyNsec = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      navigator.clipboard.writeText(nsecStore.getPrivkey());
+    };
+    const handleCopyPrivkeyHex = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      navigator.clipboard.writeText(nsecStore.getPrivkeyHex());
+    };
+    const logout = () => {
+      emit2("clearAppState");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$b,
+        createBaseVNode("div", _hoisted_2$a, [
+          createVNode(_sfc_main$l, {
+            showImages: unref(imagesStore).showImages,
+            onToggleImages: toggleImages
+          }, null, 8, ["showImages"])
+        ]),
+        _hoisted_3$7,
+        createBaseVNode("div", _hoisted_4$5, toDisplayString(relaysError2.value), 1),
+        createBaseVNode("div", _hoisted_5$4, toDisplayString(relaysWarning.value), 1),
+        createBaseVNode("ul", _hoisted_6$2, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(unref(relayStore).userReadWriteRelays, (r, i2) => {
+            return openBlock(), createElementBlock("li", {
+              class: "relay",
+              key: i2
+            }, [
+              createTextVNode(toDisplayString(r.url) + " ", 1),
+              createBaseVNode("div", _hoisted_7$1, [
+                createBaseVNode("input", {
+                  onChange: (e) => handleWriteClick(e, r.url),
+                  class: "actions__checkbox",
+                  type: "checkbox",
+                  id: `write-${i2}`,
+                  name: `write-${i2}`,
+                  checked: r.type === "write"
+                }, null, 40, _hoisted_8$1),
+                createBaseVNode("label", {
+                  class: "actions__label",
+                  for: `write-${i2}`
+                }, " publish to relay", 8, _hoisted_9$1),
+                _hoisted_10$1,
+                createBaseVNode("span", {
+                  onClick: () => handleRemoveClick(r.url),
+                  class: "actions__remove"
+                }, [
+                  createVNode(TrashIcon, { class: "trash-icon" }),
+                  _hoisted_12$1
+                ], 8, _hoisted_11$1)
+              ])
+            ]);
+          }), 128))
+        ]),
+        unref(relayStore).isConnectedToRelay && unref(nsecStore).isValidNsecPresented() && !unref(relayStore).userReadWriteRelays.length ? (openBlock(), createElementBlock("div", _hoisted_13, [
+          createTextVNode(" The list with your relays was not found on "),
+          createBaseVNode("b", null, toDisplayString(unref(relayStore).currentRelay.url), 1)
+        ])) : createCommentVNode("", true),
+        !unref(relayStore).isConnectedToRelay || !unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("div", _hoisted_14, " Please login to see and edit the list of your relays. ")) : createCommentVNode("", true),
+        unref(relayStore).isConnectedToRelay && unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("div", _hoisted_15, [
+          _hoisted_16,
+          createBaseVNode("div", _hoisted_17, [
+            withDirectives(createBaseVNode("input", {
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => newRelayUrl.value = $event),
+              class: "add-relay__input",
+              type: "text",
+              placeholder: "[wss://]relay.url"
+            }, null, 512), [
+              [vModelText, newRelayUrl.value]
+            ]),
+            createBaseVNode("button", {
+              onClick: handleAddRelay,
+              class: "add-relay__btn"
+            }, "Add")
+          ]),
+          createBaseVNode("div", _hoisted_18, toDisplayString(relayUrlError.value), 1)
+        ])) : createCommentVNode("", true),
+        _hoisted_19,
+        createBaseVNode("div", _hoisted_20, [
+          createBaseVNode("div", _hoisted_21, [
+            _hoisted_22,
+            _hoisted_23,
+            createBaseVNode("div", null, [
+              createTextVNode(" 🔑  "),
+              unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("code", _hoisted_24, toDisplayString(unref(nip19_exports).npubEncode(unref(nsecStore).getPubkey())), 1)) : (openBlock(), createElementBlock("span", _hoisted_25, "Please login to see your public key."))
+            ]),
+            createBaseVNode("div", { class: "key-block__btns" }, [
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPubkeyNpub
+              }, "Copy pubkey"),
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPubkeyHex
+              }, "Copy hex")
+            ])
+          ]),
+          createBaseVNode("div", _hoisted_26, [
+            _hoisted_27,
+            _hoisted_28,
+            createBaseVNode("div", null, [
+              createTextVNode(" 🔐  "),
+              unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("code", _hoisted_29, " *************************************************************** ")) : (openBlock(), createElementBlock("span", _hoisted_30, "Please login to get your private key."))
+            ]),
+            createBaseVNode("div", { class: "key-block__btns" }, [
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPrivkeyNsec
+              }, "Copy privkey"),
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPrivkeyHex
+              }, "Copy hex")
+            ])
+          ])
+        ]),
+        unref(relayStore).isConnectedToRelay ? (openBlock(), createElementBlock("div", _hoisted_31, [
+          createBaseVNode("button", {
+            class: "logout-btn",
+            onClick: logout
+          }, [
+            unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("span", _hoisted_32, [
+              createTextVNode(" Log Out "),
+              _hoisted_33
+            ])) : (openBlock(), createElementBlock("span", _hoisted_34, [
+              createTextVNode("Disconnect "),
+              _hoisted_35
+            ]))
+          ])
+        ])) : createCommentVNode("", true)
+      ], 64);
+    };
+  }
+});
+const Settings_vue_vue_type_style_index_0_scoped_df6b991a_lang = "";
+const Settings = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["__scopeId", "data-v-df6b991a"]]);
+function setBigUint64(view, byteOffset, value, isLE2) {
+  if (typeof view.setBigUint64 === "function")
+    return view.setBigUint64(byteOffset, value, isLE2);
+  const _32n = BigInt(32);
+  const _u32_max = BigInt(4294967295);
+  const wh = Number(value >> _32n & _u32_max);
+  const wl = Number(value & _u32_max);
+  const h2 = isLE2 ? 4 : 0;
+  const l = isLE2 ? 0 : 4;
+  view.setUint32(byteOffset + h2, wh, isLE2);
+  view.setUint32(byteOffset + l, wl, isLE2);
+}
+const Chi = (a, b, c) => a & b ^ ~a & c;
+const Maj = (a, b, c) => a & b ^ a & c ^ b & c;
+class HashMD extends Hash3 {
+  constructor(blockLen, outputLen, padOffset, isLE2) {
+    super();
+    this.blockLen = blockLen;
+    this.outputLen = outputLen;
+    this.padOffset = padOffset;
+    this.isLE = isLE2;
+    this.finished = false;
+    this.length = 0;
+    this.pos = 0;
+    this.destroyed = false;
+    this.buffer = new Uint8Array(blockLen);
+    this.view = createView(this.buffer);
+  }
+  update(data) {
+    exists(this);
+    const { view, buffer, blockLen } = this;
+    data = toBytes(data);
+    const len = data.length;
+    for (let pos = 0; pos < len; ) {
+      const take = Math.min(blockLen - this.pos, len - pos);
+      if (take === blockLen) {
+        const dataView = createView(data);
+        for (; blockLen <= len - pos; pos += blockLen)
+          this.process(dataView, pos);
+        continue;
+      }
+      buffer.set(data.subarray(pos, pos + take), this.pos);
+      this.pos += take;
+      pos += take;
+      if (this.pos === blockLen) {
+        this.process(view, 0);
+        this.pos = 0;
+      }
+    }
+    this.length += data.length;
+    this.roundClean();
+    return this;
+  }
+  digestInto(out) {
+    exists(this);
+    output(out, this);
+    this.finished = true;
+    const { buffer, view, blockLen, isLE: isLE2 } = this;
+    let { pos } = this;
+    buffer[pos++] = 128;
+    this.buffer.subarray(pos).fill(0);
+    if (this.padOffset > blockLen - pos) {
+      this.process(view, 0);
+      pos = 0;
+    }
+    for (let i2 = pos; i2 < blockLen; i2++)
+      buffer[i2] = 0;
+    setBigUint64(view, blockLen - 8, BigInt(this.length * 8), isLE2);
+    this.process(view, 0);
+    const oview = createView(out);
+    const len = this.outputLen;
+    if (len % 4)
+      throw new Error("_sha2: outputLen should be aligned to 32bit");
+    const outLen = len / 4;
+    const state = this.get();
+    if (outLen > state.length)
+      throw new Error("_sha2: outputLen bigger than state");
+    for (let i2 = 0; i2 < outLen; i2++)
+      oview.setUint32(4 * i2, state[i2], isLE2);
+  }
+  digest() {
+    const { buffer, outputLen } = this;
+    this.digestInto(buffer);
+    const res = buffer.slice(0, outputLen);
+    this.destroy();
+    return res;
+  }
+  _cloneInto(to) {
+    to || (to = new this.constructor());
+    to.set(...this.get());
+    const { blockLen, buffer, length, finished, destroyed, pos } = this;
+    to.length = length;
+    to.pos = pos;
+    to.finished = finished;
+    to.destroyed = destroyed;
+    if (length % blockLen)
+      to.buffer.set(buffer);
+    return to;
+  }
+}
+const SHA256_K = /* @__PURE__ */ new Uint32Array([
+  1116352408,
+  1899447441,
+  3049323471,
+  3921009573,
+  961987163,
+  1508970993,
+  2453635748,
+  2870763221,
+  3624381080,
+  310598401,
+  607225278,
+  1426881987,
+  1925078388,
+  2162078206,
+  2614888103,
+  3248222580,
+  3835390401,
+  4022224774,
+  264347078,
+  604807628,
+  770255983,
+  1249150122,
+  1555081692,
+  1996064986,
+  2554220882,
+  2821834349,
+  2952996808,
+  3210313671,
+  3336571891,
+  3584528711,
+  113926993,
+  338241895,
+  666307205,
+  773529912,
+  1294757372,
+  1396182291,
+  1695183700,
+  1986661051,
+  2177026350,
+  2456956037,
+  2730485921,
+  2820302411,
+  3259730800,
+  3345764771,
+  3516065817,
+  3600352804,
+  4094571909,
+  275423344,
+  430227734,
+  506948616,
+  659060556,
+  883997877,
+  958139571,
+  1322822218,
+  1537002063,
+  1747873779,
+  1955562222,
+  2024104815,
+  2227730452,
+  2361852424,
+  2428436474,
+  2756734187,
+  3204031479,
+  3329325298
+]);
+const SHA256_IV = /* @__PURE__ */ new Uint32Array([
+  1779033703,
+  3144134277,
+  1013904242,
+  2773480762,
+  1359893119,
+  2600822924,
+  528734635,
+  1541459225
+]);
+const SHA256_W = /* @__PURE__ */ new Uint32Array(64);
+class SHA2563 extends HashMD {
+  constructor() {
+    super(64, 32, 8, false);
+    this.A = SHA256_IV[0] | 0;
+    this.B = SHA256_IV[1] | 0;
+    this.C = SHA256_IV[2] | 0;
+    this.D = SHA256_IV[3] | 0;
+    this.E = SHA256_IV[4] | 0;
+    this.F = SHA256_IV[5] | 0;
+    this.G = SHA256_IV[6] | 0;
+    this.H = SHA256_IV[7] | 0;
+  }
+  get() {
+    const { A, B, C, D, E, F, G, H } = this;
+    return [A, B, C, D, E, F, G, H];
+  }
+  // prettier-ignore
+  set(A, B, C, D, E, F, G, H) {
+    this.A = A | 0;
+    this.B = B | 0;
+    this.C = C | 0;
+    this.D = D | 0;
+    this.E = E | 0;
+    this.F = F | 0;
+    this.G = G | 0;
+    this.H = H | 0;
+  }
+  process(view, offset) {
+    for (let i2 = 0; i2 < 16; i2++, offset += 4)
+      SHA256_W[i2] = view.getUint32(offset, false);
+    for (let i2 = 16; i2 < 64; i2++) {
+      const W15 = SHA256_W[i2 - 15];
+      const W2 = SHA256_W[i2 - 2];
+      const s0 = rotr(W15, 7) ^ rotr(W15, 18) ^ W15 >>> 3;
+      const s1 = rotr(W2, 17) ^ rotr(W2, 19) ^ W2 >>> 10;
+      SHA256_W[i2] = s1 + SHA256_W[i2 - 7] + s0 + SHA256_W[i2 - 16] | 0;
+    }
+    let { A, B, C, D, E, F, G, H } = this;
+    for (let i2 = 0; i2 < 64; i2++) {
+      const sigma1 = rotr(E, 6) ^ rotr(E, 11) ^ rotr(E, 25);
+      const T1 = H + sigma1 + Chi(E, F, G) + SHA256_K[i2] + SHA256_W[i2] | 0;
+      const sigma0 = rotr(A, 2) ^ rotr(A, 13) ^ rotr(A, 22);
+      const T2 = sigma0 + Maj(A, B, C) | 0;
+      H = G;
+      G = F;
+      F = E;
+      E = D + T1 | 0;
+      D = C;
+      C = B;
+      B = A;
+      A = T1 + T2 | 0;
+    }
+    A = A + this.A | 0;
+    B = B + this.B | 0;
+    C = C + this.C | 0;
+    D = D + this.D | 0;
+    E = E + this.E | 0;
+    F = F + this.F | 0;
+    G = G + this.G | 0;
+    H = H + this.H | 0;
+    this.set(A, B, C, D, E, F, G, H);
+  }
+  roundClean() {
+    SHA256_W.fill(0);
+  }
+  destroy() {
+    this.set(0, 0, 0, 0, 0, 0, 0, 0);
+    this.buffer.fill(0);
+  }
+}
+const sha256 = /* @__PURE__ */ wrapConstructor(() => new SHA2563());
+const injectChatTitle = async (chat, hostPubkey, relaysPool, relays) => {
+  const pool = relaysPool || new SimplePool();
+  const title = await getChatTitle(chat.messages, hostPubkey, pool, relays);
+  chat.title = title;
+  return chat;
+};
+const getChatTitle = async (messages, hostPubkey, pool, relays) => {
+  const event = messages[0].event;
+  const { pubkey, tags } = event;
+  const tagsPubkeys = tags.filter((tag) => tag[0] === "p").map((tag) => tag[1]);
+  const eventPubkeys = [pubkey, ...tagsPubkeys];
+  const pubkeysSet = new Set(eventPubkeys);
+  if (pubkeysSet.size > 2) {
+    return `group of ${pubkeysSet.size} events`;
+  }
+  let filter = {};
+  if (pubkeysSet.size === 1) {
+    filter = { kinds: [0], authors: [pubkey] };
+  } else if (pubkeysSet.size === 2) {
+    const contactPubkey = eventPubkeys.filter((pb) => pb !== hostPubkey)[0];
+    filter = { kinds: [0], authors: [contactPubkey] };
+  }
+  const meta = await pool.get(relays, filter);
+  const author = JSON.parse((meta == null ? void 0 : meta.content) || "{}");
+  if (author.display_name) {
+    return author.display_name;
+  } else if (author.name) {
+    return author.name;
+  } else if (author.username) {
+    return author.username;
+  } else {
+    return nip19_exports.npubEncode(pubkey).slice(0, 10) + "...";
+  }
+};
+const getNewChatTitle = async (pubkey, pool, relays) => {
+  let filter = {};
+  filter = { kinds: [0], authors: [pubkey] };
+  const meta = await pool.get(relays, filter);
+  const author = JSON.parse((meta == null ? void 0 : meta.content) || "{}");
+  if (author.display_name) {
+    return author.display_name;
+  } else if (author.name) {
+    return author.name;
+  } else if (author.username) {
+    return author.username;
+  } else {
+    return nip19_exports.npubEncode(pubkey).slice(0, 10) + "...";
+  }
+};
+const getChatRoomHash = (event) => {
+  const roomPubkeys = event.tags.filter((tag) => tag[0] === "p").map((tag) => tag[1]).sort();
+  const strToHash = roomPubkeys.join("");
+  return bytesToHex(sha256(strToHash));
+};
+const getNewChatRoomHash = (pubkeys) => {
+  const strToHash = pubkeys.sort().join("");
+  return bytesToHex(sha256(strToHash));
+};
+const getRumorFromWrap = (giftWrap, privateKey) => {
+  let seal, rumor;
+  try {
+    seal = nip44Decrypt(giftWrap, privateKey);
+    rumor = nip44Decrypt(seal, privateKey);
+  } catch (e) {
+    return null;
+  }
+  if (seal.pubkey !== rumor.pubkey) {
+    return null;
+  }
+  return rumor;
+};
+const getChatMessageFromRumor = (rumor) => {
+  return {
+    event: rumor,
+    isPublished: true
+  };
+};
+const isGroupChat = (rumor) => {
+  const tagsPubkeys = rumor.tags.filter((tag) => (tag[0] === "r" || tag[0] === "relay") && tag[1] && tag[1].length).map((tag) => tag[1]);
+  return tagsPubkeys.length > 2;
+};
+const useChat = defineStore("chat", () => {
+  const ownRumors = ref(/* @__PURE__ */ new Set());
+  function addOwnRumor(messageId) {
+    ownRumors.value.add(messageId);
+  }
+  return { ownRumors, addOwnRumor };
+});
+const _hoisted_1$a = {
+  key: 0,
+  class: "no-chats"
+};
+const _hoisted_2$9 = ["onClick"];
+const _sfc_main$b = /* @__PURE__ */ defineComponent({
+  __name: "ChatsList",
+  props: {
+    chats: {},
+    currentChatId: {},
+    showChatsList: { type: Boolean },
+    handleSelectChat: { type: Function }
+  },
+  setup(__props) {
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", {
+        class: normalizeClass(["chats__list", { "chats__list_mobile-hidden": !_ctx.showChatsList }])
+      }, [
+        !_ctx.chats.length ? (openBlock(), createElementBlock("div", _hoisted_1$a, " No chats yet... ")) : createCommentVNode("", true),
+        (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.chats, (chat) => {
+          return openBlock(), createElementBlock("div", {
+            key: chat.id,
+            class: normalizeClass(["chats__list-item", { "active": _ctx.currentChatId === chat.id }]),
+            onClick: ($event) => _ctx.handleSelectChat(chat.id)
+          }, [
+            createBaseVNode("strong", null, toDisplayString(chat.title), 1)
+          ], 10, _hoisted_2$9);
+        }), 128))
+      ], 2);
+    };
+  }
+});
+const ChatsList_vue_vue_type_style_index_0_scoped_8b709582_lang = "";
+const ChatsList = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-8b709582"]]);
+const _hoisted_1$9 = { class: "message-date" };
+const _sfc_main$a = /* @__PURE__ */ defineComponent({
+  __name: "ChatMessagesList",
+  props: {
+    messages: {},
+    userPubkey: {}
+  },
+  setup(__props) {
+    return (_ctx, _cache) => {
+      return openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.messages, (msg) => {
+        return openBlock(), createElementBlock("div", {
+          class: normalizeClass(["message-line", { "own": msg.event.pubkey === _ctx.userPubkey }])
+        }, [
+          createBaseVNode("div", {
+            class: normalizeClass(["message", { "own": msg.event.pubkey === _ctx.userPubkey }])
+          }, [
+            createBaseVNode("div", null, toDisplayString(msg.event.content), 1)
+          ], 2),
+          createBaseVNode("div", _hoisted_1$9, toDisplayString(msg.isPublished ? unref(formatedDateYear)(msg.event.created_at) : "sending..."), 1)
+        ], 2);
+      }), 256);
+    };
+  }
+});
+const ChatMessagesList_vue_vue_type_style_index_0_scoped_a4799345_lang = "";
+const ChatMessagesList = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-a4799345"]]);
+const _withScopeId$5 = (n) => (pushScopeId("data-v-05389505"), n = n(), popScopeId(), n);
+const _hoisted_1$8 = { class: "chats__text-field" };
+const _hoisted_2$8 = /* @__PURE__ */ _withScopeId$5(() => /* @__PURE__ */ createBaseVNode("button", {
+  type: "submit",
+  class: "chats__send-btn"
+}, "Send", -1));
+const _sfc_main$9 = /* @__PURE__ */ defineComponent({
+  __name: "ChatMessageForm",
+  props: {
+    roomTags: {},
+    recipientsPubkeys: {},
+    userPubkey: {}
+  },
+  emits: ["preSendMessage"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const message = ref("");
+    const nsecStore = useNsec();
+    const props = __props;
+    const prepareMessage = () => {
+      const content = message.value;
+      if (!content.length)
+        return;
+      const privateKey = nsecStore.getPrivkeyBytes();
+      if (!privateKey)
+        return;
+      const tags = props.roomTags;
+      if (!tags.length)
+        return;
+      const recipientsPubkeys = props.recipientsPubkeys;
+      if (!recipientsPubkeys.length)
+        return;
+      const event = {
+        content,
+        tags
+      };
+      const wrapsBundle = [];
+      let userRumor = null;
+      recipientsPubkeys.forEach((recipientPubkey) => {
+        const rumor = createRumor(event, privateKey);
+        const seal = createSeal(rumor, privateKey, recipientPubkey);
+        const wrap = createWrap(seal, recipientPubkey);
+        wrapsBundle.push(wrap);
+        if (recipientPubkey === props.userPubkey) {
+          userRumor = rumor;
+        }
+      });
+      message.value = "";
+      emit2("preSendMessage", userRumor, wrapsBundle);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("form", {
+        onSubmit: withModifiers(prepareMessage, ["prevent"])
+      }, [
+        createBaseVNode("div", _hoisted_1$8, [
+          withDirectives(createBaseVNode("input", {
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => message.value = $event),
+            class: "chats__input",
+            type: "text"
+          }, null, 512), [
+            [
+              vModelText,
+              message.value,
+              void 0,
+              { trim: true }
+            ]
+          ]),
+          _hoisted_2$8
+        ])
+      ], 32);
+    };
+  }
+});
+const ChatMessageForm_vue_vue_type_style_index_0_scoped_05389505_lang = "";
+const ChatMessageForm = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["__scopeId", "data-v-05389505"]]);
+const _sfc_main$8 = {};
+const _hoisted_1$7 = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "currentColor",
+  class: "bi bi-chevron-left",
+  viewBox: "0 0 16 16"
+};
+const _hoisted_2$7 = /* @__PURE__ */ createBaseVNode("path", {
+  "fill-rule": "evenodd",
+  d: "M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"
+}, null, -1);
+const _hoisted_3$6 = [
+  _hoisted_2$7
+];
+function _sfc_render(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$7, _hoisted_3$6);
+}
+const ChevronLeft = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render]]);
+const { normalizeURL } = utils_exports;
+const useChatsRelaysCache = defineStore("chatsRelaysCache", () => {
+  const metas = ref({});
+  const isLoadingRelays = ref(false);
+  function addMetas(events) {
+    events.forEach((event) => {
+      const { pubkey, tags } = event;
+      if (!metas.value.hasOwnProperty(pubkey)) {
+        metas.value[pubkey] = { relays: /* @__PURE__ */ new Set(), cache_created: Date.now() };
+      }
+      tags.forEach((tag) => {
+        if ((tag[0] === "r" || tag[0] === "relay") && tag[1] && tag[1].length) {
+          const relayUrl = normalizeURL(tag[1]);
+          metas.value[pubkey].relays.add(relayUrl);
+        }
+      });
+    });
+  }
+  function getRelaysByPubkeys(pubkeys) {
+    const relays = /* @__PURE__ */ new Set();
+    pubkeys.forEach((pubkey) => {
+      const cached = getMetaRelays(pubkey);
+      cached.forEach((relay) => relays.add(relay));
+    });
+    return relays;
+  }
+  function hasMeta(pubkey) {
+    return metas.value.hasOwnProperty(pubkey);
+  }
+  function getMetaRelays(pubkey) {
+    return hasMeta(pubkey) ? metas.value[pubkey].relays : /* @__PURE__ */ new Set();
+  }
+  return { metas, hasMeta, getMetaRelays, addMetas, getRelaysByPubkeys, isLoadingRelays };
+});
+const _withScopeId$4 = (n) => (pushScopeId("data-v-e5e92b02"), n = n(), popScopeId(), n);
+const _hoisted_1$6 = { class: "chat-header" };
+const _hoisted_2$6 = /* @__PURE__ */ _withScopeId$4(() => /* @__PURE__ */ createBaseVNode("span", null, "Chats", -1));
+const _hoisted_3$5 = { class: "chat-title" };
+const _hoisted_4$4 = { class: "chats__chat-footer" };
+const _sfc_main$7 = /* @__PURE__ */ defineComponent({
+  __name: "ChatsConversation",
+  props: {
+    chat: {},
+    userPubkey: {},
+    showChatsList: { type: Boolean }
+  },
+  emits: ["setMessageStatusToPublished", "handleDeselectChat"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const chatStore = useChat();
+    const chatsRelaysCacheStore = useChatsRelaysCache();
+    const relayStore = useRelay();
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const messagesQueue = ref({});
+    const loadingRoomRelaysQueue = ref({});
+    const props = __props;
+    const messagesContainer = ref(null);
+    const roomTags = computed(
+      () => {
+        var _a, _b, _c;
+        return ((_a = props == null ? void 0 : props.chat) == null ? void 0 : _a.messages.length) ? (_b = props.chat.messages[props.chat.messages.length - 1]) == null ? void 0 : _b.event.tags : ((_c = props == null ? void 0 : props.chat) == null ? void 0 : _c.initialRoomTags) ? props.chat.initialRoomTags : [];
+      }
+    );
+    const roomPubkeys = computed(() => roomTags.value.length ? [...new Set(roomTags.value.map((t) => t[1]))] : []);
+    const roomPubkeysWihoutUser = computed(() => roomPubkeys.value.filter((pubkey) => pubkey !== props.userPubkey));
+    onUpdated(async () => {
+      scrollChatToBottom();
+      let pubkeysToDownload = [];
+      roomPubkeysWihoutUser.value.forEach((pubkey) => {
+        if (!chatsRelaysCacheStore.hasMeta(pubkey)) {
+          pubkeysToDownload.push(pubkey);
+        }
+      });
+      const { chat } = props;
+      if (!pubkeysToDownload.length || loadingRoomRelaysQueue.value[chat.id]) {
+        return;
+      }
+      loadingRoomRelaysQueue.value[chat.id] = true;
+      const relays = relayStore.connectedUserReadWriteUrlsWithSelectedRelay;
+      const metasDM = await pool.querySync(relays, { kinds: [EVENT_KIND.DM_RELAYS], authors: pubkeysToDownload });
+      const loadedPubkeys = /* @__PURE__ */ new Set();
+      metasDM.forEach((event) => {
+        const hasRelay = event.tags.some((tag) => (tag[0] === "r" || tag[0] === "relay") && tag[1] && tag[1].length);
+        if (hasRelay) {
+          loadedPubkeys.add(event.pubkey);
+        }
+      });
+      chatsRelaysCacheStore.addMetas(metasDM);
+      pubkeysToDownload = pubkeysToDownload.filter((pubkey) => !loadedPubkeys.has(pubkey));
+      if (pubkeysToDownload.length) {
+        const metas = await pool.querySync(relays, { kinds: [EVENT_KIND.RELAY_LIST_META], authors: pubkeysToDownload });
+        chatsRelaysCacheStore.addMetas(metas);
+      }
+      loadingRoomRelaysQueue.value[chat.id] = false;
+      await nextTick();
+      setTimeout(() => {
+        var _a;
+        if (!((_a = messagesQueue.value[chat.id]) == null ? void 0 : _a.length))
+          return;
+        const queue2 = [...messagesQueue.value[chat.id]].reverse();
+        messagesQueue.value[chat.id] = [];
+        queue2.forEach(async (q) => {
+          await sendMessage(q.relays, q.wrapsBundle);
+          emit2("setMessageStatusToPublished", chat.id, q.rumorId);
+        });
+      }, 1);
+    });
+    const scrollChatToBottom = async () => {
+      await nextTick();
+      const container = messagesContainer.value;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    };
+    const preSendMessage = async (rumor, wrapsBundle) => {
+      const { chat } = props;
+      const message = {
+        event: rumor,
+        isPublished: false
+      };
+      chatStore.addOwnRumor(rumor.id);
+      chat.messages.push(message);
+      scrollChatToBottom();
+      const relays = getMessagePublishRelays();
+      if (loadingRoomRelaysQueue.value[chat.id]) {
+        if (!messagesQueue.value[chat.id]) {
+          messagesQueue.value[chat.id] = [];
+        }
+        messagesQueue.value[chat.id].push({
+          rumorId: rumor.id,
+          relays,
+          wrapsBundle
+        });
+        return;
+      }
+      await sendMessage(relays, wrapsBundle);
+      const msgIndex = chat.messages.findIndex((m) => m.event.id === rumor.id);
+      chat.messages[msgIndex].isPublished = true;
+    };
+    const getMessagePublishRelays = () => {
+      const ownRelays = relayStore.userChatRelaysUrls;
+      const chatPartnersRelays = chatsRelaysCacheStore.getRelaysByPubkeys(roomPubkeysWihoutUser.value);
+      return [.../* @__PURE__ */ new Set([...ownRelays, ...chatPartnersRelays])];
+    };
+    const sendMessage = async (relays, wrapsBundle) => {
+      const promises = [];
+      wrapsBundle.forEach((wrap) => {
+        promises.push(...pool.publish(relays, wrap));
+      });
+      return await Promise.allSettled(promises);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", {
+        class: normalizeClass(["conversation", { "conversation_mobile-hidden": _ctx.showChatsList }])
+      }, [
+        createBaseVNode("div", _hoisted_1$6, [
+          createBaseVNode("span", {
+            onClick: _cache[0] || (_cache[0] = ($event) => emit2("handleDeselectChat")),
+            class: "chats-link"
+          }, [
+            createVNode(ChevronLeft),
+            _hoisted_2$6
+          ]),
+          createBaseVNode("span", _hoisted_3$5, toDisplayString(_ctx.chat ? _ctx.chat.title : "Select chat"), 1)
+        ]),
+        _ctx.chat ? (openBlock(), createElementBlock("div", {
+          key: 0,
+          class: "chats__messages",
+          ref_key: "messagesContainer",
+          ref: messagesContainer
+        }, [
+          createVNode(ChatMessagesList, {
+            messages: _ctx.chat.messages,
+            userPubkey: _ctx.userPubkey
+          }, null, 8, ["messages", "userPubkey"])
+        ], 512)) : createCommentVNode("", true),
+        createBaseVNode("div", _hoisted_4$4, [
+          createVNode(ChatMessageForm, {
+            roomTags: roomTags.value,
+            recipientsPubkeys: roomPubkeys.value,
+            userPubkey: _ctx.userPubkey,
+            onPreSendMessage: preSendMessage
+          }, null, 8, ["roomTags", "recipientsPubkeys", "userPubkey"])
+        ])
+      ], 2);
+    };
+  }
+});
+const ChatsConversation_vue_vue_type_style_index_0_scoped_e5e92b02_lang = "";
+const ChatsConversation = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-e5e92b02"]]);
+const _withScopeId$3 = (n) => (pushScopeId("data-v-f8464317"), n = n(), popScopeId(), n);
+const _hoisted_1$5 = /* @__PURE__ */ _withScopeId$3(() => /* @__PURE__ */ createBaseVNode("label", { for: "start-chat-pubkey" }, [
+  /* @__PURE__ */ createBaseVNode("strong", null, "Profile's public key")
+], -1));
+const _hoisted_2$5 = { class: "user-field" };
+const _hoisted_3$4 = /* @__PURE__ */ _withScopeId$3(() => /* @__PURE__ */ createBaseVNode("button", {
+  type: "submit",
+  class: "start-chat-btn"
+}, "Start chat", -1));
+const _hoisted_4$3 = {
+  key: 0,
+  class: "notice"
+};
+const _hoisted_5$3 = {
+  key: 1,
+  class: "error"
+};
+const _sfc_main$6 = /* @__PURE__ */ defineComponent({
+  __name: "ChatCreateRoomForm",
+  props: {
+    isLoadingProfile: { type: Boolean }
+  },
+  emits: ["startChat"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const relayStore = useRelay();
+    const userSearchQuery = ref("");
+    const pubkeyError = ref("");
+    const startChat = () => {
+      const search = userSearchQuery.value;
+      let pubkey = "";
+      if (!relayStore.isConnectedToReadWriteRelays) {
+        pubkeyError.value = "Please connect to a relay first.";
+        return;
+      }
+      if (!search.length) {
+        pubkeyError.value = "Provide the public key of the person to chat with.";
+        return;
+      }
+      if (isSHA256Hex(search)) {
+        pubkey = search;
+      } else {
+        try {
+          let { data, type } = nip19_exports.decode(search);
+          if (type !== "npub") {
+            pubkeyError.value = "Public key is invalid. Please check it and try again.";
+            return;
+          }
+          pubkey = data.toString();
+        } catch (e) {
+          pubkeyError.value = "Public key is invalid. Please check it and try again.";
+          return;
+        }
+      }
+      pubkeyError.value = "";
+      emit2("startChat", pubkey);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        createBaseVNode("form", {
+          onSubmit: withModifiers(startChat, ["prevent"])
+        }, [
+          _hoisted_1$5,
+          createBaseVNode("div", _hoisted_2$5, [
+            withDirectives(createBaseVNode("input", {
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => userSearchQuery.value = $event),
+              class: "find-user-input",
+              id: "start-chat-pubkey",
+              type: "text",
+              placeholder: "npub or hex of pubkey"
+            }, null, 512), [
+              [
+                vModelText,
+                userSearchQuery.value,
+                void 0,
+                { trim: true }
+              ]
+            ]),
+            _hoisted_3$4
+          ])
+        ], 32),
+        _ctx.isLoadingProfile ? (openBlock(), createElementBlock("div", _hoisted_4$3, "Loading profile info...")) : createCommentVNode("", true),
+        pubkeyError.value ? (openBlock(), createElementBlock("div", _hoisted_5$3, toDisplayString(pubkeyError.value), 1)) : createCommentVNode("", true)
+      ], 64);
+    };
+  }
+});
+const ChatCreateRoomForm_vue_vue_type_style_index_0_scoped_f8464317_lang = "";
+const ChatCreateRoomForm = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-f8464317"]]);
+const _withScopeId$2 = (n) => (pushScopeId("data-v-fccd00d5"), n = n(), popScopeId(), n);
+const _hoisted_1$4 = /* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("div", { class: "chats-desc" }, [
+  /* @__PURE__ */ createBaseVNode("p", null, [
+    /* @__PURE__ */ createTextVNode(" Chats use the new Nostr "),
+    /* @__PURE__ */ createBaseVNode("a", {
+      target: "_blank",
+      href: "https://github.com/nostr-protocol/nips/blob/master/44.md"
+    }, "NIP-44"),
+    /* @__PURE__ */ createTextVNode(" encryption standard. Make sure the person you are chatting with uses a Nostr client that supports this NIP. ")
+  ])
+], -1));
+const _hoisted_2$4 = { class: "user-field-wrapper" };
+const _hoisted_3$3 = /* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("h3", { class: "chats-title" }, "Chats", -1));
+const _hoisted_4$2 = {
+  key: 0,
+  class: "no-chats"
+};
+const _hoisted_5$2 = { key: 1 };
+const _hoisted_6$1 = {
+  key: 2,
+  class: "chats"
+};
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  __name: "Chat",
+  setup(__props) {
+    const { normalizeURL: normalizeURL2 } = utils_exports;
+    let chatSub;
+    const relayStore = useRelay();
+    const nsecStore = useNsec();
+    const chatStore = useChat();
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const currentChatId = ref("");
+    const isLoadingNewChatProfile = ref(false);
+    const userChats = ref({});
+    const userChatsMessagesCache = ref({});
+    const userPubkey = ref("");
+    const isChatsLoading = ref(false);
+    const chatsEmpty = computed(() => Object.keys(userChats.value).length === 0);
+    const isConnectedLoggedInUser = computed(
+      () => relayStore.isConnectedToReadWriteRelays && nsecStore.isNsecValidTemp
+    );
+    const sortedChats = computed(() => {
+      return Object.entries(userChats.value).map(([key, value]) => value).sort((a, b) => b.created_at_last_message - a.created_at_last_message);
+    });
+    const showChatsList = ref(true);
+    watch(
+      () => nsecStore.nsec,
+      async () => {
+        if (!nsecStore.isNsecValidTemp)
+          return;
+        userPubkey.value = nsecStore.getPubkey();
+      },
+      { immediate: true }
+    );
+    watch(
+      () => relayStore.isConnectingToReadWriteRelays,
+      (value) => {
+        if (value) {
+          isChatsLoading.value = true;
+        }
+      }
+    );
+    watch(
+      () => relayStore.isConnectedToReadWriteRelays,
+      (value) => {
+        if (value && nsecStore.isNsecValidTemp) {
+          loadChats();
+        }
+      }
+    );
+    onMounted(() => {
+      if (isConnectedLoggedInUser.value) {
+        loadChats();
+      }
+    });
+    const addChat = (chat) => {
+      userChats.value[chat.id] = chat;
+      setTimeout(() => {
+        if (userChatsMessagesCache.value[chat.id]) {
+          const messages = [...userChatsMessagesCache.value[chat.id]];
+          userChatsMessagesCache.value[chat.id] = [];
+          messages.forEach((message) => {
+            userChats.value[chat.id].messages.push(message);
+          });
+        }
+      }, 1);
+      isChatsLoading.value = false;
+    };
+    const handleChatTitleError = (error) => {
+      console.error("Chats error:", error);
+    };
+    const loadChats = async () => {
+      isChatsLoading.value = true;
+      let relays = relayStore.connectedUserReadWriteUrlsWithSelectedRelay;
+      const hostPubkey = nsecStore.getPubkey();
+      userChats.value = {};
+      chatSub == null ? void 0 : chatSub.close();
+      const dmRelaysEvents = await pool.querySync(relays, {
+        kinds: [EVENT_KIND.DM_RELAYS],
+        authors: [hostPubkey]
+      });
+      if (dmRelaysEvents.length) {
+        const dmRelaysUrlsSet = /* @__PURE__ */ new Set();
+        dmRelaysEvents.forEach((event) => {
+          event.tags.forEach((tag) => {
+            if ((tag[0] === "r" || tag[0] === "relay") && tag[1] && tag[1].length) {
+              dmRelaysUrlsSet.add(normalizeURL2(tag[1]));
+            }
+          });
+        });
+        if (dmRelaysUrlsSet.size) {
+          relays = [...dmRelaysUrlsSet];
+          relayStore.setUserDMRelaysUrls(relays);
+        }
+      }
+      const hostMessages = await pool.querySync(relays, {
+        kinds: [EVENT_KIND.GIFT_WRAP],
+        "#p": [hostPubkey]
+      });
+      const privateKey = nsecStore.getPrivkeyBytes();
+      let chats = {};
+      let lastMessageDate = 0;
+      const initialMessagesIds = /* @__PURE__ */ new Set();
+      hostMessages.forEach((giftWrap) => {
+        initialMessagesIds.add(giftWrap.id);
+        const rumor = getRumorFromWrap(giftWrap, privateKey);
+        if (!rumor)
+          return;
+        if (isGroupChat(rumor))
+          return;
+        const chatId = getChatRoomHash(rumor);
+        const message = getChatMessageFromRumor(rumor);
+        if (chats[chatId]) {
+          chats[chatId].messages.push(message);
+        } else {
+          chats[chatId] = {
+            messages: [message]
+          };
+        }
+        if (rumor.created_at > lastMessageDate) {
+          lastMessageDate = rumor.created_at;
+        }
+      });
+      const chatsPromises = [];
+      for (const id in chats) {
+        const chat = chats[id];
+        chat.id = id;
+        chat.messages = chat.messages.sort((a, b) => a.event.created_at - b.event.created_at);
+        chat.created_at_last_message = chat.messages[chat.messages.length - 1].event.created_at;
+        const chatPromise = injectChatTitle(
+          chat,
+          hostPubkey,
+          pool,
+          relayStore.connectedUserReadWriteUrlsWithSelectedRelay
+        );
+        chatsPromises.push(chatPromise);
+      }
+      if (chatsPromises.length) {
+        racePromises(chatsPromises, addChat, handleChatTitleError);
+      } else {
+        isChatsLoading.value = false;
+      }
+      const lastGiftWrapDate = hostMessages.length ? lastMessageDate - TWO_DAYS : null;
+      subscribeToMessages(relays, lastGiftWrapDate, initialMessagesIds);
+    };
+    const subscribeToMessages = (relays, since = null, eventsToSkip = null) => {
+      const hostPubkey = nsecStore.getPubkey();
+      const privateKey = nsecStore.getPrivkeyBytes();
+      const filter = { kinds: [EVENT_KIND.GIFT_WRAP], "#p": [hostPubkey] };
+      if (since) {
+        filter.since = since;
+      }
+      chatSub = pool.subscribeMany(relays, [filter], {
+        onevent(giftWrap) {
+          if (eventsToSkip && eventsToSkip.has(giftWrap.id))
+            return;
+          const rumor = getRumorFromWrap(giftWrap, privateKey);
+          if (!rumor)
+            return;
+          if (isGroupChat(rumor))
+            return;
+          const chatId = getChatRoomHash(rumor);
+          const message = getChatMessageFromRumor(rumor);
+          if (userChats.value[chatId]) {
+            if (chatStore.ownRumors.has(message.event.id))
+              return;
+            userChats.value[chatId].messages.push(message);
+          } else {
+            if (!userChatsMessagesCache.value[chatId]) {
+              userChatsMessagesCache.value[chatId] = [];
+            }
+            userChatsMessagesCache.value[chatId].push(message);
+          }
+        }
+      });
+    };
+    const handleSelectChat = (chatId) => {
+      currentChatId.value = chatId;
+      showChatsList.value = false;
+    };
+    const handleDeselectChat = () => {
+      currentChatId.value = "";
+      showChatsList.value = true;
+    };
+    const setMessageStatusToPublished = (chatId, rumorId) => {
+      const message = userChats.value[chatId].messages.find(
+        (m) => m.event.id === rumorId
+      );
+      if (message) {
+        message.isPublished = true;
+      }
+    };
+    const startChat = async (pubkey) => {
+      const roomPubkeys = pubkey === userPubkey.value ? [pubkey] : [userPubkey.value, pubkey];
+      const chatId = getNewChatRoomHash(roomPubkeys);
+      if (userChats.value[chatId]) {
+        return handleSelectChat(chatId);
+      }
+      isLoadingNewChatProfile.value = true;
+      const title = await getNewChatTitle(
+        pubkey,
+        pool,
+        relayStore.connectedUserReadWriteUrlsWithSelectedRelay
+      );
+      isLoadingNewChatProfile.value = false;
+      const newChat = {
+        id: chatId,
+        messages: [],
+        title,
+        initialRoomTags: roomPubkeys.map((p2) => ["p", p2]),
+        created_at_last_message: now()
+      };
+      addChat(newChat);
+      await nextTick();
+      handleSelectChat(chatId);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$4,
+        createBaseVNode("div", _hoisted_2$4, [
+          createVNode(ChatCreateRoomForm, {
+            onStartChat: startChat,
+            isLoadingProfile: isLoadingNewChatProfile.value
+          }, null, 8, ["isLoadingProfile"])
+        ]),
+        _hoisted_3$3,
+        !isConnectedLoggedInUser.value && !isChatsLoading.value ? (openBlock(), createElementBlock("div", _hoisted_4$2, " Please connect and login to see you chats. ")) : createCommentVNode("", true),
+        isChatsLoading.value ? (openBlock(), createElementBlock("div", _hoisted_5$2, "Loading chats...")) : createCommentVNode("", true),
+        isConnectedLoggedInUser.value && !isChatsLoading.value ? (openBlock(), createElementBlock("div", _hoisted_6$1, [
+          createVNode(ChatsList, {
+            chats: sortedChats.value,
+            currentChatId: currentChatId.value,
+            handleSelectChat,
+            showChatsList: showChatsList.value
+          }, null, 8, ["chats", "currentChatId", "showChatsList"]),
+          !chatsEmpty.value ? (openBlock(), createBlock(ChatsConversation, {
+            key: 0,
+            onSetMessageStatusToPublished: setMessageStatusToPublished,
+            onHandleDeselectChat: handleDeselectChat,
+            chat: userChats.value[currentChatId.value],
+            userPubkey: userPubkey.value,
+            showChatsList: showChatsList.value
+          }, null, 8, ["chat", "userPubkey", "showChatsList"])) : createCommentVNode("", true)
+        ])) : createCommentVNode("", true)
+      ], 64);
+    };
+  }
+});
+const Chat_vue_vue_type_style_index_0_scoped_fccd00d5_lang = "";
+const Chat = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-fccd00d5"]]);
+const _withScopeId$1 = (n) => (pushScopeId("data-v-f4b4ce1a"), n = n(), popScopeId(), n);
+const _hoisted_1$3 = { class: "fields" };
+const _hoisted_2$3 = { class: "field" };
+const _hoisted_3$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("label", { class: "select-relay-label" }, [
+  /* @__PURE__ */ createBaseVNode("strong", null, "Select relay")
+], -1));
+const _hoisted_4$1 = {
+  key: 0,
+  class: "field"
+};
+const _hoisted_5$1 = { class: "field-elements" };
+const _hoisted_6 = { class: "field" };
+const _hoisted_7 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("label", {
+  class: "text-input-label",
+  for: "priv_key"
+}, [
+  /* @__PURE__ */ createBaseVNode("strong", null, "Login with private key (optional)")
+], -1));
+const _hoisted_8 = { class: "field-elements" };
+const _hoisted_9 = { class: "remember-me" };
+const _hoisted_10 = { class: "field" };
+const _hoisted_11 = ["disabled"];
+const _hoisted_12 = { class: "error" };
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  __name: "Login",
+  setup(__props) {
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const relayStore = useRelay();
+    const nsecStore = useNsec();
+    const feedStore = useFeed();
+    const ownProfileStore = useOwnProfile();
+    const userStore = useUser();
+    const router2 = useRouter();
+    const selectedRelay = ref(DEFAULT_RELAY);
+    const showCustomRelayUrl = computed(() => selectedRelay.value === "custom");
+    const showRememberMe = computed(() => nsecStore.isValidNsecPresented());
+    const loginError2 = ref("");
+    const isConnectingToRelays = ref(false);
+    const dropdownRelays = DEFAULT_RELAYS.map((r) => ({ key: r, value: r })).concat({
+      key: "custom",
+      value: "Custom relay url"
+    });
+    let afterLoginPath = "/feed";
+    let redirectToUser = false;
+    onMounted(() => {
+      if (isRedirectedFromSearch()) {
+        afterLoginPath = history.state.back;
+        redirectToUser = true;
+      }
+    });
+    watch(
+      () => nsecStore.nsec,
+      () => {
+        if (!nsecStore.isValidNsecPresented()) {
+          localStorage.clear();
+          nsecStore.setRememberMe(false);
+          return;
+        }
+        if (nsecStore.rememberMe) {
+          localStorage.setItem("privkey", nsecStore.nsec);
+        }
+      }
+    );
+    const isRedirectedFromSearch = () => {
+      return history.state && /^\/(user|event)\/[a-zA-Z0-9]+$/g.test(history.state.back);
+    };
+    const handleSelect = (selected) => {
+      selectedRelay.value = selected;
+    };
+    const showError = (msg) => {
+      loginError2.value = msg;
+    };
+    const handleConnectClick = async () => {
+      let relayUrl = selectedRelay.value;
+      if (relayUrl === "custom") {
+        const customUrl = relayStore.selectInputCustomRelayUrl;
+        relayUrl = customUrl.length ? customUrl : "";
+      }
+      if (!relayUrl.length) {
+        return showError("Please provide relay URL or choose one from the list.");
+      }
+      relayUrl = utils_exports.normalizeURL(relayUrl);
+      if (!relayUrl.length) {
+        return showError("Invalid relay URL");
+      }
+      if (isConnectingToRelays.value)
+        return;
+      if (nsecStore.isNotValidNsecPresented()) {
+        return showError("Private key is invalid. Please check it and try again.");
+      } else if (nsecStore.isValidNsecPresented()) {
+        nsecStore.updateCachedNsec(nsecStore.nsec);
+      }
+      let relay;
+      isConnectingToRelays.value = true;
+      try {
+        relay = await connectToSelectedRelay(relayUrl);
+      } catch (err) {
+        isConnectingToRelays.value = false;
+        return showError(err.message);
+      }
+      relayStore.updateCurrentRelay(relay);
+      if (nsecStore.isValidNsecPresented()) {
+        const pubkey = nsecStore.getPubkey();
+        const authorMeta = await relayGet(
+          relay,
+          [{ kinds: [EVENT_KIND.META], limit: 1, authors: [pubkey] }],
+          3e3
+          // timeout
+        );
+        if (!authorMeta) {
+          isConnectingToRelays.value = false;
+          return showError(
+            "Your profile was not found on the selected relay. Please check the private key or change the relay and try again."
+          );
+        }
+        ownProfileStore.updateMeta(authorMeta);
+        feedStore.setSelectedFeedSource("follows");
+        let relayListMeta = await relayGet(
+          relay,
+          [{ kinds: [EVENT_KIND.RELAY_LIST_META], limit: 1, authors: [pubkey] }],
+          3e3
+          // timeout
+        );
+        if (relayListMeta.tags.length) {
+          const relays = relayListMeta.tags.map((tag) => tag[1]);
+          const freshMeta = await pool.get(relays, {
+            kinds: [EVENT_KIND.RELAY_LIST_META],
+            authors: [pubkey],
+            limit: 1
+          });
+          if (freshMeta && freshMeta.tags.length && freshMeta.created_at > relayListMeta.created_at) {
+            relayListMeta = freshMeta;
+          }
+          const { read, write } = parseRelaysNip65(relayListMeta);
+          relayStore.setReedRelays(read);
+          relayStore.setWriteRelays(write);
+        }
+        relayStore.setIsConnectingToReadWriteRelaysStatus(true);
+        relayStore.setIsConnectedToReadWriteRelaysStatus(false);
+        const {
+          userConnectedReadRelays,
+          userConnectedWriteRelays
+        } = await getConnectedReadWriteRelays(relayStore.userReadWriteRelays);
+        relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays);
+        relayStore.setConnectedUserWriteRelayUrls(userConnectedWriteRelays);
+        relayStore.setIsConnectingToReadWriteRelaysStatus(false);
+        relayStore.setIsConnectedToReadWriteRelaysStatus(true);
+      }
+      isConnectingToRelays.value = false;
+      feedStore.setMountAfterLogin(true);
+      if (redirectToUser) {
+        userStore.updateRoutingStatus(true);
+      }
+      router2.push({ path: afterLoginPath });
+    };
+    const handleRememberMe = () => {
+      if (nsecStore.rememberMe) {
+        nsecStore.setRememberMe(false);
+        localStorage.clear();
+      } else {
+        nsecStore.setRememberMe(true);
+        localStorage.setItem("privkey", nsecStore.nsec);
+      }
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$3, [
+        createBaseVNode("div", _hoisted_2$3, [
+          _hoisted_3$2,
+          createVNode(Dropdown, {
+            listItems: unref(dropdownRelays),
+            onHandleSelect: handleSelect
+          }, null, 8, ["listItems"])
+        ]),
+        showCustomRelayUrl.value ? (openBlock(), createElementBlock("div", _hoisted_4$1, [
+          createBaseVNode("div", _hoisted_5$1, [
+            withDirectives(createBaseVNode("input", {
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => unref(relayStore).selectInputCustomRelayUrl = $event),
+              class: "text-input",
+              id: "relay_url",
+              type: "text",
+              placeholder: "[wss://]relay.example.com"
+            }, null, 512), [
+              [vModelText, unref(relayStore).selectInputCustomRelayUrl]
+            ])
+          ])
+        ])) : createCommentVNode("", true),
+        createBaseVNode("div", _hoisted_6, [
+          _hoisted_7,
+          createBaseVNode("div", _hoisted_8, [
+            withDirectives(createBaseVNode("input", {
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => unref(nsecStore).nsec = $event),
+              class: "text-input",
+              id: "priv_key",
+              type: "password",
+              placeholder: "nsec..."
+            }, null, 512), [
+              [vModelText, unref(nsecStore).nsec]
+            ])
+          ])
+        ]),
+        createBaseVNode("div", _hoisted_9, [
+          showRememberMe.value ? (openBlock(), createBlock(Checkbox, {
+            key: 0,
+            onOnChange: handleRememberMe,
+            checked: unref(nsecStore).rememberMe,
+            label: "Remember me"
+          }, null, 8, ["checked"])) : createCommentVNode("", true)
+        ]),
+        createBaseVNode("div", _hoisted_10, [
+          createBaseVNode("button", {
+            disabled: isConnectingToRelays.value,
+            onClick: handleConnectClick,
+            class: "button button-block"
+          }, toDisplayString(isConnectingToRelays.value ? "Connecting..." : "Connect"), 9, _hoisted_11)
+        ]),
+        createBaseVNode("div", _hoisted_12, toDisplayString(loginError2.value), 1)
+      ]);
+    };
+  }
+});
+const Login_vue_vue_type_style_index_0_scoped_f4b4ce1a_lang = "";
+const Login = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-f4b4ce1a"]]);
+const _withScopeId = (n) => (pushScopeId("data-v-aa016908"), n = n(), popScopeId(), n);
+const _hoisted_1$2 = { class: "tabs" };
+const _hoisted_2$2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { class: "tab-link-text" }, [
+  /* @__PURE__ */ createBaseVNode("i", { class: "tab-icon bi bi-justify-right" }),
+  /* @__PURE__ */ createTextVNode(" Feed ")
+], -1));
+const _hoisted_3$1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { class: "tab-link-text" }, [
+  /* @__PURE__ */ createBaseVNode("i", { class: "tab-icon bi bi-chat-dots" }),
+  /* @__PURE__ */ createTextVNode(" Chat ")
+], -1));
+const _hoisted_4 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { class: "tab-link-text" }, [
+  /* @__PURE__ */ createBaseVNode("i", { class: "tab-icon bi bi-info-circle" }),
+  /* @__PURE__ */ createTextVNode(" Help ")
+], -1));
+const _hoisted_5 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { class: "tab-link-text" }, [
+  /* @__PURE__ */ createBaseVNode("i", { class: "tab-icon bi bi-gear" }),
+  /* @__PURE__ */ createTextVNode(" Settings ")
+], -1));
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "MainMenu",
+  setup(__props) {
+    const npubStore = useNpub();
+    computed(
+      () => npubStore.cachedUrlNpub.length ? `/user/${npubStore.cachedUrlNpub}` : "/user"
+    );
+    return (_ctx, _cache) => {
+      const _component_router_link = resolveComponent("router-link");
+      return openBlock(), createElementBlock("div", _hoisted_1$2, [
+        createVNode(_component_router_link, {
+          class: "tab-link",
+          to: "/feed"
+        }, {
+          default: withCtx(() => [
+            _hoisted_2$2
+          ]),
+          _: 1
+        }),
+        createVNode(_component_router_link, {
+          class: "tab-link",
+          to: "/chat"
+        }, {
+          default: withCtx(() => [
+            _hoisted_3$1
+          ]),
+          _: 1
+        }),
+        createVNode(_component_router_link, {
+          class: "tab-link",
+          to: "/help"
+        }, {
+          default: withCtx(() => [
+            _hoisted_4
+          ]),
+          _: 1
+        }),
+        createVNode(_component_router_link, {
+          class: "tab-link",
+          to: "/settings"
+        }, {
+          default: withCtx(() => [
+            _hoisted_5
+          ]),
+          _: 1
+        })
+      ]);
+    };
+  }
+});
+const MainMenu_vue_vue_type_style_index_0_scoped_aa016908_lang = "";
+const MainMenu = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-aa016908"]]);
+const _hoisted_1$1 = { class: "search" };
+const _hoisted_2$1 = {
+  key: 0,
+  class: "warning"
+};
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "MainSearchField",
+  setup(__props) {
+    const npubStore = useNpub();
+    const userStore = useUser();
+    const router2 = useRouter();
+    const isFocused = ref(false);
+    const errorTimeout = ref(0);
+    const input = ref({});
+    const handleInputNpub = () => {
+      clearTimeout(errorTimeout.value);
+      const query = npubStore.npubInput;
+      if (!query.length) {
+        npubStore.setError("");
+        return;
+      }
+      let searchType = "user";
+      if (!isSHA256Hex(query)) {
+        try {
+          const { type } = getNip19FromSearch(query);
+          if (type === "note") {
+            searchType = "event";
+          }
+        } catch (e) {
+          if (query.length > 62) {
+            npubStore.setError(e.message);
+          } else {
+            errorTimeout.value = setTimeout(() => {
+              npubStore.setError(e.message);
+            }, 2e3);
+          }
+          return;
+        }
+      }
+      npubStore.setError("");
+      routeToUser(query, searchType);
+    };
+    const handleInputFocus = () => {
+      isFocused.value = true;
+      const query = npubStore.npubInput;
+      if (!query.length) {
+        npubStore.setError("");
+        return;
+      }
+      let searchType = "user";
+      if (isSHA256Hex(query)) {
+        routeToUser(query, searchType);
+      } else {
+        try {
+          const { type } = getNip19FromSearch(query);
+          if (type === "note") {
+            searchType = "event";
+          }
+          routeToUser(query, searchType);
+        } catch (e) {
+        }
+      }
+    };
+    const routeToUser = (query, type) => {
+      userStore.updateSearchStatus(true);
+      userStore.updateRoutingStatus(true);
+      router2.push({ path: `/${type}/${query}` });
+    };
+    const clearInput = () => {
+      clearTimeout(errorTimeout.value);
+      npubStore.updateNpubInput("");
+      npubStore.setError("");
+      input.value.focus();
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$1, [
+        createBaseVNode("div", {
+          class: normalizeClass(["search-field", { active: isFocused.value, "has-content": unref(npubStore).npubInput.length }])
+        }, [
+          createBaseVNode("i", {
+            onClick: _cache[0] || (_cache[0] = ($event) => input.value.focus()),
+            class: "bi bi-search search-icon"
+          }),
+          withDirectives(createBaseVNode("input", {
+            onFocus: handleInputFocus,
+            onBlur: _cache[1] || (_cache[1] = ($event) => isFocused.value = false),
+            class: normalizeClass(["search-input", { active: isFocused.value }]),
+            type: "text",
+            placeholder: "pubkey or note id...",
+            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => unref(npubStore).npubInput = $event),
+            onInput: handleInputNpub,
+            ref_key: "input",
+            ref: input
+          }, null, 34), [
+            [
+              vModelText,
+              unref(npubStore).npubInput,
+              void 0,
+              { trim: true }
+            ]
+          ]),
+          unref(npubStore).npubInput.length ? (openBlock(), createElementBlock("i", {
+            key: 0,
+            onClick: clearInput,
+            class: "bi bi-x-circle clear-icon"
+          })) : createCommentVNode("", true)
+        ], 2),
+        unref(npubStore).error.length ? (openBlock(), createElementBlock("div", _hoisted_2$1, "* " + toDisplayString(unref(npubStore).error), 1)) : createCommentVNode("", true)
+      ]);
+    };
+  }
+});
+const MainSearchField_vue_vue_type_style_index_0_scoped_14bfe52e_lang = "";
+const MainSearchField = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-14bfe52e"]]);
+const _hoisted_1 = { class: "header" };
+const _hoisted_2 = ["href"];
+const _hoisted_3 = {
+  key: 1,
+  class: "connect-wrapper"
+};
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "Header",
+  emits: ["clearAppState"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const ownProfileStore = useOwnProfile();
+    const npubStore = useNpub();
+    const userStore = useUser();
+    const nsecStore = useNsec();
+    const relayStore = useRelay();
+    const router2 = useRouter();
+    const username = computed(
+      () => nsecStore.isValidNsecPresented() && ownProfileStore.username.length ? ownProfileStore.username : ""
+    );
+    const handleUserClick = () => {
+      const pubkey = nsecStore.getPubkey();
+      const urlNpub = nip19_exports.npubEncode(pubkey);
+      npubStore.updateNpubInput(urlNpub);
+      userStore.updateRoutingStatus(true);
+      router2.push({ path: getUserUrlPath(pubkey) });
+    };
+    const handleLoginClick = () => {
+      const clearLocalStorage = false;
+      emit2("clearAppState", clearLocalStorage);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1, [
+        createBaseVNode("div", {
+          class: normalizeClass(["menu", { loggedin: unref(nsecStore).isValidNsecPresented() }])
+        }, [
+          createVNode(MainMenu),
+          username.value.length ? (openBlock(), createElementBlock("a", {
+            key: 0,
+            class: "username-link",
+            onClick: withModifiers(handleUserClick, ["prevent"]),
+            href: unref(getUserUrlPath)(unref(nsecStore).getPubkey())
+          }, " @" + toDisplayString(username.value), 9, _hoisted_2)) : (openBlock(), createElementBlock("span", _hoisted_3, [
+            unref(relayStore).isConnectedToRelay ? (openBlock(), createElementBlock("a", {
+              key: 0,
+              onClick: withModifiers(handleLoginClick, ["prevent"]),
+              class: "login-link",
+              href: "/login"
+            }, " Login ")) : (openBlock(), createElementBlock("button", {
+              key: 1,
+              class: "connect-btn",
+              onClick: handleLoginClick
+            }, "Connect"))
+          ]))
+        ], 2),
+        createVNode(MainSearchField)
+      ]);
+    };
+  }
+});
+const Header_vue_vue_type_style_index_0_scoped_7d7bd167_lang = "";
+const Header = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-7d7bd167"]]);
+const routes = [
+  {
+    path: "/feed",
+    name: "Feed",
+    components: {
+      default: Feed,
+      Header
+    }
+  },
+  {
+    path: "/message",
+    name: "Message",
+    components: {
+      default: Feed,
+      Header
+    }
+  },
+  {
+    path: "/chat",
+    name: "Chat",
+    components: {
+      default: Chat,
+      Header
+    }
+  },
+  // {
+  //   path: '/log',
+  //   name: 'Log',
+  //   components: {
+  //     default: Feed,
+  //     Header: Header,
+  //   },
+  // },
+  {
+    path: "/user",
+    name: "User",
+    alias: ["/event"],
+    components: {
+      default: User,
+      Header
+    }
+  },
+  {
+    path: "/user/:id",
+    alias: ["/event/:id"],
+    components: {
+      default: User,
+      Header
+    }
+  },
+  {
+    path: "/help",
+    name: "Help",
+    components: {
+      default: _sfc_main$i,
+      Header
+    }
+  },
+  {
+    path: "/",
+    components: {
+      default: _sfc_main$i,
+      Header
+    },
+    beforeEnter: (to, from, next) => {
+      const userId = to.query.user;
+      const eventId = to.query.event;
+      if (userId == null ? void 0 : userId.length) {
+        next({ path: `/user/${userId}` });
+      } else if (eventId == null ? void 0 : eventId.length) {
+        next({ path: `/event/${eventId}` });
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: "/settings",
+    components: {
+      default: Settings,
+      Header
+    }
+  },
+  {
+    path: "/login",
+    component: Login
+  }
+];
+const router = createRouter({
+  history: createWebHashHistory(),
+  // @ts-ignore
+  routes
+});
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "App",
+  setup(__props) {
+    var _a;
+    const router2 = useRouter();
+    const nsecStore = useNsec();
+    const relayStore = useRelay();
+    const feedStore = useFeed();
+    const imagesStore = useImages();
+    const poolStore = usePool();
+    const pool = poolStore.pool;
+    const isRemembered = !!((_a = localStorage.getItem("privkey")) == null ? void 0 : _a.length);
+    nsecStore.setRememberMe(isRemembered);
+    const initialNsec = isRemembered ? localStorage.getItem("privkey") : "";
+    nsecStore.updateNsec(initialNsec || "");
+    const eventsLog = ref([]);
+    const clearAppState = (clearLocalStorage = true) => {
+      var _a2;
+      if (relayStore.isConnectedToRelay) {
+        (_a2 = relayStore.currentRelay) == null ? void 0 : _a2.close();
+      }
+      closePoolSockets(pool);
+      poolStore.resetPool();
+      if (feedStore.pool) {
+        closePoolSockets(feedStore.pool);
+        feedStore.resetPool();
+      }
+      feedStore.clear();
+      relayStore.clear();
+      imagesStore.updateShowImages(false);
+      if (clearLocalStorage) {
+        localStorage.clear();
+        nsecStore.updateCachedNsec("");
+        nsecStore.updateNsec("");
+        nsecStore.setRememberMe(false);
+      }
+      router2.push("/login");
+    };
+    return (_ctx, _cache) => {
+      const _component_router_view = resolveComponent("router-view");
+      return openBlock(), createElementBlock(Fragment, null, [
+        createVNode(_component_router_view, {
+          onClearAppState: clearAppState,
+          name: "Header"
+        }),
+        createVNode(_component_router_view, {
+          onClearAppState: clearAppState,
+          eventsLog: eventsLog.value
+        }, null, 8, ["eventsLog"])
+      ], 64);
+    };
+  }
+});
+const bootstrapIcons = "";
+const app = createApp(_sfc_main);
+const pinia = createPinia();
+app.use(router).use(pinia).mount("#app");
