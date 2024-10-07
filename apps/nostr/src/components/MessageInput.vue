@@ -4,6 +4,7 @@
   import { useNsec } from '@/stores/Nsec'
   import { useFeed } from '@/stores/Feed'
   import { useRelay } from '@/stores/Relay'
+  import Textarea from '@/components/Textarea.vue'
 
   const props = defineProps<{
     sentEventIds: Set<string>
@@ -42,7 +43,8 @@
       return
     }
 
-    const messageValue = feedStore.messageToBroadcast
+    // trim here instead of "v-model.trim" because the size of textarea is flexible according to the content
+    const messageValue = feedStore.messageToBroadcast.trim()
     if (!messageValue.length) {
       msgErr.value = 'Please provide message to broadcast.'
       return
@@ -85,12 +87,8 @@
     emit('broadcastEvent', signedEvent, 'text')
   }
 
-  const handleInput = () => {
-    const text = feedStore.messageToBroadcast
-    if (!text.length) return
-    let lines = text.split('\n').length
-    if (lines < 3) lines = 3
-    rows.value = lines
+  const handleInput = (value: string) => {
+    feedStore.updateMessageToBroadcast(value)
   }
 
   const handleFocus = () => {
@@ -112,18 +110,16 @@
 
 <template>
   <div :class="['message-field', { active: isFocused }]">
-    <textarea
-      :disabled="!relayStore.isConnectedToRelay"
-      class="message-input"
+    <Textarea
       name="message"
-      id="message"
+      placeholder="What do you want to say?"
+      :disabled="!relayStore.isConnectedToRelay"
       :rows="rows"
-      v-model.trim="feedStore.messageToBroadcast"
+      :noBorder="true"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
-      placeholder="What do you want to say?"
-    ></textarea>
+    />
     <div class="message-footer">
       <button @click="toggleMessageType" class="send-presigned-btn">
         <i class="bi bi-braces presigned-icon"></i>
@@ -154,26 +150,6 @@
 
   .message-field.active {
     border: 1px solid #0092bf;
-  }
-
-  .message-input {
-    font-size: 16px;
-    padding: 10px 12px;
-    width: 100%;
-    box-sizing: border-box;
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    color: inherit;
-    outline: none;
-    line-height: 1.3;
-    resize: none;
-    display: block;
-    border-bottom: none;
-  }
-
-  .message-input:focus {
-    border-bottom: none;
   }
 
   .message-footer {

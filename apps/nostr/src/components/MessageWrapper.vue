@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import type { SubCloser } from 'nostr-tools/lib/types/abstract-pool'
   import type { Event } from 'nostr-tools'
   import MessageInput from '@/components/MessageInput.vue'
   import SignedEventInput from '@/components/SignedEventInput.vue'
@@ -67,9 +66,7 @@
 
         if (isError) {
           error += `Relays are unavailable or you are offline. Please try again or change the list of relays.`
-          broadcastMsgError.value = error
-          isSendingMessage.value = false
-          return
+          return handleBroadcastError(error)
         }
       }
 
@@ -84,33 +81,7 @@
     if (!writeRelays.length) {
       const error =
         'No relays to broadcast the message. Please provide the list of write relays in settings.'
-      return handleBroadcastError(null, error)
-    }
-
-    // TODO, handle case when user is logged in, but no write relays presented in his profile
-    // maybe show notice in that case
-
-    const relaysToWatch = relayStore.connectedFeedRelaysUrls
-    let userSub: SubCloser | null = null
-    let interval: number | undefined
-    const toWatchForUpadtes = relaysToWatch.some((r) => writeRelays.includes(r))
-    if (toWatchForUpadtes) {
-      const userNewEventOptions = [{ ids: [event.id] }]
-      userSub = pool.subscribeMany(relaysToWatch, userNewEventOptions, {
-        onevent(event: Event) {
-          // update feed only if new event is loaded
-          // interval needed because of delay between publishing and loading new event
-          interval = setInterval(() => {
-            if (props.newEvents.some((e) => e.id === event.id)) {
-              emit('loadNewRelayEvents')
-              userSub?.close()
-            }
-          }, 100)
-        },
-        onclose() {
-          clearInterval(interval)
-        },
-      })
+      return handleBroadcastError(error)
     }
 
     const networkResult = await publishEventToRelays(writeRelays, pool, event)
@@ -133,7 +104,7 @@
     if (isAllError) {
       const error =
         'Failed to broadcast the message. Please check the connection or there may be a problem on the all provided relays. Also please try again.'
-      return handleBroadcastError(userSub, error)
+      return handleBroadcastError(error)
     }
 
     // check if all relays was applied event successfully (ex. spam protection, paid relay, etc.)
@@ -144,39 +115,37 @@
           return { relay: relay, success: !!note }
         }),
       )
+      const allError = relayResults.every((r: any) => r.success === false)
       const isError = relayResults.some((r: any) => r.success === false)
-      if (isError) {
-        let error =
-          'Event was sent, but the next relay(s) were not accepted event for some reason: \n'
-        relayResults.forEach((r: any) => {
-          if (!r.success) {
-            error += `- ${r.relay} \n`
-          }
-        })
-        const allError = relayResults.every((r: any) => r.success === false)
-        if (allError) {
-          return handleBroadcastError(userSub, error)
-        }
-      }
 
-      // force feed update, because when some relays were not accepted event the feed will not be updated, so we need to update it manually
-      const successfullRelays = relayResults.filter((r: any) => r.success).map((r: any) => r.relay)
-      const toUpdateFeed = relaysToWatch.some((r) => successfullRelays.includes(r))
-      if (toUpdateFeed) {
-        emit('loadNewRelayEvents')
-        userSub?.close()
-      }
-    } else {
-      const publishedEvent = await pool.querySync(writeRelays, { ids: [event.id] })
-      if (!publishedEvent.length) {
-        const error = `Failed to broadcast the message. Please check the connection or there may be a problem with relay(s).`
-        return handleBroadcastError(userSub, error)
-      } else {
-        // TODO: probably we we can get rid of the subscription for new event above because of this, proper testing needed
-        emit('loadNewRelayEvents')
-        userSub?.close()
+      let failedRelaysListStr = ''
+      relayResults.forEach((r: any) => {
+        if (!r.success) {
+          failedRelaysListStr += `- ${r.relay} \n`
+        }
+      })
+
+      if (allError) {
+        const error = `Event was not sent, the next relay(s) were not accepted event for some reason: \n ${failedRelaysListStr}`
+        return handleBroadcastError(error)
+      } else if (isError) {
+        const error = `Event was sent, but the next relay(s) were not accepted event for some reason: \n ${failedRelaysListStr}`
+        showBroadcastNotice(error)
       }
     }
+
+    const publishedEvent = await pool.get(writeRelays, { ids: [event.id] })
+    if (!publishedEvent) {
+      const error = `Failed to broadcast the message. Please check the connection or there may be a problem with relay(s).`
+      return handleBroadcastError(error)
+    }
+
+    feedStore.pushToNewEventsToShow({
+      id: event.id,
+      pubkey: event.pubkey,
+      created_at: event.created_at,
+    })
+    emit('loadNewRelayEvents')
 
     if (type === 'text') {
       feedStore.updateMessageToBroadcast('')
@@ -189,10 +158,13 @@
     isSendingMessage.value = false
   }
 
-  const handleBroadcastError = (eventSub: SubCloser | null, error: string) => {
+  const handleBroadcastError = (error: string) => {
     broadcastMsgError.value = error
-    eventSub?.close()
     isSendingMessage.value = false
+  }
+
+  const showBroadcastNotice = (error: string) => {
+    broadcastMsgError.value = error
   }
 
   const clearBroadcastError = () => {

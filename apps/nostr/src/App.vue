@@ -2,13 +2,14 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import type { LogContentPart } from './types'
-  import { closePoolSockets } from '@/utils/network'
+  import { asyncClosePool } from '@/utils/network'
 
   import { useNsec } from '@/stores/Nsec'
   import { useRelay } from '@/stores/Relay'
   import { useFeed } from '@/stores/Feed'
   import { usePool } from '@/stores/Pool'
   import { useImages } from '@/stores/Images'
+  import type { SimplePool } from 'nostr-tools'
 
   const router = useRouter()
   const nsecStore = useNsec()
@@ -34,23 +35,23 @@
     eventsLog.value.unshift(parts)
   }
 
-  const clearAppState = (clearLocalStorage: boolean = true) => {
+  const clearAppState = async (clearLocalStorage: boolean = true) => {
+    feedStore.clearNewEventsBadgeUpdateInterval()
+
     if (relayStore.isConnectedToRelay) {
       relayStore.currentRelay?.close()
     }
 
-    // pool.close(relayStore.userReadWriteRelaysUrls)
-    closePoolSockets(pool)
-    poolStore.resetPool()
+    // TODO: loader on the logout page needed to show the status of closing connections to relays
 
-    // feedStore.pool?.close(relayStore.connectedFeedRelaysUrls)
-    if (feedStore.pool) {
-      closePoolSockets(feedStore.pool)
-      feedStore.resetPool()
-    }
+    // console.time('asyncClosePool') // Start timing
+    await asyncClosePool(pool as SimplePool)
+    // console.timeEnd('asyncClosePool') // End timing
 
     feedStore.clear()
     relayStore.clear()
+    poolStore.resetPool()
+
     imagesStore.updateShowImages(false)
 
     if (clearLocalStorage) {

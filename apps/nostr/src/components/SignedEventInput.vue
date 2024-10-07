@@ -2,6 +2,7 @@
   import { ref, defineEmits } from 'vue'
   import { useRelay } from '@/stores/Relay'
   import { useFeed } from '@/stores/Feed'
+  import Textarea from '@/components/Textarea.vue'
 
   defineProps<{
     isSendingMessage: boolean
@@ -19,14 +20,16 @@
   const handleSendSignedEvent = () => {
     emit('clearBroadcastError')
 
-    if (!feedStore.signedJson.length) {
+    const signedJson = feedStore.signedJson.trim()
+
+    if (!signedJson.length) {
       jsonErr.value = 'Please provide a signed event.'
       return
     }
 
     let event
     try {
-      event = JSON.parse(feedStore.signedJson)
+      event = JSON.parse(signedJson)
     } catch (e) {
       jsonErr.value = 'Invalid JSON. Please check it and try again.'
       return
@@ -61,6 +64,10 @@
 
   const toggleMessageType = () => {
     emit('toggleMessageType')
+  }
+
+  const handleInput = (value: string) => {
+    feedStore.updateSignedJson(value)
   }
 
   const handleFocus = () => {
@@ -129,18 +136,17 @@
     <label for="signed_json"><strong>JSON of a signed event</strong></label>
   </div>
   <div :class="['message-field', { active: isFocused }]">
-    <textarea
-      :disabled="!relayStore.isConnectedToRelay"
-      class="message-input"
+    <Textarea
       name="signed_json"
-      id="signed_json"
-      cols="30"
-      rows="5"
+      :disabled="!relayStore.isConnectedToRelay"
+      :rows="5"
+      :isJson="true"
+      :noBorder="true"
+      @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
-      v-model.trim="feedStore.signedJson"
       placeholder='{"kind":1,"pubkey":"5486dbb083512982669fa180aa02d722ce35054233cea724061fbc5f39f81aa3","created_at":1685664152,"content":"Test message 👋","tags":[],"id":"89adae408121ba6d721203365becff4d312292a9dd9b7a35ffa230a1483b09a2","sig":"b2592ae88ba1040c928e458dd6822413f148c8cc4f478d992e024e8c9d9648b96e6ce6dc564ab5815675007f824d9e9f634f8dbde554afeb6e594bcaac4389dd"}'
-    ></textarea>
+    />
     <div class="message-footer">
       <button @click="toggleMessageType" class="send-presigned-btn">
         <i class="bi bi-pencil-square post-icon"></i>
@@ -216,25 +222,6 @@
 
   .message-field.active {
     border: 1px solid #0092bf;
-  }
-
-  .message-input {
-    font-size: 15px;
-    padding: 10px 12px;
-    width: 100%;
-    box-sizing: border-box;
-    background: transparent;
-    border: none;
-    color: inherit;
-    outline: none;
-    line-height: 1.3;
-    resize: none;
-    display: block;
-    border-bottom: none;
-  }
-
-  .message-input:focus {
-    border-bottom: none;
   }
 
   .message-footer {

@@ -3,9 +3,7 @@
  */
 
 import { SimplePool, Relay, utils, type Event } from 'nostr-tools'
-
 import { timeout } from '@/utils/helpers'
-import { isWsAvailable } from '@/utils'
 import type { TypedRelay } from '@/types'
 
 export const connectToSelectedRelay = async (relayUrl: string) => {
@@ -32,26 +30,27 @@ export const connectToSelectedRelay = async (relayUrl: string) => {
   return relay
 }
 
-export const getConnectedReadWriteRelays = async (readAndWriteRelays: TypedRelay[]) => {
+export const getConnectedReadWriteRelays = async (
+  pool: SimplePool,
+  readAndWriteRelays: TypedRelay[],
+) => {
   const userConnectedReadRelays: string[] = []
   const userConnectedWriteRelays: string[] = []
 
   if (readAndWriteRelays.length) {
     const result = await Promise.all(
-      readAndWriteRelays.map(async (relay: TypedRelay) => {
-        const isConnected = await isWsAvailable(relay.url)
-        return { url: relay.url, connected: isConnected, type: relay.type }
+      readAndWriteRelays.map(async (r: TypedRelay) => {
+        let relay: Relay
+        try {
+          relay = await pool.ensureRelay(r.url)
+        } catch (e) {
+          return { url: r.url, connected: false, type: r.type }
+        }
+        return { url: relay.url, connected: relay.connected, type: r.type }
       }),
     )
 
     result.forEach((r) => {
-      // TODO: CHECK THIS
-      // reset pool relays somehow to avoid this check
-      // it is for the case when new url added and the previous handleRelayConnect was not finished yet
-      // if (useProvidedRelaysList && !relayStore.reedRelays.includes(r.url)) {
-      //   return
-      // }
-
       if (r.connected) {
         userConnectedReadRelays.push(r.url)
         if (r.type === 'write') {
@@ -77,7 +76,6 @@ export const getFollowsConnectedRelaysMap = async (
   connectedUserRelays: string[],
   pool: SimplePool,
 ) => {
-  // const pool = new SimplePool()
   const followsRelaysMap: Record<string, string[]> = {}
   let followsPubkeys: string[] = []
 
@@ -87,8 +85,8 @@ export const getFollowsConnectedRelaysMap = async (
       kinds: [10002],
       authors: followsPubkeys,
     })
-    const followsRelaysUrlsExceptUserRelays = new Set()
 
+    const followsRelaysUrlsExceptUserRelays = new Set()
     followsMeta.forEach((event: Event) => {
       event.tags.forEach((tag) => {
         if (tag[0] !== 'r') return
@@ -100,8 +98,13 @@ export const getFollowsConnectedRelaysMap = async (
 
     const followsSortedRelays = await Promise.all(
       Array.from(followsRelaysUrlsExceptUserRelays).map(async (relayUrl: any) => {
-        const isConnected = await isWsAvailable(relayUrl)
-        return { url: relayUrl, connected: isConnected }
+        let relay: Relay
+        try {
+          relay = await pool.ensureRelay(relayUrl)
+        } catch (e) {
+          return { url: relayUrl, connected: false }
+        }
+        return { url: relayUrl, connected: relay.connected }
       }),
     )
 
@@ -134,8 +137,6 @@ export const getFollowsConnectedRelaysMap = async (
       })
       followsRelaysMap[event.pubkey] = normalizedUrls
     })
-
-    // feedRelays = [...new Set([...feedRelays, ...followsConnectedRelaysUrls])]
   }
 
   return followsRelaysMap
@@ -161,6 +162,37 @@ export const closeWebSocket = (webSocket: WebSocket) => {
 }
 
 /**
+ * function used internal private property of the pool, property "relays"
+ * after updating nostr-tools, this function shoule be tested and updated if needed
+ */
+export const asyncClosePool = async (pool: SimplePool) => {
+  // @ts-ignore
+  const relays = Array.from(pool.relays.keys())
+
+  // Call the original close method
+  pool.close(relays)
+
+  // A helper function to check if a WebSocket is closed
+  const isClosed = (ws: WebSocket) => !ws || ws.readyState === WebSocket.CLOSED
+
+  // Wait for all WebSockets to close
+  const relayClosePromises = relays.map(async (url) => {
+    // @ts-ignore
+    const ws = pool.relays.get(url)?.ws // Access the WebSocket for this relay
+
+    if (!ws) return // If no WebSocket exists, nothing to wait for
+
+    // Wait until the WebSocket is closed
+    while (!isClosed(ws)) {
+      await new Promise((resolve) => setTimeout(resolve, 100)) // Poll every 100ms
+    }
+  })
+
+  // Wait for all relays to finish closing
+  await Promise.all(relayClosePromises)
+}
+
+/**
  * terminate all connections to the pool
  * after using this function that pool should be destroyed
  * and new pool created if needed, because it will be in inconsistent state
@@ -172,7 +204,7 @@ export const closePoolSockets = async (pool: any) => {
       to get direct access to relays, close them and ensure that relays were closed
       then we set pool to null, so it will have no impact on further operations
     */
-    const closingSockets: Promise<void>[] = []
+    const closingSockets: Promise<unknown>[] = []
     // @ts-ignore
     pool.relays.forEach((r) => {
       // @ts-ignore

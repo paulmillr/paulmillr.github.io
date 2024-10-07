@@ -13892,7 +13892,6 @@ const isReply = (event) => {
 };
 const listRootEvents = (pool, relays, filters) => {
   return new Promise((resolve2) => {
-    const events = [];
     let filtersLimit;
     let newFilters = filters;
     if (filters && filters.length && filters[0].limit) {
@@ -13901,6 +13900,7 @@ const listRootEvents = (pool, relays, filters) => {
       filtersLimit = limit;
     }
     let subClosed = false;
+    const events = [];
     const sub = pool.subscribeMany(relays, newFilters, {
       onevent(event) {
         if (subClosed)
@@ -13951,33 +13951,33 @@ const getNip19FromSearch = (query) => {
   }
   return nip19data;
 };
-const _withScopeId$e = (n) => (pushScopeId("data-v-393546d0"), n = n(), popScopeId(), n);
-const _hoisted_1$E = { class: "event-details" };
-const _hoisted_2$B = { key: 0 };
-const _hoisted_3$v = { class: "highlight" };
-const _hoisted_4$m = { key: 1 };
-const _hoisted_5$f = {
+const _withScopeId$h = (n) => (pushScopeId("data-v-393546d0"), n = n(), popScopeId(), n);
+const _hoisted_1$H = { class: "event-details" };
+const _hoisted_2$C = { key: 0 };
+const _hoisted_3$w = { class: "highlight" };
+const _hoisted_4$n = { key: 1 };
+const _hoisted_5$h = {
   key: 0,
   class: "highlight"
 };
-const _hoisted_6$c = {
+const _hoisted_6$d = {
   key: 1,
   class: "event-details__no-user"
 };
-const _hoisted_7$9 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
+const _hoisted_7$a = /* @__PURE__ */ _withScopeId$h(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
 const _hoisted_8$9 = { class: "highlight" };
-const _hoisted_9$8 = { key: 2 };
-const _hoisted_10$8 = {
+const _hoisted_9$9 = { key: 2 };
+const _hoisted_10$9 = {
   key: 0,
   class: "highlight"
 };
-const _hoisted_11$7 = {
+const _hoisted_11$8 = {
   key: 1,
   class: "event-details__no-user"
 };
-const _hoisted_12$7 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
-const _hoisted_13$5 = { class: "highlight" };
-const _sfc_main$I = /* @__PURE__ */ defineComponent({
+const _hoisted_12$8 = /* @__PURE__ */ _withScopeId$h(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
+const _hoisted_13$6 = { class: "highlight" };
+const _sfc_main$M = /* @__PURE__ */ defineComponent({
   __name: "RawData",
   props: {
     event: {},
@@ -14008,7 +14008,7 @@ const _sfc_main$I = /* @__PURE__ */ defineComponent({
       rawDataActiveTab.value = tab;
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$E, [
+      return openBlock(), createElementBlock("div", _hoisted_1$H, [
         createBaseVNode("div", {
           class: normalizeClass(["event-details__header", { "event-details__header_user": _ctx.isUserEvent }])
         }, [
@@ -14026,19 +14026,19 @@ const _sfc_main$I = /* @__PURE__ */ defineComponent({
             class: normalizeClass(["event-details__tab", { "event-details__tab_active": rawDataActiveTab.value === 3 }])
           }, "Author content", 2)
         ], 2),
-        rawDataActiveTab.value === 1 ? (openBlock(), createElementBlock("div", _hoisted_2$B, [
-          createBaseVNode("pre", _hoisted_3$v, toDisplayString(JSON.stringify(clearEvent.value, null, 2)), 1)
+        rawDataActiveTab.value === 1 ? (openBlock(), createElementBlock("div", _hoisted_2$C, [
+          createBaseVNode("pre", _hoisted_3$w, toDisplayString(JSON.stringify(clearEvent.value, null, 2)), 1)
         ])) : createCommentVNode("", true),
-        showAuthorTab.value && rawDataActiveTab.value === 2 ? (openBlock(), createElementBlock("div", _hoisted_4$m, [
-          _ctx.authorEvent ? (openBlock(), createElementBlock("pre", _hoisted_5$f, toDisplayString(JSON.stringify(clearAuthorEvent.value, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_6$c, [
-            _hoisted_7$9,
+        showAuthorTab.value && rawDataActiveTab.value === 2 ? (openBlock(), createElementBlock("div", _hoisted_4$n, [
+          _ctx.authorEvent ? (openBlock(), createElementBlock("pre", _hoisted_5$h, toDisplayString(JSON.stringify(clearAuthorEvent.value, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_6$d, [
+            _hoisted_7$a,
             createBaseVNode("pre", _hoisted_8$9, "pubkey: " + toDisplayString(_ctx.event.pubkey) + " \nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
           ]))
         ])) : createCommentVNode("", true),
-        rawDataActiveTab.value === 3 ? (openBlock(), createElementBlock("div", _hoisted_9$8, [
-          _ctx.event.author ? (openBlock(), createElementBlock("pre", _hoisted_10$8, toDisplayString(JSON.stringify(_ctx.event.author, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_11$7, [
-            _hoisted_12$7,
-            createBaseVNode("pre", _hoisted_13$5, "pubkey: " + toDisplayString(_ctx.event.pubkey) + "\nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
+        rawDataActiveTab.value === 3 ? (openBlock(), createElementBlock("div", _hoisted_9$9, [
+          _ctx.event.author ? (openBlock(), createElementBlock("pre", _hoisted_10$9, toDisplayString(JSON.stringify(_ctx.event.author, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_11$8, [
+            _hoisted_12$8,
+            createBaseVNode("pre", _hoisted_13$6, "pubkey: " + toDisplayString(_ctx.event.pubkey) + "\nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
           ]))
         ])) : createCommentVNode("", true)
       ]);
@@ -14053,9 +14053,9 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const RawData = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["__scopeId", "data-v-393546d0"]]);
-const _sfc_main$H = {};
-const _hoisted_1$D = {
+const RawData = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["__scopeId", "data-v-393546d0"]]);
+const _sfc_main$L = {};
+const _hoisted_1$G = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14063,16 +14063,16 @@ const _hoisted_1$D = {
   class: "bi bi-heart",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$A = /* @__PURE__ */ createBaseVNode("path", { d: "m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" }, null, -1);
-const _hoisted_3$u = [
-  _hoisted_2$A
+const _hoisted_2$B = /* @__PURE__ */ createBaseVNode("path", { d: "m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" }, null, -1);
+const _hoisted_3$v = [
+  _hoisted_2$B
 ];
-function _sfc_render$c(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$D, _hoisted_3$u);
+function _sfc_render$b(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$G, _hoisted_3$v);
 }
-const EmptyHeartIcon = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["render", _sfc_render$c]]);
-const _sfc_main$G = {};
-const _hoisted_1$C = {
+const EmptyHeartIcon = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$b]]);
+const _sfc_main$K = {};
+const _hoisted_1$F = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14080,16 +14080,16 @@ const _hoisted_1$C = {
   class: "bi bi-repeat",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$z = /* @__PURE__ */ createBaseVNode("path", { d: "M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" }, null, -1);
-const _hoisted_3$t = [
-  _hoisted_2$z
+const _hoisted_2$A = /* @__PURE__ */ createBaseVNode("path", { d: "M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" }, null, -1);
+const _hoisted_3$u = [
+  _hoisted_2$A
 ];
-function _sfc_render$b(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$C, _hoisted_3$t);
+function _sfc_render$a(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$F, _hoisted_3$u);
 }
-const ArrowRepeatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["render", _sfc_render$b]]);
-const _sfc_main$F = {};
-const _hoisted_1$B = {
+const ArrowRepeatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$a]]);
+const _sfc_main$J = {};
+const _hoisted_1$E = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "22",
   height: "22",
@@ -14097,16 +14097,16 @@ const _hoisted_1$B = {
   class: "bi bi-reply",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$y = /* @__PURE__ */ createBaseVNode("path", { d: "M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z" }, null, -1);
-const _hoisted_3$s = [
-  _hoisted_2$y
+const _hoisted_2$z = /* @__PURE__ */ createBaseVNode("path", { d: "M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z" }, null, -1);
+const _hoisted_3$t = [
+  _hoisted_2$z
 ];
-function _sfc_render$a(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$B, _hoisted_3$s);
+function _sfc_render$9(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$E, _hoisted_3$t);
 }
-const ReplyIcon = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$a]]);
-const _sfc_main$E = {};
-const _hoisted_1$A = {
+const ReplyIcon = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$9]]);
+const _sfc_main$I = {};
+const _hoisted_1$D = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14114,21 +14114,21 @@ const _hoisted_1$A = {
   class: "bi bi-chat",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$x = /* @__PURE__ */ createBaseVNode("path", { d: "M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105" }, null, -1);
-const _hoisted_3$r = [
-  _hoisted_2$x
+const _hoisted_2$y = /* @__PURE__ */ createBaseVNode("path", { d: "M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105" }, null, -1);
+const _hoisted_3$s = [
+  _hoisted_2$y
 ];
-function _sfc_render$9(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$A, _hoisted_3$r);
+function _sfc_render$8(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$D, _hoisted_3$s);
 }
-const ChatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$9]]);
-const _hoisted_1$z = { class: "actions-bar" };
-const _hoisted_2$w = { class: "actions-bar__action actions-bar__num" };
-const _hoisted_3$q = { class: "actions_bar-number" };
-const _hoisted_4$l = { class: "actions-bar__action actions-bar__num" };
-const _hoisted_5$e = { class: "actions_bar-number" };
-const _hoisted_6$b = { class: "actions_bar-number" };
-const _sfc_main$D = /* @__PURE__ */ defineComponent({
+const ChatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["render", _sfc_render$8]]);
+const _hoisted_1$C = { class: "actions-bar" };
+const _hoisted_2$x = { class: "actions-bar__action actions-bar__num" };
+const _hoisted_3$r = { class: "actions_bar-number" };
+const _hoisted_4$m = { class: "actions-bar__action actions-bar__num" };
+const _hoisted_5$g = { class: "actions_bar-number" };
+const _hoisted_6$c = { class: "actions_bar-number" };
+const _sfc_main$H = /* @__PURE__ */ defineComponent({
   __name: "EventActionsBar",
   props: {
     likes: {},
@@ -14146,14 +14146,14 @@ const _sfc_main$D = /* @__PURE__ */ defineComponent({
       emit2("handleShowReplies");
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$z, [
-        createBaseVNode("span", _hoisted_2$w, [
+      return openBlock(), createElementBlock("div", _hoisted_1$C, [
+        createBaseVNode("span", _hoisted_2$x, [
           createVNode(EmptyHeartIcon, { class: "actions-bar__icon" }),
-          createBaseVNode("span", _hoisted_3$q, toDisplayString(_ctx.likes), 1)
+          createBaseVNode("span", _hoisted_3$r, toDisplayString(_ctx.likes), 1)
         ]),
-        createBaseVNode("span", _hoisted_4$l, [
+        createBaseVNode("span", _hoisted_4$m, [
           createVNode(ArrowRepeatIcon, { class: "actions-bar__icon" }),
-          createBaseVNode("span", _hoisted_5$e, toDisplayString(_ctx.reposts), 1)
+          createBaseVNode("span", _hoisted_5$g, toDisplayString(_ctx.reposts), 1)
         ]),
         _ctx.hasReplyBtn ? (openBlock(), createElementBlock("span", {
           key: 0,
@@ -14161,7 +14161,7 @@ const _sfc_main$D = /* @__PURE__ */ defineComponent({
           class: "actions-bar__action actions-bar__num actions-bar__replies"
         }, [
           createVNode(ChatIcon, { class: "actions-bar__icon" }),
-          createBaseVNode("span", _hoisted_6$b, toDisplayString(_ctx.replies), 1)
+          createBaseVNode("span", _hoisted_6$c, toDisplayString(_ctx.replies), 1)
         ])) : createCommentVNode("", true),
         _ctx.hasReplyBtn ? (openBlock(), createElementBlock("span", {
           key: 1,
@@ -14208,11 +14208,11 @@ const useUser = defineStore("user", () => {
   }
   return { isRoutingUser, updateRoutingStatus, updateSearchStatus, isSearchUsed };
 });
-const _hoisted_1$y = { class: "event-content" };
-const _hoisted_2$v = { key: 0 };
-const _hoisted_3$p = { key: 1 };
-const _hoisted_4$k = ["onClick"];
-const _sfc_main$C = /* @__PURE__ */ defineComponent({
+const _hoisted_1$B = { class: "event-content" };
+const _hoisted_2$w = { key: 0 };
+const _hoisted_3$q = { key: 1 };
+const _hoisted_4$l = ["onClick"];
+const _sfc_main$G = /* @__PURE__ */ defineComponent({
   __name: "EventText",
   props: {
     event: {},
@@ -14307,15 +14307,15 @@ const _sfc_main$C = /* @__PURE__ */ defineComponent({
       router2.push({ path: `/user/${mentionNpub}` });
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$y, [
+      return openBlock(), createElementBlock("div", _hoisted_1$B, [
         (openBlock(true), createElementBlock(Fragment, null, renderList(contentParts.value, (part) => {
           return openBlock(), createElementBlock("span", null, [
-            part.type === "text" ? (openBlock(), createElementBlock("span", _hoisted_2$v, toDisplayString(part.value), 1)) : createCommentVNode("", true),
-            part.type === "profile" ? (openBlock(), createElementBlock("span", _hoisted_3$p, [
+            part.type === "text" ? (openBlock(), createElementBlock("span", _hoisted_2$w, toDisplayString(part.value), 1)) : createCommentVNode("", true),
+            part.type === "profile" ? (openBlock(), createElementBlock("span", _hoisted_3$q, [
               createBaseVNode("a", {
                 onClick: withModifiers(() => handleClickMention(part.npub), ["prevent"]),
                 href: "#"
-              }, toDisplayString(part.value), 9, _hoisted_4$k)
+              }, toDisplayString(part.value), 9, _hoisted_4$l)
             ])) : createCommentVNode("", true)
           ]);
         }), 256))
@@ -14324,7 +14324,56 @@ const _sfc_main$C = /* @__PURE__ */ defineComponent({
   }
 });
 const EventText_vue_vue_type_style_index_0_scoped_2c0eedfd_lang = "";
-const EventText = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["__scopeId", "data-v-2c0eedfd"]]);
+const EventText = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["__scopeId", "data-v-2c0eedfd"]]);
+const _hoisted_1$A = ["name", "disabled", "rows", "placeholder"];
+const _sfc_main$F = /* @__PURE__ */ defineComponent({
+  __name: "Textarea",
+  props: {
+    rows: {},
+    placeholder: {},
+    disabled: { type: Boolean },
+    name: {},
+    isJson: { type: Boolean },
+    noBorder: { type: Boolean }
+  },
+  emits: ["input", "focus", "blur"],
+  setup(__props, { emit: __emit }) {
+    const props = __props;
+    const emit2 = __emit;
+    const text = ref("");
+    const _rows = ref(props.rows);
+    const handleInput = () => {
+      emit2("input", text.value);
+      let lines = text.value.split("\n").length;
+      if (lines < 3)
+        lines = 3;
+      _rows.value = lines;
+    };
+    const handleFocus = () => {
+      emit2("focus");
+    };
+    const handleBlur = () => {
+      emit2("blur");
+    };
+    return (_ctx, _cache) => {
+      return withDirectives((openBlock(), createElementBlock("textarea", {
+        name: _ctx.name,
+        disabled: _ctx.disabled,
+        rows: _rows.value,
+        placeholder: _ctx.placeholder,
+        "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => text.value = $event),
+        onInput: handleInput,
+        onFocus: handleFocus,
+        onBlur: handleBlur,
+        class: normalizeClass([{ json: _ctx.isJson, "no-border": _ctx.noBorder }])
+      }, null, 42, _hoisted_1$A)), [
+        [vModelText, text.value]
+      ]);
+    };
+  }
+});
+const Textarea_vue_vue_type_style_index_0_scoped_0b1d3662_lang = "";
+const Textarea = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["__scopeId", "data-v-0b1d3662"]]);
 function isBytes(a) {
   return a instanceof Uint8Array || a != null && typeof a === "object" && a.constructor.name === "Uint8Array";
 }
@@ -14748,8 +14797,8 @@ const useMetasCache = defineStore("metasCache", () => {
     setMetaValue
   };
 });
-const _sfc_main$B = {};
-const _hoisted_1$x = {
+const _sfc_main$E = {};
+const _hoisted_1$z = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "22",
   height: "22",
@@ -14757,18 +14806,18 @@ const _hoisted_1$x = {
   class: "bi bi-link-45deg",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$u = /* @__PURE__ */ createBaseVNode("path", { d: "M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" }, null, -1);
-const _hoisted_3$o = /* @__PURE__ */ createBaseVNode("path", { d: "M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" }, null, -1);
-const _hoisted_4$j = [
-  _hoisted_2$u,
-  _hoisted_3$o
+const _hoisted_2$v = /* @__PURE__ */ createBaseVNode("path", { d: "M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" }, null, -1);
+const _hoisted_3$p = /* @__PURE__ */ createBaseVNode("path", { d: "M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" }, null, -1);
+const _hoisted_4$k = [
+  _hoisted_2$v,
+  _hoisted_3$p
 ];
-function _sfc_render$8(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$x, _hoisted_4$j);
+function _sfc_render$7(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$z, _hoisted_4$k);
 }
-const LinkIcon = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$8]]);
-const _sfc_main$A = {};
-const _hoisted_1$w = {
+const LinkIcon = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$7]]);
+const _sfc_main$D = {};
+const _hoisted_1$y = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "22",
   height: "22",
@@ -14776,16 +14825,16 @@ const _hoisted_1$w = {
   class: "bi bi-check2",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$t = /* @__PURE__ */ createBaseVNode("path", { d: "M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" }, null, -1);
-const _hoisted_3$n = [
-  _hoisted_2$t
+const _hoisted_2$u = /* @__PURE__ */ createBaseVNode("path", { d: "M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" }, null, -1);
+const _hoisted_3$o = [
+  _hoisted_2$u
 ];
-function _sfc_render$7(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$w, _hoisted_3$n);
+function _sfc_render$6(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$y, _hoisted_3$o);
 }
-const CheckIcon = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$7]]);
-const _sfc_main$z = {};
-const _hoisted_1$v = {
+const CheckIcon = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$6]]);
+const _sfc_main$C = {};
+const _hoisted_1$x = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "18",
   height: "18",
@@ -14793,18 +14842,18 @@ const _hoisted_1$v = {
   class: "bi bi-check-square",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$s = /* @__PURE__ */ createBaseVNode("path", { d: "M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" }, null, -1);
-const _hoisted_3$m = /* @__PURE__ */ createBaseVNode("path", { d: "M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" }, null, -1);
-const _hoisted_4$i = [
-  _hoisted_2$s,
-  _hoisted_3$m
+const _hoisted_2$t = /* @__PURE__ */ createBaseVNode("path", { d: "M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" }, null, -1);
+const _hoisted_3$n = /* @__PURE__ */ createBaseVNode("path", { d: "M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" }, null, -1);
+const _hoisted_4$j = [
+  _hoisted_2$t,
+  _hoisted_3$n
 ];
-function _sfc_render$6(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$v, _hoisted_4$i);
+function _sfc_render$5(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$x, _hoisted_4$j);
 }
-const CheckSquareIcon = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$6]]);
-const _sfc_main$y = {};
-const _hoisted_1$u = {
+const CheckSquareIcon = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$5]]);
+const _sfc_main$B = {};
+const _hoisted_1$w = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14812,19 +14861,19 @@ const _hoisted_1$u = {
   class: "bi bi-diagram-2-fill",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$r = /* @__PURE__ */ createBaseVNode("path", {
+const _hoisted_2$s = /* @__PURE__ */ createBaseVNode("path", {
   "fill-rule": "evenodd",
   d: "M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 5 7h2.5V6A1.5 1.5 0 0 1 6 4.5zm-3 8A1.5 1.5 0 0 1 4.5 10h1A1.5 1.5 0 0 1 7 11.5v1A1.5 1.5 0 0 1 5.5 14h-1A1.5 1.5 0 0 1 3 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 9 12.5z"
 }, null, -1);
-const _hoisted_3$l = [
-  _hoisted_2$r
+const _hoisted_3$m = [
+  _hoisted_2$s
 ];
-function _sfc_render$5(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$u, _hoisted_3$l);
+function _sfc_render$4(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$w, _hoisted_3$m);
 }
-const ThreadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$5]]);
-const _sfc_main$x = {};
-const _hoisted_1$t = {
+const ThreadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$4]]);
+const _sfc_main$A = {};
+const _hoisted_1$v = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "18",
   height: "18",
@@ -14832,69 +14881,69 @@ const _hoisted_1$t = {
   class: "bi bi-exclamation-octagon",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$q = /* @__PURE__ */ createBaseVNode("path", { d: "M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z" }, null, -1);
-const _hoisted_3$k = /* @__PURE__ */ createBaseVNode("path", { d: "M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" }, null, -1);
-const _hoisted_4$h = [
-  _hoisted_2$q,
-  _hoisted_3$k
+const _hoisted_2$r = /* @__PURE__ */ createBaseVNode("path", { d: "M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z" }, null, -1);
+const _hoisted_3$l = /* @__PURE__ */ createBaseVNode("path", { d: "M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" }, null, -1);
+const _hoisted_4$i = [
+  _hoisted_2$r,
+  _hoisted_3$l
 ];
-function _sfc_render$4(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$t, _hoisted_4$h);
+function _sfc_render$3(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$v, _hoisted_4$i);
 }
-const InvalidSignatureIcon = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["render", _sfc_render$4]]);
-const _hoisted_1$s = { class: "thread" };
-const _hoisted_2$p = {
+const InvalidSignatureIcon = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$3]]);
+const _hoisted_1$u = { class: "thread" };
+const _hoisted_2$q = {
   key: 0,
   class: "loading-thread"
 };
-const _hoisted_3$j = { class: "event-card" };
-const _hoisted_4$g = {
+const _hoisted_3$k = { class: "event-card" };
+const _hoisted_4$h = {
   key: 0,
   class: "event-img"
 };
-const _hoisted_5$d = ["src", "title"];
-const _hoisted_6$a = {
+const _hoisted_5$f = ["src", "title"];
+const _hoisted_6$b = {
   key: 1,
   class: "bi bi-person-circle author-pic__alternate"
 };
-const _hoisted_7$8 = { class: "event-content" };
+const _hoisted_7$9 = { class: "event-content" };
 const _hoisted_8$8 = { class: "event-header" };
-const _hoisted_9$7 = ["href"];
-const _hoisted_10$7 = { class: "event-username-text" };
-const _hoisted_11$6 = {
+const _hoisted_9$8 = ["href"];
+const _hoisted_10$8 = { class: "event-username-text" };
+const _hoisted_11$7 = {
   key: 0,
   class: "event-replying-to"
 };
-const _hoisted_12$6 = {
+const _hoisted_12$7 = {
   key: 1,
   class: "replying-to-separator"
 };
-const _hoisted_13$4 = ["href"];
-const _hoisted_14$4 = { class: "event-body" };
-const _hoisted_15$4 = { class: "event-footer" };
+const _hoisted_13$5 = ["href"];
+const _hoisted_14$5 = { class: "event-body" };
+const _hoisted_15$5 = { class: "event-footer" };
 const _hoisted_16$4 = { class: "event-footer__right-actions" };
 const _hoisted_17$4 = { class: "event-footer__link-wrapper" };
 const _hoisted_18$3 = { class: "event__raw-data" };
 const _hoisted_19$3 = { class: "event-footer-code-wrapper" };
 const _hoisted_20$3 = { class: "event-footer__signature-text" };
-const _hoisted_21$3 = { class: "event-footer__right-actions" };
+const _hoisted_21$2 = { class: "event-footer__right-actions" };
 const _hoisted_22$2 = { class: "event-footer__link-wrapper" };
-const _hoisted_23$2 = {
+const _hoisted_23$1 = {
   key: 0,
   class: "reply-field"
 };
-const _hoisted_24$2 = { class: "reply-field__actions" };
-const _hoisted_25$2 = { class: "reply-field__error" };
-const _hoisted_26$2 = ["disabled"];
-const _hoisted_27$2 = {
+const _hoisted_24$1 = { class: "reply-field__actions" };
+const _hoisted_25$1 = { class: "error" };
+const _hoisted_26$1 = ["disabled"];
+const _hoisted_27$1 = {
   key: 1,
   class: "loading-replies"
 };
-const _hoisted_28$2 = {
+const _hoisted_28$1 = {
   key: 2,
   class: "replies"
 };
-const _sfc_main$w = /* @__PURE__ */ defineComponent({
+const _sfc_main$z = /* @__PURE__ */ defineComponent({
   __name: "EventContent",
   props: {
     event: {},
@@ -14955,7 +15004,7 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
         } else {
           name = author.display_name;
         }
-        if (name.length) {
+        if (name && name.length) {
           return name;
         }
       }
@@ -15224,10 +15273,13 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
       isLoadingThread.value = false;
       ancestorsEvents.value = ancestors;
     };
+    const hanleReplyInput = (value) => {
+      replyText.value = value;
+    };
     return (_ctx, _cache) => {
       const _component_EventContent = resolveComponent("EventContent", true);
       return openBlock(), createElementBlock(Fragment, null, [
-        createBaseVNode("div", _hoisted_1$s, [
+        createBaseVNode("div", _hoisted_1$u, [
           (openBlock(true), createElementBlock(Fragment, null, renderList(ancestorsEvents.value, (aEvent, i2) => {
             return openBlock(), createElementBlock("div", {
               class: "ancestor",
@@ -15243,9 +15295,9 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
               }, null, 8, ["onToggleRawData", "event", "currentReadRelays", "pool", "hasReplyBtn", "threadDescender"])
             ]);
           }), 128)),
-          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_2$p, "Loading thread...")) : createCommentVNode("", true)
+          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_2$q, "Loading thread...")) : createCommentVNode("", true)
         ]),
-        createBaseVNode("div", _hoisted_3$j, [
+        createBaseVNode("div", _hoisted_3$k, [
           createBaseVNode("div", {
             class: normalizeClass(["event-card__content", { flipped: _ctx.event.showRawData }])
           }, [
@@ -15256,16 +15308,16 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
                 { "event-card__front_custom": _ctx.pubKey === _ctx.event.pubkey }
               ])
             }, [
-              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_4$g, [
+              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_4$h, [
                 _ctx.event.author ? (openBlock(), createElementBlock("img", {
                   key: 0,
                   class: normalizeClass(["author-pic", { "author-pic__squared": !_ctx.event.author.picture }]),
                   src: _ctx.event.author.picture,
                   title: `Avatar for ${_ctx.event.author.name}`,
                   alt: "user's avatar"
-                }, null, 10, _hoisted_5$d)) : (openBlock(), createElementBlock("i", _hoisted_6$a))
+                }, null, 10, _hoisted_5$f)) : (openBlock(), createElementBlock("i", _hoisted_6$b))
               ])) : createCommentVNode("", true),
-              createBaseVNode("div", _hoisted_7$8, [
+              createBaseVNode("div", _hoisted_7$9, [
                 createBaseVNode("div", _hoisted_8$8, [
                   createBaseVNode("div", null, [
                     createBaseVNode("a", {
@@ -15273,12 +15325,12 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
                       onClick: _cache[0] || (_cache[0] = withModifiers(() => handleUserClick(_ctx.event.pubkey), ["prevent"])),
                       href: unref(getUserUrlPath)(_ctx.event.pubkey)
                     }, [
-                      createBaseVNode("b", _hoisted_10$7, toDisplayString(displayName(_ctx.event.author, _ctx.event.pubkey)), 1)
-                    ], 8, _hoisted_9$7)
+                      createBaseVNode("b", _hoisted_10$8, toDisplayString(displayName(_ctx.event.author, _ctx.event.pubkey)), 1)
+                    ], 8, _hoisted_9$8)
                   ]),
                   createBaseVNode("div", null, toDisplayString(unref(formatedDate)(_ctx.event.created_at)), 1)
                 ]),
-                _ctx.event.replyingTo ? (openBlock(), createElementBlock("div", _hoisted_11$6, [
+                _ctx.event.replyingTo ? (openBlock(), createElementBlock("div", _hoisted_11$7, [
                   _ctx.isMainEvent ? (openBlock(), createElementBlock("span", {
                     key: 0,
                     onClick: loadEventThread,
@@ -15287,21 +15339,21 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
                     createVNode(ThreadIcon),
                     createTextVNode(" View thread ")
                   ])) : createCommentVNode("", true),
-                  _ctx.isMainEvent ? (openBlock(), createElementBlock("span", _hoisted_12$6, "  |  ")) : createCommentVNode("", true),
+                  _ctx.isMainEvent ? (openBlock(), createElementBlock("span", _hoisted_12$7, "  |  ")) : createCommentVNode("", true),
                   createBaseVNode("span", null, [
                     createTextVNode(" Replying to "),
                     createBaseVNode("a", {
                       onClick: _cache[1] || (_cache[1] = withModifiers(() => handleUserClick(_ctx.event.replyingTo.pubkey), ["prevent"])),
                       href: unref(getUserUrlPath)(_ctx.event.replyingTo.pubkey),
                       class: "event-username-link event-username-text"
-                    }, "@" + toDisplayString(displayName(_ctx.event.replyingTo.user, _ctx.event.replyingTo.pubkey)), 9, _hoisted_13$4)
+                    }, "@" + toDisplayString(displayName(_ctx.event.replyingTo.user, _ctx.event.replyingTo.pubkey)), 9, _hoisted_13$5)
                   ])
                 ])) : createCommentVNode("", true),
-                createBaseVNode("div", _hoisted_14$4, [
+                createBaseVNode("div", _hoisted_14$5, [
                   createVNode(EventText, { event: _ctx.event }, null, 8, ["event"])
                 ]),
-                createBaseVNode("div", _hoisted_15$4, [
-                  createVNode(_sfc_main$D, {
+                createBaseVNode("div", _hoisted_15$5, [
+                  createVNode(_sfc_main$H, {
                     onShowReplyField: handleToggleReplyField,
                     onHandleShowReplies: handleLoadReplies,
                     onHandleHideReplies: handleHideReplies,
@@ -15358,7 +15410,7 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
                   !isSigVerified.value ? (openBlock(), createBlock(InvalidSignatureIcon, { key: 1 })) : createCommentVNode("", true),
                   createBaseVNode("span", _hoisted_20$3, toDisplayString(isSigVerified.value ? "Signature is valid" : "Invalid signature"), 1)
                 ], 2),
-                createBaseVNode("div", _hoisted_21$3, [
+                createBaseVNode("div", _hoisted_21$2, [
                   createBaseVNode("div", _hoisted_22$2, [
                     isCopiedEventLink.value ? (openBlock(), createBlock(CheckIcon, {
                       key: 0,
@@ -15381,33 +15433,31 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
             ], 2)
           ], 2)
         ]),
-        showReplyField.value ? (openBlock(), createElementBlock("div", _hoisted_23$2, [
-          withDirectives(createBaseVNode("textarea", {
-            "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => replyText.value = $event),
-            rows: "4",
+        showReplyField.value ? (openBlock(), createElementBlock("div", _hoisted_23$1, [
+          createVNode(Textarea, {
+            placeholder: "Write a reply...",
             class: "reply-field__textarea",
-            placeholder: "Write a reply..."
-          }, null, 512), [
-            [vModelText, replyText.value]
-          ]),
-          createBaseVNode("div", _hoisted_24$2, [
-            createBaseVNode("div", _hoisted_25$2, toDisplayString(msgErr.value), 1),
+            rows: 4,
+            onInput: hanleReplyInput
+          }),
+          createBaseVNode("div", _hoisted_24$1, [
+            createBaseVNode("div", _hoisted_25$1, toDisplayString(msgErr.value), 1),
             createBaseVNode("button", {
               disabled: isPublishingReply.value,
               onClick: handleSendReply,
               class: "reply-field__btn"
-            }, toDisplayString(isPublishingReply.value ? "Sending reply..." : "Reply"), 9, _hoisted_26$2)
+            }, toDisplayString(isPublishingReply.value ? "Sending reply..." : "Reply"), 9, _hoisted_26$1)
           ])
         ])) : createCommentVNode("", true),
-        isLoadingReplies.value ? (openBlock(), createElementBlock("div", _hoisted_27$2, "Loading replies...")) : createCommentVNode("", true),
-        showReplies.value && eventReplies.value.length ? (openBlock(), createElementBlock("div", _hoisted_28$2, [
+        isLoadingReplies.value ? (openBlock(), createElementBlock("div", _hoisted_27$1, "Loading replies...")) : createCommentVNode("", true),
+        showReplies.value && eventReplies.value.length ? (openBlock(), createElementBlock("div", _hoisted_28$1, [
           (openBlock(true), createElementBlock(Fragment, null, renderList(eventReplies.value, (reply) => {
             return openBlock(), createElementBlock("div", {
               class: "reply",
               key: reply.id
             }, [
               createVNode(_component_EventContent, {
-                onToggleRawData: _cache[5] || (_cache[5] = () => handleToggleRawData(_ctx.event.id)),
+                onToggleRawData: _cache[4] || (_cache[4] = () => handleToggleRawData(_ctx.event.id)),
                 event: reply,
                 currentReadRelays: _ctx.currentReadRelays,
                 pool: _ctx.pool,
@@ -15420,10 +15470,10 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const EventContent_vue_vue_type_style_index_0_scoped_48e6ed81_lang = "";
-const EventContent = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["__scopeId", "data-v-48e6ed81"]]);
-const _sfc_main$v = {};
-const _hoisted_1$r = {
+const EventContent_vue_vue_type_style_index_0_scoped_6dee6863_lang = "";
+const EventContent = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["__scopeId", "data-v-6dee6863"]]);
+const _sfc_main$y = {};
+const _hoisted_1$t = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -15431,17 +15481,17 @@ const _hoisted_1$r = {
   class: "bi bi-arrows-expand",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$o = /* @__PURE__ */ createBaseVNode("path", {
+const _hoisted_2$p = /* @__PURE__ */ createBaseVNode("path", {
   "fill-rule": "evenodd",
   d: "M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8ZM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2ZM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10Z"
 }, null, -1);
-const _hoisted_3$i = [
-  _hoisted_2$o
+const _hoisted_3$j = [
+  _hoisted_2$p
 ];
-function _sfc_render$3(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$r, _hoisted_3$i);
+function _sfc_render$2(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$t, _hoisted_3$j);
 }
-const ExpandArrow = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["render", _sfc_render$3]]);
+const ExpandArrow = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$2]]);
 const usePool = defineStore("pool", () => {
   const pool = ref(new SimplePool());
   function resetPool() {
@@ -15449,32 +15499,32 @@ const usePool = defineStore("pool", () => {
   }
   return { pool, resetPool };
 });
-const _withScopeId$d = (n) => (pushScopeId("data-v-5f3cf145"), n = n(), popScopeId(), n);
-const _hoisted_1$q = { class: "event" };
-const _hoisted_2$n = { key: 0 };
-const _hoisted_3$h = {
+const _withScopeId$g = (n) => (pushScopeId("data-v-5f3cf145"), n = n(), popScopeId(), n);
+const _hoisted_1$s = { class: "event" };
+const _hoisted_2$o = { key: 0 };
+const _hoisted_3$i = {
   key: 1,
   class: "replies"
 };
-const _hoisted_4$f = { class: "replies__other-link" };
-const _hoisted_5$c = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("span", { class: "replies__other-text" }, " Show more replies ", -1));
-const _hoisted_6$9 = {
+const _hoisted_4$g = { class: "replies__other-link" };
+const _hoisted_5$e = /* @__PURE__ */ _withScopeId$g(() => /* @__PURE__ */ createBaseVNode("span", { class: "replies__other-text" }, " Show more replies ", -1));
+const _hoisted_6$a = {
   key: 1,
   class: "replies__other"
 };
-const _hoisted_7$7 = {
+const _hoisted_7$8 = {
   key: 2,
   class: "replies__other"
 };
 const _hoisted_8$7 = { class: "replies__other-text" };
-const _hoisted_9$6 = { key: 4 };
-const _hoisted_10$6 = {
+const _hoisted_9$7 = { key: 4 };
+const _hoisted_10$7 = {
   key: 5,
   class: "replies__list"
 };
-const _hoisted_11$5 = { class: "replies__list-item" };
-const _hoisted_12$5 = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("div", { class: "replies__list-item-line-horizontal" }, null, -1));
-const _sfc_main$u = /* @__PURE__ */ defineComponent({
+const _hoisted_11$6 = { class: "replies__list-item" };
+const _hoisted_12$6 = /* @__PURE__ */ _withScopeId$g(() => /* @__PURE__ */ createBaseVNode("div", { class: "replies__list-item-line-horizontal" }, null, -1));
+const _sfc_main$x = /* @__PURE__ */ defineComponent({
   __name: "ParentEventView",
   props: {
     event: {},
@@ -15577,7 +15627,7 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
       }
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$q, [
+      return openBlock(), createElementBlock("div", _hoisted_1$s, [
         (openBlock(), createBlock(EventContent, {
           key: _ctx.event.id,
           onLoadRootReplies: loadRootReplies,
@@ -15591,20 +15641,20 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
           pool: unref(pool),
           hasReplyBtn: _ctx.hasReplyBtn
         }, null, 8, ["event", "pubKey", "currentReadRelays", "pool", "hasReplyBtn"])),
-        isLoadingFirstReply.value ? (openBlock(), createElementBlock("div", _hoisted_2$n, "Loading replies...")) : createCommentVNode("", true),
-        replyEvent.value ? (openBlock(), createElementBlock("div", _hoisted_3$h, [
+        isLoadingFirstReply.value ? (openBlock(), createElementBlock("div", _hoisted_2$o, "Loading replies...")) : createCommentVNode("", true),
+        replyEvent.value ? (openBlock(), createElementBlock("div", _hoisted_3$i, [
           !showAllReplies.value && showMoreRepliesBtn.value && !isLoadingThread.value ? (openBlock(), createElementBlock("div", {
             key: 0,
             onClick: handleLoadMoreReplies,
             class: "replies__other"
           }, [
-            createBaseVNode("span", _hoisted_4$f, [
-              _hoisted_5$c,
+            createBaseVNode("span", _hoisted_4$g, [
+              _hoisted_5$e,
               createVNode(ExpandArrow)
             ])
           ])) : createCommentVNode("", true),
-          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_6$9, "Loading replies...")) : createCommentVNode("", true),
-          showAllReplies.value && showMoreRepliesBtn.value ? (openBlock(), createElementBlock("div", _hoisted_7$7, [
+          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_6$a, "Loading replies...")) : createCommentVNode("", true),
+          showAllReplies.value && showMoreRepliesBtn.value ? (openBlock(), createElementBlock("div", _hoisted_7$8, [
             createBaseVNode("span", _hoisted_8$7, " Loaded " + toDisplayString(eventReplies.value.length) + " replies ", 1)
           ])) : createCommentVNode("", true),
           createBaseVNode("div", {
@@ -15621,7 +15671,7 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
             key: 3,
             class: normalizeClass(["line-horizontal", { "line-horizontal_height": showMoreRepliesBtn.value }])
           }, null, 2)) : createCommentVNode("", true),
-          !showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_9$6, [
+          !showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_9$7, [
             (openBlock(), createBlock(EventContent, {
               key: replyEvent.value.id,
               event: replyEvent.value,
@@ -15630,10 +15680,10 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
               hasReplyBtn: _ctx.hasReplyBtn
             }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"]))
           ])) : createCommentVNode("", true),
-          showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_10$6, [
+          showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_10$7, [
             (openBlock(true), createElementBlock(Fragment, null, renderList(eventReplies.value, (reply, i2) => {
-              return openBlock(), createElementBlock("div", _hoisted_11$5, [
-                _hoisted_12$5,
+              return openBlock(), createElementBlock("div", _hoisted_11$6, [
+                _hoisted_12$6,
                 createBaseVNode("div", {
                   class: normalizeClass([
                     "replies__list-item-line-vertical",
@@ -15656,8 +15706,8 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
   }
 });
 const ParentEventView_vue_vue_type_style_index_0_scoped_5f3cf145_lang = "";
-const ParentEventView = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["__scopeId", "data-v-5f3cf145"]]);
-const _sfc_main$t = /* @__PURE__ */ defineComponent({
+const ParentEventView = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["__scopeId", "data-v-5f3cf145"]]);
+const _sfc_main$w = /* @__PURE__ */ defineComponent({
   __name: "RelayEventsList",
   props: {
     events: {},
@@ -15690,16 +15740,16 @@ const _sfc_main$t = /* @__PURE__ */ defineComponent({
   }
 });
 const RelayEventsList_vue_vue_type_style_index_0_scoped_421078f4_lang = "";
-const RelayEventsList = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["__scopeId", "data-v-421078f4"]]);
-const _hoisted_1$p = {
+const RelayEventsList = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["__scopeId", "data-v-421078f4"]]);
+const _hoisted_1$r = {
   key: 0,
   class: "pagination"
 };
-const _hoisted_2$m = { key: 0 };
-const _hoisted_3$g = { key: 1 };
-const _hoisted_4$e = { key: 1 };
-const _hoisted_5$b = { key: 4 };
-const _sfc_main$s = /* @__PURE__ */ defineComponent({
+const _hoisted_2$n = { key: 0 };
+const _hoisted_3$h = { key: 1 };
+const _hoisted_4$f = { key: 1 };
+const _hoisted_5$d = { key: 4 };
+const _sfc_main$v = /* @__PURE__ */ defineComponent({
   __name: "Pagination",
   props: {
     pagesCount: {},
@@ -15728,9 +15778,9 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
     );
     return (_ctx, _cache) => {
       const _component_router_link = resolveComponent("router-link");
-      return _ctx.pagesCount > 1 ? (openBlock(), createElementBlock("div", _hoisted_1$p, [
+      return _ctx.pagesCount > 1 ? (openBlock(), createElementBlock("div", _hoisted_1$r, [
         createTextVNode(" Pages: "),
-        _ctx.pagesCount < 5 ? (openBlock(), createElementBlock("span", _hoisted_2$m, [
+        _ctx.pagesCount < 5 ? (openBlock(), createElementBlock("span", _hoisted_2$n, [
           (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.pagesCount, (page) => {
             return openBlock(), createBlock(_component_router_link, {
               key: page,
@@ -15744,7 +15794,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
             }, 1032, ["class", "to"]);
           }), 128))
         ])) : createCommentVNode("", true),
-        _ctx.pagesCount >= 5 ? (openBlock(), createElementBlock("span", _hoisted_3$g, [
+        _ctx.pagesCount >= 5 ? (openBlock(), createElementBlock("span", _hoisted_3$h, [
           _ctx.currentPage >= 3 ? (openBlock(), createBlock(_component_router_link, {
             key: 1,
             class: normalizeClass(["pagination__link"]),
@@ -15755,7 +15805,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
             ]),
             _: 1
           }, 8, ["to"])) : createCommentVNode("", true),
-          _ctx.currentPage > 3 ? (openBlock(), createElementBlock("span", _hoisted_4$e, "...")) : createCommentVNode("", true),
+          _ctx.currentPage > 3 ? (openBlock(), createElementBlock("span", _hoisted_4$f, "...")) : createCommentVNode("", true),
           _ctx.currentPage != 1 ? (openBlock(), createBlock(_component_router_link, {
             key: _ctx.currentPage - 1,
             class: normalizeClass(["pagination__link"]),
@@ -15786,7 +15836,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
             ]),
             _: 1
           }, 8, ["to"])) : createCommentVNode("", true),
-          _ctx.currentPage < _ctx.pagesCount - 2 ? (openBlock(), createElementBlock("span", _hoisted_5$b, "...")) : createCommentVNode("", true),
+          _ctx.currentPage < _ctx.pagesCount - 2 ? (openBlock(), createElementBlock("span", _hoisted_5$d, "...")) : createCommentVNode("", true),
           _ctx.currentPage <= _ctx.pagesCount - 2 ? (openBlock(), createBlock(_component_router_link, {
             key: _ctx.pagesCount,
             class: normalizeClass(["pagination__link"]),
@@ -15803,7 +15853,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
   }
 });
 const Pagination_vue_vue_type_style_index_0_scoped_6b61b6ba_lang = "";
-const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["__scopeId", "data-v-6b61b6ba"]]);
+const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["__scopeId", "data-v-6b61b6ba"]]);
 const useFeed = defineStore("feed", () => {
   const events = ref([]);
   const showNewEventsBadge = ref(false);
@@ -15814,8 +15864,10 @@ const useFeed = defineStore("feed", () => {
   const messageToBroadcast = ref("");
   const signedJson = ref("");
   const newEventsBadgeUpdateInterval = ref(0);
+  const timeToGetNewPosts = ref(0);
   const selectedFeedSource = ref("network");
   const eventsId = computed(() => events.value.map((e) => e.id));
+  const newEventsToShowIds = computed(() => newEventsToShow.value.map((e) => e.id));
   const isFollowsSource = computed(() => selectedFeedSource.value === "follows");
   const isNetworkSource = computed(() => selectedFeedSource.value === "network");
   const isLoadingFeedSource = ref(false);
@@ -15823,7 +15875,6 @@ const useFeed = defineStore("feed", () => {
   const isLoadingMore = ref(false);
   const isMountAfterLogin = ref(false);
   const toRemountFeed = ref(false);
-  const pool = ref(new SimplePool());
   function clear2() {
     clearNewEventsBadgeUpdateInterval();
     events.value = [];
@@ -15893,11 +15944,11 @@ const useFeed = defineStore("feed", () => {
     clearInterval(newEventsBadgeUpdateInterval.value);
     newEventsBadgeUpdateInterval.value = 0;
   }
-  function resetPool() {
-    pool.value = new SimplePool();
-  }
   function setToRemountFeed(value) {
     toRemountFeed.value = value;
+  }
+  function resetTimeToGetNewPostsToNow() {
+    timeToGetNewPosts.value = Math.floor(Date.now() / 1e3);
   }
   return {
     events,
@@ -15936,25 +15987,25 @@ const useFeed = defineStore("feed", () => {
     newEventsBadgeUpdateInterval,
     clearNewEventsBadgeUpdateInterval,
     clear: clear2,
-    pool,
-    resetPool,
     toRemountFeed,
-    setToRemountFeed
+    setToRemountFeed,
+    newEventsToShowIds,
+    timeToGetNewPosts,
+    resetTimeToGetNewPostsToNow
   };
 });
-const _withScopeId$c = (n) => (pushScopeId("data-v-2d4fce59"), n = n(), popScopeId(), n);
-const _hoisted_1$o = ["disabled", "rows"];
-const _hoisted_2$l = { class: "message-footer" };
-const _hoisted_3$f = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-braces presigned-icon" }, null, -1));
-const _hoisted_4$d = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("span", null, "Send presigned message", -1));
-const _hoisted_5$a = [
-  _hoisted_3$f,
-  _hoisted_4$d
+const _withScopeId$f = (n) => (pushScopeId("data-v-decfe70f"), n = n(), popScopeId(), n);
+const _hoisted_1$q = { class: "message-footer" };
+const _hoisted_2$m = /* @__PURE__ */ _withScopeId$f(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-braces presigned-icon" }, null, -1));
+const _hoisted_3$g = /* @__PURE__ */ _withScopeId$f(() => /* @__PURE__ */ createBaseVNode("span", null, "Send presigned message", -1));
+const _hoisted_4$e = [
+  _hoisted_2$m,
+  _hoisted_3$g
 ];
-const _hoisted_6$8 = ["disabled"];
-const _hoisted_7$6 = { class: "error" };
-const _hoisted_8$6 = { class: "warning" };
-const _sfc_main$r = /* @__PURE__ */ defineComponent({
+const _hoisted_5$c = ["disabled"];
+const _hoisted_6$9 = { class: "error" };
+const _hoisted_7$7 = { class: "warning" };
+const _sfc_main$u = /* @__PURE__ */ defineComponent({
   __name: "MessageInput",
   props: {
     sentEventIds: {},
@@ -15988,7 +16039,7 @@ const _sfc_main$r = /* @__PURE__ */ defineComponent({
         msgErr.value = "Please login with your private key or generate random key in settings.";
         return;
       }
-      const messageValue = feedStore.messageToBroadcast;
+      const messageValue = feedStore.messageToBroadcast.trim();
       if (!messageValue.length) {
         msgErr.value = "Please provide message to broadcast.";
         return;
@@ -16025,14 +16076,8 @@ const _sfc_main$r = /* @__PURE__ */ defineComponent({
       msgErr.value = "";
       emit2("broadcastEvent", signedEvent, "text");
     };
-    const handleInput = () => {
-      const text = feedStore.messageToBroadcast;
-      if (!text.length)
-        return;
-      let lines = text.split("\n").length;
-      if (lines < 3)
-        lines = 3;
-      rows.value = lines;
+    const handleInput = (value) => {
+      feedStore.updateMessageToBroadcast(value);
     };
     const handleFocus = () => {
       isFocused.value = true;
@@ -16052,48 +16097,39 @@ const _sfc_main$r = /* @__PURE__ */ defineComponent({
         createBaseVNode("div", {
           class: normalizeClass(["message-field", { active: isFocused.value }])
         }, [
-          withDirectives(createBaseVNode("textarea", {
-            disabled: !unref(relayStore).isConnectedToRelay,
-            class: "message-input",
+          createVNode(Textarea, {
             name: "message",
-            id: "message",
+            placeholder: "What do you want to say?",
+            disabled: !unref(relayStore).isConnectedToRelay,
             rows: rows.value,
-            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => unref(feedStore).messageToBroadcast = $event),
+            noBorder: true,
             onInput: handleInput,
             onFocus: handleFocus,
-            onBlur: handleBlur,
-            placeholder: "What do you want to say?"
-          }, null, 40, _hoisted_1$o), [
-            [
-              vModelText,
-              unref(feedStore).messageToBroadcast,
-              void 0,
-              { trim: true }
-            ]
-          ]),
-          createBaseVNode("div", _hoisted_2$l, [
+            onBlur: handleBlur
+          }, null, 8, ["disabled", "rows"]),
+          createBaseVNode("div", _hoisted_1$q, [
             createBaseVNode("button", {
               onClick: toggleMessageType,
               class: "send-presigned-btn"
-            }, _hoisted_5$a),
+            }, _hoisted_4$e),
             createBaseVNode("button", {
               disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay,
               class: normalizeClass(["send-btn", { disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay }]),
               onClick: handleSendMessage
-            }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_6$8)
+            }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_5$c)
           ])
         ], 2),
-        createBaseVNode("div", _hoisted_7$6, toDisplayString(msgErr.value), 1),
-        createBaseVNode("div", _hoisted_8$6, toDisplayString(msgNotice.value), 1)
+        createBaseVNode("div", _hoisted_6$9, toDisplayString(msgErr.value), 1),
+        createBaseVNode("div", _hoisted_7$7, toDisplayString(msgNotice.value), 1)
       ], 64);
     };
   }
 });
-const MessageInput_vue_vue_type_style_index_0_scoped_2d4fce59_lang = "";
-const MessageInput = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["__scopeId", "data-v-2d4fce59"]]);
-const _withScopeId$b = (n) => (pushScopeId("data-v-7a0c8f52"), n = n(), popScopeId(), n);
-const _hoisted_1$n = { class: "signed-message-desc" };
-const _hoisted_2$k = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("p", { class: "signed-message-desc_p" }, [
+const MessageInput_vue_vue_type_style_index_0_scoped_decfe70f_lang = "";
+const MessageInput = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["__scopeId", "data-v-decfe70f"]]);
+const _withScopeId$e = (n) => (pushScopeId("data-v-030e0684"), n = n(), popScopeId(), n);
+const _hoisted_1$p = { class: "signed-message-desc" };
+const _hoisted_2$l = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("p", { class: "signed-message-desc_p" }, [
   /* @__PURE__ */ createTextVNode(" Event should be signed with your private key in advance. More details about events and signatures are "),
   /* @__PURE__ */ createBaseVNode("a", {
     target: "_blank",
@@ -16101,36 +16137,35 @@ const _hoisted_2$k = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ create
   }, "here"),
   /* @__PURE__ */ createTextVNode(". ")
 ], -1));
-const _hoisted_3$e = { class: "signed-message-desc_p" };
-const _hoisted_4$c = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("br", null, null, -1));
-const _hoisted_5$9 = { class: "warning" };
-const _hoisted_6$7 = {
+const _hoisted_3$f = { class: "signed-message-desc_p" };
+const _hoisted_4$d = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("br", null, null, -1));
+const _hoisted_5$b = { class: "warning" };
+const _hoisted_6$8 = {
   key: 0,
   class: "additional-relays"
 };
-const _hoisted_7$5 = { class: "additional-relay-field" };
-const _hoisted_8$5 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("span", { class: "aditinal-relay-num" }, "1.", -1));
-const _hoisted_9$5 = ["value"];
-const _hoisted_10$5 = { class: "additional-relay-field" };
-const _hoisted_11$4 = { class: "aditinal-relay-num" };
-const _hoisted_12$4 = ["onInput"];
-const _hoisted_13$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("div", { class: "message-field-label" }, [
+const _hoisted_7$6 = { class: "additional-relay-field" };
+const _hoisted_8$6 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("span", { class: "aditinal-relay-num" }, "1.", -1));
+const _hoisted_9$6 = ["value"];
+const _hoisted_10$6 = { class: "additional-relay-field" };
+const _hoisted_11$5 = { class: "aditinal-relay-num" };
+const _hoisted_12$5 = ["onInput"];
+const _hoisted_13$4 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("div", { class: "message-field-label" }, [
   /* @__PURE__ */ createBaseVNode("label", { for: "signed_json" }, [
     /* @__PURE__ */ createBaseVNode("strong", null, "JSON of a signed event")
   ])
 ], -1));
-const _hoisted_14$3 = ["disabled"];
-const _hoisted_15$3 = { class: "message-footer" };
-const _hoisted_16$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-pencil-square post-icon" }, null, -1));
-const _hoisted_17$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("span", null, "New post within your profile", -1));
-const _hoisted_18$2 = [
-  _hoisted_16$3,
-  _hoisted_17$3
+const _hoisted_14$4 = { class: "message-footer" };
+const _hoisted_15$4 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-pencil-square post-icon" }, null, -1));
+const _hoisted_16$3 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("span", null, "New post within your profile", -1));
+const _hoisted_17$3 = [
+  _hoisted_15$4,
+  _hoisted_16$3
 ];
-const _hoisted_19$2 = ["disabled"];
-const _hoisted_20$2 = { class: "error" };
-const _hoisted_21$2 = { class: "warning" };
-const _sfc_main$q = /* @__PURE__ */ defineComponent({
+const _hoisted_18$2 = ["disabled"];
+const _hoisted_19$2 = { class: "error" };
+const _hoisted_20$2 = { class: "warning" };
+const _sfc_main$t = /* @__PURE__ */ defineComponent({
   __name: "SignedEventInput",
   props: {
     isSendingMessage: { type: Boolean },
@@ -16147,13 +16182,14 @@ const _sfc_main$q = /* @__PURE__ */ defineComponent({
     const isFocused = ref(false);
     const handleSendSignedEvent = () => {
       emit2("clearBroadcastError");
-      if (!feedStore.signedJson.length) {
+      const signedJson = feedStore.signedJson.trim();
+      if (!signedJson.length) {
         jsonErr.value = "Please provide a signed event.";
         return;
       }
       let event;
       try {
-        event = JSON.parse(feedStore.signedJson);
+        event = JSON.parse(signedJson);
       } catch (e) {
         jsonErr.value = "Invalid JSON. Please check it and try again.";
         return;
@@ -16184,6 +16220,9 @@ const _sfc_main$q = /* @__PURE__ */ defineComponent({
     const toggleMessageType = () => {
       emit2("toggleMessageType");
     };
+    const handleInput = (value) => {
+      feedStore.updateSignedJson(value);
+    };
     const handleFocus = () => {
       isFocused.value = true;
     };
@@ -16194,13 +16233,13 @@ const _sfc_main$q = /* @__PURE__ */ defineComponent({
     return (_ctx, _cache) => {
       var _a, _b;
       return openBlock(), createElementBlock(Fragment, null, [
-        createBaseVNode("div", _hoisted_1$n, [
-          _hoisted_2$k,
-          createBaseVNode("p", _hoisted_3$e, [
+        createBaseVNode("div", _hoisted_1$p, [
+          _hoisted_2$l,
+          createBaseVNode("p", _hoisted_3$f, [
             createTextVNode(" Event will be broadcasted to a selected relay("),
             createBaseVNode("em", null, toDisplayString(unref(relayStore).isConnectedToRelay ? unref(relayStore).currentRelay.url : "available after connect"), 1),
             createTextVNode("). You can add more relays to retransmit the event. "),
-            _hoisted_4$c
+            _hoisted_4$d
           ]),
           createBaseVNode("p", { class: "signed-message-desc_p" }, [
             createBaseVNode("button", {
@@ -16208,78 +16247,70 @@ const _sfc_main$q = /* @__PURE__ */ defineComponent({
               onClick: handleClickAddNewField
             }, "Add relay")
           ]),
-          createBaseVNode("div", _hoisted_5$9, toDisplayString(addRelayNotice.value), 1),
-          unref(relayStore).additionalRelaysCountForSignedEvent > 0 ? (openBlock(), createElementBlock("div", _hoisted_6$7, [
-            createBaseVNode("div", _hoisted_7$5, [
-              _hoisted_8$5,
+          createBaseVNode("div", _hoisted_5$b, toDisplayString(addRelayNotice.value), 1),
+          unref(relayStore).additionalRelaysCountForSignedEvent > 0 ? (openBlock(), createElementBlock("div", _hoisted_6$8, [
+            createBaseVNode("div", _hoisted_7$6, [
+              _hoisted_8$6,
               createBaseVNode("input", {
                 class: "additional-relay-input",
                 readonly: "",
                 value: ((_a = unref(relayStore).currentRelay) == null ? void 0 : _a.url) ? `${(_b = unref(relayStore).currentRelay) == null ? void 0 : _b.url} (selected)` : "Firstly connect to default relay",
                 type: "text"
-              }, null, 8, _hoisted_9$5)
+              }, null, 8, _hoisted_9$6)
             ]),
             (openBlock(true), createElementBlock(Fragment, null, renderList(unref(relayStore).additionalRelaysCountForSignedEvent, (i2) => {
               return openBlock(), createElementBlock("div", { key: i2 }, [
-                createBaseVNode("div", _hoisted_10$5, [
-                  createBaseVNode("span", _hoisted_11$4, toDisplayString(i2 + 1) + ".", 1),
+                createBaseVNode("div", _hoisted_10$6, [
+                  createBaseVNode("span", _hoisted_11$5, toDisplayString(i2 + 1) + ".", 1),
                   createBaseVNode("input", {
                     class: "additional-relay-input",
                     onInput: (event) => handleRelayInput(event, i2),
                     placeholder: "[wss://]relay.example.com",
                     type: "text"
-                  }, null, 40, _hoisted_12$4)
+                  }, null, 40, _hoisted_12$5)
                 ])
               ]);
             }), 128))
           ])) : createCommentVNode("", true)
         ]),
-        _hoisted_13$3,
+        _hoisted_13$4,
         createBaseVNode("div", {
           class: normalizeClass(["message-field", { active: isFocused.value }])
         }, [
-          withDirectives(createBaseVNode("textarea", {
-            disabled: !unref(relayStore).isConnectedToRelay,
-            class: "message-input",
+          createVNode(Textarea, {
             name: "signed_json",
-            id: "signed_json",
-            cols: "30",
-            rows: "5",
+            disabled: !unref(relayStore).isConnectedToRelay,
+            rows: 5,
+            isJson: true,
+            noBorder: true,
+            onInput: handleInput,
             onFocus: handleFocus,
             onBlur: handleBlur,
-            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => unref(feedStore).signedJson = $event),
             placeholder: '{"kind":1,"pubkey":"5486dbb083512982669fa180aa02d722ce35054233cea724061fbc5f39f81aa3","created_at":1685664152,"content":"Test message 👋","tags":[],"id":"89adae408121ba6d721203365becff4d312292a9dd9b7a35ffa230a1483b09a2","sig":"b2592ae88ba1040c928e458dd6822413f148c8cc4f478d992e024e8c9d9648b96e6ce6dc564ab5815675007f824d9e9f634f8dbde554afeb6e594bcaac4389dd"}'
-          }, null, 40, _hoisted_14$3), [
-            [
-              vModelText,
-              unref(feedStore).signedJson,
-              void 0,
-              { trim: true }
-            ]
-          ]),
-          createBaseVNode("div", _hoisted_15$3, [
+          }, null, 8, ["disabled"]),
+          createBaseVNode("div", _hoisted_14$4, [
             createBaseVNode("button", {
               onClick: toggleMessageType,
               class: "send-presigned-btn"
-            }, _hoisted_18$2),
+            }, _hoisted_17$3),
             createBaseVNode("button", {
               disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay,
               class: normalizeClass(["button send-btn", { disabled: !unref(relayStore).isConnectedToRelay }]),
               onClick: handleSendSignedEvent
-            }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_19$2)
+            }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_18$2)
           ])
         ], 2),
-        createBaseVNode("div", _hoisted_20$2, toDisplayString(jsonErr.value), 1),
-        createBaseVNode("div", _hoisted_21$2, toDisplayString(msgNotice.value), 1)
+        createBaseVNode("div", _hoisted_19$2, toDisplayString(jsonErr.value), 1),
+        createBaseVNode("div", _hoisted_20$2, toDisplayString(msgNotice.value), 1)
       ], 64);
     };
   }
 });
-const SignedEventInput_vue_vue_type_style_index_0_scoped_7a0c8f52_lang = "";
-const SignedEventInput = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["__scopeId", "data-v-7a0c8f52"]]);
-const _hoisted_1$m = { class: "message-field-wrapper" };
-const _hoisted_2$j = { class: "error" };
-const _sfc_main$p = /* @__PURE__ */ defineComponent({
+const SignedEventInput_vue_vue_type_style_index_0_scoped_030e0684_lang = "";
+const SignedEventInput = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["__scopeId", "data-v-030e0684"]]);
+const _hoisted_1$o = { class: "message-field-wrapper" };
+const _hoisted_2$k = { class: "error" };
+const _sfc_main$s = /* @__PURE__ */ defineComponent({
   __name: "MessageWrapper",
   props: {
     newEvents: {}
@@ -16291,7 +16322,6 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
     const poolStore = usePool();
     const pool = poolStore.pool;
     const emit2 = __emit;
-    const props = __props;
     const sentEventIds = ref(/* @__PURE__ */ new Set());
     const isPresignedMessage = ref(false);
     const isSendingMessage = ref(false);
@@ -16329,9 +16359,7 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
           }
           if (isError) {
             error += `Relays are unavailable or you are offline. Please try again or change the list of relays.`;
-            broadcastMsgError.value = error;
-            isSendingMessage.value = false;
-            return;
+            return handleBroadcastError(error);
           }
         }
         writeRelays = [relayStore.currentRelay.url, ...connectedJsonRelays];
@@ -16342,33 +16370,13 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
       }
       if (!writeRelays.length) {
         const error = "No relays to broadcast the message. Please provide the list of write relays in settings.";
-        return handleBroadcastError(null, error);
-      }
-      const relaysToWatch = relayStore.connectedFeedRelaysUrls;
-      let userSub = null;
-      let interval;
-      const toWatchForUpadtes = relaysToWatch.some((r) => writeRelays.includes(r));
-      if (toWatchForUpadtes) {
-        const userNewEventOptions = [{ ids: [event.id] }];
-        userSub = pool.subscribeMany(relaysToWatch, userNewEventOptions, {
-          onevent(event2) {
-            interval = setInterval(() => {
-              if (props.newEvents.some((e) => e.id === event2.id)) {
-                emit2("loadNewRelayEvents");
-                userSub == null ? void 0 : userSub.close();
-              }
-            }, 100);
-          },
-          onclose() {
-            clearInterval(interval);
-          }
-        });
+        return handleBroadcastError(error);
       }
       const networkResult = await publishEventToRelays(writeRelays, pool, event);
       const isAllError = networkResult.every((r) => r.success === false);
       if (isAllError) {
         const error = "Failed to broadcast the message. Please check the connection or there may be a problem on the all provided relays. Also please try again.";
-        return handleBroadcastError(userSub, error);
+        return handleBroadcastError(error);
       }
       if (type === "json" && writeRelays.length > 1) {
         const relayResults = await Promise.all(
@@ -16377,36 +16385,36 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
             return { relay, success: !!note };
           })
         );
+        const allError = relayResults.every((r) => r.success === false);
         const isError = relayResults.some((r) => r.success === false);
-        if (isError) {
-          let error = "Event was sent, but the next relay(s) were not accepted event for some reason: \n";
-          relayResults.forEach((r) => {
-            if (!r.success) {
-              error += `- ${r.relay} 
+        let failedRelaysListStr = "";
+        relayResults.forEach((r) => {
+          if (!r.success) {
+            failedRelaysListStr += `- ${r.relay} 
 `;
-            }
-          });
-          const allError = relayResults.every((r) => r.success === false);
-          if (allError) {
-            return handleBroadcastError(userSub, error);
           }
-        }
-        const successfullRelays = relayResults.filter((r) => r.success).map((r) => r.relay);
-        const toUpdateFeed = relaysToWatch.some((r) => successfullRelays.includes(r));
-        if (toUpdateFeed) {
-          emit2("loadNewRelayEvents");
-          userSub == null ? void 0 : userSub.close();
-        }
-      } else {
-        const publishedEvent = await pool.querySync(writeRelays, { ids: [event.id] });
-        if (!publishedEvent.length) {
-          const error = `Failed to broadcast the message. Please check the connection or there may be a problem with relay(s).`;
-          return handleBroadcastError(userSub, error);
-        } else {
-          emit2("loadNewRelayEvents");
-          userSub == null ? void 0 : userSub.close();
+        });
+        if (allError) {
+          const error = `Event was not sent, the next relay(s) were not accepted event for some reason: 
+ ${failedRelaysListStr}`;
+          return handleBroadcastError(error);
+        } else if (isError) {
+          const error = `Event was sent, but the next relay(s) were not accepted event for some reason: 
+ ${failedRelaysListStr}`;
+          showBroadcastNotice(error);
         }
       }
+      const publishedEvent = await pool.get(writeRelays, { ids: [event.id] });
+      if (!publishedEvent) {
+        const error = `Failed to broadcast the message. Please check the connection or there may be a problem with relay(s).`;
+        return handleBroadcastError(error);
+      }
+      feedStore.pushToNewEventsToShow({
+        id: event.id,
+        pubkey: event.pubkey,
+        created_at: event.created_at
+      });
+      emit2("loadNewRelayEvents");
       if (type === "text") {
         feedStore.updateMessageToBroadcast("");
       }
@@ -16416,16 +16424,18 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
       sentEventIds.value.add(event.id);
       isSendingMessage.value = false;
     };
-    const handleBroadcastError = (eventSub, error) => {
+    const handleBroadcastError = (error) => {
       broadcastMsgError.value = error;
-      eventSub == null ? void 0 : eventSub.close();
       isSendingMessage.value = false;
+    };
+    const showBroadcastNotice = (error) => {
+      broadcastMsgError.value = error;
     };
     const clearBroadcastError = () => {
       broadcastMsgError.value = "";
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$m, [
+      return openBlock(), createElementBlock("div", _hoisted_1$o, [
         isPresignedMessage.value ? (openBlock(), createBlock(SignedEventInput, {
           key: 0,
           onBroadcastEvent: broadcastEvent,
@@ -16441,16 +16451,16 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
           sentEventIds: sentEventIds.value,
           isSendingMessage: isSendingMessage.value
         }, null, 8, ["sentEventIds", "isSendingMessage"])),
-        createBaseVNode("div", _hoisted_2$j, toDisplayString(broadcastMsgError.value), 1)
+        createBaseVNode("div", _hoisted_2$k, toDisplayString(broadcastMsgError.value), 1)
       ]);
     };
   }
 });
-const MessageWrapper_vue_vue_type_style_index_0_scoped_be88706d_lang = "";
-const MessageWrapper = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["__scopeId", "data-v-be88706d"]]);
-const _hoisted_1$l = { class: "dropdown" };
-const _hoisted_2$i = ["data-value"];
-const _sfc_main$o = /* @__PURE__ */ defineComponent({
+const MessageWrapper_vue_vue_type_style_index_0_scoped_5959c1f5_lang = "";
+const MessageWrapper = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["__scopeId", "data-v-5959c1f5"]]);
+const _hoisted_1$n = { class: "dropdown" };
+const _hoisted_2$j = ["data-value"];
+const _sfc_main$r = /* @__PURE__ */ defineComponent({
   __name: "Dropdown",
   props: {
     listItems: {},
@@ -16466,6 +16476,9 @@ const _sfc_main$o = /* @__PURE__ */ defineComponent({
     const emit2 = __emit;
     const props = __props;
     const selectedIndex = ref(0);
+    onUpdated(() => {
+      updateSelectedIndex();
+    });
     onMounted(() => {
       prevSelectedListItem.value = document.querySelector(".active");
       document.addEventListener("click", (evt) => {
@@ -16481,13 +16494,16 @@ const _sfc_main$o = /* @__PURE__ */ defineComponent({
           hideList();
         }
       });
+      updateSelectedIndex();
+    });
+    const updateSelectedIndex = () => {
       if (props.selectedKey) {
         const index = props.listItems.findIndex((item) => item.key === props.selectedKey);
         if (index !== -1) {
           selectedIndex.value = index;
         }
       }
-    });
+    };
     const handleSelectClick = () => {
       if (props.disabled)
         return;
@@ -16522,7 +16538,7 @@ const _sfc_main$o = /* @__PURE__ */ defineComponent({
       items.value.classList.remove("open");
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$l, [
+      return openBlock(), createElementBlock("div", _hoisted_1$n, [
         createBaseVNode("button", {
           ref_key: "selectBtn",
           ref: selectBtn,
@@ -16540,16 +16556,16 @@ const _sfc_main$o = /* @__PURE__ */ defineComponent({
               key: `item-${i2}`,
               "data-value": item.key,
               class: normalizeClass(["item", { active: i2 === selectedIndex.value }])
-            }, toDisplayString(item.value), 11, _hoisted_2$i);
+            }, toDisplayString(item.value), 11, _hoisted_2$j);
           }), 128))
         ], 512)
       ]);
     };
   }
 });
-const Dropdown_vue_vue_type_style_index_0_scoped_206086dd_lang = "";
-const Dropdown = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["__scopeId", "data-v-206086dd"]]);
-const _sfc_main$n = /* @__PURE__ */ defineComponent({
+const Dropdown_vue_vue_type_style_index_0_scoped_600a84f1_lang = "";
+const Dropdown = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["__scopeId", "data-v-600a84f1"]]);
+const _sfc_main$q = /* @__PURE__ */ defineComponent({
   __name: "FeedSourceSelect",
   props: {
     disabled: { type: Boolean }
@@ -16589,15 +16605,15 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const _withScopeId$a = (n) => (pushScopeId("data-v-1cc3595f"), n = n(), popScopeId(), n);
-const _hoisted_1$k = { class: "custom-checkbox" };
-const _hoisted_2$h = ["checked"];
-const _hoisted_3$d = /* @__PURE__ */ _withScopeId$a(() => /* @__PURE__ */ createBaseVNode("span", { class: "checkmark" }, null, -1));
-const _hoisted_4$b = {
+const _withScopeId$d = (n) => (pushScopeId("data-v-35ca07dd"), n = n(), popScopeId(), n);
+const _hoisted_1$m = { class: "custom-checkbox" };
+const _hoisted_2$i = ["checked"];
+const _hoisted_3$e = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("span", { class: "checkmark" }, null, -1));
+const _hoisted_4$c = {
   class: "label-text",
   for: "checkbox"
 };
-const _sfc_main$m = /* @__PURE__ */ defineComponent({
+const _sfc_main$p = /* @__PURE__ */ defineComponent({
   __name: "Checkbox",
   props: {
     label: {},
@@ -16606,29 +16622,29 @@ const _sfc_main$m = /* @__PURE__ */ defineComponent({
   emits: ["onChange"],
   setup(__props, { emit: __emit }) {
     const emit2 = __emit;
-    const onChange = () => {
-      emit2("onChange");
+    const onChange = (event) => {
+      emit2("onChange", event);
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$k, [
+      return openBlock(), createElementBlock("div", _hoisted_1$m, [
         createBaseVNode("label", null, [
           createBaseVNode("input", {
             id: "checkbox",
             onChange,
             checked: _ctx.checked,
             type: "checkbox"
-          }, null, 40, _hoisted_2$h),
-          _hoisted_3$d,
-          createBaseVNode("span", _hoisted_4$b, toDisplayString(_ctx.label), 1)
+          }, null, 40, _hoisted_2$i),
+          _hoisted_3$e,
+          createBaseVNode("span", _hoisted_4$c, toDisplayString(_ctx.label), 1)
         ])
       ]);
     };
   }
 });
-const Checkbox_vue_vue_type_style_index_0_scoped_1cc3595f_lang = "";
-const Checkbox = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["__scopeId", "data-v-1cc3595f"]]);
-const _hoisted_1$j = { class: "wrapper" };
-const _sfc_main$l = /* @__PURE__ */ defineComponent({
+const Checkbox_vue_vue_type_style_index_0_scoped_35ca07dd_lang = "";
+const Checkbox = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["__scopeId", "data-v-35ca07dd"]]);
+const _hoisted_1$l = { class: "wrapper" };
+const _sfc_main$o = /* @__PURE__ */ defineComponent({
   __name: "ShowImagesCheckbox",
   setup(__props) {
     const imagesStore = useImages();
@@ -16637,7 +16653,7 @@ const _sfc_main$l = /* @__PURE__ */ defineComponent({
     };
     return (_ctx, _cache) => {
       const _component_router_link = resolveComponent("router-link");
-      return openBlock(), createElementBlock("div", _hoisted_1$j, [
+      return openBlock(), createElementBlock("div", _hoisted_1$l, [
         createVNode(Checkbox, {
           onOnChange: toggleImages,
           checked: unref(imagesStore).showImages,
@@ -16658,12 +16674,12 @@ const _sfc_main$l = /* @__PURE__ */ defineComponent({
   }
 });
 const ShowImagesCheckbox_vue_vue_type_style_index_0_lang = "";
-const _hoisted_1$i = { class: "feed-header" };
-const _hoisted_2$g = {
+const _hoisted_1$k = { class: "feed-header" };
+const _hoisted_2$h = {
   key: 0,
   class: "warning"
 };
-const _sfc_main$k = /* @__PURE__ */ defineComponent({
+const _sfc_main$n = /* @__PURE__ */ defineComponent({
   __name: "FeedHeader",
   props: {
     isDisabledSourceSelect: { type: Boolean }
@@ -16679,21 +16695,21 @@ const _sfc_main$k = /* @__PURE__ */ defineComponent({
     };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
-        createBaseVNode("div", _hoisted_1$i, [
-          createVNode(_sfc_main$n, {
+        createBaseVNode("div", _hoisted_1$k, [
+          createVNode(_sfc_main$q, {
             class: "dropdown",
             disabled: props.isDisabledSourceSelect,
             onShowFeedNotice: showFeedNotice
           }, null, 8, ["disabled"]),
-          createVNode(_sfc_main$l)
+          createVNode(_sfc_main$o)
         ]),
-        notice.value.length ? (openBlock(), createElementBlock("div", _hoisted_2$g, toDisplayString(notice.value), 1)) : createCommentVNode("", true)
+        notice.value.length ? (openBlock(), createElementBlock("div", _hoisted_2$h, toDisplayString(notice.value), 1)) : createCommentVNode("", true)
       ], 64);
     };
   }
 });
 const FeedHeader_vue_vue_type_style_index_0_scoped_03f1c3ab_lang = "";
-const FeedHeader = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["__scopeId", "data-v-03f1c3ab"]]);
+const FeedHeader = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["__scopeId", "data-v-03f1c3ab"]]);
 const DEFAULT_RELAY = "wss://nos.lol";
 const DEFAULT_RELAYS = [
   "wss://nos.lol",
@@ -16753,14 +16769,19 @@ const connectToSelectedRelay = async (relayUrl) => {
   }
   return relay;
 };
-const getConnectedReadWriteRelays = async (readAndWriteRelays) => {
+const getConnectedReadWriteRelays = async (pool, readAndWriteRelays) => {
   const userConnectedReadRelays = [];
   const userConnectedWriteRelays = [];
   if (readAndWriteRelays.length) {
     const result = await Promise.all(
-      readAndWriteRelays.map(async (relay) => {
-        const isConnected = await isWsAvailable(relay.url);
-        return { url: relay.url, connected: isConnected, type: relay.type };
+      readAndWriteRelays.map(async (r) => {
+        let relay;
+        try {
+          relay = await pool.ensureRelay(r.url);
+        } catch (e) {
+          return { url: r.url, connected: false, type: r.type };
+        }
+        return { url: relay.url, connected: relay.connected, type: r.type };
       })
     );
     result.forEach((r) => {
@@ -16796,8 +16817,13 @@ const getFollowsConnectedRelaysMap = async (follows, connectedUserRelays, pool) 
     });
     const followsSortedRelays = await Promise.all(
       Array.from(followsRelaysUrlsExceptUserRelays).map(async (relayUrl) => {
-        const isConnected = await isWsAvailable(relayUrl);
-        return { url: relayUrl, connected: isConnected };
+        let relay;
+        try {
+          relay = await pool.ensureRelay(relayUrl);
+        } catch (e) {
+          return { url: relayUrl, connected: false };
+        }
+        return { url: relayUrl, connected: relay.connected };
       })
     );
     const followsConnectedRelaysUrls = followsSortedRelays.filter((r) => r.connected).map((r) => r.url);
@@ -16816,58 +16842,45 @@ const getFollowsConnectedRelaysMap = async (follows, connectedUserRelays, pool) 
   }
   return followsRelaysMap;
 };
-const closeWebSocket = (webSocket) => {
-  return new Promise((resolve2, reject) => {
-    if (webSocket.readyState === WebSocket.CLOSING || webSocket.readyState === WebSocket.CLOSED) {
-      resolve2(true);
+const asyncClosePool = async (pool) => {
+  const relays = Array.from(pool.relays.keys());
+  pool.close(relays);
+  const isClosed = (ws) => !ws || ws.readyState === WebSocket.CLOSED;
+  const relayClosePromises = relays.map(async (url) => {
+    var _a;
+    const ws = (_a = pool.relays.get(url)) == null ? void 0 : _a.ws;
+    if (!ws)
       return;
+    while (!isClosed(ws)) {
+      await new Promise((resolve2) => setTimeout(resolve2, 100));
     }
-    webSocket.onclose = function() {
-      resolve2(true);
-    };
-    webSocket.onerror = function() {
-      reject(false);
-    };
-    webSocket.close();
   });
+  await Promise.all(relayClosePromises);
 };
-const closePoolSockets = async (pool) => {
-  try {
-    const closingSockets = [];
-    pool.relays.forEach((r) => {
-      if (!r.connected)
-        return;
-      closingSockets.push(closeWebSocket(r.ws));
-    });
-    await Promise.all(closingSockets);
-  } catch (e) {
-    console.error("Error while closing websocket:", e);
-  }
-};
-const _withScopeId$9 = (n) => (pushScopeId("data-v-fd8ac58c"), n = n(), popScopeId(), n);
-const _hoisted_1$h = { id: "feed" };
-const _hoisted_2$f = { class: "columns" };
-const _hoisted_3$c = {
+const _withScopeId$c = (n) => (pushScopeId("data-v-7abbe2bf"), n = n(), popScopeId(), n);
+const _hoisted_1$j = { id: "feed" };
+const _hoisted_2$g = { class: "columns" };
+const _hoisted_3$d = {
   key: 0,
   class: "connecting-notice"
 };
-const _hoisted_4$a = {
+const _hoisted_4$b = {
   key: 1,
   class: "connecting-notice"
 };
-const _hoisted_5$8 = {
+const _hoisted_5$a = {
   key: 0,
   class: "new-events__imgs"
 };
-const _hoisted_6$6 = ["src"];
-const _hoisted_7$4 = ["src"];
-const _hoisted_8$4 = { class: "new-events__text" };
-const _hoisted_9$4 = /* @__PURE__ */ _withScopeId$9(() => /* @__PURE__ */ createBaseVNode("b", { class: "new-events__arrow" }, "↑", -1));
-const _hoisted_10$4 = {
+const _hoisted_6$7 = ["src"];
+const _hoisted_7$5 = ["src"];
+const _hoisted_8$5 = { class: "new-events__text" };
+const _hoisted_9$5 = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("b", { class: "new-events__arrow" }, "↑", -1));
+const _hoisted_10$5 = {
   key: 3,
   class: "loading-more"
 };
-const _sfc_main$j = /* @__PURE__ */ defineComponent({
+const _sfc_main$m = /* @__PURE__ */ defineComponent({
   __name: "Feed",
   props: {
     eventsLog: {}
@@ -16888,7 +16901,6 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
       () => Math.ceil(feedStore.paginationEventsIds.length / DEFAULT_EVENTS_COUNT)
     );
     const currPath = computed(() => route.path);
-    let newEvents = ref([]);
     const pool = poolStore.pool;
     const isDisabledSourceSelect = ref(false);
     watch(
@@ -16929,19 +16941,15 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
     const changeFeedSource = async () => {
       await remountFeed();
     };
-    const remountFeed = async () => {
+    function disableSelect() {
       isDisabledSourceSelect.value = true;
-      if (feedStore.newEventsBadgeUpdateInterval) {
-        feedStore.clearNewEventsBadgeUpdateInterval();
-      }
-      if (feedStore.pool) {
-        try {
-          await closePoolSockets(feedStore.pool);
-          feedStore.resetPool();
-        } catch (e) {
-          console.error("Error while closing websocket:", e);
-        }
-      }
+    }
+    function enableSelect() {
+      isDisabledSourceSelect.value = false;
+    }
+    const remountFeed = async () => {
+      disableSelect();
+      feedStore.clearNewEventsBadgeUpdateInterval();
       feedStore.setShowNewEventsBadge(false);
       feedStore.updateNewEventsToShow([]);
       feedStore.updatePaginationEventsIds([]);
@@ -16949,7 +16957,7 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
       await mountFeed();
     };
     async function mountFeed() {
-      isDisabledSourceSelect.value = true;
+      disableSelect();
       feedStore.setLoadingFeedSourceStatus(true);
       const pubkey = nsecStore.getPubkey();
       let feedRelays = relayStore.connectedUserReadRelayUrls.length ? relayStore.connectedUserReadRelayUrls : [relayStore.currentRelay.url];
@@ -16982,6 +16990,7 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
       if (followsPubkeys.length) {
         postsFilter.authors = followsPubkeys;
       }
+      feedStore.resetTimeToGetNewPostsToNow();
       let posts = await listRootEvents(pool, feedRelays, [postsFilter]);
       posts = posts.sort((a, b) => b.created_at - a.created_at);
       const isRootPosts = true;
@@ -17003,40 +17012,54 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
         }
       );
       feedStore.setLoadingMoreStatus(false);
-      let subscribePostsFilter = { kinds: [1], limit: 1 };
+      let subscribePostsFilter = { kinds: [1] };
       if (followsPubkeys.length) {
         subscribePostsFilter.authors = followsPubkeys;
       }
-      await subscibeFeedForUpdates(feedRelays, subscribePostsFilter);
-      feedStore.newEventsBadgeUpdateInterval = setInterval(updateNewEventsElement, 3e3);
-      isDisabledSourceSelect.value = false;
+      feedStore.newEventsBadgeUpdateInterval = setInterval(async () => {
+        const currentInterval = feedStore.newEventsBadgeUpdateInterval;
+        await getFeedUpdates(feedRelays, subscribePostsFilter, currentInterval);
+      }, 3e3);
+      enableSelect();
     }
-    async function subscibeFeedForUpdates(feedRelays, subscribePostsFilter) {
-      var _a;
-      await ((_a = feedStore.pool) == null ? void 0 : _a.subscribeMany(feedRelays, [subscribePostsFilter], {
-        onevent(event) {
-          if (feedStore.eventsId.includes(event.id))
-            return;
-          const nip10Data = nip10_exports.parse(event);
-          if (nip10Data.reply || nip10Data.root)
-            return;
-          newEvents.value.push({ id: event.id, pubkey: event.pubkey });
-          feedStore.pushToNewEventsToShow({ id: event.id, pubkey: event.pubkey });
-        },
-        onclose(r) {
-          console.warn("Subscription closed", r);
-        }
-      }));
-    }
-    async function updateNewEventsElement() {
+    const getFeedUpdates = async (feedRelays, subscribePostsFilter, currentInterval) => {
+      if (feedStore.isLoadingNewEvents)
+        return;
+      subscribePostsFilter.since = feedStore.timeToGetNewPosts;
+      feedStore.resetTimeToGetNewPostsToNow();
+      let newEvents = await pool.querySync(feedRelays, subscribePostsFilter);
+      if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
+        return;
+      }
+      newEvents = newEvents.sort((a, b) => a.created_at - b.created_at);
+      newEvents.forEach((event) => {
+        if (feedStore.eventsId.includes(event.id))
+          return;
+        if (feedStore.newEventsToShowIds.includes(event.id))
+          return;
+        if (feedStore.paginationEventsIds.includes(event.id))
+          return;
+        const nip10Data = nip10_exports.parse(event);
+        if (nip10Data.reply || nip10Data.root)
+          return;
+        feedStore.pushToNewEventsToShow({
+          id: event.id,
+          pubkey: event.pubkey,
+          created_at: event.created_at
+        });
+      });
+      await updateNewEventsElement(currentInterval);
+    };
+    async function updateNewEventsElement(currentInterval) {
       var _a, _b;
+      if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
+        return;
+      }
       const relays = relayStore.connectedFeedRelaysUrls;
       if (!relays.length)
         return;
       const eventsToShow = feedStore.newEventsToShow;
       if (eventsToShow.length < 2)
-        return;
-      if (!feedStore.newEventsBadgeUpdateInterval)
         return;
       feedStore.setNewEventsBadgeCount(eventsToShow.length);
       feedStore.setShowNewEventsBadge(true);
@@ -17046,26 +17069,27 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
       const eventsListOptions2 = { kinds: [0], authors: [pub2], limit: 1 };
       const author1 = await pool.querySync(relays, eventsListOptions1);
       const author2 = await pool.querySync(relays, eventsListOptions2);
-      if (!feedStore.newEventsBadgeUpdateInterval)
+      if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
         return;
+      }
       if (!((_a = author1[0]) == null ? void 0 : _a.content) || !((_b = author2[0]) == null ? void 0 : _b.content))
         return;
       const authorImg1 = JSON.parse(author1[0].content).picture;
       const authorImg2 = JSON.parse(author2[0].content).picture;
       feedStore.setNewEventsBadgeImageUrls([authorImg1, authorImg2]);
     }
-    const showFeedPage = async (page) => {
-      if (feedStore.isLoadingNewEvents)
+    const showFeedPage = async (page, ignoreLoadingStatus = false) => {
+      if (!ignoreLoadingStatus && feedStore.isLoadingNewEvents)
         return;
       feedStore.setLoadingNewEventsStatus(true);
+      disableSelect();
       const relays = relayStore.connectedFeedRelaysUrls;
       if (!relays.length)
         return;
       const limit = DEFAULT_EVENTS_COUNT;
       const start = (page - 1) * limit;
       const end = start + limit;
-      const reversedIds = feedStore.paginationEventsIds.slice().reverse();
-      const idsToShow = reversedIds.slice(start, end);
+      const idsToShow = feedStore.paginationEventsIds.slice(start, end);
       const postsEvents = await pool.querySync(relays, { ids: idsToShow });
       let posts = postsEvents.sort((a, b) => b.created_at - a.created_at);
       const isRootPosts = true;
@@ -17081,72 +17105,61 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
       feedStore.updateEvents(posts);
       feedStore.setLoadingNewEventsStatus(false);
       currentPage.value = page;
+      enableSelect();
     };
     const loadNewRelayEvents = async () => {
       if (feedStore.isLoadingNewEvents)
         return;
+      disableSelect();
       feedStore.setLoadingNewEventsStatus(true);
       feedStore.setShowNewEventsBadge(false);
       const relays = relayStore.connectedFeedRelaysUrls;
       if (!relays.length)
         return;
       router2.push({ path: `${route.path}` });
-      let eventsToShow = feedStore.newEventsToShow;
-      feedStore.updateNewEventsToShow(
-        feedStore.newEventsToShow.filter((item) => !eventsToShow.includes(item))
-      );
-      const ids = eventsToShow.map((e) => e.id);
-      const limit = DEFAULT_EVENTS_COUNT;
-      feedStore.updatePaginationEventsIds(feedStore.paginationEventsIds.concat(ids));
-      const firstPageIds = feedStore.paginationEventsIds.slice(-limit);
-      const postsEvents = await pool.querySync(relays, { ids: firstPageIds });
-      let posts = postsEvents.sort((a, b) => b.created_at - a.created_at);
-      const isRootPosts = true;
-      await loadAndInjectDataToPosts(
-        posts,
-        null,
-        {},
-        relays,
-        metasCacheStore,
-        pool,
-        isRootPosts
-      );
-      feedStore.updateEvents(posts);
+      let eventsToShow = [...feedStore.newEventsToShow];
+      feedStore.updateNewEventsToShow([]);
+      const ids = eventsToShow.map((e) => e.id).reverse();
+      const newPaginationEventsIds = [...feedStore.paginationEventsIds];
+      newPaginationEventsIds.unshift(...ids);
+      feedStore.updatePaginationEventsIds(newPaginationEventsIds);
+      const ignoreLoadingStatus = true;
+      await showFeedPage(1, ignoreLoadingStatus);
       feedStore.setLoadingNewEventsStatus(false);
-      currentPage.value = 1;
+      enableSelect();
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$h, [
+      return openBlock(), createElementBlock("div", _hoisted_1$j, [
         createVNode(MessageWrapper, {
           onLoadNewRelayEvents: loadNewRelayEvents,
-          newEvents: unref(newEvents)
+          newEvents: unref(feedStore).newEventsToShow
         }, null, 8, ["newEvents"]),
         createVNode(FeedHeader, { isDisabledSourceSelect: isDisabledSourceSelect.value }, null, 8, ["isDisabledSourceSelect"]),
-        createBaseVNode("div", _hoisted_2$f, [
+        createBaseVNode("div", _hoisted_2$g, [
           createBaseVNode("div", {
             class: normalizeClass(["events", { events_hidden: currPath.value === "/log" }])
           }, [
-            unref(feedStore).isLoadingFeedSource ? (openBlock(), createElementBlock("div", _hoisted_3$c, " Loading feed from " + toDisplayString(unref(feedStore).selectedFeedSource) + "... ", 1)) : createCommentVNode("", true),
-            unref(feedStore).isLoadingNewEvents ? (openBlock(), createElementBlock("div", _hoisted_4$a, " Loading new notes... ")) : createCommentVNode("", true),
+            unref(feedStore).isLoadingFeedSource ? (openBlock(), createElementBlock("div", _hoisted_3$d, " Loading feed from " + toDisplayString(unref(feedStore).selectedFeedSource) + "... ", 1)) : createCommentVNode("", true),
+            unref(feedStore).isLoadingNewEvents ? (openBlock(), createElementBlock("div", _hoisted_4$b, " Loading new notes... ")) : createCommentVNode("", true),
             unref(feedStore).showNewEventsBadge ? (openBlock(), createElementBlock("div", {
               key: 2,
               onClick: loadNewRelayEvents,
               class: normalizeClass(["new-events", { "new-events_top-shifted": unref(feedStore).isLoadingNewEvents }])
             }, [
-              unref(imagesStore).showImages && unref(feedStore).newEventsBadgeImageUrls.length ? (openBlock(), createElementBlock("div", _hoisted_5$8, [
+              unref(imagesStore).showImages && unref(feedStore).newEventsBadgeImageUrls.length ? (openBlock(), createElementBlock("div", _hoisted_5$a, [
                 createBaseVNode("img", {
                   class: "new-events__img",
                   src: newAuthorImg1.value,
                   alt: "user's avatar"
-                }, null, 8, _hoisted_6$6),
+                }, null, 8, _hoisted_6$7),
                 createBaseVNode("img", {
                   class: "new-events__img",
                   src: newAuthorImg2.value,
                   alt: "user's avatar"
-                }, null, 8, _hoisted_7$4)
+                }, null, 8, _hoisted_7$5)
               ])) : createCommentVNode("", true),
-              createBaseVNode("span", _hoisted_8$4, toDisplayString(unref(feedStore).newEventsBadgeCount) + " new notes", 1),
-              _hoisted_9$4
+              createBaseVNode("span", _hoisted_8$5, toDisplayString(unref(feedStore).newEventsBadgeCount) + " new notes", 1),
+              _hoisted_9$5
             ], 2)) : createCommentVNode("", true),
             createVNode(RelayEventsList, {
               events: unref(feedStore).events,
@@ -17155,7 +17168,7 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
               currentReadRelays: unref(relayStore).connectedFeedRelaysUrls,
               onToggleRawData: unref(feedStore).toggleEventRawData
             }, null, 8, ["events", "pubKey", "showImages", "currentReadRelays", "onToggleRawData"]),
-            unref(feedStore).isLoadingMore ? (openBlock(), createElementBlock("div", _hoisted_10$4, "Loading more posts...")) : createCommentVNode("", true),
+            unref(feedStore).isLoadingMore ? (openBlock(), createElementBlock("div", _hoisted_10$5, "Loading more posts...")) : createCommentVNode("", true),
             createVNode(Pagination, {
               pagesCount: pagesCount.value,
               currentPage: currentPage.value,
@@ -17167,12 +17180,12 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const Feed_vue_vue_type_style_index_0_scoped_fd8ac58c_lang = "";
-const Feed = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["__scopeId", "data-v-fd8ac58c"]]);
-const _hoisted_1$g = /* @__PURE__ */ createStaticVNode('<h3>Slightly Private App</h3><p><a href="https://nostr.com">nostr</a> is public, censorship-resistant social network. It&#39;s simple: <ol><li>Select a relay from the list, or specify a <a href="https://nostr.watch/" target="_blank">custom URL</a></li><li><em>Optionally</em>, set your private key, to create new messages</li></ol></p><p> Traditional social networks can suppress certain posts or users. In nostr, every message is signed by user&#39;s <em>private key</em> and broadcasted to <em>relays</em>. <strong>Messages are tamper-resistant</strong>: no one can edit them, or the signature will become invalid. <strong>Users can&#39;t be blocked</strong>: even if a relay blocks someone, it&#39;s always possible to switch to a different one, or create up a personal relay. </p><p> The app is available at <a href="http://nostr.spa">nostr.spa</a>. You can: <ul><li><em>Connect</em> and see relay&#39;s global feed.</li><li><em>Post</em> new messages to the relay.</li><li><em>Broadcast</em> a pre-signed message. No need to enter a private key.</li><li><em>Search</em> information about a user or an event.</li></ul></p>', 4);
-const _hoisted_5$7 = /* @__PURE__ */ createStaticVNode("<ul><li>No tracking from our end</li><li>Private keys are not sent anywhere. They are stored in RAM of your device</li><li>Relay will see your ip+browser after you click <em>Connect</em> button</li><li>GitHub will see ip+browser of anyone who&#39;s using the app, because it&#39;s hosted on GitHub Pages. They won&#39;t see any nostr-specific interactions you will make</li><li><em>Show avatars</em> feature will leak your ip+browser to random people on the internet. Since there are no centralized servers in nostr, every user can specify their own URL for avatar hosting. Meaning, users can control the hosting webservers and see logs</li><li><em>Remember me</em> feature will write private key you&#39;ve entered to browser&#39;s Local Storage, which is usually stored on your device&#39;s disk</li><li>VPN or TOR usage is advised, <em>as with any nostr client</em>, to prevent ip leakage</li></ul>", 1);
-const _hoisted_6$5 = /* @__PURE__ */ createStaticVNode('<h3>Open source</h3><p> The lightweight nostr client is built to showcase <a href="/noble/">noble</a> cryptography. Signing is done using <a target="_blank" href="https://github.com/paulmillr/noble-curves">noble-curves</a>, while <a target="_blank" href="https://github.com/paulmillr/scure-base">scure-base</a> is used for bech32, <a target="_blank" href="https://github.com/nbd-wtf/nostr-tools">nostr-tools</a> are used for general nostr utilities and Vue.js is utilized for UI. Check out <a target="_blank" href="https://github.com/paulmillr/paulmillr.github.io">the source code</a>. You are welcome to host the client on your personal website. </p>', 2);
-const _sfc_main$i = /* @__PURE__ */ defineComponent({
+const Feed_vue_vue_type_style_index_0_scoped_7abbe2bf_lang = "";
+const Feed = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["__scopeId", "data-v-7abbe2bf"]]);
+const _hoisted_1$i = /* @__PURE__ */ createStaticVNode('<h3>Slightly Private App</h3><p><a href="https://nostr.com">nostr</a> is public, censorship-resistant social network. It&#39;s simple: <ol><li>Select a relay from the list, or specify a <a href="https://nostr.watch/" target="_blank">custom URL</a></li><li><em>Optionally</em>, set your private key, to create new messages</li></ol></p><p> Traditional social networks can suppress certain posts or users. In nostr, every message is signed by user&#39;s <em>private key</em> and broadcasted to <em>relays</em>. <strong>Messages are tamper-resistant</strong>: no one can edit them, or the signature will become invalid. <strong>Users can&#39;t be blocked</strong>: even if a relay blocks someone, it&#39;s always possible to switch to a different one, or create up a personal relay. </p><p> The app is available at <a href="http://nostr.spa">nostr.spa</a>. You can: <ul><li><em>Connect</em> and see relay&#39;s global feed.</li><li><em>Post</em> new messages to the relay.</li><li><em>Broadcast</em> a pre-signed message. No need to enter a private key.</li><li><em>Search</em> information about a user or an event.</li></ul></p>', 4);
+const _hoisted_5$9 = /* @__PURE__ */ createStaticVNode("<ul><li>No tracking from our end</li><li>Private keys are not sent anywhere. They are stored in RAM of your device</li><li>Relay will see your ip+browser after you click <em>Connect</em> button</li><li>GitHub will see ip+browser of anyone who&#39;s using the app, because it&#39;s hosted on GitHub Pages. They won&#39;t see any nostr-specific interactions you will make</li><li><em>Show avatars</em> feature will leak your ip+browser to random people on the internet. Since there are no centralized servers in nostr, every user can specify their own URL for avatar hosting. Meaning, users can control the hosting webservers and see logs</li><li><em>Remember me</em> feature will write private key you&#39;ve entered to browser&#39;s Local Storage, which is usually stored on your device&#39;s disk</li><li>VPN or TOR usage is advised, <em>as with any nostr client</em>, to prevent ip leakage</li></ul>", 1);
+const _hoisted_6$6 = /* @__PURE__ */ createStaticVNode('<h3>Open source</h3><p> The lightweight nostr client is built to showcase <a href="/noble/">noble</a> cryptography. Signing is done using <a target="_blank" href="https://github.com/paulmillr/noble-curves">noble-curves</a>, while <a target="_blank" href="https://github.com/paulmillr/scure-base">scure-base</a> is used for bech32, <a target="_blank" href="https://github.com/nbd-wtf/nostr-tools">nostr-tools</a> are used for general nostr utilities and Vue.js is utilized for UI. Check out <a target="_blank" href="https://github.com/paulmillr/paulmillr.github.io">the source code</a>. You are welcome to host the client on your personal website. </p>', 2);
+const _sfc_main$l = /* @__PURE__ */ defineComponent({
   __name: "Help",
   props: {
     showPrivacy: {}
@@ -17192,16 +17205,16 @@ const _sfc_main$i = /* @__PURE__ */ defineComponent({
     });
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
-        _hoisted_1$g,
+        _hoisted_1$i,
         createBaseVNode("p", null, [
           createBaseVNode("h3", {
             id: "#privacy",
             ref_key: "privacyEl",
             ref: privacyEl
           }, "Privacy policy", 512),
-          _hoisted_5$7
+          _hoisted_5$9
         ]),
-        _hoisted_6$5
+        _hoisted_6$6
       ], 64);
     };
   }
@@ -17251,30 +17264,30 @@ const useOwnProfile = defineStore("ownProfile", () => {
   }
   return { contactsEvent, updateContactsEvent, updateMeta, username, pubkey };
 });
-const _withScopeId$8 = (n) => (pushScopeId("data-v-7d13b372"), n = n(), popScopeId(), n);
-const _hoisted_1$f = { class: "event" };
-const _hoisted_2$e = {
+const _withScopeId$b = (n) => (pushScopeId("data-v-7d13b372"), n = n(), popScopeId(), n);
+const _hoisted_1$h = { class: "event" };
+const _hoisted_2$f = {
   key: 0,
   class: "event__content"
 };
-const _hoisted_3$b = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("hr", null, null, -1));
-const _hoisted_4$9 = { class: "event__code-block" };
-const _hoisted_5$6 = { class: "event__code-title" };
-const _hoisted_6$4 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("b", null, "Author: ", -1));
-const _hoisted_7$3 = { class: "content-col_code" };
-const _hoisted_8$3 = { class: "event__code" };
-const _hoisted_9$3 = { class: "event__code-block" };
-const _hoisted_10$3 = { class: "event__code-title" };
-const _hoisted_11$3 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("b", null, "Meta event id: ", -1));
-const _hoisted_12$3 = { class: "content-col_code" };
-const _hoisted_13$2 = { class: "event__code" };
-const _hoisted_14$2 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("div", { class: "header-col" }, [
+const _hoisted_3$c = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("hr", null, null, -1));
+const _hoisted_4$a = { class: "event__code-block" };
+const _hoisted_5$8 = { class: "event__code-title" };
+const _hoisted_6$5 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("b", null, "Author: ", -1));
+const _hoisted_7$4 = { class: "content-col_code" };
+const _hoisted_8$4 = { class: "event__code" };
+const _hoisted_9$4 = { class: "event__code-block" };
+const _hoisted_10$4 = { class: "event__code-title" };
+const _hoisted_11$4 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("b", null, "Meta event id: ", -1));
+const _hoisted_12$4 = { class: "content-col_code" };
+const _hoisted_13$3 = { class: "event__code" };
+const _hoisted_14$3 = /* @__PURE__ */ _withScopeId$b(() => /* @__PURE__ */ createBaseVNode("div", { class: "header-col" }, [
   /* @__PURE__ */ createBaseVNode("b", null, "Created: ")
 ], -1));
-const _hoisted_15$2 = { class: "content-col_code" };
+const _hoisted_15$3 = { class: "content-col_code" };
 const _hoisted_16$2 = { class: "event__code" };
 const _hoisted_17$2 = { class: "event-footer__signature-text" };
-const _sfc_main$h = /* @__PURE__ */ defineComponent({
+const _sfc_main$k = /* @__PURE__ */ defineComponent({
   __name: "UserEvent",
   props: {
     event: {},
@@ -17307,39 +17320,39 @@ const _sfc_main$h = /* @__PURE__ */ defineComponent({
       showRawData.value = !showRawData.value;
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$f, [
-        !showRawData.value ? (openBlock(), createElementBlock("div", _hoisted_2$e, [
+      return openBlock(), createElementBlock("div", _hoisted_1$h, [
+        !showRawData.value ? (openBlock(), createElementBlock("div", _hoisted_2$f, [
           renderSlot(_ctx.$slots, "default", {}, () => [
             createTextVNode("No content for event")
           ], true),
-          _hoisted_3$b,
-          createBaseVNode("div", _hoisted_4$9, [
-            createBaseVNode("div", _hoisted_5$6, [
-              _hoisted_6$4,
+          _hoisted_3$c,
+          createBaseVNode("div", _hoisted_4$a, [
+            createBaseVNode("div", _hoisted_5$8, [
+              _hoisted_6$5,
               createBaseVNode("button", {
                 class: "event__code-btn",
                 onClick: _cache[0] || (_cache[0] = ($event) => showHexPubkey.value = !showHexPubkey.value)
               }, toDisplayString(showHexPubkey.value ? "npub" : "hex"), 1)
             ]),
-            createBaseVNode("div", _hoisted_7$3, [
-              createBaseVNode("code", _hoisted_8$3, toDisplayString(showHexPubkey.value ? pubkey.value : unref(nip19_exports).npubEncode(pubkey.value)), 1)
+            createBaseVNode("div", _hoisted_7$4, [
+              createBaseVNode("code", _hoisted_8$4, toDisplayString(showHexPubkey.value ? pubkey.value : unref(nip19_exports).npubEncode(pubkey.value)), 1)
             ])
           ]),
-          createBaseVNode("div", _hoisted_9$3, [
-            createBaseVNode("div", _hoisted_10$3, [
-              _hoisted_11$3,
+          createBaseVNode("div", _hoisted_9$4, [
+            createBaseVNode("div", _hoisted_10$4, [
+              _hoisted_11$4,
               createBaseVNode("button", {
                 class: "event__code-btn",
                 onClick: _cache[1] || (_cache[1] = ($event) => showHexId.value = !showHexId.value)
               }, toDisplayString(showHexId.value ? "nevent" : "hex"), 1)
             ]),
-            createBaseVNode("div", _hoisted_12$3, [
-              createBaseVNode("code", _hoisted_13$2, toDisplayString(showHexId.value ? id.value : unref(nip19_exports).neventEncode({ id: id.value })), 1)
+            createBaseVNode("div", _hoisted_12$4, [
+              createBaseVNode("code", _hoisted_13$3, toDisplayString(showHexId.value ? id.value : unref(nip19_exports).neventEncode({ id: id.value })), 1)
             ])
           ]),
           createBaseVNode("div", null, [
-            _hoisted_14$2,
-            createBaseVNode("div", _hoisted_15$2, [
+            _hoisted_14$3,
+            createBaseVNode("div", _hoisted_15$3, [
               createBaseVNode("code", _hoisted_16$2, toDisplayString(unref(formatedDate)(created_at.value)), 1)
             ])
           ])
@@ -17373,7 +17386,7 @@ const _sfc_main$h = /* @__PURE__ */ defineComponent({
   }
 });
 const UserEvent_vue_vue_type_style_index_0_scoped_7d13b372_lang = "";
-const UserEvent = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["__scopeId", "data-v-7d13b372"]]);
+const UserEvent = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["__scopeId", "data-v-7d13b372"]]);
 const TWO_DAYS = 2 * 24 * 60 * 60;
 const secureRandom = () => {
   return crypto.getRandomValues(new Uint32Array(1))[0] / (4294967295 + 1);
@@ -17420,7 +17433,7 @@ const createWrap = (event, recipientPublicKey) => {
 };
 const loginError = "Please login to follow the user.";
 const relaysError = "Something went wrong, please ensure that your write relays are online.";
-const _sfc_main$g = /* @__PURE__ */ defineComponent({
+const _sfc_main$j = /* @__PURE__ */ defineComponent({
   __name: "FollowBtn",
   props: {
     isFollowed: { type: Boolean },
@@ -17486,9 +17499,9 @@ const _sfc_main$g = /* @__PURE__ */ defineComponent({
   }
 });
 const FollowBtn_vue_vue_type_style_index_0_scoped_8646c4c8_lang = "";
-const FollowBtn = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["__scopeId", "data-v-8646c4c8"]]);
-const _sfc_main$f = {};
-const _hoisted_1$e = {
+const FollowBtn = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["__scopeId", "data-v-8646c4c8"]]);
+const _sfc_main$i = {};
+const _hoisted_1$g = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -17496,67 +17509,67 @@ const _hoisted_1$e = {
   class: "bi bi-download",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$d = /* @__PURE__ */ createBaseVNode("path", { d: "M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" }, null, -1);
-const _hoisted_3$a = /* @__PURE__ */ createBaseVNode("path", { d: "M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" }, null, -1);
-const _hoisted_4$8 = [
-  _hoisted_2$d,
-  _hoisted_3$a
+const _hoisted_2$e = /* @__PURE__ */ createBaseVNode("path", { d: "M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" }, null, -1);
+const _hoisted_3$b = /* @__PURE__ */ createBaseVNode("path", { d: "M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" }, null, -1);
+const _hoisted_4$9 = [
+  _hoisted_2$e,
+  _hoisted_3$b
 ];
-function _sfc_render$2(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$e, _hoisted_4$8);
+function _sfc_render$1(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$g, _hoisted_4$9);
 }
-const DownloadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$2]]);
-const _withScopeId$7 = (n) => (pushScopeId("data-v-f777a106"), n = n(), popScopeId(), n);
-const _hoisted_1$d = {
+const DownloadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$1]]);
+const _withScopeId$a = (n) => (pushScopeId("data-v-f777a106"), n = n(), popScopeId(), n);
+const _hoisted_1$f = {
   key: 0,
   class: "loading-notice"
 };
-const _hoisted_2$c = { class: "user" };
-const _hoisted_3$9 = {
+const _hoisted_2$d = { class: "user" };
+const _hoisted_3$a = {
   key: 0,
   class: "user__avatar-wrapper"
 };
-const _hoisted_4$7 = ["src"];
-const _hoisted_5$5 = { class: "user__info" };
-const _hoisted_6$3 = { class: "user__info__content" };
-const _hoisted_7$2 = { class: "user__nickname-wrapper" };
-const _hoisted_8$2 = { class: "user__nickname" };
-const _hoisted_9$2 = { class: "user-action-error warning" };
-const _hoisted_10$2 = { class: "user__name" };
-const _hoisted_11$2 = {
+const _hoisted_4$8 = ["src"];
+const _hoisted_5$7 = { class: "user__info" };
+const _hoisted_6$4 = { class: "user__info__content" };
+const _hoisted_7$3 = { class: "user__nickname-wrapper" };
+const _hoisted_8$3 = { class: "user__nickname" };
+const _hoisted_9$3 = { class: "user-action-error warning" };
+const _hoisted_10$3 = { class: "user__name" };
+const _hoisted_11$3 = {
   key: 0,
   class: "user__nip05"
 };
-const _hoisted_12$2 = ["href"];
-const _hoisted_13$1 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("strong", null, "nip05", -1));
-const _hoisted_14$1 = {
+const _hoisted_12$3 = ["href"];
+const _hoisted_13$2 = /* @__PURE__ */ _withScopeId$a(() => /* @__PURE__ */ createBaseVNode("strong", null, "nip05", -1));
+const _hoisted_14$2 = {
   key: 1,
   class: "user__contacts"
 };
-const _hoisted_15$1 = { class: "user__contacts-col user__following-cnt" };
+const _hoisted_15$2 = { class: "user__contacts-col user__following-cnt" };
 const _hoisted_16$1 = { class: "user__contacts-col user__followers-cnt" };
 const _hoisted_17$1 = { key: 0 };
 const _hoisted_18$1 = {
   key: 1,
   class: "user__contacts-download-icon"
 };
-const _hoisted_19$1 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("span", { class: "user__contacts-followers-word" }, " Followers ", -1));
+const _hoisted_19$1 = /* @__PURE__ */ _withScopeId$a(() => /* @__PURE__ */ createBaseVNode("span", { class: "user__contacts-followers-word" }, " Followers ", -1));
 const _hoisted_20$1 = { class: "user__desc" };
 const _hoisted_21$1 = { key: 2 };
 const _hoisted_22$1 = {
   key: 3,
   id: "user-posts"
 };
-const _hoisted_23$1 = { key: 0 };
-const _hoisted_24$1 = { key: 1 };
-const _hoisted_25$1 = {
+const _hoisted_23 = { key: 0 };
+const _hoisted_24 = { key: 1 };
+const _hoisted_25 = {
   key: 5,
   class: "not-found"
 };
-const _hoisted_26$1 = { class: "not-found__desc" };
-const _hoisted_27$1 = { key: 0 };
-const _hoisted_28$1 = { key: 1 };
-const _sfc_main$e = /* @__PURE__ */ defineComponent({
+const _hoisted_26 = { class: "not-found__desc" };
+const _hoisted_27 = { key: 0 };
+const _hoisted_28 = { key: 1 };
+const _sfc_main$h = /* @__PURE__ */ defineComponent({
   __name: "User",
   setup(__props) {
     const poolStore = usePool();
@@ -17932,25 +17945,25 @@ const _sfc_main$e = /* @__PURE__ */ defineComponent({
     };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
-        showLoadingUser.value ? (openBlock(), createElementBlock("div", _hoisted_1$d, "Loading profile info...")) : createCommentVNode("", true),
+        showLoadingUser.value ? (openBlock(), createElementBlock("div", _hoisted_1$f, "Loading profile info...")) : createCommentVNode("", true),
         userEvent.value.id ? (openBlock(), createBlock(UserEvent, {
           author: userDetails.value,
           event: userEvent.value,
           key: userEvent.value.id
         }, {
           default: withCtx(() => [
-            createBaseVNode("div", _hoisted_2$c, [
-              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_3$9, [
+            createBaseVNode("div", _hoisted_2$d, [
+              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_3$a, [
                 createBaseVNode("img", {
                   alt: "user's avatar",
                   class: "user__avatar",
                   src: userDetails.value.picture
-                }, null, 8, _hoisted_4$7)
+                }, null, 8, _hoisted_4$8)
               ])) : createCommentVNode("", true),
-              createBaseVNode("div", _hoisted_5$5, [
-                createBaseVNode("div", _hoisted_6$3, [
-                  createBaseVNode("div", _hoisted_7$2, [
-                    createBaseVNode("span", _hoisted_8$2, toDisplayString(unref(getDisplayUsername)(userDetails.value, pubHex.value)), 1),
+              createBaseVNode("div", _hoisted_5$7, [
+                createBaseVNode("div", _hoisted_6$4, [
+                  createBaseVNode("div", _hoisted_7$3, [
+                    createBaseVNode("span", _hoisted_8$3, toDisplayString(unref(getDisplayUsername)(userDetails.value, pubHex.value)), 1),
                     showFollowBtn.value ? (openBlock(), createBlock(FollowBtn, {
                       key: 0,
                       pubkeyToFollow: pubHex.value,
@@ -17959,19 +17972,19 @@ const _sfc_main$e = /* @__PURE__ */ defineComponent({
                       onHandleFollowError: handleUserActionError
                     }, null, 8, ["pubkeyToFollow", "isFollowed"])) : createCommentVNode("", true)
                   ]),
-                  createBaseVNode("div", _hoisted_9$2, toDisplayString(userActionError.value), 1),
-                  createBaseVNode("div", _hoisted_10$2, toDisplayString(showDisplayName(userDetails.value)), 1),
-                  isUserHasValidNip05.value ? (openBlock(), createElementBlock("div", _hoisted_11$2, [
+                  createBaseVNode("div", _hoisted_9$3, toDisplayString(userActionError.value), 1),
+                  createBaseVNode("div", _hoisted_10$3, toDisplayString(showDisplayName(userDetails.value)), 1),
+                  isUserHasValidNip05.value ? (openBlock(), createElementBlock("div", _hoisted_11$3, [
                     createBaseVNode("a", {
                       target: "_blank",
                       href: nip05toURL(userDetails.value.nip05)
                     }, [
-                      _hoisted_13$1,
+                      _hoisted_13$2,
                       createTextVNode(": " + toDisplayString(userDetails.value.nip05), 1)
-                    ], 8, _hoisted_12$2)
+                    ], 8, _hoisted_12$3)
                   ])) : createCommentVNode("", true),
-                  userDetails.value.followingCount >= 0 ? (openBlock(), createElementBlock("div", _hoisted_14$1, [
-                    createBaseVNode("span", _hoisted_15$1, [
+                  userDetails.value.followingCount >= 0 ? (openBlock(), createElementBlock("div", _hoisted_14$2, [
+                    createBaseVNode("span", _hoisted_15$2, [
                       createBaseVNode("b", null, toDisplayString(userDetails.value.followingCount), 1),
                       createTextVNode(" Following ")
                     ]),
@@ -17991,7 +18004,7 @@ const _sfc_main$e = /* @__PURE__ */ defineComponent({
         }, 8, ["author", "event"])) : createCommentVNode("", true),
         showLoadingTextNotes.value ? (openBlock(), createElementBlock("div", _hoisted_21$1, "Loading notes...")) : createCommentVNode("", true),
         unref(userNotesStore).notes.length > 0 && !showLoadingTextNotes.value ? (openBlock(), createElementBlock("h3", _hoisted_22$1, [
-          isEventSearch.value ? (openBlock(), createElementBlock("span", _hoisted_23$1, "Event info")) : (openBlock(), createElementBlock("span", _hoisted_24$1, "User notes"))
+          isEventSearch.value ? (openBlock(), createElementBlock("span", _hoisted_23, "Event info")) : (openBlock(), createElementBlock("span", _hoisted_24, "User notes"))
         ])) : createCommentVNode("", true),
         (openBlock(true), createElementBlock(Fragment, null, renderList(unref(userNotesStore).notes, (event, i2) => {
           return openBlock(), createBlock(ParentEventView, {
@@ -18010,10 +18023,10 @@ const _sfc_main$e = /* @__PURE__ */ defineComponent({
           currentPage: currentPage.value,
           onShowPage: showUserPage
         }, null, 8, ["pagesCount", "currentPage"])) : createCommentVNode("", true),
-        showNotFoundError.value || isOffline.value ? (openBlock(), createElementBlock("div", _hoisted_25$1, [
-          createBaseVNode("div", _hoisted_26$1, [
-            showNotFoundError.value ? (openBlock(), createElementBlock("span", _hoisted_27$1, " Data was not found on selected relay. Please try to connect to another one or you can try to load info from the list of popular relays. ")) : createCommentVNode("", true),
-            isOffline.value ? (openBlock(), createElementBlock("span", _hoisted_28$1, "Please connect first or search in the list of popular relays.")) : createCommentVNode("", true)
+        showNotFoundError.value || isOffline.value ? (openBlock(), createElementBlock("div", _hoisted_25, [
+          createBaseVNode("div", _hoisted_26, [
+            showNotFoundError.value ? (openBlock(), createElementBlock("span", _hoisted_27, " Data was not found on selected relay. Please try to connect to another one or you can try to load info from the list of popular relays. ")) : createCommentVNode("", true),
+            isOffline.value ? (openBlock(), createElementBlock("span", _hoisted_28, "Please connect first or search in the list of popular relays.")) : createCommentVNode("", true)
           ]),
           createBaseVNode("div", null, [
             createBaseVNode("button", {
@@ -18035,94 +18048,60 @@ const _sfc_main$e = /* @__PURE__ */ defineComponent({
   }
 });
 const User_vue_vue_type_style_index_0_scoped_f777a106_lang = "";
-const User = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["__scopeId", "data-v-f777a106"]]);
-const _sfc_main$d = {};
-const _hoisted_1$c = {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: "16",
-  height: "16",
-  fill: "currentColor",
-  class: "bi bi-trash",
-  viewBox: "0 0 16 16"
-};
-const _hoisted_2$b = /* @__PURE__ */ createBaseVNode("path", { d: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" }, null, -1);
-const _hoisted_3$8 = /* @__PURE__ */ createBaseVNode("path", { d: "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" }, null, -1);
-const _hoisted_4$6 = [
-  _hoisted_2$b,
-  _hoisted_3$8
-];
-function _sfc_render$1(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$c, _hoisted_4$6);
-}
-const TrashIcon = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$1]]);
-const _withScopeId$6 = (n) => (pushScopeId("data-v-df6b991a"), n = n(), popScopeId(), n);
-const _hoisted_1$b = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Images:", -1));
-const _hoisted_2$a = { class: "show-images" };
-const _hoisted_3$7 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your relays:", -1));
-const _hoisted_4$5 = { class: "error" };
-const _hoisted_5$4 = { class: "warning" };
-const _hoisted_6$2 = { class: "relays" };
-const _hoisted_7$1 = { class: "actions" };
-const _hoisted_8$1 = ["onChange", "id", "name", "checked"];
-const _hoisted_9$1 = ["for"];
-const _hoisted_10$1 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("span", { class: "actions__delimiter" }, " | ", -1));
-const _hoisted_11$1 = ["onClick"];
-const _hoisted_12$1 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("span", { class: "actions__remove-label" }, "remove", -1));
-const _hoisted_13 = { key: 0 };
-const _hoisted_14 = { key: 1 };
-const _hoisted_15 = { key: 2 };
-const _hoisted_16 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Add relay:", -1));
-const _hoisted_17 = { class: "add-relay" };
-const _hoisted_18 = { class: "error" };
-const _hoisted_19 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your Keys:", -1));
-const _hoisted_20 = { class: "keys" };
-const _hoisted_21 = { class: "key-block" };
-const _hoisted_22 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", null, "Public key:", -1));
-const _hoisted_23 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", { class: "key-block__desc" }, [
-  /* @__PURE__ */ createBaseVNode("small", null, " Public key identifies your Nostr account. Feel free to share it with others. ")
-], -1));
-const _hoisted_24 = {
-  key: 0,
-  class: "key-block__code"
-};
-const _hoisted_25 = { key: 1 };
-const _hoisted_26 = { class: "key-block" };
-const _hoisted_27 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", null, "Private key:", -1));
-const _hoisted_28 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("div", { class: "key-block__desc" }, [
-  /* @__PURE__ */ createBaseVNode("small", null, [
-    /* @__PURE__ */ createTextVNode(" Private key fully controls your Nostr account and used to cryptographically sign your messages. "),
-    /* @__PURE__ */ createBaseVNode("b", null, "Do not share your private key with anyone and keep it secure.")
-  ])
-], -1));
-const _hoisted_29 = {
-  key: 0,
-  class: "key-block__code"
-};
-const _hoisted_30 = { key: 1 };
-const _hoisted_31 = {
-  key: 3,
-  class: "logout-block"
-};
-const _hoisted_32 = { key: 0 };
-const _hoisted_33 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-door-closed" }, null, -1));
-const _hoisted_34 = { key: 1 };
-const _hoisted_35 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-door-closed" }, null, -1));
-const UPDATING_RELAY_ERROR = "Updating relays error. Please reload the page and try again or write us about the issue.";
-const _sfc_main$c = /* @__PURE__ */ defineComponent({
-  __name: "Settings",
-  emits: ["relayConnect", "relayDisconnect", "clearAppState"],
-  setup(__props, { emit: __emit }) {
-    const emit2 = __emit;
-    const poolStore = usePool();
-    const nsecStore = useNsec();
-    const feedStore = useFeed();
+const User = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["__scopeId", "data-v-f777a106"]]);
+const _withScopeId$9 = (n) => (pushScopeId("data-v-3ab5012e"), n = n(), popScopeId(), n);
+const _hoisted_1$e = /* @__PURE__ */ _withScopeId$9(() => /* @__PURE__ */ createBaseVNode("h4", null, "Images:", -1));
+const _sfc_main$g = /* @__PURE__ */ defineComponent({
+  __name: "Images",
+  setup(__props) {
     const imagesStore = useImages();
+    const toggleImages = () => {
+      imagesStore.updateShowImages(!imagesStore.showImages);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$e,
+        createVNode(_sfc_main$o, {
+          showImages: unref(imagesStore).showImages,
+          onToggleImages: toggleImages
+        }, null, 8, ["showImages"])
+      ], 64);
+    };
+  }
+});
+const Images_vue_vue_type_style_index_0_scoped_3ab5012e_lang = "";
+const Images = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["__scopeId", "data-v-3ab5012e"]]);
+const _withScopeId$8 = (n) => (pushScopeId("data-v-7acb228a"), n = n(), popScopeId(), n);
+const _hoisted_1$d = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your relays:", -1));
+const _hoisted_2$c = { class: "error" };
+const _hoisted_3$9 = { class: "relays" };
+const _hoisted_4$7 = { class: "actions" };
+const _hoisted_5$6 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("span", { class: "actions__delimiter" }, " | ", -1));
+const _hoisted_6$3 = ["onClick"];
+const _hoisted_7$2 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-trash trash-icon" }, null, -1));
+const _hoisted_8$2 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("span", { class: "actions__remove-label" }, "remove", -1));
+const _hoisted_9$2 = [
+  _hoisted_7$2,
+  _hoisted_8$2
+];
+const _hoisted_10$2 = { key: 0 };
+const _hoisted_11$2 = { key: 1 };
+const _hoisted_12$2 = { key: 2 };
+const _hoisted_13$1 = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("h4", null, "Add relay:", -1));
+const _hoisted_14$1 = { class: "add-relay" };
+const _hoisted_15$1 = { class: "error" };
+const UPDATING_RELAY_ERROR = "Updating relays error. Please reload the page and try again or write us about the issue.";
+const _sfc_main$f = /* @__PURE__ */ defineComponent({
+  __name: "Relays",
+  setup(__props) {
+    const poolStore = usePool();
     const pool = poolStore.pool;
     const relayStore = useRelay();
+    const nsecStore = useNsec();
+    const feedStore = useFeed();
+    const relaysError2 = ref("");
     const newRelayUrl = ref("");
     const relayUrlError = ref("");
-    const relaysError2 = ref("");
-    const relaysWarning = ref("");
     const prepareNip65Event = (tags) => {
       relaysError2.value = "";
       const nsecValue = nsecStore.nsec ? nsecStore.nsec.trim() : "";
@@ -18237,85 +18216,40 @@ const _sfc_main$c = /* @__PURE__ */ defineComponent({
       feedStore.setToRemountFeed(true);
       relayStore.addConnectedUserReadRelay(relay);
     };
-    const toggleImages = () => {
-      imagesStore.updateShowImages(!imagesStore.showImages);
-    };
-    const handleCopyPubkeyNpub = () => {
-      if (!nsecStore.isValidNsecPresented())
-        return;
-      const pubkey = nsecStore.getPubkey();
-      navigator.clipboard.writeText(nip19_exports.npubEncode(pubkey));
-    };
-    const handleCopyPubkeyHex = () => {
-      if (!nsecStore.isValidNsecPresented())
-        return;
-      navigator.clipboard.writeText(nsecStore.getPubkey());
-    };
-    const handleCopyPrivkeyNsec = () => {
-      if (!nsecStore.isValidNsecPresented())
-        return;
-      navigator.clipboard.writeText(nsecStore.getPrivkey());
-    };
-    const handleCopyPrivkeyHex = () => {
-      if (!nsecStore.isValidNsecPresented())
-        return;
-      navigator.clipboard.writeText(nsecStore.getPrivkeyHex());
-    };
-    const logout = () => {
-      emit2("clearAppState");
-    };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
-        _hoisted_1$b,
-        createBaseVNode("div", _hoisted_2$a, [
-          createVNode(_sfc_main$l, {
-            showImages: unref(imagesStore).showImages,
-            onToggleImages: toggleImages
-          }, null, 8, ["showImages"])
-        ]),
-        _hoisted_3$7,
-        createBaseVNode("div", _hoisted_4$5, toDisplayString(relaysError2.value), 1),
-        createBaseVNode("div", _hoisted_5$4, toDisplayString(relaysWarning.value), 1),
-        createBaseVNode("ul", _hoisted_6$2, [
+        _hoisted_1$d,
+        createBaseVNode("div", _hoisted_2$c, toDisplayString(relaysError2.value), 1),
+        createBaseVNode("ul", _hoisted_3$9, [
           (openBlock(true), createElementBlock(Fragment, null, renderList(unref(relayStore).userReadWriteRelays, (r, i2) => {
             return openBlock(), createElementBlock("li", {
               class: "relay",
               key: i2
             }, [
               createTextVNode(toDisplayString(r.url) + " ", 1),
-              createBaseVNode("div", _hoisted_7$1, [
-                createBaseVNode("input", {
-                  onChange: (e) => handleWriteClick(e, r.url),
-                  class: "actions__checkbox",
-                  type: "checkbox",
-                  id: `write-${i2}`,
-                  name: `write-${i2}`,
-                  checked: r.type === "write"
-                }, null, 40, _hoisted_8$1),
-                createBaseVNode("label", {
-                  class: "actions__label",
-                  for: `write-${i2}`
-                }, " publish to relay", 8, _hoisted_9$1),
-                _hoisted_10$1,
+              createBaseVNode("div", _hoisted_4$7, [
+                createVNode(Checkbox, {
+                  onOnChange: (e) => handleWriteClick(e, r.url),
+                  checked: r.type === "write",
+                  label: "publish to relay"
+                }, null, 8, ["onOnChange", "checked"]),
+                _hoisted_5$6,
                 createBaseVNode("span", {
                   onClick: () => handleRemoveClick(r.url),
                   class: "actions__remove"
-                }, [
-                  createVNode(TrashIcon, { class: "trash-icon" }),
-                  _hoisted_12$1
-                ], 8, _hoisted_11$1)
+                }, _hoisted_9$2, 8, _hoisted_6$3)
               ])
             ]);
           }), 128))
         ]),
-        unref(relayStore).isConnectedToRelay && unref(nsecStore).isValidNsecPresented() && !unref(relayStore).userReadWriteRelays.length ? (openBlock(), createElementBlock("div", _hoisted_13, [
+        unref(relayStore).isConnectedToRelay && unref(nsecStore).isValidNsecPresented() && !unref(relayStore).userReadWriteRelays.length ? (openBlock(), createElementBlock("div", _hoisted_10$2, [
           createTextVNode(" The list with your relays was not found on "),
           createBaseVNode("b", null, toDisplayString(unref(relayStore).currentRelay.url), 1)
         ])) : createCommentVNode("", true),
-        !unref(relayStore).isConnectedToRelay || !unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("div", _hoisted_14, " Please login to see and edit the list of your relays. ")) : createCommentVNode("", true),
-        unref(relayStore).isConnectedToRelay && unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("div", _hoisted_15, [
-          _hoisted_16,
-          createBaseVNode("div", _hoisted_17, [
+        !unref(relayStore).isConnectedToRelay || !unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("div", _hoisted_11$2, " Please login to see and edit the list of your relays. ")) : createCommentVNode("", true),
+        unref(relayStore).isConnectedToRelay && unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("div", _hoisted_12$2, [
+          _hoisted_13$1,
+          createBaseVNode("div", _hoisted_14$1, [
             withDirectives(createBaseVNode("input", {
               "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => newRelayUrl.value = $event),
               class: "add-relay__input",
@@ -18329,67 +18263,235 @@ const _sfc_main$c = /* @__PURE__ */ defineComponent({
               class: "add-relay__btn"
             }, "Add")
           ]),
-          createBaseVNode("div", _hoisted_18, toDisplayString(relayUrlError.value), 1)
-        ])) : createCommentVNode("", true),
-        _hoisted_19,
-        createBaseVNode("div", _hoisted_20, [
-          createBaseVNode("div", _hoisted_21, [
-            _hoisted_22,
-            _hoisted_23,
-            createBaseVNode("div", null, [
-              createTextVNode(" 🔑  "),
-              unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("code", _hoisted_24, toDisplayString(unref(nip19_exports).npubEncode(unref(nsecStore).getPubkey())), 1)) : (openBlock(), createElementBlock("span", _hoisted_25, "Please login to see your public key."))
-            ]),
-            createBaseVNode("div", { class: "key-block__btns" }, [
-              createBaseVNode("button", {
-                class: "copy-btn",
-                onClick: handleCopyPubkeyNpub
-              }, "Copy pubkey"),
-              createBaseVNode("button", {
-                class: "copy-btn",
-                onClick: handleCopyPubkeyHex
-              }, "Copy hex")
-            ])
-          ]),
-          createBaseVNode("div", _hoisted_26, [
-            _hoisted_27,
-            _hoisted_28,
-            createBaseVNode("div", null, [
-              createTextVNode(" 🔐  "),
-              unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("code", _hoisted_29, " *************************************************************** ")) : (openBlock(), createElementBlock("span", _hoisted_30, "Please login to get your private key."))
-            ]),
-            createBaseVNode("div", { class: "key-block__btns" }, [
-              createBaseVNode("button", {
-                class: "copy-btn",
-                onClick: handleCopyPrivkeyNsec
-              }, "Copy privkey"),
-              createBaseVNode("button", {
-                class: "copy-btn",
-                onClick: handleCopyPrivkeyHex
-              }, "Copy hex")
-            ])
-          ])
-        ]),
-        unref(relayStore).isConnectedToRelay ? (openBlock(), createElementBlock("div", _hoisted_31, [
-          createBaseVNode("button", {
-            class: "logout-btn",
-            onClick: logout
-          }, [
-            unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("span", _hoisted_32, [
-              createTextVNode(" Log Out "),
-              _hoisted_33
-            ])) : (openBlock(), createElementBlock("span", _hoisted_34, [
-              createTextVNode("Disconnect "),
-              _hoisted_35
-            ]))
-          ])
+          createBaseVNode("div", _hoisted_15$1, toDisplayString(relayUrlError.value), 1)
         ])) : createCommentVNode("", true)
       ], 64);
     };
   }
 });
-const Settings_vue_vue_type_style_index_0_scoped_df6b991a_lang = "";
-const Settings = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["__scopeId", "data-v-df6b991a"]]);
+const Relays_vue_vue_type_style_index_0_scoped_7acb228a_lang = "";
+const Relays = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["__scopeId", "data-v-7acb228a"]]);
+const _withScopeId$7 = (n) => (pushScopeId("data-v-b00f96f8"), n = n(), popScopeId(), n);
+const _hoisted_1$c = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your Keys:", -1));
+const _hoisted_2$b = { class: "keys" };
+const _hoisted_3$8 = { class: "key-block" };
+const _hoisted_4$6 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("div", null, "Public key:", -1));
+const _hoisted_5$5 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("div", { class: "key-block__desc" }, [
+  /* @__PURE__ */ createBaseVNode("small", null, " Public key identifies your Nostr account. Feel free to share it with others. ")
+], -1));
+const _hoisted_6$2 = {
+  key: 0,
+  class: "key-block__code"
+};
+const _hoisted_7$1 = { key: 1 };
+const _hoisted_8$1 = { class: "key-block__btns" };
+const _hoisted_9$1 = {
+  key: 0,
+  class: "bi bi-clipboard copy-icon"
+};
+const _hoisted_10$1 = {
+  key: 1,
+  class: "bi bi-check-lg copy-icon"
+};
+const _hoisted_11$1 = {
+  key: 0,
+  class: "bi bi-clipboard copy-icon"
+};
+const _hoisted_12$1 = {
+  key: 1,
+  class: "bi bi-check-lg copy-icon"
+};
+const _hoisted_13 = { class: "key-block" };
+const _hoisted_14 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("div", null, "Private key:", -1));
+const _hoisted_15 = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("div", { class: "key-block__desc" }, [
+  /* @__PURE__ */ createBaseVNode("small", null, [
+    /* @__PURE__ */ createTextVNode(" Private key fully controls your Nostr account and used to cryptographically sign your messages. "),
+    /* @__PURE__ */ createBaseVNode("b", null, "Do not share your private key with anyone and keep it secure.")
+  ])
+], -1));
+const _hoisted_16 = {
+  key: 0,
+  class: "key-block__code"
+};
+const _hoisted_17 = { key: 1 };
+const _hoisted_18 = { class: "key-block__btns" };
+const _hoisted_19 = {
+  key: 0,
+  class: "bi bi-clipboard copy-icon"
+};
+const _hoisted_20 = {
+  key: 1,
+  class: "bi bi-check-lg copy-icon"
+};
+const _hoisted_21 = {
+  key: 0,
+  class: "bi bi-clipboard copy-icon"
+};
+const _hoisted_22 = {
+  key: 1,
+  class: "bi bi-check-lg copy-icon"
+};
+const _sfc_main$e = /* @__PURE__ */ defineComponent({
+  __name: "Keys",
+  setup(__props) {
+    const nsecStore = useNsec();
+    const showCopyPubCheck = ref(false);
+    const showCopyPubHexCheck = ref(false);
+    const showCopyPrivCheck = ref(false);
+    const showCopyPrivHexCheck = ref(false);
+    const handleCopyPubkeyNpub = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      const pubkey = nsecStore.getPubkey();
+      navigator.clipboard.writeText(nip19_exports.npubEncode(pubkey));
+      showCopyPubCheck.value = true;
+      setTimeout(() => {
+        showCopyPubCheck.value = false;
+      }, 2e3);
+    };
+    const handleCopyPubkeyHex = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      navigator.clipboard.writeText(nsecStore.getPubkey());
+      showCopyPubHexCheck.value = true;
+      setTimeout(() => {
+        showCopyPubHexCheck.value = false;
+      }, 2e3);
+    };
+    const handleCopyPrivkeyNsec = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      navigator.clipboard.writeText(nsecStore.getPrivkey());
+      showCopyPrivCheck.value = true;
+      setTimeout(() => {
+        showCopyPrivCheck.value = false;
+      }, 2e3);
+    };
+    const handleCopyPrivkeyHex = () => {
+      if (!nsecStore.isValidNsecPresented())
+        return;
+      navigator.clipboard.writeText(nsecStore.getPrivkeyHex());
+      showCopyPrivHexCheck.value = true;
+      setTimeout(() => {
+        showCopyPrivHexCheck.value = false;
+      }, 2e3);
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        _hoisted_1$c,
+        createBaseVNode("div", _hoisted_2$b, [
+          createBaseVNode("div", _hoisted_3$8, [
+            _hoisted_4$6,
+            _hoisted_5$5,
+            createBaseVNode("div", null, [
+              createTextVNode(" 🔑  "),
+              unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("code", _hoisted_6$2, toDisplayString(unref(nip19_exports).npubEncode(unref(nsecStore).getPubkey())), 1)) : (openBlock(), createElementBlock("span", _hoisted_7$1, "Please login to see your public key."))
+            ]),
+            createBaseVNode("div", _hoisted_8$1, [
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPubkeyNpub
+              }, [
+                !showCopyPubCheck.value ? (openBlock(), createElementBlock("i", _hoisted_9$1)) : (openBlock(), createElementBlock("i", _hoisted_10$1)),
+                createTextVNode(" Copy pubkey ")
+              ]),
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPubkeyHex
+              }, [
+                !showCopyPubHexCheck.value ? (openBlock(), createElementBlock("i", _hoisted_11$1)) : (openBlock(), createElementBlock("i", _hoisted_12$1)),
+                createTextVNode(" Copy hex ")
+              ])
+            ])
+          ]),
+          createBaseVNode("div", _hoisted_13, [
+            _hoisted_14,
+            _hoisted_15,
+            createBaseVNode("div", null, [
+              createTextVNode(" 🔐  "),
+              unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("code", _hoisted_16, " *************************************************************** ")) : (openBlock(), createElementBlock("span", _hoisted_17, "Please login to get your private key."))
+            ]),
+            createBaseVNode("div", _hoisted_18, [
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPrivkeyNsec
+              }, [
+                !showCopyPrivCheck.value ? (openBlock(), createElementBlock("i", _hoisted_19)) : (openBlock(), createElementBlock("i", _hoisted_20)),
+                createTextVNode(" Copy privkey ")
+              ]),
+              createBaseVNode("button", {
+                class: "copy-btn",
+                onClick: handleCopyPrivkeyHex
+              }, [
+                !showCopyPrivHexCheck.value ? (openBlock(), createElementBlock("i", _hoisted_21)) : (openBlock(), createElementBlock("i", _hoisted_22)),
+                createTextVNode(" Copy hex ")
+              ])
+            ])
+          ])
+        ])
+      ], 64);
+    };
+  }
+});
+const Keys_vue_vue_type_style_index_0_scoped_b00f96f8_lang = "";
+const Keys = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["__scopeId", "data-v-b00f96f8"]]);
+const _withScopeId$6 = (n) => (pushScopeId("data-v-9f59ac9c"), n = n(), popScopeId(), n);
+const _hoisted_1$b = {
+  key: 0,
+  class: "logout-block"
+};
+const _hoisted_2$a = { key: 0 };
+const _hoisted_3$7 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-door-closed" }, null, -1));
+const _hoisted_4$5 = { key: 1 };
+const _hoisted_5$4 = /* @__PURE__ */ _withScopeId$6(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-door-closed" }, null, -1));
+const _sfc_main$d = /* @__PURE__ */ defineComponent({
+  __name: "Logout",
+  emits: ["logout"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const nsecStore = useNsec();
+    const relayStore = useRelay();
+    const logout = () => {
+      emit2("logout");
+    };
+    return (_ctx, _cache) => {
+      return unref(relayStore).isConnectedToRelay ? (openBlock(), createElementBlock("div", _hoisted_1$b, [
+        createBaseVNode("button", {
+          class: "logout-btn",
+          onClick: logout
+        }, [
+          unref(nsecStore).isValidNsecPresented() ? (openBlock(), createElementBlock("span", _hoisted_2$a, [
+            createTextVNode(" Log Out "),
+            _hoisted_3$7
+          ])) : (openBlock(), createElementBlock("span", _hoisted_4$5, [
+            createTextVNode("Disconnect "),
+            _hoisted_5$4
+          ]))
+        ])
+      ])) : createCommentVNode("", true);
+    };
+  }
+});
+const Logout_vue_vue_type_style_index_0_scoped_9f59ac9c_lang = "";
+const Logout = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["__scopeId", "data-v-9f59ac9c"]]);
+const _sfc_main$c = /* @__PURE__ */ defineComponent({
+  __name: "Settings",
+  emits: ["clearAppState"],
+  setup(__props, { emit: __emit }) {
+    const emit2 = __emit;
+    const logout = () => {
+      emit2("clearAppState");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock(Fragment, null, [
+        createVNode(Images),
+        createVNode(Relays),
+        createVNode(Keys),
+        createVNode(Logout, { onLogout: logout })
+      ], 64);
+    };
+  }
+});
 function setBigUint64(view, byteOffset, value, isLE2) {
   if (typeof view.setBigUint64 === "function")
     return view.setBigUint64(byteOffset, value, isLE2);
@@ -19432,7 +19534,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
 });
 const Chat_vue_vue_type_style_index_0_scoped_fccd00d5_lang = "";
 const Chat = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-fccd00d5"]]);
-const _withScopeId$1 = (n) => (pushScopeId("data-v-f4b4ce1a"), n = n(), popScopeId(), n);
+const _withScopeId$1 = (n) => (pushScopeId("data-v-a6f94b84"), n = n(), popScopeId(), n);
 const _hoisted_1$3 = { class: "fields" };
 const _hoisted_2$3 = { class: "field" };
 const _hoisted_3$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("label", { class: "select-relay-label" }, [
@@ -19575,7 +19677,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
         const {
           userConnectedReadRelays,
           userConnectedWriteRelays
-        } = await getConnectedReadWriteRelays(relayStore.userReadWriteRelays);
+        } = await getConnectedReadWriteRelays(pool, relayStore.userReadWriteRelays);
         relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays);
         relayStore.setConnectedUserWriteRelayUrls(userConnectedWriteRelays);
         relayStore.setIsConnectingToReadWriteRelaysStatus(false);
@@ -19653,8 +19755,8 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const Login_vue_vue_type_style_index_0_scoped_f4b4ce1a_lang = "";
-const Login = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-f4b4ce1a"]]);
+const Login_vue_vue_type_style_index_0_scoped_a6f94b84_lang = "";
+const Login = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-a6f94b84"]]);
 const _withScopeId = (n) => (pushScopeId("data-v-aa016908"), n = n(), popScopeId(), n);
 const _hoisted_1$2 = { class: "tabs" };
 const _hoisted_2$2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { class: "tab-link-text" }, [
@@ -19955,14 +20057,14 @@ const routes = [
     path: "/help",
     name: "Help",
     components: {
-      default: _sfc_main$i,
+      default: _sfc_main$l,
       Header
     }
   },
   {
     path: "/",
     components: {
-      default: _sfc_main$i,
+      default: _sfc_main$l,
       Header
     },
     beforeEnter: (to, from, next) => {
@@ -19980,7 +20082,7 @@ const routes = [
   {
     path: "/settings",
     components: {
-      default: Settings,
+      default: _sfc_main$c,
       Header
     }
   },
@@ -20010,19 +20112,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const initialNsec = isRemembered ? localStorage.getItem("privkey") : "";
     nsecStore.updateNsec(initialNsec || "");
     const eventsLog = ref([]);
-    const clearAppState = (clearLocalStorage = true) => {
+    const clearAppState = async (clearLocalStorage = true) => {
       var _a2;
+      feedStore.clearNewEventsBadgeUpdateInterval();
       if (relayStore.isConnectedToRelay) {
         (_a2 = relayStore.currentRelay) == null ? void 0 : _a2.close();
       }
-      closePoolSockets(pool);
-      poolStore.resetPool();
-      if (feedStore.pool) {
-        closePoolSockets(feedStore.pool);
-        feedStore.resetPool();
-      }
+      await asyncClosePool(pool);
       feedStore.clear();
       relayStore.clear();
+      poolStore.resetPool();
       imagesStore.updateShowImages(false);
       if (clearLocalStorage) {
         localStorage.clear();

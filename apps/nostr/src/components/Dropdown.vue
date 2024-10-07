@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
+  import { onMounted, onUpdated, ref } from 'vue'
 
   const items = ref<HTMLDivElement | null>(null)
   const selectBtn = ref<HTMLDivElement | null>(null)
@@ -14,6 +14,10 @@
   }>()
 
   const selectedIndex = ref(0)
+
+  onUpdated(() => {
+    updateSelectedIndex()
+  })
 
   onMounted(() => {
     prevSelectedListItem.value = document.querySelector('.active')
@@ -40,13 +44,17 @@
       }
     })
 
+    updateSelectedIndex()
+  })
+
+  const updateSelectedIndex = () => {
     if (props.selectedKey) {
       const index = props.listItems.findIndex((item) => item.key === props.selectedKey)
       if (index !== -1) {
         selectedIndex.value = index
       }
     }
-  })
+  }
 
   const handleSelectClick = () => {
     if (props.disabled) return

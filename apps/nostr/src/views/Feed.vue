@@ -14,7 +14,7 @@
   import { usePool } from '@/stores/Pool'
   import { useNsec } from '@/stores/Nsec'
   import { useMetasCache } from '@/stores/MetasCache'
-  import { getFollowsConnectedRelaysMap, closePoolSockets } from '@/utils/network'
+  import { getFollowsConnectedRelaysMap } from '@/utils/network'
   import { loadAndInjectDataToPosts, listRootEvents } from '@/utils'
   import { EVENT_KIND } from '@/nostr'
 
@@ -41,10 +41,6 @@
     Math.ceil(feedStore.paginationEventsIds.length / DEFAULT_EVENTS_COUNT),
   )
   const currPath = computed(() => route.path)
-
-  // migrated from App.vue
-  // TODO: maybe get rid of this, used in broadcastEvent, store can be used instead
-  let newEvents = ref<{ id: string; pubkey: string }[]>([])
 
   const pool = poolStore.pool
   const isDisabledSourceSelect = ref(false)
@@ -94,22 +90,18 @@
     await remountFeed()
   }
 
-  const remountFeed = async () => {
+  function disableSelect() {
     isDisabledSourceSelect.value = true
+  }
 
-    if (feedStore.newEventsBadgeUpdateInterval) {
-      feedStore.clearNewEventsBadgeUpdateInterval()
-    }
+  function enableSelect() {
+    isDisabledSourceSelect.value = false
+  }
 
-    if (feedStore.pool) {
-      try {
-        await closePoolSockets(feedStore.pool)
-        feedStore.resetPool()
-      } catch (e) {
-        console.error('Error while closing websocket:', e)
-      }
-    }
+  const remountFeed = async () => {
+    disableSelect()
 
+    feedStore.clearNewEventsBadgeUpdateInterval()
     feedStore.setShowNewEventsBadge(false)
     feedStore.updateNewEventsToShow([])
     feedStore.updatePaginationEventsIds([])
@@ -123,7 +115,7 @@
    * For remounting feed use function remountFeed
    */
   async function mountFeed() {
-    isDisabledSourceSelect.value = true
+    disableSelect()
     feedStore.setLoadingFeedSourceStatus(true)
 
     const pubkey = nsecStore.getPubkey()
@@ -164,6 +156,9 @@
     if (followsPubkeys.length) {
       postsFilter.authors = followsPubkeys
     }
+
+    feedStore.resetTimeToGetNewPostsToNow()
+
     let posts = (await listRootEvents(pool as SimplePool, feedRelays, [postsFilter])) as Event[]
     posts = posts.sort((a, b) => b.created_at - a.created_at)
 
@@ -191,39 +186,62 @@
     feedStore.setLoadingMoreStatus(false)
 
     // subscribe to new events
-    let subscribePostsFilter: Filter = { kinds: [1], limit: 1 }
+    let subscribePostsFilter: Filter = { kinds: [1] }
     if (followsPubkeys.length) {
       subscribePostsFilter.authors = followsPubkeys
     }
-    await subscibeFeedForUpdates(feedRelays, subscribePostsFilter)
-    feedStore.newEventsBadgeUpdateInterval = setInterval(updateNewEventsElement, 3000)
 
-    isDisabledSourceSelect.value = false
+    feedStore.newEventsBadgeUpdateInterval = setInterval(async () => {
+      const currentInterval = feedStore.newEventsBadgeUpdateInterval
+      await getFeedUpdates(feedRelays, subscribePostsFilter, currentInterval)
+    }, 3000)
+
+    enableSelect()
   }
 
-  async function subscibeFeedForUpdates(feedRelays: string[], subscribePostsFilter: Filter) {
-    // subPool is a global variable used later to close all connections
-    await feedStore.pool?.subscribeMany(feedRelays, [subscribePostsFilter], {
-      onevent(event: Event) {
-        if (feedStore.eventsId.includes(event.id)) return
-        const nip10Data = nip10.parse(event)
-        if (nip10Data.reply || nip10Data.root) return // filter non root events
-        newEvents.value.push({ id: event.id, pubkey: event.pubkey })
-        feedStore.pushToNewEventsToShow({ id: event.id, pubkey: event.pubkey })
-      },
-      onclose(r) {
-        console.warn('Subscription closed', r)
-      },
+  const getFeedUpdates = async (
+    feedRelays: string[],
+    subscribePostsFilter: Filter,
+    currentInterval: number,
+  ) => {
+    if (feedStore.isLoadingNewEvents) return
+
+    subscribePostsFilter.since = feedStore.timeToGetNewPosts
+    feedStore.resetTimeToGetNewPostsToNow()
+    let newEvents = await pool.querySync(feedRelays, subscribePostsFilter)
+    if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
+      return
+    }
+
+    newEvents = newEvents.sort((a, b) => a.created_at - b.created_at)
+    newEvents.forEach((event) => {
+      if (feedStore.eventsId.includes(event.id)) return
+      if (feedStore.newEventsToShowIds.includes(event.id)) return
+      if (feedStore.paginationEventsIds.includes(event.id)) return
+
+      const nip10Data = nip10.parse(event)
+      if (nip10Data.reply || nip10Data.root) return // filter non root events
+
+      feedStore.pushToNewEventsToShow({
+        id: event.id,
+        pubkey: event.pubkey,
+        created_at: event.created_at,
+      })
     })
+
+    await updateNewEventsElement(currentInterval)
   }
 
-  async function updateNewEventsElement() {
+  async function updateNewEventsElement(currentInterval: number) {
+    if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
+      return
+    }
+
     const relays = relayStore.connectedFeedRelaysUrls
     if (!relays.length) return
 
     const eventsToShow = feedStore.newEventsToShow
     if (eventsToShow.length < 2) return
-    if (!feedStore.newEventsBadgeUpdateInterval) return
 
     feedStore.setNewEventsBadgeCount(eventsToShow.length)
     feedStore.setShowNewEventsBadge(true)
@@ -237,7 +255,9 @@
     const author1 = await pool.querySync(relays, eventsListOptions1)
     const author2 = await pool.querySync(relays, eventsListOptions2)
 
-    if (!feedStore.newEventsBadgeUpdateInterval) return
+    if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
+      return
+    }
     if (!author1[0]?.content || !author2[0]?.content) return
 
     const authorImg1 = JSON.parse(author1[0].content).picture
@@ -246,9 +266,10 @@
     feedStore.setNewEventsBadgeImageUrls([authorImg1, authorImg2])
   }
 
-  const showFeedPage = async (page: number) => {
-    if (feedStore.isLoadingNewEvents) return
+  const showFeedPage = async (page: number, ignoreLoadingStatus: boolean = false) => {
+    if (!ignoreLoadingStatus && feedStore.isLoadingNewEvents) return
     feedStore.setLoadingNewEventsStatus(true)
+    disableSelect()
 
     const relays = relayStore.connectedFeedRelaysUrls
     if (!relays.length) return
@@ -257,8 +278,7 @@
     const start = (page - 1) * limit
     const end = start + limit
 
-    const reversedIds = feedStore.paginationEventsIds.slice().reverse()
-    const idsToShow = reversedIds.slice(start, end)
+    const idsToShow = feedStore.paginationEventsIds.slice(start, end)
 
     const postsEvents = await pool.querySync(relays, { ids: idsToShow })
     let posts = postsEvents.sort((a, b) => b.created_at - a.created_at)
@@ -277,10 +297,12 @@
     feedStore.updateEvents(posts as EventExtended[])
     feedStore.setLoadingNewEventsStatus(false)
     currentPage.value = page
+    enableSelect()
   }
 
   const loadNewRelayEvents = async () => {
     if (feedStore.isLoadingNewEvents) return
+    disableSelect()
 
     feedStore.setLoadingNewEventsStatus(true)
     feedStore.setShowNewEventsBadge(false)
@@ -290,34 +312,18 @@
 
     router.push({ path: `${route.path}` })
 
-    let eventsToShow = feedStore.newEventsToShow
-    feedStore.updateNewEventsToShow(
-      feedStore.newEventsToShow.filter((item: ShortPubkeyEvent) => !eventsToShow.includes(item)),
-    )
+    let eventsToShow = [...feedStore.newEventsToShow]
+    feedStore.updateNewEventsToShow([])
 
-    const ids = eventsToShow.map((e: ShortPubkeyEvent) => e.id)
-    const limit = DEFAULT_EVENTS_COUNT
+    const ids = eventsToShow.map((e: ShortPubkeyEvent) => e.id).reverse() // make the last event to go first
 
-    feedStore.updatePaginationEventsIds(feedStore.paginationEventsIds.concat(ids))
-    const firstPageIds = feedStore.paginationEventsIds.slice(-limit)
+    // prepend new events ids to the list of pagination events ids
+    const newPaginationEventsIds = [...feedStore.paginationEventsIds]
+    newPaginationEventsIds.unshift(...ids)
+    feedStore.updatePaginationEventsIds(newPaginationEventsIds)
 
-    const postsEvents = await pool.querySync(relays, { ids: firstPageIds })
-    let posts = postsEvents.sort((a, b) => b.created_at - a.created_at)
-
-    const isRootPosts = true
-    await loadAndInjectDataToPosts(
-      posts,
-      null,
-      {},
-      relays,
-      metasCacheStore,
-      pool as SimplePool,
-      isRootPosts,
-    )
-
-    // update view
-    feedStore.updateEvents(posts as EventExtended[])
-    feedStore.setLoadingNewEventsStatus(false)
+    const ignoreLoadingStatus = true
+    await showFeedPage(1, ignoreLoadingStatus)
 
     // logHtmlParts([
     //   { type: 'text', value: `loaded ${eventsToShow.length}` },
@@ -325,13 +331,17 @@
     //   { type: 'bold', value: relayStore.connectedFeedRelaysPrettyStr },
     // ])
 
-    currentPage.value = 1
+    feedStore.setLoadingNewEventsStatus(false)
+    enableSelect()
   }
 </script>
 
 <template>
   <div id="feed">
-    <MessageWrapper @loadNewRelayEvents="loadNewRelayEvents" :newEvents="newEvents" />
+    <MessageWrapper
+      @loadNewRelayEvents="loadNewRelayEvents"
+      :newEvents="feedStore.newEventsToShow"
+    />
 
     <FeedHeader :isDisabledSourceSelect="isDisabledSourceSelect" />
 
@@ -404,7 +414,7 @@
     position: absolute;
     z-index: 1;
     padding: 4px 8px;
-    top: 17px;
+    top: 10px;
     left: 50%;
     transform: translate(-50%, 0);
     background: #0092bf;
@@ -413,6 +423,8 @@
     align-items: center;
     justify-content: center;
     width: 200px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
   }
 
   .new-events_top-shifted {

@@ -15,6 +15,7 @@
   import RawData from './RawData.vue'
   import EventActionsBar from './EventActionsBar.vue'
   import EventText from './EventText.vue'
+  import Textarea from '@/components/Textarea.vue'
   import { useNpub } from '@/stores/Npub'
   import { useNsec } from '@/stores/Nsec'
   import { useUser } from '@/stores/User'
@@ -97,7 +98,7 @@
       } else {
         name = author.display_name
       }
-      if (name.length) {
+      if (name && name.length) {
         return name
       }
     }
@@ -420,6 +421,10 @@
     isLoadingThread.value = false
     ancestorsEvents.value = ancestors
   }
+
+  const hanleReplyInput = (value: string) => {
+    replyText.value = value
+  }
 </script>
 
 <template>
@@ -584,14 +589,14 @@
   </div>
 
   <div v-if="showReplyField" class="reply-field">
-    <textarea
-      v-model="replyText"
-      rows="4"
-      class="reply-field__textarea"
+    <Textarea
       placeholder="Write a reply..."
-    ></textarea>
+      class="reply-field__textarea"
+      :rows="4"
+      @input="hanleReplyInput"
+    />
     <div class="reply-field__actions">
-      <div class="reply-field__error">{{ msgErr }}</div>
+      <div class="error">{{ msgErr }}</div>
       <button :disabled="isPublishingReply" @click="handleSendReply" class="reply-field__btn">
         {{ isPublishingReply ? 'Sending reply...' : 'Reply' }}
       </button>
@@ -794,9 +799,7 @@
   }
 
   .reply-field__textarea {
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 10px;
+    margin: 10px 0;
   }
 
   .reply-field__actions {
@@ -807,10 +810,35 @@
 
   .reply-field__btn {
     cursor: pointer;
+    background: #0092bf;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: auto;
   }
 
-  .reply-field__error {
-    color: red;
+  .reply-field__btn:hover {
+    background: #0077a3;
+  }
+
+  .reply-field__btn:active {
+    opacity: 0.9;
+  }
+
+  .reply-field__btn.disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .reply-field__btn.disabled:hover {
+    background: #0092bf;
+  }
+
+  .error {
+    color: #ff4040;
     font-size: 16px;
     flex-grow: 1;
     text-align: right;

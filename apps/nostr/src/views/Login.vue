@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import { utils, Relay, type Event } from 'nostr-tools'
+  import { utils, Relay, type Event, SimplePool } from 'nostr-tools'
   import { connectToSelectedRelay } from '@/utils/network'
   import { DEFAULT_RELAY, DEFAULT_RELAYS } from '@/app'
   import { relayGet, parseRelaysNip65 } from '@/utils'
@@ -163,7 +163,7 @@
       }: {
         userConnectedReadRelays: string[]
         userConnectedWriteRelays: string[]
-      } = await getConnectedReadWriteRelays(relayStore.userReadWriteRelays)
+      } = await getConnectedReadWriteRelays(pool as SimplePool, relayStore.userReadWriteRelays)
       relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays)
       relayStore.setConnectedUserWriteRelayUrls(userConnectedWriteRelays)
 

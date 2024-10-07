@@ -6,8 +6,8 @@
 
   const emit = defineEmits(['onChange'])
 
-  const onChange = () => {
-    emit('onChange')
+  const onChange = (event: Event) => {
+    emit('onChange', event)
   }
 </script>
 

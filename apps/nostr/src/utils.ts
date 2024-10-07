@@ -545,7 +545,6 @@ export const isReply = (event: Event) => {
 
 export const listRootEvents = (pool: SimplePool, relays: string[], filters: Filter[]) => {
   return new Promise((resolve) => {
-    const events: Event[] = []
     let filtersLimit: number | undefined
     let newFilters = filters
     if (filters && filters.length && filters[0].limit) {
@@ -555,6 +554,7 @@ export const listRootEvents = (pool: SimplePool, relays: string[], filters: Filt
     }
 
     let subClosed = false
+    const events: Event[] = []
     const sub = pool.subscribeMany(relays, newFilters, {
       onevent(event: Event) {
         if (subClosed) return

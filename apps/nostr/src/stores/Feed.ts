@@ -1,6 +1,5 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { SimplePool } from 'nostr-tools'
 import type { EventExtended, ShortPubkeyEvent } from '@/types'
 
 export const useFeed = defineStore('feed', () => {
@@ -15,10 +14,12 @@ export const useFeed = defineStore('feed', () => {
 
   // created by setInterval, to update new events badge
   const newEventsBadgeUpdateInterval = ref(0)
+  const timeToGetNewPosts = ref(0)
 
   const selectedFeedSource = ref('network')
 
   const eventsId = computed(() => events.value.map((e) => e.id))
+  const newEventsToShowIds = computed(() => newEventsToShow.value.map((e) => e.id))
   const isFollowsSource = computed(() => selectedFeedSource.value === 'follows')
   const isNetworkSource = computed(() => selectedFeedSource.value === 'network')
   const isLoadingFeedSource = ref(false)
@@ -27,8 +28,6 @@ export const useFeed = defineStore('feed', () => {
 
   const isMountAfterLogin = ref(false)
   const toRemountFeed = ref(false)
-
-  const pool = ref(new SimplePool())
 
   function clear() {
     clearNewEventsBadgeUpdateInterval()
@@ -118,12 +117,12 @@ export const useFeed = defineStore('feed', () => {
     newEventsBadgeUpdateInterval.value = 0
   }
 
-  function resetPool() {
-    pool.value = new SimplePool()
-  }
-
   function setToRemountFeed(value: boolean) {
     toRemountFeed.value = value
+  }
+
+  function resetTimeToGetNewPostsToNow() {
+    timeToGetNewPosts.value = Math.floor(Date.now() / 1000)
   }
 
   return {
@@ -163,9 +162,10 @@ export const useFeed = defineStore('feed', () => {
     newEventsBadgeUpdateInterval,
     clearNewEventsBadgeUpdateInterval,
     clear,
-    pool,
-    resetPool,
     toRemountFeed,
     setToRemountFeed,
+    newEventsToShowIds,
+    timeToGetNewPosts,
+    resetTimeToGetNewPostsToNow,
   }
 })
