@@ -90,7 +90,8 @@ Here is some software which uses Noble. You can [add new entry on github](https:
     [aptos-ts-sdk](https://github.com/aptos-labs/aptos-ts-sdk/blob/62de7f532feaa653556846eea6b66e33f7dc29d6/package.json#L53)
 - Others:
   - [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
-  - [ed25519-keygen](https://github.com/paulmillr/ed25519-keygen) SSH, PGP, TOR key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
+  - [age encryption in typescript](https://github.com/FiloSottile/typage)
+  - [micro-key-producer](https://github.com/paulmillr/micro-key-producer) SSH, PGP, TOR, BLS key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
   - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
   - BLS signatures: [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 - Everything that uses noble, tracked using GitHub dependency graph:
