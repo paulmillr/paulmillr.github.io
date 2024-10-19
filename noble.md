@@ -92,6 +92,7 @@ Here is some software which uses Noble. You can [add new entry on github](https:
   - [did-jwt](https://github.com/decentralized-identity/did-jwt), [hpke-js](https://github.com/dajiaji/hpke-js), [js-libp2p-noise](https://github.com/ChainSafe/js-libp2p-noise)
   - [age encryption in typescript](https://github.com/FiloSottile/typage)
   - [micro-key-producer](https://github.com/paulmillr/micro-key-producer) SSH, PGP, TOR, BLS key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
+  - [session-user-id](https://github.com/theinfinityway/session_id) for Session messenger
   - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
   - BLS signatures: [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 - Everything that uses noble, tracked using GitHub dependency graph:
