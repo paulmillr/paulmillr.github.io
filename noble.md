@@ -96,9 +96,9 @@ Here is some software which uses Noble. You can [add new entry on github](https:
   - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
   - BLS signatures: [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 - Everything that uses noble, tracked using GitHub dependency graph:
-  - [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents): 3.5K repos, 95 packages
-  - [curves](https://github.com/paulmillr/noble-curves/network/dependents): 150K repos, 500 packages
-  - [hashes](https://github.com/paulmillr/noble-hashes/network/dependents): 310K repos, 1100 packages
+  - [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents): 5K repos, 130 packages
+  - [curves](https://github.com/paulmillr/noble-curves/network/dependents): 240K repos, 600 packages
+  - [hashes](https://github.com/paulmillr/noble-hashes/network/dependents): 420K repos, 1300 packages
 
 ### Resources, articles, documentation
 
