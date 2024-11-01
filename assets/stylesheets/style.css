@@ -209,26 +209,6 @@ ul > li::marker {
 tr {
   border-bottom-color: #cecdc3; /* f-200 */
 }
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #100f0f; /* f-black */
-    color: #cecdc3; /* f-200 */
-  }
-  a,
-  .breadcrumbs a:visited {
-    color: #cecdc3; /* f-200 */
-  }
-  a:visited {
-    color: #84847e;
-  }
-  .dimmed,
-  .dimmed a,
-  .dimmed a:visited,
-  ol > li::marker,
-  ul > li::marker {
-    color: #a09d98;
-  }
-}
 
 /* highlight.css stuff */
 pre {
@@ -248,3 +228,28 @@ pre {
   color: #24837b; /* f-cyan-600, number */
 }
 /* end of custom css for paulmillr.com */
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #100f0f; /* f-black */
+    color: #cecdc3; /* f-200 */
+  }
+  a,
+  .breadcrumbs a:visited {
+    color: #cecdc3; /* f-200 */
+  }
+  a:visited {
+    color: #84847e;
+  }
+  .dimmed,
+  .dimmed a,
+  .dimmed a:visited,
+  ol > li::marker,
+  ul > li::marker {
+    color: #a09d98;
+  }
+  pre {
+    background-color: #222;
+    color: #f2f0e5;
+  }
+}
