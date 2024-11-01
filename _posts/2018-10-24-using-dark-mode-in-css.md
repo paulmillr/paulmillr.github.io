@@ -5,9 +5,9 @@ tags: ['programming']
 highlight: true
 ---
 
-MacOS Mojave has been recently released with the [Dark Mode](https://www.apple.com/macos/mojave/) option.
+MacOS Mojave has been recently released with the Dark Mode.
 
-The option allows you to enable dark interface through all the system, which is very useful while working in the evenings and nights. Native apps are able to take advantage of the mode by following [the interface guidelines](https://developer.apple.com/documentation/appkit/supporting_dark_mode_in_your_interface).
+The option allows you to enable dark interface through all the system, which is very useful while working in the evenings and nights. Native apps are able to take advantage of the mode by following [the interface guidelines](https://developer.apple.com/documentation/uikit/appearance_customization/supporting_dark_mode_in_your_interface).
 
 What about web apps? The good news is: Safari 12.1, Chrome 73 and Firefox 67 support Dark Mode! The CSS itself is very simple:
 

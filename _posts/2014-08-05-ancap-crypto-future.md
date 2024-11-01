@@ -1,8 +1,6 @@
 ---
 layout: post
 title: 'On smart contracts'
-language: en
-published: true
 tags: ['libertarianism']
 ---
 

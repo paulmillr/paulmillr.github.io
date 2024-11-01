@@ -84,4 +84,4 @@ Let’s work together on making our software swift, small & secure!
 
 Thanks to [Philipp Dunkel](https://github.com/pipobscure), [Jon Schlinkert](https://github.com/jonschlinkert) and everyone else involved in releasing v3 out.
 
-My next step is to create a set of highly auditable 0-dep cryptographic libraries for JS. I call it **noble-crypto** and the first packages are already out! Check it: [noble-ed25519](https://github.com/paulmillr/noble-ed25519) & [noble-secp256k1](https://github.com/paulmillr/noble-secp256k1).
+My next step is to create a set of highly auditable 0-dep cryptographic libraries for JS. I call it **noble-cryptography** and the first packages are already out! Check it: [noble-ed25519](https://github.com/paulmillr/noble-ed25519) & [noble-secp256k1](https://github.com/paulmillr/noble-secp256k1).

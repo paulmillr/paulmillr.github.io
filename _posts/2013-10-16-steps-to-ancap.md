@@ -20,7 +20,7 @@ It is safe to say that no one would have considered an elected parliament up to 
 
 ## Bottom-up revolution
 
-Other great way was [described](http://mises.org/document/4365/) by Hoppe.
+Other great way was described by Hoppe in ["What Must Be Done"](http://mises.org/document/4365/).
 
 Since the world no longer consists of monarchies and instead cluttered by democracies, top-down method is no longer possible. President does not longer exercise ultimate governing authority as head of state and head of government. Even if he'd declared something like that, congress / parliament / whatever may ban the law.
 
