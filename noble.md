@@ -54,7 +54,7 @@ Contact me if you want to help with the effort.
 - 2024
   - Feb: post-quantum have been [released](https://github.com/paulmillr/noble-post-quantum/commit/2834e5c3409f70309edf9c30b2c4206cd449cd8e)
   - May: received a grant from [Farcaster](https://www.farcaster.xyz)
-  - Sep: ciphers (and curves) have been #6 [audited](https://github.com/paulmillr/noble-ciphers/blob/ac7a601590eac6d1ba845cea0e1ae611aeacea32/audit/2024-09-cure53-audit-nbl4.pdf) by Cure53
+  - Sep: ciphers (and curves) have been #6 [audited](https://github.com/paulmillr/noble-ciphers/blob/ac7a601590eac6d1ba845cea0e1ae611aeacea32/audit/2024-09-cure53-audit-nbl4.pdf) by Cure53. The audit has been funded by [Opensats](https://opensats.org).
 
 Currently active large sponsors include [vault12](https://vault12.com). You can
 fund the project using [github](https://github.com/sponsors/paulmillr).
@@ -73,7 +73,7 @@ Here is some software which uses Noble. You can [add new entry on github](https:
 
 - Apps: [Protonmail](https://github.com/ProtonMail/WebClients), [Reflect](https://reflect.app),
   [Keycloak](https://github.com/keycloak/keycloak/blob/5af30011225bf4fecec9d75f58ad35a4ea2c7211/js/libs/keycloak-js/package.json#L81)
-- Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app), [Kraken](https://github.com/krakenfx/wallet/blob/e53708ec60890b1abcc955ef4954bba340000671/package.json#L27-L28), [Leather](https://github.com/leather-io/extension/blob/36a84dc5ea72044b918ea2ab20fdd26809580935/package.json#L151)
+- Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app), [Kraken](https://github.com/krakenfx/wallet/blob/e53708ec60890b1abcc955ef4954bba340000671/package.json#L27-L28), [Leather](https://github.com/leather-io/extension/blob/36a84dc5ea72044b918ea2ab20fdd26809580935/package.json#L151), [Alby](https://github.com/getAlby/lightning-browser-extension/blob/master/package.json#L42)
 - Blockchain libraries:
   - Bitcoin: [scure-btc-signer](https://github.com/paulmillr/scure-btc-signer), [tapscript](https://github.com/cmdruid/tapscript)
   - Ethereum: [ethereum-cryptography](https://github.com/ethereum/js-ethereum-cryptography), [micro-eth-signer](https://github.com/paulmillr/micro-eth-signer), [ethers](https://github.com/ethers-io/ethers.js), [viem](https://viem.sh), [@ethereumjs](https://github.com/ethereumjs/ethereumjs-monorepo), [web3.js](https://github.com/web3/web3.js), [gridplus-lattice-sdk](https://github.com/GridPlus/lattice-eth2-utils),
