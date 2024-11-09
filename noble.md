@@ -54,9 +54,9 @@ Contact me if you want to help with the effort.
 - 2024
   - Feb: post-quantum have been [released](https://github.com/paulmillr/noble-post-quantum/commit/2834e5c3409f70309edf9c30b2c4206cd449cd8e)
   - May: received a grant from [Farcaster](https://www.farcaster.xyz)
-  - Sep: ciphers (and curves) have been #6 [audited](https://github.com/paulmillr/noble-ciphers/blob/ac7a601590eac6d1ba845cea0e1ae611aeacea32/audit/2024-09-cure53-audit-nbl4.pdf) by Cure53. The audit has been funded by [Opensats](https://opensats.org).
+  - Sep: ciphers (and curves) have been #6 [audited](https://github.com/paulmillr/noble-ciphers/blob/ac7a601590eac6d1ba845cea0e1ae611aeacea32/audit/2024-09-cure53-audit-nbl4.pdf) by Cure53. The audit has been funded by [OpenSats](https://opensats.org).
 
-Currently active large sponsors include [vault12](https://vault12.com). You can
+Currently active large sponsors include [wevm](https://wevm.dev) & [vault12](https://vault12.com). You can
 fund the project using [github](https://github.com/sponsors/paulmillr).
 
 ### scure
