@@ -71,7 +71,7 @@ Noble's non-cryptographic sister project. Audited micro-libraries:
 
 Here is some software which uses Noble. You can [add new entry on github](https://github.com/paulmillr/noble-curves/discussions/90).
 
-- Apps: [Protonmail](https://github.com/ProtonMail/WebClients), [Reflect](https://reflect.app),
+- Apps: [Protonmail](https://github.com/ProtonMail/WebClients), [Tutanota](https://github.com/tutao/tutanota/blob/2723002d9733c6e408942c44c9fe35711ed2a2e0/packages/tutanota-crypto/lib/internal/noble-curves-1.3.0.js#L12), [Polymarket](https://polymarket.com/), [Reflect](https://reflect.app),
   [Keycloak](https://github.com/keycloak/keycloak/blob/5af30011225bf4fecec9d75f58ad35a4ea2c7211/js/libs/keycloak-js/package.json#L81)
 - Wallets: [Metamask](https://github.com/MetaMask/eth-sig-util), [Rainbow](https://github.com/rainbow-me/browser-extension), [Rabby](https://github.com/RabbyHub/Rabby), [Phantom](https://phantom.app), [Kraken](https://github.com/krakenfx/wallet/blob/e53708ec60890b1abcc955ef4954bba340000671/package.json#L27-L28), [Leather](https://github.com/leather-io/extension/blob/36a84dc5ea72044b918ea2ab20fdd26809580935/package.json#L151), [Alby](https://github.com/getAlby/lightning-browser-extension/blob/master/package.json#L42)
 - Blockchain libraries:
