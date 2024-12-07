@@ -15,16 +15,16 @@ function makeMap$2(str, expectsLowerCase) {
 }
 const NOOP$1 = () => {
 };
-const hasOwnProperty$2 = Object.prototype.hasOwnProperty;
-const hasOwn$1 = (val, key) => hasOwnProperty$2.call(val, key);
-const isArray$3 = Array.isArray;
-const isMap$1 = (val) => toTypeString$1(val) === "[object Map]";
-const isFunction$2 = (val) => typeof val === "function";
+const hasOwnProperty$c = Object.prototype.hasOwnProperty;
+const hasOwn$1 = (val, key) => hasOwnProperty$c.call(val, key);
+const isArray$8 = Array.isArray;
+const isMap$3 = (val) => toTypeString$1(val) === "[object Map]";
+const isFunction$5 = (val) => typeof val === "function";
 const isString$2 = (val) => typeof val === "string";
-const isSymbol$1 = (val) => typeof val === "symbol";
-const isObject$1 = (val) => val !== null && typeof val === "object";
-const objectToString$1 = Object.prototype.toString;
-const toTypeString$1 = (value) => objectToString$1.call(value);
+const isSymbol$4 = (val) => typeof val === "symbol";
+const isObject$9 = (val) => val !== null && typeof val === "object";
+const objectToString$3 = Object.prototype.toString;
+const toTypeString$1 = (value) => objectToString$3.call(value);
 const toRawType = (value) => {
   return toTypeString$1(value).slice(8, -1);
 };
@@ -306,10 +306,10 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
   let deps = [];
   if (type === "clear") {
     deps = [...depsMap.values()];
-  } else if (key === "length" && isArray$3(target)) {
+  } else if (key === "length" && isArray$8(target)) {
     const newLength = Number(newValue);
     depsMap.forEach((dep, key2) => {
-      if (key2 === "length" || !isSymbol$1(key2) && key2 >= newLength) {
+      if (key2 === "length" || !isSymbol$4(key2) && key2 >= newLength) {
         deps.push(dep);
       }
     });
@@ -319,9 +319,9 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
     }
     switch (type) {
       case "add":
-        if (!isArray$3(target)) {
+        if (!isArray$8(target)) {
           deps.push(depsMap.get(ITERATE_KEY));
-          if (isMap$1(target)) {
+          if (isMap$3(target)) {
             deps.push(depsMap.get(MAP_KEY_ITERATE_KEY));
           }
         } else if (isIntegerKey(key)) {
@@ -329,15 +329,15 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
         }
         break;
       case "delete":
-        if (!isArray$3(target)) {
+        if (!isArray$8(target)) {
           deps.push(depsMap.get(ITERATE_KEY));
-          if (isMap$1(target)) {
+          if (isMap$3(target)) {
             deps.push(depsMap.get(MAP_KEY_ITERATE_KEY));
           }
         }
         break;
       case "set":
-        if (isMap$1(target)) {
+        if (isMap$3(target)) {
           deps.push(depsMap.get(ITERATE_KEY));
         }
         break;
@@ -360,7 +360,7 @@ function getDepFromReactive(object, key) {
 }
 const isNonTrackableKeys = /* @__PURE__ */ makeMap$2(`__proto__,__v_isRef,__isVue`);
 const builtInSymbols = new Set(
-  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol$1)
+  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol$4)
 );
 const arrayInstrumentations = /* @__PURE__ */ createArrayInstrumentations();
 function createArrayInstrumentations() {
@@ -391,7 +391,7 @@ function createArrayInstrumentations() {
   });
   return instrumentations;
 }
-function hasOwnProperty$1(key) {
+function hasOwnProperty$b(key) {
   const obj = toRaw(this);
   track(obj, "has", key);
   return obj.hasOwnProperty(key);
@@ -417,17 +417,17 @@ class BaseReactiveHandler {
       }
       return;
     }
-    const targetIsArray = isArray$3(target);
+    const targetIsArray = isArray$8(target);
     if (!isReadonly2) {
       if (targetIsArray && hasOwn$1(arrayInstrumentations, key)) {
         return Reflect.get(arrayInstrumentations, key, receiver);
       }
       if (key === "hasOwnProperty") {
-        return hasOwnProperty$1;
+        return hasOwnProperty$b;
       }
     }
     const res = Reflect.get(target, key, receiver);
-    if (isSymbol$1(key) ? builtInSymbols.has(key) : isNonTrackableKeys(key)) {
+    if (isSymbol$4(key) ? builtInSymbols.has(key) : isNonTrackableKeys(key)) {
       return res;
     }
     if (!isReadonly2) {
@@ -439,7 +439,7 @@ class BaseReactiveHandler {
     if (isRef(res)) {
       return targetIsArray && isIntegerKey(key) ? res : res.value;
     }
-    if (isObject$1(res)) {
+    if (isObject$9(res)) {
       return isReadonly2 ? readonly(res) : reactive(res);
     }
     return res;
@@ -457,7 +457,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
         oldValue = toRaw(oldValue);
         value = toRaw(value);
       }
-      if (!isArray$3(target) && isRef(oldValue) && !isRef(value)) {
+      if (!isArray$8(target) && isRef(oldValue) && !isRef(value)) {
         if (isOldValueReadonly) {
           return false;
         } else {
@@ -466,7 +466,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
         }
       }
     }
-    const hadKey = isArray$3(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn$1(target, key);
+    const hadKey = isArray$8(target) && isIntegerKey(key) ? Number(key) < target.length : hasOwn$1(target, key);
     const result = Reflect.set(target, key, value, receiver);
     if (target === toRaw(receiver)) {
       if (!hadKey) {
@@ -488,7 +488,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
   }
   has(target, key) {
     const result = Reflect.has(target, key);
-    if (!isSymbol$1(key) || !builtInSymbols.has(key)) {
+    if (!isSymbol$4(key) || !builtInSymbols.has(key)) {
       track(target, "has", key);
     }
     return result;
@@ -497,7 +497,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
     track(
       target,
       "iterate",
-      isArray$3(target) ? "length" : ITERATE_KEY
+      isArray$8(target) ? "length" : ITERATE_KEY
     );
     return Reflect.ownKeys(target);
   }
@@ -626,7 +626,7 @@ function createIterableMethod(method, isReadonly2, isShallow2) {
   return function(...args) {
     const target = this["__v_raw"];
     const rawTarget = toRaw(target);
-    const targetIsMap = isMap$1(rawTarget);
+    const targetIsMap = isMap$3(rawTarget);
     const isPair = method === "entries" || method === Symbol.iterator && targetIsMap;
     const isKeyOnly = method === "keys" && targetIsMap;
     const innerIterator = target[method](...args);
@@ -832,7 +832,7 @@ function readonly(target) {
   );
 }
 function createReactiveObject(target, isReadonly2, baseHandlers, collectionHandlers, proxyMap) {
-  if (!isObject$1(target)) {
+  if (!isObject$9(target)) {
     return target;
   }
   if (target["__v_raw"] && !(isReadonly2 && target["__v_isReactive"])) {
@@ -878,8 +878,8 @@ function markRaw(value) {
   }
   return value;
 }
-const toReactive = (value) => isObject$1(value) ? reactive(value) : value;
-const toReadonly = (value) => isObject$1(value) ? readonly(value) : value;
+const toReactive = (value) => isObject$9(value) ? reactive(value) : value;
+const toReadonly = (value) => isObject$9(value) ? readonly(value) : value;
 class ComputedRefImpl {
   constructor(getter, _setter, isReadonly2, isSSR) {
     this._setter = _setter;
@@ -923,7 +923,7 @@ class ComputedRefImpl {
 function computed$1(getterOrOptions, debugOptions, isSSR = false) {
   let getter;
   let setter;
-  const onlyGetter = isFunction$2(getterOrOptions);
+  const onlyGetter = isFunction$5(getterOrOptions);
   if (onlyGetter) {
     getter = getterOrOptions;
     setter = NOOP$1;
@@ -1013,7 +1013,7 @@ function proxyRefs(objectWithRefs) {
   return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
 }
 function toRefs(object) {
-  const ret = isArray$3(object) ? new Array(object.length) : {};
+  const ret = isArray$8(object) ? new Array(object.length) : {};
   for (const key in object) {
     ret[key] = propertyToRef(object, key);
   }
@@ -1065,20 +1065,20 @@ const remove = (arr, el) => {
     arr.splice(i2, 1);
   }
 };
-const hasOwnProperty = Object.prototype.hasOwnProperty;
-const hasOwn = (val, key) => hasOwnProperty.call(val, key);
-const isArray$2 = Array.isArray;
-const isMap = (val) => toTypeString(val) === "[object Map]";
-const isSet = (val) => toTypeString(val) === "[object Set]";
-const isFunction$1 = (val) => typeof val === "function";
+const hasOwnProperty$a = Object.prototype.hasOwnProperty;
+const hasOwn = (val, key) => hasOwnProperty$a.call(val, key);
+const isArray$7 = Array.isArray;
+const isMap$2 = (val) => toTypeString(val) === "[object Map]";
+const isSet$2 = (val) => toTypeString(val) === "[object Set]";
+const isFunction$4 = (val) => typeof val === "function";
 const isString$1 = (val) => typeof val === "string";
-const isSymbol = (val) => typeof val === "symbol";
-const isObject = (val) => val !== null && typeof val === "object";
+const isSymbol$3 = (val) => typeof val === "symbol";
+const isObject$8 = (val) => val !== null && typeof val === "object";
 const isPromise = (val) => {
-  return (isObject(val) || isFunction$1(val)) && isFunction$1(val.then) && isFunction$1(val.catch);
+  return (isObject$8(val) || isFunction$4(val)) && isFunction$4(val.then) && isFunction$4(val.catch);
 };
-const objectToString = Object.prototype.toString;
-const toTypeString = (value) => objectToString.call(value);
+const objectToString$2 = Object.prototype.toString;
+const toTypeString = (value) => objectToString$2.call(value);
 const isPlainObject$1 = (val) => toTypeString(val) === "[object Object]";
 const isReservedProp = /* @__PURE__ */ makeMap$1(
   // the leading comma is intentional so empty string "" is also included
@@ -1128,7 +1128,7 @@ const getGlobalThis = () => {
   return _globalThis || (_globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
 };
 function normalizeStyle(value) {
-  if (isArray$2(value)) {
+  if (isArray$7(value)) {
     const res = {};
     for (let i2 = 0; i2 < value.length; i2++) {
       const item = value[i2];
@@ -1140,7 +1140,7 @@ function normalizeStyle(value) {
       }
     }
     return res;
-  } else if (isString$1(value) || isObject(value)) {
+  } else if (isString$1(value) || isObject$8(value)) {
     return value;
   }
 }
@@ -1161,14 +1161,14 @@ function normalizeClass(value) {
   let res = "";
   if (isString$1(value)) {
     res = value;
-  } else if (isArray$2(value)) {
+  } else if (isArray$7(value)) {
     for (let i2 = 0; i2 < value.length; i2++) {
       const normalized = normalizeClass(value[i2]);
       if (normalized) {
         res += normalized + " ";
       }
     }
-  } else if (isObject(value)) {
+  } else if (isObject$8(value)) {
     for (const name in value) {
       if (value[name]) {
         res += name + " ";
@@ -1178,12 +1178,12 @@ function normalizeClass(value) {
   return res.trim();
 }
 const toDisplayString = (val) => {
-  return isString$1(val) ? val : val == null ? "" : isArray$2(val) || isObject(val) && (val.toString === objectToString || !isFunction$1(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
+  return isString$1(val) ? val : val == null ? "" : isArray$7(val) || isObject$8(val) && (val.toString === objectToString$2 || !isFunction$4(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
 };
 const replacer = (_key, val) => {
   if (val && val.__v_isRef) {
     return replacer(_key, val.value);
-  } else if (isMap(val)) {
+  } else if (isMap$2(val)) {
     return {
       [`Map(${val.size})`]: [...val.entries()].reduce(
         (entries, [key, val2], i2) => {
@@ -1193,20 +1193,20 @@ const replacer = (_key, val) => {
         {}
       )
     };
-  } else if (isSet(val)) {
+  } else if (isSet$2(val)) {
     return {
       [`Set(${val.size})`]: [...val.values()].map((v) => stringifySymbol(v))
     };
-  } else if (isSymbol(val)) {
+  } else if (isSymbol$3(val)) {
     return stringifySymbol(val);
-  } else if (isObject(val) && !isArray$2(val) && !isPlainObject$1(val)) {
+  } else if (isObject$8(val) && !isArray$7(val) && !isPlainObject$1(val)) {
     return String(val);
   }
   return val;
 };
 const stringifySymbol = (v, i2 = "") => {
   var _a;
-  return isSymbol(v) ? `Symbol(${(_a = v.description) != null ? _a : i2})` : v;
+  return isSymbol$3(v) ? `Symbol(${(_a = v.description) != null ? _a : i2})` : v;
 };
 /**
 * @vue/runtime-core v3.4.19
@@ -1286,11 +1286,11 @@ function formatTraceEntry({ vnode, recurseCount }) {
 }
 function formatProps(props) {
   const res = [];
-  const keys = Object.keys(props);
-  keys.slice(0, 3).forEach((key) => {
+  const keys2 = Object.keys(props);
+  keys2.slice(0, 3).forEach((key) => {
     res.push(...formatProp(key, props[key]));
   });
-  if (keys.length > 3) {
+  if (keys2.length > 3) {
     res.push(` ...`);
   }
   return res;
@@ -1304,7 +1304,7 @@ function formatProp(key, value, raw) {
   } else if (isRef(value)) {
     value = formatProp(key, toRaw(value.value), true);
     return raw ? value : [`${key}=Ref<`, value, `>`];
-  } else if (isFunction$1(value)) {
+  } else if (isFunction$4(value)) {
     return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
   } else {
     value = toRaw(value);
@@ -1319,7 +1319,7 @@ function callWithErrorHandling(fn, instance, type, args) {
   }
 }
 function callWithAsyncErrorHandling(fn, instance, type, args) {
-  if (isFunction$1(fn)) {
+  if (isFunction$4(fn)) {
     const res = callWithErrorHandling(fn, instance, type, args);
     if (res && isPromise(res)) {
       res.catch((err) => {
@@ -1423,7 +1423,7 @@ function invalidateJob(job) {
   }
 }
 function queuePostFlushCb(cb) {
-  if (!isArray$2(cb)) {
+  if (!isArray$7(cb)) {
     if (!activePostFlushCbs || !activePostFlushCbs.includes(
       cb,
       cb.allowRecurse ? postFlushIndex + 1 : postFlushIndex
@@ -1558,7 +1558,7 @@ function normalizeEmitsOptions(comp, appContext, asMixin = false) {
   const raw = comp.emits;
   let normalized = {};
   let hasExtends = false;
-  if (!isFunction$1(comp)) {
+  if (!isFunction$4(comp)) {
     const extendEmits = (raw2) => {
       const normalizedFromExtend = normalizeEmitsOptions(raw2, appContext, true);
       if (normalizedFromExtend) {
@@ -1577,17 +1577,17 @@ function normalizeEmitsOptions(comp, appContext, asMixin = false) {
     }
   }
   if (!raw && !hasExtends) {
-    if (isObject(comp)) {
+    if (isObject$8(comp)) {
       cache.set(comp, null);
     }
     return null;
   }
-  if (isArray$2(raw)) {
+  if (isArray$7(raw)) {
     raw.forEach((key) => normalized[key] = null);
   } else {
     extend$1(normalized, raw);
   }
-  if (isObject(comp)) {
+  if (isObject$8(comp)) {
     cache.set(comp, normalized);
   }
   return normalized;
@@ -1716,31 +1716,31 @@ function renderComponentRoot(instance) {
     handleError(err, instance, 1);
     result = createVNode(Comment);
   }
-  let root = result;
+  let root2 = result;
   if (fallthroughAttrs && inheritAttrs !== false) {
-    const keys = Object.keys(fallthroughAttrs);
-    const { shapeFlag } = root;
-    if (keys.length) {
+    const keys2 = Object.keys(fallthroughAttrs);
+    const { shapeFlag } = root2;
+    if (keys2.length) {
       if (shapeFlag & (1 | 6)) {
-        if (propsOptions && keys.some(isModelListener$1)) {
+        if (propsOptions && keys2.some(isModelListener$1)) {
           fallthroughAttrs = filterModelListeners(
             fallthroughAttrs,
             propsOptions
           );
         }
-        root = cloneVNode(root, fallthroughAttrs);
+        root2 = cloneVNode(root2, fallthroughAttrs);
       }
     }
   }
   if (vnode.dirs) {
-    root = cloneVNode(root);
-    root.dirs = root.dirs ? root.dirs.concat(vnode.dirs) : vnode.dirs;
+    root2 = cloneVNode(root2);
+    root2.dirs = root2.dirs ? root2.dirs.concat(vnode.dirs) : vnode.dirs;
   }
   if (vnode.transition) {
-    root.transition = vnode.transition;
+    root2.transition = vnode.transition;
   }
   {
-    result = root;
+    result = root2;
   }
   setCurrentRenderingInstance(prev);
   return result;
@@ -1822,11 +1822,11 @@ function hasPropsChanged(prevProps, nextProps, emitsOptions) {
 }
 function updateHOCHostEl({ vnode, parent }, el) {
   while (parent) {
-    const root = parent.subTree;
-    if (root.suspense && root.suspense.activeBranch === vnode) {
-      root.el = vnode.el;
+    const root2 = parent.subTree;
+    if (root2.suspense && root2.suspense.activeBranch === vnode) {
+      root2.el = vnode.el;
     }
-    if (root === vnode) {
+    if (root2 === vnode) {
       (vnode = parent.vnode).el = el;
       parent = parent.parent;
     } else {
@@ -1870,7 +1870,7 @@ function resolve(registry, name) {
 const isSuspense = (type) => type.__isSuspense;
 function queueEffectWithSuspense(fn, suspense) {
   if (suspense && suspense.pendingBranch) {
-    if (isArray$2(fn)) {
+    if (isArray$7(fn)) {
       suspense.effects.push(...fn);
     } else {
       suspense.effects.push(fn);
@@ -1922,7 +1922,7 @@ function doWatch(source, cb, {
   } else if (isReactive(source)) {
     getter = () => reactiveGetter(source);
     forceTrigger = true;
-  } else if (isArray$2(source)) {
+  } else if (isArray$7(source)) {
     isMultiSource = true;
     forceTrigger = source.some((s) => isReactive(s) || isShallow(s));
     getter = () => source.map((s) => {
@@ -1930,12 +1930,12 @@ function doWatch(source, cb, {
         return s.value;
       } else if (isReactive(s)) {
         return reactiveGetter(s);
-      } else if (isFunction$1(s)) {
+      } else if (isFunction$4(s)) {
         return callWithErrorHandling(s, instance, 2);
       } else
         ;
     });
-  } else if (isFunction$1(source)) {
+  } else if (isFunction$4(source)) {
     if (cb) {
       getter = () => callWithErrorHandling(source, instance, 2);
     } else {
@@ -2049,7 +2049,7 @@ function instanceWatch(source, value, options) {
   const publicThis = this.proxy;
   const getter = isString$1(source) ? source.includes(".") ? createPathGetter(publicThis, source) : () => publicThis[source] : source.bind(publicThis, publicThis);
   let cb;
-  if (isFunction$1(value)) {
+  if (isFunction$4(value)) {
     cb = value;
   } else {
     cb = value.handler;
@@ -2071,7 +2071,7 @@ function createPathGetter(ctx, path) {
   };
 }
 function traverse(value, depth, currentDepth = 0, seen) {
-  if (!isObject(value) || value["__v_skip"]) {
+  if (!isObject$8(value) || value["__v_skip"]) {
     return value;
   }
   if (depth && depth > 0) {
@@ -2087,11 +2087,11 @@ function traverse(value, depth, currentDepth = 0, seen) {
   seen.add(value);
   if (isRef(value)) {
     traverse(value.value, depth, currentDepth, seen);
-  } else if (isArray$2(value)) {
+  } else if (isArray$7(value)) {
     for (let i2 = 0; i2 < value.length; i2++) {
       traverse(value[i2], depth, currentDepth, seen);
     }
-  } else if (isSet(value) || isMap(value)) {
+  } else if (isSet$2(value) || isMap$2(value)) {
     value.forEach((v) => {
       traverse(v, depth, currentDepth, seen);
     });
@@ -2111,7 +2111,7 @@ function withDirectives(vnode, directives) {
   for (let i2 = 0; i2 < directives.length; i2++) {
     let [dir, value, arg, modifiers = EMPTY_OBJ] = directives[i2];
     if (dir) {
-      if (isFunction$1(dir)) {
+      if (isFunction$4(dir)) {
         dir = {
           mounted: dir,
           updated: dir
@@ -2156,7 +2156,7 @@ function invokeDirectiveHook(vnode, prevVNode, instance, name) {
 /*! #__NO_SIDE_EFFECTS__ */
 // @__NO_SIDE_EFFECTS__
 function defineComponent(options, extraOptions) {
-  return isFunction$1(options) ? (
+  return isFunction$4(options) ? (
     // #8326: extend call and options.name access are considered side-effects
     // by Rollup, so we have to wrap it in a pure-annotated IIFE.
     /* @__PURE__ */ (() => extend$1({ name: options.name }, extraOptions, { setup: options }))()
@@ -2249,7 +2249,7 @@ function onErrorCaptured(hook, target = currentInstance) {
 function renderList(source, renderItem, cache, index) {
   let ret;
   const cached = cache && cache[index];
-  if (isArray$2(source) || isString$1(source)) {
+  if (isArray$7(source) || isString$1(source)) {
     ret = new Array(source.length);
     for (let i2 = 0, l = source.length; i2 < l; i2++) {
       ret[i2] = renderItem(source[i2], i2, void 0, cached && cached[i2]);
@@ -2259,17 +2259,17 @@ function renderList(source, renderItem, cache, index) {
     for (let i2 = 0; i2 < source; i2++) {
       ret[i2] = renderItem(i2 + 1, i2, void 0, cached && cached[i2]);
     }
-  } else if (isObject(source)) {
+  } else if (isObject$8(source)) {
     if (source[Symbol.iterator]) {
       ret = Array.from(
         source,
         (item, i2) => renderItem(item, i2, void 0, cached && cached[i2])
       );
     } else {
-      const keys = Object.keys(source);
-      ret = new Array(keys.length);
-      for (let i2 = 0, l = keys.length; i2 < l; i2++) {
-        const key = keys[i2];
+      const keys2 = Object.keys(source);
+      ret = new Array(keys2.length);
+      for (let i2 = 0, l = keys2.length; i2 < l; i2++) {
+        const key = keys2[i2];
         ret[i2] = renderItem(source[key], key, i2, cached && cached[i2]);
       }
     }
@@ -2451,7 +2451,7 @@ const PublicInstanceProxyHandlers = {
   }
 };
 function normalizePropsOrEmits(props) {
-  return isArray$2(props) ? props.reduce(
+  return isArray$7(props) ? props.reduce(
     (normalized, p2) => (normalized[p2] = null, normalized),
     {}
   ) : props;
@@ -2505,7 +2505,7 @@ function applyOptions(instance) {
   if (methods) {
     for (const key in methods) {
       const methodHandler = methods[key];
-      if (isFunction$1(methodHandler)) {
+      if (isFunction$4(methodHandler)) {
         {
           ctx[key] = methodHandler.bind(publicThis);
         }
@@ -2514,7 +2514,7 @@ function applyOptions(instance) {
   }
   if (dataOptions) {
     const data = dataOptions.call(publicThis, publicThis);
-    if (!isObject(data))
+    if (!isObject$8(data))
       ;
     else {
       instance.data = reactive(data);
@@ -2524,8 +2524,8 @@ function applyOptions(instance) {
   if (computedOptions) {
     for (const key in computedOptions) {
       const opt = computedOptions[key];
-      const get2 = isFunction$1(opt) ? opt.bind(publicThis, publicThis) : isFunction$1(opt.get) ? opt.get.bind(publicThis, publicThis) : NOOP;
-      const set2 = !isFunction$1(opt) && isFunction$1(opt.set) ? opt.set.bind(publicThis) : NOOP;
+      const get2 = isFunction$4(opt) ? opt.bind(publicThis, publicThis) : isFunction$4(opt.get) ? opt.get.bind(publicThis, publicThis) : NOOP;
+      const set2 = !isFunction$4(opt) && isFunction$4(opt.set) ? opt.set.bind(publicThis) : NOOP;
       const c = computed({
         get: get2,
         set: set2
@@ -2544,7 +2544,7 @@ function applyOptions(instance) {
     }
   }
   if (provideOptions) {
-    const provides = isFunction$1(provideOptions) ? provideOptions.call(publicThis) : provideOptions;
+    const provides = isFunction$4(provideOptions) ? provideOptions.call(publicThis) : provideOptions;
     Reflect.ownKeys(provides).forEach((key) => {
       provide(key, provides[key]);
     });
@@ -2553,7 +2553,7 @@ function applyOptions(instance) {
     callHook(created, instance, "c");
   }
   function registerLifecycleHook(register, hook) {
-    if (isArray$2(hook)) {
+    if (isArray$7(hook)) {
       hook.forEach((_hook) => register(_hook.bind(publicThis)));
     } else if (hook) {
       register(hook.bind(publicThis));
@@ -2571,7 +2571,7 @@ function applyOptions(instance) {
   registerLifecycleHook(onBeforeUnmount, beforeUnmount);
   registerLifecycleHook(onUnmounted, unmounted);
   registerLifecycleHook(onServerPrefetch, serverPrefetch);
-  if (isArray$2(expose)) {
+  if (isArray$7(expose)) {
     if (expose.length) {
       const exposed = instance.exposed || (instance.exposed = {});
       expose.forEach((key) => {
@@ -2596,13 +2596,13 @@ function applyOptions(instance) {
     instance.directives = directives;
 }
 function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) {
-  if (isArray$2(injectOptions)) {
+  if (isArray$7(injectOptions)) {
     injectOptions = normalizeInject(injectOptions);
   }
   for (const key in injectOptions) {
     const opt = injectOptions[key];
     let injected;
-    if (isObject(opt)) {
+    if (isObject$8(opt)) {
       if ("default" in opt) {
         injected = inject(
           opt.from || key,
@@ -2629,7 +2629,7 @@ function resolveInjections(injectOptions, ctx, checkDuplicateProperties = NOOP) 
 }
 function callHook(hook, instance, type) {
   callWithAsyncErrorHandling(
-    isArray$2(hook) ? hook.map((h2) => h2.bind(instance.proxy)) : hook.bind(instance.proxy),
+    isArray$7(hook) ? hook.map((h2) => h2.bind(instance.proxy)) : hook.bind(instance.proxy),
     instance,
     type
   );
@@ -2638,17 +2638,17 @@ function createWatcher(raw, ctx, publicThis, key) {
   const getter = key.includes(".") ? createPathGetter(publicThis, key) : () => publicThis[key];
   if (isString$1(raw)) {
     const handler = ctx[raw];
-    if (isFunction$1(handler)) {
+    if (isFunction$4(handler)) {
       watch(getter, handler);
     }
-  } else if (isFunction$1(raw)) {
+  } else if (isFunction$4(raw)) {
     watch(getter, raw.bind(publicThis));
-  } else if (isObject(raw)) {
-    if (isArray$2(raw)) {
+  } else if (isObject$8(raw)) {
+    if (isArray$7(raw)) {
       raw.forEach((r) => createWatcher(r, ctx, publicThis, key));
     } else {
-      const handler = isFunction$1(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
-      if (isFunction$1(handler)) {
+      const handler = isFunction$4(raw.handler) ? raw.handler.bind(publicThis) : ctx[raw.handler];
+      if (isFunction$4(handler)) {
         watch(getter, handler, raw);
       }
     }
@@ -2680,7 +2680,7 @@ function resolveMergedOptions(instance) {
     }
     mergeOptions$1(resolved, base, optionMergeStrategies);
   }
-  if (isObject(base)) {
+  if (isObject$8(base)) {
     cache.set(base, resolved);
   }
   return resolved;
@@ -2745,8 +2745,8 @@ function mergeDataFn(to, from) {
   }
   return function mergedDataFn() {
     return extend$1(
-      isFunction$1(to) ? to.call(this, this) : to,
-      isFunction$1(from) ? from.call(this, this) : from
+      isFunction$4(to) ? to.call(this, this) : to,
+      isFunction$4(from) ? from.call(this, this) : from
     );
   };
 }
@@ -2754,7 +2754,7 @@ function mergeInject(to, from) {
   return mergeObjectOptions(normalizeInject(to), normalizeInject(from));
 }
 function normalizeInject(raw) {
-  if (isArray$2(raw)) {
+  if (isArray$7(raw)) {
     const res = {};
     for (let i2 = 0; i2 < raw.length; i2++) {
       res[raw[i2]] = raw[i2];
@@ -2771,7 +2771,7 @@ function mergeObjectOptions(to, from) {
 }
 function mergeEmitsOrPropsOptions(to, from) {
   if (to) {
-    if (isArray$2(to) && isArray$2(from)) {
+    if (isArray$7(to) && isArray$7(from)) {
       return [.../* @__PURE__ */ new Set([...to, ...from])];
     }
     return extend$1(
@@ -2818,10 +2818,10 @@ function createAppContext() {
 let uid$1 = 0;
 function createAppAPI(render, hydrate) {
   return function createApp2(rootComponent, rootProps = null) {
-    if (!isFunction$1(rootComponent)) {
+    if (!isFunction$4(rootComponent)) {
       rootComponent = extend$1({}, rootComponent);
     }
-    if (rootProps != null && !isObject(rootProps)) {
+    if (rootProps != null && !isObject$8(rootProps)) {
       rootProps = null;
     }
     const context = createAppContext();
@@ -2843,10 +2843,10 @@ function createAppAPI(render, hydrate) {
       use(plugin, ...options) {
         if (installedPlugins.has(plugin))
           ;
-        else if (plugin && isFunction$1(plugin.install)) {
+        else if (plugin && isFunction$4(plugin.install)) {
           installedPlugins.add(plugin);
           plugin.install(app2, ...options);
-        } else if (isFunction$1(plugin)) {
+        } else if (isFunction$4(plugin)) {
           installedPlugins.add(plugin);
           plugin(app2, ...options);
         } else
@@ -2938,7 +2938,7 @@ function inject(key, defaultValue, treatDefaultAsFactory = false) {
     if (provides && key in provides) {
       return provides[key];
     } else if (arguments.length > 1) {
-      return treatDefaultAsFactory && isFunction$1(defaultValue) ? defaultValue.call(instance && instance.proxy) : defaultValue;
+      return treatDefaultAsFactory && isFunction$4(defaultValue) ? defaultValue.call(instance && instance.proxy) : defaultValue;
     } else
       ;
   }
@@ -3105,7 +3105,7 @@ function resolvePropValue(options, props, key, value, instance, isAbsent) {
     const hasDefault = hasOwn(opt, "default");
     if (hasDefault && value === void 0) {
       const defaultValue = opt.default;
-      if (opt.type !== Function && !opt.skipFactory && isFunction$1(defaultValue)) {
+      if (opt.type !== Function && !opt.skipFactory && isFunction$4(defaultValue)) {
         const { propsDefaults } = instance;
         if (key in propsDefaults) {
           value = propsDefaults[key];
@@ -3147,13 +3147,13 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
   const normalized = {};
   const needCastKeys = [];
   let hasExtends = false;
-  if (!isFunction$1(comp)) {
+  if (!isFunction$4(comp)) {
     const extendProps = (raw2) => {
       hasExtends = true;
-      const [props, keys] = normalizePropsOptions(raw2, appContext, true);
+      const [props, keys2] = normalizePropsOptions(raw2, appContext, true);
       extend$1(normalized, props);
-      if (keys)
-        needCastKeys.push(...keys);
+      if (keys2)
+        needCastKeys.push(...keys2);
     };
     if (!asMixin && appContext.mixins.length) {
       appContext.mixins.forEach(extendProps);
@@ -3166,12 +3166,12 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
     }
   }
   if (!raw && !hasExtends) {
-    if (isObject(comp)) {
+    if (isObject$8(comp)) {
       cache.set(comp, EMPTY_ARR);
     }
     return EMPTY_ARR;
   }
-  if (isArray$2(raw)) {
+  if (isArray$7(raw)) {
     for (let i2 = 0; i2 < raw.length; i2++) {
       const normalizedKey = camelize(raw[i2]);
       if (validatePropName(normalizedKey)) {
@@ -3183,7 +3183,7 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
       const normalizedKey = camelize(key);
       if (validatePropName(normalizedKey)) {
         const opt = raw[key];
-        const prop = normalized[normalizedKey] = isArray$2(opt) || isFunction$1(opt) ? { type: opt } : extend$1({}, opt);
+        const prop = normalized[normalizedKey] = isArray$7(opt) || isFunction$4(opt) ? { type: opt } : extend$1({}, opt);
         if (prop) {
           const booleanIndex = getTypeIndex(Boolean, prop.type);
           const stringIndex = getTypeIndex(String, prop.type);
@@ -3203,7 +3203,7 @@ function normalizePropsOptions(comp, appContext, asMixin = false) {
     }
   }
   const res = [normalized, needCastKeys];
-  if (isObject(comp)) {
+  if (isObject$8(comp)) {
     cache.set(comp, res);
   }
   return res;
@@ -3230,15 +3230,15 @@ function isSameType(a, b) {
   return getType(a) === getType(b);
 }
 function getTypeIndex(type, expectedTypes) {
-  if (isArray$2(expectedTypes)) {
+  if (isArray$7(expectedTypes)) {
     return expectedTypes.findIndex((t) => isSameType(t, type));
-  } else if (isFunction$1(expectedTypes)) {
+  } else if (isFunction$4(expectedTypes)) {
     return isSameType(expectedTypes, type) ? 0 : -1;
   }
   return -1;
 }
 const isInternalKey = (key) => key[0] === "_" || key === "$stable";
-const normalizeSlotValue = (value) => isArray$2(value) ? value.map(normalizeVNode) : [normalizeVNode(value)];
+const normalizeSlotValue = (value) => isArray$7(value) ? value.map(normalizeVNode) : [normalizeVNode(value)];
 const normalizeSlot$1 = (key, rawSlot, ctx) => {
   if (rawSlot._n) {
     return rawSlot;
@@ -3257,7 +3257,7 @@ const normalizeObjectSlots = (rawSlots, slots, instance) => {
     if (isInternalKey(key))
       continue;
     const value = rawSlots[key];
-    if (isFunction$1(value)) {
+    if (isFunction$4(value)) {
       slots[key] = normalizeSlot$1(key, value, ctx);
     } else if (value != null) {
       const normalized = normalizeSlotValue(value);
@@ -3322,11 +3322,11 @@ const updateSlots = (instance, children, optimized) => {
   }
 };
 function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
-  if (isArray$2(rawRef)) {
+  if (isArray$7(rawRef)) {
     rawRef.forEach(
       (r, i2) => setRef(
         r,
-        oldRawRef && (isArray$2(oldRawRef) ? oldRawRef[i2] : oldRawRef),
+        oldRawRef && (isArray$7(oldRawRef) ? oldRawRef[i2] : oldRawRef),
         parentSuspense,
         vnode,
         isUnmount
@@ -3353,7 +3353,7 @@ function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
       oldRef.value = null;
     }
   }
-  if (isFunction$1(ref2)) {
+  if (isFunction$4(ref2)) {
     callWithErrorHandling(ref2, owner, 12, [value, refs]);
   } else {
     const _isString = isString$1(ref2);
@@ -3363,9 +3363,9 @@ function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
         if (rawRef.f) {
           const existing = _isString ? hasOwn(setupState, ref2) ? setupState[ref2] : refs[ref2] : ref2.value;
           if (isUnmount) {
-            isArray$2(existing) && remove(existing, refValue);
+            isArray$7(existing) && remove(existing, refValue);
           } else {
-            if (!isArray$2(existing)) {
+            if (!isArray$7(existing)) {
               if (_isString) {
                 refs[ref2] = [refValue];
                 if (hasOwn(setupState, ref2)) {
@@ -4709,7 +4709,7 @@ function needTransition(parentSuspense, transition) {
 function traverseStaticChildren(n1, n2, shallow = false) {
   const ch1 = n1.children;
   const ch2 = n2.children;
-  if (isArray$2(ch1) && isArray$2(ch2)) {
+  if (isArray$7(ch1) && isArray$7(ch2)) {
     for (let i2 = 0; i2 < ch1.length; i2++) {
       const c1 = ch1[i2];
       let c2 = ch2[i2];
@@ -4844,7 +4844,7 @@ const normalizeRef = ({
   if (typeof ref2 === "number") {
     ref2 = "" + ref2;
   }
-  return ref2 != null ? isString$1(ref2) || isRef(ref2) || isFunction$1(ref2) ? { i: currentRenderingInstance, r: ref2, k: ref_key, f: !!ref_for } : ref2 : null;
+  return ref2 != null ? isString$1(ref2) || isRef(ref2) || isFunction$4(ref2) ? { i: currentRenderingInstance, r: ref2, k: ref_key, f: !!ref_for } : ref2 : null;
 };
 function createBaseVNode(type, props = null, children = null, patchFlag = 0, dynamicProps = null, shapeFlag = type === Fragment ? 0 : 1, isBlockNode = false, needFullChildrenNormalization = false) {
   const vnode = {
@@ -4930,14 +4930,14 @@ function _createVNode(type, props = null, children = null, patchFlag = 0, dynami
     if (klass && !isString$1(klass)) {
       props.class = normalizeClass(klass);
     }
-    if (isObject(style)) {
-      if (isProxy(style) && !isArray$2(style)) {
+    if (isObject$8(style)) {
+      if (isProxy(style) && !isArray$7(style)) {
         style = extend$1({}, style);
       }
       props.style = normalizeStyle(style);
     }
   }
-  const shapeFlag = isString$1(type) ? 1 : isSuspense(type) ? 128 : isTeleport(type) ? 64 : isObject(type) ? 4 : isFunction$1(type) ? 2 : 0;
+  const shapeFlag = isString$1(type) ? 1 : isSuspense(type) ? 128 : isTeleport(type) ? 64 : isObject$8(type) ? 4 : isFunction$4(type) ? 2 : 0;
   return createBaseVNode(
     type,
     props,
@@ -4967,7 +4967,7 @@ function cloneVNode(vnode, extraProps, mergeRef = false) {
       // #2078 in the case of <component :is="vnode" ref="extra"/>
       // if the vnode itself already has a ref, cloneVNode will need to merge
       // the refs so the single vnode can be set on multiple refs
-      mergeRef && ref2 ? isArray$2(ref2) ? ref2.concat(normalizeRef(extraProps)) : [ref2, normalizeRef(extraProps)] : normalizeRef(extraProps)
+      mergeRef && ref2 ? isArray$7(ref2) ? ref2.concat(normalizeRef(extraProps)) : [ref2, normalizeRef(extraProps)] : normalizeRef(extraProps)
     ) : ref2,
     scopeId: vnode.scopeId,
     slotScopeIds: vnode.slotScopeIds,
@@ -5015,7 +5015,7 @@ function createCommentVNode(text = "", asBlock = false) {
 function normalizeVNode(child) {
   if (child == null || typeof child === "boolean") {
     return createVNode(Comment);
-  } else if (isArray$2(child)) {
+  } else if (isArray$7(child)) {
     return createVNode(
       Fragment,
       null,
@@ -5036,7 +5036,7 @@ function normalizeChildren(vnode, children) {
   const { shapeFlag } = vnode;
   if (children == null) {
     children = null;
-  } else if (isArray$2(children)) {
+  } else if (isArray$7(children)) {
     type = 16;
   } else if (typeof children === "object") {
     if (shapeFlag & (1 | 64)) {
@@ -5061,7 +5061,7 @@ function normalizeChildren(vnode, children) {
         }
       }
     }
-  } else if (isFunction$1(children)) {
+  } else if (isFunction$4(children)) {
     children = { default: children, _ctx: currentRenderingInstance };
     type = 32;
   } else {
@@ -5090,7 +5090,7 @@ function mergeProps(...args) {
       } else if (isOn$1(key)) {
         const existing = ret[key];
         const incoming = toMerge[key];
-        if (incoming && existing !== incoming && !(isArray$2(existing) && existing.includes(incoming))) {
+        if (incoming && existing !== incoming && !(isArray$7(existing) && existing.includes(incoming))) {
           ret[key] = existing ? [].concat(existing, incoming) : incoming;
         }
       } else if (key !== "") {
@@ -5289,13 +5289,13 @@ function setupStatefulComponent(instance, isSSR) {
   }
 }
 function handleSetupResult(instance, setupResult, isSSR) {
-  if (isFunction$1(setupResult)) {
+  if (isFunction$4(setupResult)) {
     if (instance.type.__ssrInlineRender) {
       instance.ssrRender = setupResult;
     } else {
       instance.render = setupResult;
     }
-  } else if (isObject(setupResult)) {
+  } else if (isObject$8(setupResult)) {
     instance.setupState = proxyRefs(setupResult);
   } else
     ;
@@ -5381,7 +5381,7 @@ function getExposeProxy(instance) {
 const classifyRE = /(?:^|[-_])(\w)/g;
 const classify = (str) => str.replace(classifyRE, (c) => c.toUpperCase()).replace(/[-_]/g, "");
 function getComponentName(Component, includeInferred = true) {
-  return isFunction$1(Component) ? Component.displayName || Component.name : Component.name || includeInferred && Component.__name;
+  return isFunction$4(Component) ? Component.displayName || Component.name : Component.name || includeInferred && Component.__name;
 }
 function formatComponentName(instance, Component, isRoot = false) {
   let name = getComponentName(Component);
@@ -5406,7 +5406,7 @@ function formatComponentName(instance, Component, isRoot = false) {
   return name ? classify(name) : isRoot ? `App` : `Anonymous`;
 }
 function isClassComponent(value) {
-  return isFunction$1(value) && "__vccOpts" in value;
+  return isFunction$4(value) && "__vccOpts" in value;
 }
 const computed = (getterOrOptions, debugOptions) => {
   return computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
@@ -5414,7 +5414,7 @@ const computed = (getterOrOptions, debugOptions) => {
 function h(type, propsOrChildren, children) {
   const l = arguments.length;
   if (l === 2) {
-    if (isObject(propsOrChildren) && !isArray$2(propsOrChildren)) {
+    if (isObject$8(propsOrChildren) && !isArray$7(propsOrChildren)) {
       if (isVNode(propsOrChildren)) {
         return createVNode(type, null, [propsOrChildren]);
       }
@@ -5445,8 +5445,8 @@ const isOn = (key) => key.charCodeAt(0) === 111 && key.charCodeAt(1) === 110 && 
 (key.charCodeAt(2) > 122 || key.charCodeAt(2) < 97);
 const isModelListener = (key) => key.startsWith("onUpdate:");
 const extend = Object.assign;
-const isArray$1 = Array.isArray;
-const isFunction = (val) => typeof val === "function";
+const isArray$6 = Array.isArray;
+const isFunction$3 = (val) => typeof val === "function";
 const isString = (val) => typeof val === "string";
 const cacheStringFunction = (fn) => {
   const cache = /* @__PURE__ */ Object.create(null);
@@ -5605,7 +5605,7 @@ function patchStyle(el, prev, next) {
 }
 const importantRE = /\s*!important$/;
 function setStyle(style, name, val) {
-  if (isArray$1(val)) {
+  if (isArray$6(val)) {
     val.forEach((v) => setStyle(style, name, v));
   } else {
     if (val == null)
@@ -5763,7 +5763,7 @@ function createInvoker(initialValue, instance) {
   return invoker;
 }
 function patchStopImmediatePropagation(e, value) {
-  if (isArray$1(value)) {
+  if (isArray$6(value)) {
     const originalStop = e.stopImmediatePropagation;
     e.stopImmediatePropagation = () => {
       originalStop.call(e);
@@ -5810,7 +5810,7 @@ function shouldSetAsProp(el, key, value, isSVG) {
     if (key === "innerHTML" || key === "textContent") {
       return true;
     }
-    if (key in el && isNativeOn(key) && isFunction(value)) {
+    if (key in el && isNativeOn(key) && isFunction$3(value)) {
       return true;
     }
     return false;
@@ -5840,7 +5840,7 @@ function shouldSetAsProp(el, key, value, isSVG) {
 }
 const getModelAssigner = (vnode) => {
   const fn = vnode.props["onUpdate:modelValue"] || false;
-  return isArray$1(fn) ? (value) => invokeArrayFns(fn, value) : fn;
+  return isArray$6(fn) ? (value) => invokeArrayFns(fn, value) : fn;
 };
 function onCompositionStart(e) {
   e.target.composing = true;
@@ -5943,7 +5943,7 @@ const createApp = (...args) => {
     if (!container)
       return;
     const component = app2._component;
-    if (!isFunction(component) && !component.render && !component.template) {
+    if (!isFunction$3(component) && !component.render && !component.template) {
       component.template = container.innerHTML;
     }
     container.innerHTML = "";
@@ -6330,13 +6330,13 @@ function applyToParams(fn, params) {
   const newParams = {};
   for (const key in params) {
     const value = params[key];
-    newParams[key] = isArray(value) ? value.map(fn) : fn(value);
+    newParams[key] = isArray$5(value) ? value.map(fn) : fn(value);
   }
   return newParams;
 }
 const noop = () => {
 };
-const isArray = Array.isArray;
+const isArray$5 = Array.isArray;
 const TRAILING_SLASH_RE = /\/$/;
 const removeTrailingSlash = (path) => path.replace(TRAILING_SLASH_RE, "");
 function parseURL(parseQuery2, location2, currentLocation = "/") {
@@ -6390,10 +6390,10 @@ function isSameRouteLocationParams(a, b) {
   return true;
 }
 function isSameRouteLocationParamsValue(a, b) {
-  return isArray(a) ? isEquivalentArray(a, b) : isArray(b) ? isEquivalentArray(b, a) : a === b;
+  return isArray$5(a) ? isEquivalentArray(a, b) : isArray$5(b) ? isEquivalentArray(b, a) : a === b;
 }
 function isEquivalentArray(a, b) {
-  return isArray(b) ? a.length === b.length && a.every((value, i2) => value === b[i2]) : a.length === 1 && a[0] === b;
+  return isArray$5(b) ? a.length === b.length && a.every((value, i2) => value === b[i2]) : a.length === 1 && a[0] === b;
 }
 function resolveRelativePath(to, from) {
   if (to.startsWith("/"))
@@ -6730,7 +6730,7 @@ function tokensToParser(segments, extraOptions) {
   const options = assign({}, BASE_PATH_PARSER_OPTIONS, extraOptions);
   const score = [];
   let pattern = options.start ? "^" : "";
-  const keys = [];
+  const keys2 = [];
   for (const segment of segments) {
     const segmentScores = segment.length ? [] : [
       90
@@ -6748,7 +6748,7 @@ function tokensToParser(segments, extraOptions) {
         subSegmentScore += 40;
       } else if (token.type === 1) {
         const { value, repeatable, optional, regexp } = token;
-        keys.push({
+        keys2.push({
           name: value,
           repeatable,
           optional
@@ -6800,7 +6800,7 @@ function tokensToParser(segments, extraOptions) {
       return null;
     for (let i2 = 1; i2 < match.length; i2++) {
       const value = match[i2] || "";
-      const key = keys[i2 - 1];
+      const key = keys2[i2 - 1];
       params[key.name] = value && key.repeatable ? value.split("/") : value;
     }
     return params;
@@ -6818,10 +6818,10 @@ function tokensToParser(segments, extraOptions) {
         } else if (token.type === 1) {
           const { value, repeatable, optional } = token;
           const param = value in params ? params[value] : "";
-          if (isArray(param) && !repeatable) {
+          if (isArray$5(param) && !repeatable) {
             throw new Error(`Provided param "${value}" is an array but it is not repeatable (* or + modifiers)`);
           }
-          const text = isArray(param) ? param.join("/") : param;
+          const text = isArray$5(param) ? param.join("/") : param;
           if (!text) {
             if (optional) {
               if (segment.length < 2) {
@@ -6842,7 +6842,7 @@ function tokensToParser(segments, extraOptions) {
   return {
     re,
     score,
-    keys,
+    keys: keys2,
     parse: parse3,
     stringify
   };
@@ -7176,9 +7176,9 @@ function createRouterMatcher(routes2, globalOptions) {
   routes2.forEach((route) => addRoute(route));
   return { addRoute, resolve: resolve2, removeRoute, getRoutes, getRecordMatcher };
 }
-function paramsFromLocation(params, keys) {
+function paramsFromLocation(params, keys2) {
   const newParams = {};
-  for (const key of keys) {
+  for (const key of keys2) {
     if (key in params)
       newParams[key] = params[key];
   }
@@ -7285,7 +7285,7 @@ function parseQuery(search) {
     const value = eqPos < 0 ? null : decode$1(searchParam.slice(eqPos + 1));
     if (key in query) {
       let currentValue = query[key];
-      if (!isArray(currentValue)) {
+      if (!isArray$5(currentValue)) {
         currentValue = query[key] = [currentValue];
       }
       currentValue.push(value);
@@ -7306,7 +7306,7 @@ function stringifyQuery(query) {
       }
       continue;
     }
-    const values = isArray(value) ? value.map((v) => v && encodeQueryValue(v)) : [value && encodeQueryValue(value)];
+    const values = isArray$5(value) ? value.map((v) => v && encodeQueryValue(v)) : [value && encodeQueryValue(value)];
     values.forEach((value2) => {
       if (value2 !== void 0) {
         search += (search.length ? "&" : "") + key;
@@ -7322,7 +7322,7 @@ function normalizeQuery(query) {
   for (const key in query) {
     const value = query[key];
     if (value !== void 0) {
-      normalizedQuery[key] = isArray(value) ? value.map((v) => v == null ? null : "" + v) : value == null ? value : "" + value;
+      normalizedQuery[key] = isArray$5(value) ? value.map((v) => v == null ? null : "" + v) : value == null ? value : "" + value;
     }
   }
   return normalizedQuery;
@@ -7525,7 +7525,7 @@ function includesParams(outer, inner) {
       if (innerValue !== outerValue)
         return false;
     } else {
-      if (!isArray(outerValue) || outerValue.length !== innerValue.length || innerValue.some((value, i2) => value !== outerValue[i2]))
+      if (!isArray$5(outerValue) || outerValue.length !== innerValue.length || innerValue.some((value, i2) => value !== outerValue[i2]))
         return false;
     }
   }
@@ -7863,7 +7863,7 @@ function createRouter(options) {
       guards = [];
       for (const record of enteringRecords) {
         if (record.beforeEnter) {
-          if (isArray(record.beforeEnter)) {
+          if (isArray$5(record.beforeEnter)) {
             for (const beforeEnter of record.beforeEnter)
               guards.push(guardToPromiseFn(beforeEnter, to, from));
           } else {
@@ -8183,7 +8183,7 @@ function concatBytes$2(...arrays) {
   });
   return r;
 }
-let Hash$2 = class Hash {
+let Hash$4 = class Hash {
   // Safe version that clones internal state
   clone() {
     return this._cloneInto();
@@ -8215,7 +8215,7 @@ function setBigUint64$2(view, byteOffset, value, isLE2) {
   view.setUint32(byteOffset + h2, wh, isLE2);
   view.setUint32(byteOffset + l, wl, isLE2);
 }
-let SHA2$1 = class SHA2 extends Hash$2 {
+let SHA2$1 = class SHA2 extends Hash$4 {
   constructor(blockLen, outputLen, padOffset, isLE2) {
     super();
     this.blockLen = blockLen;
@@ -8724,10 +8724,10 @@ function tonelliShanks(P) {
   if (S === 1) {
     const p1div4 = (P + _1n$3) / _4n;
     return function tonelliFast(Fp2, n) {
-      const root = Fp2.pow(n, p1div4);
-      if (!Fp2.eql(Fp2.sqr(root), n))
+      const root2 = Fp2.pow(n, p1div4);
+      if (!Fp2.eql(Fp2.sqr(root2), n))
         throw new Error("Cannot find square root");
-      return root;
+      return root2;
     };
   }
   const Q1div2 = (Q + _1n$3) / _2n$1;
@@ -8760,10 +8760,10 @@ function FpSqrt(P) {
   if (P % _4n === _3n$1) {
     const p1div4 = (P + _1n$3) / _4n;
     return function sqrt3mod4(Fp2, n) {
-      const root = Fp2.pow(n, p1div4);
-      if (!Fp2.eql(Fp2.sqr(root), n))
+      const root2 = Fp2.pow(n, p1div4);
+      if (!Fp2.eql(Fp2.sqr(root2), n))
         throw new Error("Cannot find square root");
-      return root;
+      return root2;
     };
   }
   if (P % _8n === _5n) {
@@ -8773,10 +8773,10 @@ function FpSqrt(P) {
       const v = Fp2.pow(n2, c1);
       const nv = Fp2.mul(n, v);
       const i2 = Fp2.mul(Fp2.mul(nv, _2n$1), v);
-      const root = Fp2.mul(nv, Fp2.sub(i2, Fp2.ONE));
-      if (!Fp2.eql(Fp2.sqr(root), n))
+      const root2 = Fp2.mul(nv, Fp2.sub(i2, Fp2.ONE));
+      if (!Fp2.eql(Fp2.sqr(root2), n))
         throw new Error("Cannot find square root");
-      return root;
+      return root2;
     };
   }
   return tonelliShanks(P);
@@ -9830,7 +9830,7 @@ function weierstrass(curveDef) {
     utils
   };
 }
-let HMAC$1 = class HMAC extends Hash$2 {
+let HMAC$1 = class HMAC extends Hash$4 {
   constructor(hash2, _key) {
     super();
     this.finished = false;
@@ -9928,10 +9928,10 @@ function sqrtMod(y) {
   const b223 = pow2(b220, _3n2, P) * b3 % P;
   const t1 = pow2(b223, _23n, P) * b22 % P;
   const t2 = pow2(t1, _6n, P) * b2 % P;
-  const root = pow2(t2, _2n, P);
-  if (!Fp.eql(Fp.sqr(root), y))
+  const root2 = pow2(t2, _2n, P);
+  if (!Fp.eql(Fp.sqr(root2), y))
     throw new Error("Cannot find square root");
-  return root;
+  return root2;
 }
 const Fp = Field(secp256k1P, void 0, void 0, { sqrt: sqrtMod });
 const secp256k1 = createCurve({
@@ -10130,7 +10130,7 @@ function concatBytes(...arrays) {
   });
   return r;
 }
-let Hash$1 = class Hash2 {
+let Hash$3 = class Hash2 {
   // Safe version that clones internal state
   clone() {
     return this._cloneInto();
@@ -10203,7 +10203,7 @@ function setBigUint64$1(view, byteOffset, value, isLE2) {
   view.setUint32(byteOffset + h2, wh, isLE2);
   view.setUint32(byteOffset + l, wl, isLE2);
 }
-class SHA22 extends Hash$1 {
+class SHA22 extends Hash$3 {
   constructor(blockLen, outputLen, padOffset, isLE2) {
     super();
     this.blockLen = blockLen;
@@ -11283,7 +11283,7 @@ const chacha20 = /* @__PURE__ */ createCipher(chachaCore, {
   counterLength: 4,
   allowShortKeys: false
 });
-class HMAC2 extends Hash$1 {
+class HMAC2 extends Hash$3 {
   constructor(hash2, _key) {
     super();
     this.finished = false;
@@ -13119,11 +13119,11 @@ function getConversationKey(privkeyA, pubkeyB) {
   return extract(sha256$1, sharedX, "nip44-v2");
 }
 function getMessageKeys(conversationKey, nonce) {
-  const keys = expand(sha256$1, conversationKey, nonce, 76);
+  const keys2 = expand(sha256$1, conversationKey, nonce, 76);
   return {
-    chacha_key: keys.subarray(0, 32),
-    chacha_nonce: keys.subarray(32, 44),
-    hmac_key: keys.subarray(44, 76)
+    chacha_key: keys2.subarray(0, 32),
+    chacha_nonce: keys2.subarray(32, 44),
+    hmac_key: keys2.subarray(44, 76)
   };
 }
 function calcPaddedLen(len) {
@@ -13474,6 +13474,328 @@ const EVENT_KIND = {
   FOLLOW_LIST: 3
 };
 const PURPLEPAG_RELAY_URL = "wss://purplepag.es/";
+var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+function getDefaultExportFromCjs(x) {
+  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
+}
+var freeGlobal$1 = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+var _freeGlobal = freeGlobal$1;
+var freeGlobal = _freeGlobal;
+var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+var root$8 = freeGlobal || freeSelf || Function("return this")();
+var _root = root$8;
+var root$7 = _root;
+var Symbol$5 = root$7.Symbol;
+var _Symbol = Symbol$5;
+function arrayMap$1(array, iteratee) {
+  var index = -1, length = array == null ? 0 : array.length, result = Array(length);
+  while (++index < length) {
+    result[index] = iteratee(array[index], index, array);
+  }
+  return result;
+}
+var _arrayMap = arrayMap$1;
+var isArray$4 = Array.isArray;
+var isArray_1 = isArray$4;
+var Symbol$4 = _Symbol;
+var objectProto$c = Object.prototype;
+var hasOwnProperty$9 = objectProto$c.hasOwnProperty;
+var nativeObjectToString$1 = objectProto$c.toString;
+var symToStringTag$1 = Symbol$4 ? Symbol$4.toStringTag : void 0;
+function getRawTag$1(value) {
+  var isOwn = hasOwnProperty$9.call(value, symToStringTag$1), tag = value[symToStringTag$1];
+  try {
+    value[symToStringTag$1] = void 0;
+    var unmasked = true;
+  } catch (e) {
+  }
+  var result = nativeObjectToString$1.call(value);
+  if (unmasked) {
+    if (isOwn) {
+      value[symToStringTag$1] = tag;
+    } else {
+      delete value[symToStringTag$1];
+    }
+  }
+  return result;
+}
+var _getRawTag = getRawTag$1;
+var objectProto$b = Object.prototype;
+var nativeObjectToString = objectProto$b.toString;
+function objectToString$1(value) {
+  return nativeObjectToString.call(value);
+}
+var _objectToString = objectToString$1;
+var Symbol$3 = _Symbol, getRawTag = _getRawTag, objectToString = _objectToString;
+var nullTag = "[object Null]", undefinedTag = "[object Undefined]";
+var symToStringTag = Symbol$3 ? Symbol$3.toStringTag : void 0;
+function baseGetTag$6(value) {
+  if (value == null) {
+    return value === void 0 ? undefinedTag : nullTag;
+  }
+  return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+}
+var _baseGetTag = baseGetTag$6;
+function isObjectLike$7(value) {
+  return value != null && typeof value == "object";
+}
+var isObjectLike_1 = isObjectLike$7;
+var baseGetTag$5 = _baseGetTag, isObjectLike$6 = isObjectLike_1;
+var symbolTag$2 = "[object Symbol]";
+function isSymbol$2(value) {
+  return typeof value == "symbol" || isObjectLike$6(value) && baseGetTag$5(value) == symbolTag$2;
+}
+var isSymbol_1 = isSymbol$2;
+var Symbol$2 = _Symbol, arrayMap = _arrayMap, isArray$3 = isArray_1, isSymbol$1 = isSymbol_1;
+var INFINITY$1 = 1 / 0;
+var symbolProto$1 = Symbol$2 ? Symbol$2.prototype : void 0, symbolToString = symbolProto$1 ? symbolProto$1.toString : void 0;
+function baseToString$2(value) {
+  if (typeof value == "string") {
+    return value;
+  }
+  if (isArray$3(value)) {
+    return arrayMap(value, baseToString$2) + "";
+  }
+  if (isSymbol$1(value)) {
+    return symbolToString ? symbolToString.call(value) : "";
+  }
+  var result = value + "";
+  return result == "0" && 1 / value == -INFINITY$1 ? "-0" : result;
+}
+var _baseToString = baseToString$2;
+function baseSlice$1(array, start, end) {
+  var index = -1, length = array.length;
+  if (start < 0) {
+    start = -start > length ? 0 : length + start;
+  }
+  end = end > length ? length : end;
+  if (end < 0) {
+    end += length;
+  }
+  length = start > end ? 0 : end - start >>> 0;
+  start >>>= 0;
+  var result = Array(length);
+  while (++index < length) {
+    result[index] = array[index + start];
+  }
+  return result;
+}
+var _baseSlice = baseSlice$1;
+var baseSlice = _baseSlice;
+function castSlice$1(array, start, end) {
+  var length = array.length;
+  end = end === void 0 ? length : end;
+  return !start && end >= length ? array : baseSlice(array, start, end);
+}
+var _castSlice = castSlice$1;
+var rsAstralRange$2 = "\\ud800-\\udfff", rsComboMarksRange$2 = "\\u0300-\\u036f", reComboHalfMarksRange$2 = "\\ufe20-\\ufe2f", rsComboSymbolsRange$2 = "\\u20d0-\\u20ff", rsComboRange$2 = rsComboMarksRange$2 + reComboHalfMarksRange$2 + rsComboSymbolsRange$2, rsVarRange$2 = "\\ufe0e\\ufe0f";
+var rsZWJ$2 = "\\u200d";
+var reHasUnicode = RegExp("[" + rsZWJ$2 + rsAstralRange$2 + rsComboRange$2 + rsVarRange$2 + "]");
+function hasUnicode$3(string) {
+  return reHasUnicode.test(string);
+}
+var _hasUnicode = hasUnicode$3;
+function isObject$7(value) {
+  var type = typeof value;
+  return value != null && (type == "object" || type == "function");
+}
+var isObject_1 = isObject$7;
+var baseGetTag$4 = _baseGetTag, isObjectLike$5 = isObjectLike_1;
+var regexpTag$3 = "[object RegExp]";
+function baseIsRegExp$1(value) {
+  return isObjectLike$5(value) && baseGetTag$4(value) == regexpTag$3;
+}
+var _baseIsRegExp = baseIsRegExp$1;
+function baseUnary$4(func) {
+  return function(value) {
+    return func(value);
+  };
+}
+var _baseUnary = baseUnary$4;
+var _nodeUtil = { exports: {} };
+_nodeUtil.exports;
+(function(module, exports) {
+  var freeGlobal2 = _freeGlobal;
+  var freeExports = exports && !exports.nodeType && exports;
+  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var freeProcess = moduleExports && freeGlobal2.process;
+  var nodeUtil2 = function() {
+    try {
+      var types = freeModule && freeModule.require && freeModule.require("util").types;
+      if (types) {
+        return types;
+      }
+      return freeProcess && freeProcess.binding && freeProcess.binding("util");
+    } catch (e) {
+    }
+  }();
+  module.exports = nodeUtil2;
+})(_nodeUtil, _nodeUtil.exports);
+var _nodeUtilExports = _nodeUtil.exports;
+var baseIsRegExp = _baseIsRegExp, baseUnary$3 = _baseUnary, nodeUtil$3 = _nodeUtilExports;
+var nodeIsRegExp = nodeUtil$3 && nodeUtil$3.isRegExp;
+var isRegExp$1 = nodeIsRegExp ? baseUnary$3(nodeIsRegExp) : baseIsRegExp;
+var isRegExp_1 = isRegExp$1;
+function baseProperty$1(key) {
+  return function(object) {
+    return object == null ? void 0 : object[key];
+  };
+}
+var _baseProperty = baseProperty$1;
+var baseProperty = _baseProperty;
+var asciiSize$1 = baseProperty("length");
+var _asciiSize = asciiSize$1;
+var rsAstralRange$1 = "\\ud800-\\udfff", rsComboMarksRange$1 = "\\u0300-\\u036f", reComboHalfMarksRange$1 = "\\ufe20-\\ufe2f", rsComboSymbolsRange$1 = "\\u20d0-\\u20ff", rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1, rsVarRange$1 = "\\ufe0e\\ufe0f";
+var rsAstral$1 = "[" + rsAstralRange$1 + "]", rsCombo$1 = "[" + rsComboRange$1 + "]", rsFitz$1 = "\\ud83c[\\udffb-\\udfff]", rsModifier$1 = "(?:" + rsCombo$1 + "|" + rsFitz$1 + ")", rsNonAstral$1 = "[^" + rsAstralRange$1 + "]", rsRegional$1 = "(?:\\ud83c[\\udde6-\\uddff]){2}", rsSurrPair$1 = "[\\ud800-\\udbff][\\udc00-\\udfff]", rsZWJ$1 = "\\u200d";
+var reOptMod$1 = rsModifier$1 + "?", rsOptVar$1 = "[" + rsVarRange$1 + "]?", rsOptJoin$1 = "(?:" + rsZWJ$1 + "(?:" + [rsNonAstral$1, rsRegional$1, rsSurrPair$1].join("|") + ")" + rsOptVar$1 + reOptMod$1 + ")*", rsSeq$1 = rsOptVar$1 + reOptMod$1 + rsOptJoin$1, rsSymbol$1 = "(?:" + [rsNonAstral$1 + rsCombo$1 + "?", rsCombo$1, rsRegional$1, rsSurrPair$1, rsAstral$1].join("|") + ")";
+var reUnicode$1 = RegExp(rsFitz$1 + "(?=" + rsFitz$1 + ")|" + rsSymbol$1 + rsSeq$1, "g");
+function unicodeSize$1(string) {
+  var result = reUnicode$1.lastIndex = 0;
+  while (reUnicode$1.test(string)) {
+    ++result;
+  }
+  return result;
+}
+var _unicodeSize = unicodeSize$1;
+var asciiSize = _asciiSize, hasUnicode$2 = _hasUnicode, unicodeSize = _unicodeSize;
+function stringSize$1(string) {
+  return hasUnicode$2(string) ? unicodeSize(string) : asciiSize(string);
+}
+var _stringSize = stringSize$1;
+function asciiToArray$1(string) {
+  return string.split("");
+}
+var _asciiToArray = asciiToArray$1;
+var rsAstralRange = "\\ud800-\\udfff", rsComboMarksRange = "\\u0300-\\u036f", reComboHalfMarksRange = "\\ufe20-\\ufe2f", rsComboSymbolsRange = "\\u20d0-\\u20ff", rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange, rsVarRange = "\\ufe0e\\ufe0f";
+var rsAstral = "[" + rsAstralRange + "]", rsCombo = "[" + rsComboRange + "]", rsFitz = "\\ud83c[\\udffb-\\udfff]", rsModifier = "(?:" + rsCombo + "|" + rsFitz + ")", rsNonAstral = "[^" + rsAstralRange + "]", rsRegional = "(?:\\ud83c[\\udde6-\\uddff]){2}", rsSurrPair = "[\\ud800-\\udbff][\\udc00-\\udfff]", rsZWJ = "\\u200d";
+var reOptMod = rsModifier + "?", rsOptVar = "[" + rsVarRange + "]?", rsOptJoin = "(?:" + rsZWJ + "(?:" + [rsNonAstral, rsRegional, rsSurrPair].join("|") + ")" + rsOptVar + reOptMod + ")*", rsSeq = rsOptVar + reOptMod + rsOptJoin, rsSymbol = "(?:" + [rsNonAstral + rsCombo + "?", rsCombo, rsRegional, rsSurrPair, rsAstral].join("|") + ")";
+var reUnicode = RegExp(rsFitz + "(?=" + rsFitz + ")|" + rsSymbol + rsSeq, "g");
+function unicodeToArray$1(string) {
+  return string.match(reUnicode) || [];
+}
+var _unicodeToArray = unicodeToArray$1;
+var asciiToArray = _asciiToArray, hasUnicode$1 = _hasUnicode, unicodeToArray = _unicodeToArray;
+function stringToArray$1(string) {
+  return hasUnicode$1(string) ? unicodeToArray(string) : asciiToArray(string);
+}
+var _stringToArray = stringToArray$1;
+var reWhitespace = /\s/;
+function trimmedEndIndex$1(string) {
+  var index = string.length;
+  while (index-- && reWhitespace.test(string.charAt(index))) {
+  }
+  return index;
+}
+var _trimmedEndIndex = trimmedEndIndex$1;
+var trimmedEndIndex = _trimmedEndIndex;
+var reTrimStart = /^\s+/;
+function baseTrim$1(string) {
+  return string ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, "") : string;
+}
+var _baseTrim = baseTrim$1;
+var baseTrim = _baseTrim, isObject$6 = isObject_1, isSymbol = isSymbol_1;
+var NAN = 0 / 0;
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+var reIsBinary = /^0b[01]+$/i;
+var reIsOctal = /^0o[0-7]+$/i;
+var freeParseInt = parseInt;
+function toNumber$1(value) {
+  if (typeof value == "number") {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return NAN;
+  }
+  if (isObject$6(value)) {
+    var other = typeof value.valueOf == "function" ? value.valueOf() : value;
+    value = isObject$6(other) ? other + "" : other;
+  }
+  if (typeof value != "string") {
+    return value === 0 ? value : +value;
+  }
+  value = baseTrim(value);
+  var isBinary = reIsBinary.test(value);
+  return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+}
+var toNumber_1 = toNumber$1;
+var toNumber = toNumber_1;
+var INFINITY = 1 / 0, MAX_INTEGER = 17976931348623157e292;
+function toFinite$1(value) {
+  if (!value) {
+    return value === 0 ? value : 0;
+  }
+  value = toNumber(value);
+  if (value === INFINITY || value === -INFINITY) {
+    var sign = value < 0 ? -1 : 1;
+    return sign * MAX_INTEGER;
+  }
+  return value === value ? value : 0;
+}
+var toFinite_1 = toFinite$1;
+var toFinite = toFinite_1;
+function toInteger$1(value) {
+  var result = toFinite(value), remainder = result % 1;
+  return result === result ? remainder ? result - remainder : result : 0;
+}
+var toInteger_1 = toInteger$1;
+var baseToString$1 = _baseToString;
+function toString$1(value) {
+  return value == null ? "" : baseToString$1(value);
+}
+var toString_1 = toString$1;
+var baseToString = _baseToString, castSlice = _castSlice, hasUnicode = _hasUnicode, isObject$5 = isObject_1, isRegExp = isRegExp_1, stringSize = _stringSize, stringToArray = _stringToArray, toInteger = toInteger_1, toString = toString_1;
+var DEFAULT_TRUNC_LENGTH = 30, DEFAULT_TRUNC_OMISSION = "...";
+var reFlags$1 = /\w*$/;
+function truncate(string, options) {
+  var length = DEFAULT_TRUNC_LENGTH, omission = DEFAULT_TRUNC_OMISSION;
+  if (isObject$5(options)) {
+    var separator = "separator" in options ? options.separator : separator;
+    length = "length" in options ? toInteger(options.length) : length;
+    omission = "omission" in options ? baseToString(options.omission) : omission;
+  }
+  string = toString(string);
+  var strLength = string.length;
+  if (hasUnicode(string)) {
+    var strSymbols = stringToArray(string);
+    strLength = strSymbols.length;
+  }
+  if (length >= strLength) {
+    return string;
+  }
+  var end = length - stringSize(omission);
+  if (end < 1) {
+    return omission;
+  }
+  var result = strSymbols ? castSlice(strSymbols, 0, end).join("") : string.slice(0, end);
+  if (separator === void 0) {
+    return result + omission;
+  }
+  if (strSymbols) {
+    end += result.length - end;
+  }
+  if (isRegExp(separator)) {
+    if (string.slice(end).search(separator)) {
+      var match, substring = result;
+      if (!separator.global) {
+        separator = RegExp(separator.source, toString(reFlags$1.exec(separator)) + "g");
+      }
+      separator.lastIndex = 0;
+      while (match = separator.exec(substring)) {
+        var newEnd = match.index;
+      }
+      result = result.slice(0, newEnd === void 0 ? end : newEnd);
+    }
+  } else if (string.indexOf(baseToString(separator), end) != end) {
+    var index = result.lastIndexOf(separator);
+    if (index > -1) {
+      result = result.slice(0, index);
+    }
+  }
+  return result + omission;
+}
+var truncate_1 = truncate;
+const truncate$1 = /* @__PURE__ */ getDefaultExportFromCjs(truncate_1);
 const markNotesAsRoot = (posts) => {
   posts.forEach((post) => post.isRoot = true);
 };
@@ -13532,7 +13854,7 @@ const injectReplyingToDataToNotes = (replyingToEvent, postsEvents) => {
 const injectRootRepliesToNote = (postEvent, repliesEvents) => {
   let replies = 0;
   for (const reply of repliesEvents) {
-    if (nip10IsFirstLevelReplyForEvent(postEvent.id, reply)) {
+    if (nip10IsFirstLevelReply(postEvent.id, reply)) {
       replies++;
     }
   }
@@ -13541,7 +13863,7 @@ const injectRootRepliesToNote = (postEvent, repliesEvents) => {
 const injectNotRootRepliesToNote = (postEvent, repliesEvents) => {
   let replies = 0;
   for (const reply of repliesEvents) {
-    if (nip10IsReplyForEvent(postEvent.id, reply)) {
+    if (nip10IsSecondLevelReply(postEvent.id, reply)) {
       replies++;
     }
   }
@@ -13574,7 +13896,7 @@ const getNoteReferences = (postEvent) => {
   const allReferencesPubkeys = /* @__PURE__ */ new Set();
   const references = parseReferences(postEvent);
   for (let i2 = 0; i2 < references.length; i2++) {
-    let { profile } = references[i2];
+    const { profile } = references[i2];
     if (!(profile == null ? void 0 : profile.pubkey))
       continue;
     allReferencesPubkeys.add(profile.pubkey);
@@ -13592,7 +13914,7 @@ const injectReferencesToNote = (postEvent, referencesMetas) => {
   const references = parseReferences(postEvent);
   const referencesToInject = [];
   for (let i2 = 0; i2 < references.length; i2++) {
-    let { profile } = references[i2];
+    const { profile } = references[i2];
     if (!(profile == null ? void 0 : profile.pubkey))
       continue;
     referencesMetas.forEach((meta) => {
@@ -13689,24 +14011,6 @@ const isWsAvailable = (url, timeout2 = 5e3) => {
 const isSHA256Hex = (hex2) => {
   return /^[a-f0-9]{64}$/.test(hex2);
 };
-const relayGet = (relay, filters, timeout2) => {
-  const timout = new Promise((resolve2) => {
-    setTimeout(() => {
-      resolve2(null);
-    }, timeout2);
-  });
-  const connection = new Promise((resolve2) => {
-    const sub = relay.subscribe(filters, {
-      onevent(event) {
-        resolve2(event);
-      },
-      oneose() {
-        sub.close();
-      }
-    });
-  });
-  return Promise.race([connection, timout]);
-};
 const parseRelaysNip65 = (event) => {
   const { tags } = event;
   const relays = { read: [], write: [], all: [] };
@@ -13774,12 +14078,12 @@ const racePromises = (promises, handleSuccess, handleError2) => {
     racePromises(remainingPromises, handleSuccess, handleError2);
   });
 };
-const nip10IsFirstLevelReplyForEvent = (eventId, reply) => {
+const nip10IsFirstLevelReply = (eventId, reply) => {
   var _a;
   const nip10Data = nip10_exports.parse(reply);
   return !nip10Data.reply && ((_a = nip10Data == null ? void 0 : nip10Data.root) == null ? void 0 : _a.id) === eventId;
 };
-const nip10IsReplyForEvent = (eventId, reply) => {
+const nip10IsSecondLevelReply = (eventId, reply) => {
   var _a, _b;
   const nip10Data = nip10_exports.parse(reply);
   return ((_a = nip10Data == null ? void 0 : nip10Data.reply) == null ? void 0 : _a.id) === eventId || ((_b = nip10Data == null ? void 0 : nip10Data.root) == null ? void 0 : _b.id) === eventId;
@@ -13809,7 +14113,7 @@ const loadAndInjectDataToPosts = async (posts, replyingToEvent, userRelaysMap = 
     }
     const pubkeysForRequest = [];
     allPubkeysToGet.forEach((pubkey) => {
-      if (!metasCacheStore.hasPubkey(author) && !cachedMetasPubkeys.has(pubkey)) {
+      if (!metasCacheStore.hasPubkey(pubkey) && !cachedMetasPubkeys.has(pubkey)) {
         pubkeysForRequest.push(pubkey);
       }
       cachedMetasPubkeys.add(pubkey);
@@ -13887,8 +14191,8 @@ const getEventWithAuthorById = async (eventId, relays, pool) => {
   return event;
 };
 const isReply = (event) => {
-  const { reply, root } = nip10_exports.parse(event);
-  return !!reply || !!root;
+  const { reply, root: root2 } = nip10_exports.parse(event);
+  return !!reply || !!root2;
 };
 const listRootEvents = (pool, relays, filters) => {
   return new Promise((resolve2) => {
@@ -13951,23 +14255,45 @@ const getNip19FromSearch = (query) => {
   }
   return nip19data;
 };
+const getTextLines = (text) => text.split(/\n/);
+const cutTextByLine = (text, line) => {
+  const lines = getTextLines(text);
+  if (lines.length <= line)
+    return text;
+  return lines.slice(0, line).join("\n");
+};
+const cutTextByLength = (text, length) => {
+  if (text.length <= length) {
+    return text;
+  }
+  return truncate$1(text, {
+    length,
+    separator: /,? +/
+  });
+};
+const cutTextByLengthAndLine = (text, length, lines) => {
+  return cutTextByLength(cutTextByLine(text, lines), length);
+};
+const getNpub = (pubkey) => {
+  return nip19_exports.npubEncode(pubkey);
+};
 const _withScopeId$h = (n) => (pushScopeId("data-v-393546d0"), n = n(), popScopeId(), n);
-const _hoisted_1$H = { class: "event-details" };
-const _hoisted_2$C = { key: 0 };
-const _hoisted_3$w = { class: "highlight" };
-const _hoisted_4$n = { key: 1 };
-const _hoisted_5$h = {
+const _hoisted_1$I = { class: "event-details" };
+const _hoisted_2$D = { key: 0 };
+const _hoisted_3$x = { class: "highlight" };
+const _hoisted_4$o = { key: 1 };
+const _hoisted_5$i = {
   key: 0,
   class: "highlight"
 };
-const _hoisted_6$d = {
+const _hoisted_6$c = {
   key: 1,
   class: "event-details__no-user"
 };
-const _hoisted_7$a = /* @__PURE__ */ _withScopeId$h(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
-const _hoisted_8$9 = { class: "highlight" };
-const _hoisted_9$9 = { key: 2 };
-const _hoisted_10$9 = {
+const _hoisted_7$9 = /* @__PURE__ */ _withScopeId$h(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
+const _hoisted_8$8 = { class: "highlight" };
+const _hoisted_9$8 = { key: 2 };
+const _hoisted_10$8 = {
   key: 0,
   class: "highlight"
 };
@@ -13975,9 +14301,9 @@ const _hoisted_11$8 = {
   key: 1,
   class: "event-details__no-user"
 };
-const _hoisted_12$8 = /* @__PURE__ */ _withScopeId$h(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
+const _hoisted_12$7 = /* @__PURE__ */ _withScopeId$h(() => /* @__PURE__ */ createBaseVNode("div", null, "No info about author on this relay.", -1));
 const _hoisted_13$6 = { class: "highlight" };
-const _sfc_main$M = /* @__PURE__ */ defineComponent({
+const _sfc_main$N = /* @__PURE__ */ defineComponent({
   __name: "RawData",
   props: {
     event: {},
@@ -14008,7 +14334,7 @@ const _sfc_main$M = /* @__PURE__ */ defineComponent({
       rawDataActiveTab.value = tab;
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$H, [
+      return openBlock(), createElementBlock("div", _hoisted_1$I, [
         createBaseVNode("div", {
           class: normalizeClass(["event-details__header", { "event-details__header_user": _ctx.isUserEvent }])
         }, [
@@ -14026,18 +14352,18 @@ const _sfc_main$M = /* @__PURE__ */ defineComponent({
             class: normalizeClass(["event-details__tab", { "event-details__tab_active": rawDataActiveTab.value === 3 }])
           }, "Author content", 2)
         ], 2),
-        rawDataActiveTab.value === 1 ? (openBlock(), createElementBlock("div", _hoisted_2$C, [
-          createBaseVNode("pre", _hoisted_3$w, toDisplayString(JSON.stringify(clearEvent.value, null, 2)), 1)
+        rawDataActiveTab.value === 1 ? (openBlock(), createElementBlock("div", _hoisted_2$D, [
+          createBaseVNode("pre", _hoisted_3$x, toDisplayString(JSON.stringify(clearEvent.value, null, 2)), 1)
         ])) : createCommentVNode("", true),
-        showAuthorTab.value && rawDataActiveTab.value === 2 ? (openBlock(), createElementBlock("div", _hoisted_4$n, [
-          _ctx.authorEvent ? (openBlock(), createElementBlock("pre", _hoisted_5$h, toDisplayString(JSON.stringify(clearAuthorEvent.value, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_6$d, [
-            _hoisted_7$a,
-            createBaseVNode("pre", _hoisted_8$9, "pubkey: " + toDisplayString(_ctx.event.pubkey) + " \nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
+        showAuthorTab.value && rawDataActiveTab.value === 2 ? (openBlock(), createElementBlock("div", _hoisted_4$o, [
+          _ctx.authorEvent ? (openBlock(), createElementBlock("pre", _hoisted_5$i, toDisplayString(JSON.stringify(clearAuthorEvent.value, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_6$c, [
+            _hoisted_7$9,
+            createBaseVNode("pre", _hoisted_8$8, "pubkey: " + toDisplayString(_ctx.event.pubkey) + " \nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
           ]))
         ])) : createCommentVNode("", true),
-        rawDataActiveTab.value === 3 ? (openBlock(), createElementBlock("div", _hoisted_9$9, [
-          _ctx.event.author ? (openBlock(), createElementBlock("pre", _hoisted_10$9, toDisplayString(JSON.stringify(_ctx.event.author, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_11$8, [
-            _hoisted_12$8,
+        rawDataActiveTab.value === 3 ? (openBlock(), createElementBlock("div", _hoisted_9$8, [
+          _ctx.event.author ? (openBlock(), createElementBlock("pre", _hoisted_10$8, toDisplayString(JSON.stringify(_ctx.event.author, null, 2)), 1)) : (openBlock(), createElementBlock("div", _hoisted_11$8, [
+            _hoisted_12$7,
             createBaseVNode("pre", _hoisted_13$6, "pubkey: " + toDisplayString(_ctx.event.pubkey) + "\nnpub: " + toDisplayString(unref(nip19_exports).npubEncode(_ctx.event.pubkey)), 1)
           ]))
         ])) : createCommentVNode("", true)
@@ -14053,9 +14379,9 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const RawData = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["__scopeId", "data-v-393546d0"]]);
-const _sfc_main$L = {};
-const _hoisted_1$G = {
+const RawData = /* @__PURE__ */ _export_sfc(_sfc_main$N, [["__scopeId", "data-v-393546d0"]]);
+const _sfc_main$M = {};
+const _hoisted_1$H = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14063,16 +14389,16 @@ const _hoisted_1$G = {
   class: "bi bi-heart",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$B = /* @__PURE__ */ createBaseVNode("path", { d: "m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" }, null, -1);
-const _hoisted_3$v = [
-  _hoisted_2$B
+const _hoisted_2$C = /* @__PURE__ */ createBaseVNode("path", { d: "m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" }, null, -1);
+const _hoisted_3$w = [
+  _hoisted_2$C
 ];
 function _sfc_render$b(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$G, _hoisted_3$v);
+  return openBlock(), createElementBlock("svg", _hoisted_1$H, _hoisted_3$w);
 }
-const EmptyHeartIcon = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$b]]);
-const _sfc_main$K = {};
-const _hoisted_1$F = {
+const EmptyHeartIcon = /* @__PURE__ */ _export_sfc(_sfc_main$M, [["render", _sfc_render$b]]);
+const _sfc_main$L = {};
+const _hoisted_1$G = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14080,16 +14406,16 @@ const _hoisted_1$F = {
   class: "bi bi-repeat",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$A = /* @__PURE__ */ createBaseVNode("path", { d: "M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" }, null, -1);
-const _hoisted_3$u = [
-  _hoisted_2$A
+const _hoisted_2$B = /* @__PURE__ */ createBaseVNode("path", { d: "M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" }, null, -1);
+const _hoisted_3$v = [
+  _hoisted_2$B
 ];
 function _sfc_render$a(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$F, _hoisted_3$u);
+  return openBlock(), createElementBlock("svg", _hoisted_1$G, _hoisted_3$v);
 }
-const ArrowRepeatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$a]]);
-const _sfc_main$J = {};
-const _hoisted_1$E = {
+const ArrowRepeatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$L, [["render", _sfc_render$a]]);
+const _sfc_main$K = {};
+const _hoisted_1$F = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "22",
   height: "22",
@@ -14097,16 +14423,16 @@ const _hoisted_1$E = {
   class: "bi bi-reply",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$z = /* @__PURE__ */ createBaseVNode("path", { d: "M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z" }, null, -1);
-const _hoisted_3$t = [
-  _hoisted_2$z
+const _hoisted_2$A = /* @__PURE__ */ createBaseVNode("path", { d: "M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z" }, null, -1);
+const _hoisted_3$u = [
+  _hoisted_2$A
 ];
 function _sfc_render$9(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$E, _hoisted_3$t);
+  return openBlock(), createElementBlock("svg", _hoisted_1$F, _hoisted_3$u);
 }
-const ReplyIcon = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$9]]);
-const _sfc_main$I = {};
-const _hoisted_1$D = {
+const ReplyIcon = /* @__PURE__ */ _export_sfc(_sfc_main$K, [["render", _sfc_render$9]]);
+const _sfc_main$J = {};
+const _hoisted_1$E = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14114,21 +14440,21 @@ const _hoisted_1$D = {
   class: "bi bi-chat",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$y = /* @__PURE__ */ createBaseVNode("path", { d: "M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105" }, null, -1);
-const _hoisted_3$s = [
-  _hoisted_2$y
+const _hoisted_2$z = /* @__PURE__ */ createBaseVNode("path", { d: "M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105" }, null, -1);
+const _hoisted_3$t = [
+  _hoisted_2$z
 ];
 function _sfc_render$8(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$D, _hoisted_3$s);
+  return openBlock(), createElementBlock("svg", _hoisted_1$E, _hoisted_3$t);
 }
-const ChatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$I, [["render", _sfc_render$8]]);
-const _hoisted_1$C = { class: "actions-bar" };
-const _hoisted_2$x = { class: "actions-bar__action actions-bar__num" };
-const _hoisted_3$r = { class: "actions_bar-number" };
-const _hoisted_4$m = { class: "actions-bar__action actions-bar__num" };
-const _hoisted_5$g = { class: "actions_bar-number" };
-const _hoisted_6$c = { class: "actions_bar-number" };
-const _sfc_main$H = /* @__PURE__ */ defineComponent({
+const ChatIcon = /* @__PURE__ */ _export_sfc(_sfc_main$J, [["render", _sfc_render$8]]);
+const _hoisted_1$D = { class: "actions-bar" };
+const _hoisted_2$y = { class: "actions-bar__action actions-bar__num" };
+const _hoisted_3$s = { class: "actions_bar-number" };
+const _hoisted_4$n = { class: "actions-bar__action actions-bar__num" };
+const _hoisted_5$h = { class: "actions_bar-number" };
+const _hoisted_6$b = { class: "actions_bar-number" };
+const _sfc_main$I = /* @__PURE__ */ defineComponent({
   __name: "EventActionsBar",
   props: {
     likes: {},
@@ -14146,14 +14472,14 @@ const _sfc_main$H = /* @__PURE__ */ defineComponent({
       emit2("handleShowReplies");
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$C, [
-        createBaseVNode("span", _hoisted_2$x, [
+      return openBlock(), createElementBlock("div", _hoisted_1$D, [
+        createBaseVNode("span", _hoisted_2$y, [
           createVNode(EmptyHeartIcon, { class: "actions-bar__icon" }),
-          createBaseVNode("span", _hoisted_3$r, toDisplayString(_ctx.likes), 1)
+          createBaseVNode("span", _hoisted_3$s, toDisplayString(_ctx.likes), 1)
         ]),
-        createBaseVNode("span", _hoisted_4$m, [
+        createBaseVNode("span", _hoisted_4$n, [
           createVNode(ArrowRepeatIcon, { class: "actions-bar__icon" }),
-          createBaseVNode("span", _hoisted_5$g, toDisplayString(_ctx.reposts), 1)
+          createBaseVNode("span", _hoisted_5$h, toDisplayString(_ctx.reposts), 1)
         ]),
         _ctx.hasReplyBtn ? (openBlock(), createElementBlock("span", {
           key: 0,
@@ -14161,7 +14487,7 @@ const _sfc_main$H = /* @__PURE__ */ defineComponent({
           class: "actions-bar__action actions-bar__num actions-bar__replies"
         }, [
           createVNode(ChatIcon, { class: "actions-bar__icon" }),
-          createBaseVNode("span", _hoisted_6$c, toDisplayString(_ctx.replies), 1)
+          createBaseVNode("span", _hoisted_6$b, toDisplayString(_ctx.replies), 1)
         ])) : createCommentVNode("", true),
         _ctx.hasReplyBtn ? (openBlock(), createElementBlock("span", {
           key: 1,
@@ -14208,15 +14534,1015 @@ const useUser = defineStore("user", () => {
   }
   return { isRoutingUser, updateRoutingStatus, updateSearchStatus, isSearchUsed };
 });
-const _hoisted_1$B = { class: "event-content" };
-const _hoisted_2$w = { key: 0 };
-const _hoisted_3$q = { key: 1 };
-const _hoisted_4$l = ["onClick"];
-const _sfc_main$G = /* @__PURE__ */ defineComponent({
+function listCacheClear$1() {
+  this.__data__ = [];
+  this.size = 0;
+}
+var _listCacheClear = listCacheClear$1;
+function eq$2(value, other) {
+  return value === other || value !== value && other !== other;
+}
+var eq_1 = eq$2;
+var eq$1 = eq_1;
+function assocIndexOf$4(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq$1(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+var _assocIndexOf = assocIndexOf$4;
+var assocIndexOf$3 = _assocIndexOf;
+var arrayProto = Array.prototype;
+var splice = arrayProto.splice;
+function listCacheDelete$1(key) {
+  var data = this.__data__, index = assocIndexOf$3(data, key);
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  --this.size;
+  return true;
+}
+var _listCacheDelete = listCacheDelete$1;
+var assocIndexOf$2 = _assocIndexOf;
+function listCacheGet$1(key) {
+  var data = this.__data__, index = assocIndexOf$2(data, key);
+  return index < 0 ? void 0 : data[index][1];
+}
+var _listCacheGet = listCacheGet$1;
+var assocIndexOf$1 = _assocIndexOf;
+function listCacheHas$1(key) {
+  return assocIndexOf$1(this.__data__, key) > -1;
+}
+var _listCacheHas = listCacheHas$1;
+var assocIndexOf = _assocIndexOf;
+function listCacheSet$1(key, value) {
+  var data = this.__data__, index = assocIndexOf(data, key);
+  if (index < 0) {
+    ++this.size;
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+var _listCacheSet = listCacheSet$1;
+var listCacheClear = _listCacheClear, listCacheDelete = _listCacheDelete, listCacheGet = _listCacheGet, listCacheHas = _listCacheHas, listCacheSet = _listCacheSet;
+function ListCache$4(entries) {
+  var index = -1, length = entries == null ? 0 : entries.length;
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+ListCache$4.prototype.clear = listCacheClear;
+ListCache$4.prototype["delete"] = listCacheDelete;
+ListCache$4.prototype.get = listCacheGet;
+ListCache$4.prototype.has = listCacheHas;
+ListCache$4.prototype.set = listCacheSet;
+var _ListCache = ListCache$4;
+var ListCache$3 = _ListCache;
+function stackClear$1() {
+  this.__data__ = new ListCache$3();
+  this.size = 0;
+}
+var _stackClear = stackClear$1;
+function stackDelete$1(key) {
+  var data = this.__data__, result = data["delete"](key);
+  this.size = data.size;
+  return result;
+}
+var _stackDelete = stackDelete$1;
+function stackGet$1(key) {
+  return this.__data__.get(key);
+}
+var _stackGet = stackGet$1;
+function stackHas$1(key) {
+  return this.__data__.has(key);
+}
+var _stackHas = stackHas$1;
+var baseGetTag$3 = _baseGetTag, isObject$4 = isObject_1;
+var asyncTag = "[object AsyncFunction]", funcTag$2 = "[object Function]", genTag$1 = "[object GeneratorFunction]", proxyTag = "[object Proxy]";
+function isFunction$2(value) {
+  if (!isObject$4(value)) {
+    return false;
+  }
+  var tag = baseGetTag$3(value);
+  return tag == funcTag$2 || tag == genTag$1 || tag == asyncTag || tag == proxyTag;
+}
+var isFunction_1 = isFunction$2;
+var root$6 = _root;
+var coreJsData$1 = root$6["__core-js_shared__"];
+var _coreJsData = coreJsData$1;
+var coreJsData = _coreJsData;
+var maskSrcKey = function() {
+  var uid2 = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || "");
+  return uid2 ? "Symbol(src)_1." + uid2 : "";
+}();
+function isMasked$1(func) {
+  return !!maskSrcKey && maskSrcKey in func;
+}
+var _isMasked = isMasked$1;
+var funcProto$1 = Function.prototype;
+var funcToString$1 = funcProto$1.toString;
+function toSource$2(func) {
+  if (func != null) {
+    try {
+      return funcToString$1.call(func);
+    } catch (e) {
+    }
+    try {
+      return func + "";
+    } catch (e) {
+    }
+  }
+  return "";
+}
+var _toSource = toSource$2;
+var isFunction$1 = isFunction_1, isMasked = _isMasked, isObject$3 = isObject_1, toSource$1 = _toSource;
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+var funcProto = Function.prototype, objectProto$a = Object.prototype;
+var funcToString = funcProto.toString;
+var hasOwnProperty$8 = objectProto$a.hasOwnProperty;
+var reIsNative = RegExp(
+  "^" + funcToString.call(hasOwnProperty$8).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"
+);
+function baseIsNative$1(value) {
+  if (!isObject$3(value) || isMasked(value)) {
+    return false;
+  }
+  var pattern = isFunction$1(value) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource$1(value));
+}
+var _baseIsNative = baseIsNative$1;
+function getValue$1(object, key) {
+  return object == null ? void 0 : object[key];
+}
+var _getValue = getValue$1;
+var baseIsNative = _baseIsNative, getValue = _getValue;
+function getNative$7(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : void 0;
+}
+var _getNative = getNative$7;
+var getNative$6 = _getNative, root$5 = _root;
+var Map$4 = getNative$6(root$5, "Map");
+var _Map = Map$4;
+var getNative$5 = _getNative;
+var nativeCreate$4 = getNative$5(Object, "create");
+var _nativeCreate = nativeCreate$4;
+var nativeCreate$3 = _nativeCreate;
+function hashClear$1() {
+  this.__data__ = nativeCreate$3 ? nativeCreate$3(null) : {};
+  this.size = 0;
+}
+var _hashClear = hashClear$1;
+function hashDelete$1(key) {
+  var result = this.has(key) && delete this.__data__[key];
+  this.size -= result ? 1 : 0;
+  return result;
+}
+var _hashDelete = hashDelete$1;
+var nativeCreate$2 = _nativeCreate;
+var HASH_UNDEFINED$1 = "__lodash_hash_undefined__";
+var objectProto$9 = Object.prototype;
+var hasOwnProperty$7 = objectProto$9.hasOwnProperty;
+function hashGet$1(key) {
+  var data = this.__data__;
+  if (nativeCreate$2) {
+    var result = data[key];
+    return result === HASH_UNDEFINED$1 ? void 0 : result;
+  }
+  return hasOwnProperty$7.call(data, key) ? data[key] : void 0;
+}
+var _hashGet = hashGet$1;
+var nativeCreate$1 = _nativeCreate;
+var objectProto$8 = Object.prototype;
+var hasOwnProperty$6 = objectProto$8.hasOwnProperty;
+function hashHas$1(key) {
+  var data = this.__data__;
+  return nativeCreate$1 ? data[key] !== void 0 : hasOwnProperty$6.call(data, key);
+}
+var _hashHas = hashHas$1;
+var nativeCreate = _nativeCreate;
+var HASH_UNDEFINED = "__lodash_hash_undefined__";
+function hashSet$1(key, value) {
+  var data = this.__data__;
+  this.size += this.has(key) ? 0 : 1;
+  data[key] = nativeCreate && value === void 0 ? HASH_UNDEFINED : value;
+  return this;
+}
+var _hashSet = hashSet$1;
+var hashClear = _hashClear, hashDelete = _hashDelete, hashGet = _hashGet, hashHas = _hashHas, hashSet = _hashSet;
+function Hash$2(entries) {
+  var index = -1, length = entries == null ? 0 : entries.length;
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+Hash$2.prototype.clear = hashClear;
+Hash$2.prototype["delete"] = hashDelete;
+Hash$2.prototype.get = hashGet;
+Hash$2.prototype.has = hashHas;
+Hash$2.prototype.set = hashSet;
+var _Hash = Hash$2;
+var Hash$1 = _Hash, ListCache$2 = _ListCache, Map$3 = _Map;
+function mapCacheClear$1() {
+  this.size = 0;
+  this.__data__ = {
+    "hash": new Hash$1(),
+    "map": new (Map$3 || ListCache$2)(),
+    "string": new Hash$1()
+  };
+}
+var _mapCacheClear = mapCacheClear$1;
+function isKeyable$1(value) {
+  var type = typeof value;
+  return type == "string" || type == "number" || type == "symbol" || type == "boolean" ? value !== "__proto__" : value === null;
+}
+var _isKeyable = isKeyable$1;
+var isKeyable = _isKeyable;
+function getMapData$4(map, key) {
+  var data = map.__data__;
+  return isKeyable(key) ? data[typeof key == "string" ? "string" : "hash"] : data.map;
+}
+var _getMapData = getMapData$4;
+var getMapData$3 = _getMapData;
+function mapCacheDelete$1(key) {
+  var result = getMapData$3(this, key)["delete"](key);
+  this.size -= result ? 1 : 0;
+  return result;
+}
+var _mapCacheDelete = mapCacheDelete$1;
+var getMapData$2 = _getMapData;
+function mapCacheGet$1(key) {
+  return getMapData$2(this, key).get(key);
+}
+var _mapCacheGet = mapCacheGet$1;
+var getMapData$1 = _getMapData;
+function mapCacheHas$1(key) {
+  return getMapData$1(this, key).has(key);
+}
+var _mapCacheHas = mapCacheHas$1;
+var getMapData = _getMapData;
+function mapCacheSet$1(key, value) {
+  var data = getMapData(this, key), size2 = data.size;
+  data.set(key, value);
+  this.size += data.size == size2 ? 0 : 1;
+  return this;
+}
+var _mapCacheSet = mapCacheSet$1;
+var mapCacheClear = _mapCacheClear, mapCacheDelete = _mapCacheDelete, mapCacheGet = _mapCacheGet, mapCacheHas = _mapCacheHas, mapCacheSet = _mapCacheSet;
+function MapCache$1(entries) {
+  var index = -1, length = entries == null ? 0 : entries.length;
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+MapCache$1.prototype.clear = mapCacheClear;
+MapCache$1.prototype["delete"] = mapCacheDelete;
+MapCache$1.prototype.get = mapCacheGet;
+MapCache$1.prototype.has = mapCacheHas;
+MapCache$1.prototype.set = mapCacheSet;
+var _MapCache = MapCache$1;
+var ListCache$1 = _ListCache, Map$2 = _Map, MapCache = _MapCache;
+var LARGE_ARRAY_SIZE = 200;
+function stackSet$1(key, value) {
+  var data = this.__data__;
+  if (data instanceof ListCache$1) {
+    var pairs = data.__data__;
+    if (!Map$2 || pairs.length < LARGE_ARRAY_SIZE - 1) {
+      pairs.push([key, value]);
+      this.size = ++data.size;
+      return this;
+    }
+    data = this.__data__ = new MapCache(pairs);
+  }
+  data.set(key, value);
+  this.size = data.size;
+  return this;
+}
+var _stackSet = stackSet$1;
+var ListCache = _ListCache, stackClear = _stackClear, stackDelete = _stackDelete, stackGet = _stackGet, stackHas = _stackHas, stackSet = _stackSet;
+function Stack$1(entries) {
+  var data = this.__data__ = new ListCache(entries);
+  this.size = data.size;
+}
+Stack$1.prototype.clear = stackClear;
+Stack$1.prototype["delete"] = stackDelete;
+Stack$1.prototype.get = stackGet;
+Stack$1.prototype.has = stackHas;
+Stack$1.prototype.set = stackSet;
+var _Stack = Stack$1;
+function arrayEach$1(array, iteratee) {
+  var index = -1, length = array == null ? 0 : array.length;
+  while (++index < length) {
+    if (iteratee(array[index], index, array) === false) {
+      break;
+    }
+  }
+  return array;
+}
+var _arrayEach = arrayEach$1;
+var getNative$4 = _getNative;
+var defineProperty$1 = function() {
+  try {
+    var func = getNative$4(Object, "defineProperty");
+    func({}, "", {});
+    return func;
+  } catch (e) {
+  }
+}();
+var _defineProperty = defineProperty$1;
+var defineProperty = _defineProperty;
+function baseAssignValue$2(object, key, value) {
+  if (key == "__proto__" && defineProperty) {
+    defineProperty(object, key, {
+      "configurable": true,
+      "enumerable": true,
+      "value": value,
+      "writable": true
+    });
+  } else {
+    object[key] = value;
+  }
+}
+var _baseAssignValue = baseAssignValue$2;
+var baseAssignValue$1 = _baseAssignValue, eq = eq_1;
+var objectProto$7 = Object.prototype;
+var hasOwnProperty$5 = objectProto$7.hasOwnProperty;
+function assignValue$2(object, key, value) {
+  var objValue = object[key];
+  if (!(hasOwnProperty$5.call(object, key) && eq(objValue, value)) || value === void 0 && !(key in object)) {
+    baseAssignValue$1(object, key, value);
+  }
+}
+var _assignValue = assignValue$2;
+var assignValue$1 = _assignValue, baseAssignValue = _baseAssignValue;
+function copyObject$4(source, props, object, customizer) {
+  var isNew = !object;
+  object || (object = {});
+  var index = -1, length = props.length;
+  while (++index < length) {
+    var key = props[index];
+    var newValue = customizer ? customizer(object[key], source[key], key, object, source) : void 0;
+    if (newValue === void 0) {
+      newValue = source[key];
+    }
+    if (isNew) {
+      baseAssignValue(object, key, newValue);
+    } else {
+      assignValue$1(object, key, newValue);
+    }
+  }
+  return object;
+}
+var _copyObject = copyObject$4;
+function baseTimes$1(n, iteratee) {
+  var index = -1, result = Array(n);
+  while (++index < n) {
+    result[index] = iteratee(index);
+  }
+  return result;
+}
+var _baseTimes = baseTimes$1;
+var baseGetTag$2 = _baseGetTag, isObjectLike$4 = isObjectLike_1;
+var argsTag$2 = "[object Arguments]";
+function baseIsArguments$1(value) {
+  return isObjectLike$4(value) && baseGetTag$2(value) == argsTag$2;
+}
+var _baseIsArguments = baseIsArguments$1;
+var baseIsArguments = _baseIsArguments, isObjectLike$3 = isObjectLike_1;
+var objectProto$6 = Object.prototype;
+var hasOwnProperty$4 = objectProto$6.hasOwnProperty;
+var propertyIsEnumerable$1 = objectProto$6.propertyIsEnumerable;
+var isArguments$1 = baseIsArguments(function() {
+  return arguments;
+}()) ? baseIsArguments : function(value) {
+  return isObjectLike$3(value) && hasOwnProperty$4.call(value, "callee") && !propertyIsEnumerable$1.call(value, "callee");
+};
+var isArguments_1 = isArguments$1;
+var isBuffer$2 = { exports: {} };
+function stubFalse() {
+  return false;
+}
+var stubFalse_1 = stubFalse;
+isBuffer$2.exports;
+(function(module, exports) {
+  var root2 = _root, stubFalse2 = stubFalse_1;
+  var freeExports = exports && !exports.nodeType && exports;
+  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var Buffer2 = moduleExports ? root2.Buffer : void 0;
+  var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
+  var isBuffer2 = nativeIsBuffer || stubFalse2;
+  module.exports = isBuffer2;
+})(isBuffer$2, isBuffer$2.exports);
+var isBufferExports = isBuffer$2.exports;
+var MAX_SAFE_INTEGER$1 = 9007199254740991;
+var reIsUint = /^(?:0|[1-9]\d*)$/;
+function isIndex$1(value, length) {
+  var type = typeof value;
+  length = length == null ? MAX_SAFE_INTEGER$1 : length;
+  return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
+}
+var _isIndex = isIndex$1;
+var MAX_SAFE_INTEGER = 9007199254740991;
+function isLength$2(value) {
+  return typeof value == "number" && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+}
+var isLength_1 = isLength$2;
+var baseGetTag$1 = _baseGetTag, isLength$1 = isLength_1, isObjectLike$2 = isObjectLike_1;
+var argsTag$1 = "[object Arguments]", arrayTag$1 = "[object Array]", boolTag$2 = "[object Boolean]", dateTag$2 = "[object Date]", errorTag$1 = "[object Error]", funcTag$1 = "[object Function]", mapTag$4 = "[object Map]", numberTag$2 = "[object Number]", objectTag$2 = "[object Object]", regexpTag$2 = "[object RegExp]", setTag$4 = "[object Set]", stringTag$2 = "[object String]", weakMapTag$2 = "[object WeakMap]";
+var arrayBufferTag$2 = "[object ArrayBuffer]", dataViewTag$3 = "[object DataView]", float32Tag$2 = "[object Float32Array]", float64Tag$2 = "[object Float64Array]", int8Tag$2 = "[object Int8Array]", int16Tag$2 = "[object Int16Array]", int32Tag$2 = "[object Int32Array]", uint8Tag$2 = "[object Uint8Array]", uint8ClampedTag$2 = "[object Uint8ClampedArray]", uint16Tag$2 = "[object Uint16Array]", uint32Tag$2 = "[object Uint32Array]";
+var typedArrayTags = {};
+typedArrayTags[float32Tag$2] = typedArrayTags[float64Tag$2] = typedArrayTags[int8Tag$2] = typedArrayTags[int16Tag$2] = typedArrayTags[int32Tag$2] = typedArrayTags[uint8Tag$2] = typedArrayTags[uint8ClampedTag$2] = typedArrayTags[uint16Tag$2] = typedArrayTags[uint32Tag$2] = true;
+typedArrayTags[argsTag$1] = typedArrayTags[arrayTag$1] = typedArrayTags[arrayBufferTag$2] = typedArrayTags[boolTag$2] = typedArrayTags[dataViewTag$3] = typedArrayTags[dateTag$2] = typedArrayTags[errorTag$1] = typedArrayTags[funcTag$1] = typedArrayTags[mapTag$4] = typedArrayTags[numberTag$2] = typedArrayTags[objectTag$2] = typedArrayTags[regexpTag$2] = typedArrayTags[setTag$4] = typedArrayTags[stringTag$2] = typedArrayTags[weakMapTag$2] = false;
+function baseIsTypedArray$1(value) {
+  return isObjectLike$2(value) && isLength$1(value.length) && !!typedArrayTags[baseGetTag$1(value)];
+}
+var _baseIsTypedArray = baseIsTypedArray$1;
+var baseIsTypedArray = _baseIsTypedArray, baseUnary$2 = _baseUnary, nodeUtil$2 = _nodeUtilExports;
+var nodeIsTypedArray = nodeUtil$2 && nodeUtil$2.isTypedArray;
+var isTypedArray$1 = nodeIsTypedArray ? baseUnary$2(nodeIsTypedArray) : baseIsTypedArray;
+var isTypedArray_1 = isTypedArray$1;
+var baseTimes = _baseTimes, isArguments = isArguments_1, isArray$2 = isArray_1, isBuffer$1 = isBufferExports, isIndex = _isIndex, isTypedArray = isTypedArray_1;
+var objectProto$5 = Object.prototype;
+var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
+function arrayLikeKeys$2(value, inherited) {
+  var isArr = isArray$2(value), isArg = !isArr && isArguments(value), isBuff = !isArr && !isArg && isBuffer$1(value), isType = !isArr && !isArg && !isBuff && isTypedArray(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes(value.length, String) : [], length = result.length;
+  for (var key in value) {
+    if ((inherited || hasOwnProperty$3.call(value, key)) && !(skipIndexes && // Safari 9 has enumerable `arguments.length` in strict mode.
+    (key == "length" || // Node.js 0.10 has enumerable non-index properties on buffers.
+    isBuff && (key == "offset" || key == "parent") || // PhantomJS 2 has enumerable non-index properties on typed arrays.
+    isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || // Skip index properties.
+    isIndex(key, length)))) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+var _arrayLikeKeys = arrayLikeKeys$2;
+var objectProto$4 = Object.prototype;
+function isPrototype$3(value) {
+  var Ctor = value && value.constructor, proto = typeof Ctor == "function" && Ctor.prototype || objectProto$4;
+  return value === proto;
+}
+var _isPrototype = isPrototype$3;
+function overArg$2(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+var _overArg = overArg$2;
+var overArg$1 = _overArg;
+var nativeKeys$1 = overArg$1(Object.keys, Object);
+var _nativeKeys = nativeKeys$1;
+var isPrototype$2 = _isPrototype, nativeKeys = _nativeKeys;
+var objectProto$3 = Object.prototype;
+var hasOwnProperty$2 = objectProto$3.hasOwnProperty;
+function baseKeys$1(object) {
+  if (!isPrototype$2(object)) {
+    return nativeKeys(object);
+  }
+  var result = [];
+  for (var key in Object(object)) {
+    if (hasOwnProperty$2.call(object, key) && key != "constructor") {
+      result.push(key);
+    }
+  }
+  return result;
+}
+var _baseKeys = baseKeys$1;
+var isFunction = isFunction_1, isLength = isLength_1;
+function isArrayLike$2(value) {
+  return value != null && isLength(value.length) && !isFunction(value);
+}
+var isArrayLike_1 = isArrayLike$2;
+var arrayLikeKeys$1 = _arrayLikeKeys, baseKeys = _baseKeys, isArrayLike$1 = isArrayLike_1;
+function keys$3(object) {
+  return isArrayLike$1(object) ? arrayLikeKeys$1(object) : baseKeys(object);
+}
+var keys_1 = keys$3;
+var copyObject$3 = _copyObject, keys$2 = keys_1;
+function baseAssign$1(object, source) {
+  return object && copyObject$3(source, keys$2(source), object);
+}
+var _baseAssign = baseAssign$1;
+function nativeKeysIn$1(object) {
+  var result = [];
+  if (object != null) {
+    for (var key in Object(object)) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+var _nativeKeysIn = nativeKeysIn$1;
+var isObject$2 = isObject_1, isPrototype$1 = _isPrototype, nativeKeysIn = _nativeKeysIn;
+var objectProto$2 = Object.prototype;
+var hasOwnProperty$1 = objectProto$2.hasOwnProperty;
+function baseKeysIn$1(object) {
+  if (!isObject$2(object)) {
+    return nativeKeysIn(object);
+  }
+  var isProto = isPrototype$1(object), result = [];
+  for (var key in object) {
+    if (!(key == "constructor" && (isProto || !hasOwnProperty$1.call(object, key)))) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+var _baseKeysIn = baseKeysIn$1;
+var arrayLikeKeys = _arrayLikeKeys, baseKeysIn = _baseKeysIn, isArrayLike = isArrayLike_1;
+function keysIn$3(object) {
+  return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
+}
+var keysIn_1 = keysIn$3;
+var copyObject$2 = _copyObject, keysIn$2 = keysIn_1;
+function baseAssignIn$1(object, source) {
+  return object && copyObject$2(source, keysIn$2(source), object);
+}
+var _baseAssignIn = baseAssignIn$1;
+var _cloneBuffer = { exports: {} };
+_cloneBuffer.exports;
+(function(module, exports) {
+  var root2 = _root;
+  var freeExports = exports && !exports.nodeType && exports;
+  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var Buffer2 = moduleExports ? root2.Buffer : void 0, allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0;
+  function cloneBuffer2(buffer, isDeep) {
+    if (isDeep) {
+      return buffer.slice();
+    }
+    var length = buffer.length, result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+    buffer.copy(result);
+    return result;
+  }
+  module.exports = cloneBuffer2;
+})(_cloneBuffer, _cloneBuffer.exports);
+var _cloneBufferExports = _cloneBuffer.exports;
+function copyArray$1(source, array) {
+  var index = -1, length = source.length;
+  array || (array = Array(length));
+  while (++index < length) {
+    array[index] = source[index];
+  }
+  return array;
+}
+var _copyArray = copyArray$1;
+function arrayFilter$1(array, predicate) {
+  var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
+  while (++index < length) {
+    var value = array[index];
+    if (predicate(value, index, array)) {
+      result[resIndex++] = value;
+    }
+  }
+  return result;
+}
+var _arrayFilter = arrayFilter$1;
+function stubArray$2() {
+  return [];
+}
+var stubArray_1 = stubArray$2;
+var arrayFilter = _arrayFilter, stubArray$1 = stubArray_1;
+var objectProto$1 = Object.prototype;
+var propertyIsEnumerable = objectProto$1.propertyIsEnumerable;
+var nativeGetSymbols$1 = Object.getOwnPropertySymbols;
+var getSymbols$3 = !nativeGetSymbols$1 ? stubArray$1 : function(object) {
+  if (object == null) {
+    return [];
+  }
+  object = Object(object);
+  return arrayFilter(nativeGetSymbols$1(object), function(symbol) {
+    return propertyIsEnumerable.call(object, symbol);
+  });
+};
+var _getSymbols = getSymbols$3;
+var copyObject$1 = _copyObject, getSymbols$2 = _getSymbols;
+function copySymbols$1(source, object) {
+  return copyObject$1(source, getSymbols$2(source), object);
+}
+var _copySymbols = copySymbols$1;
+function arrayPush$2(array, values) {
+  var index = -1, length = values.length, offset = array.length;
+  while (++index < length) {
+    array[offset + index] = values[index];
+  }
+  return array;
+}
+var _arrayPush = arrayPush$2;
+var overArg = _overArg;
+var getPrototype$2 = overArg(Object.getPrototypeOf, Object);
+var _getPrototype = getPrototype$2;
+var arrayPush$1 = _arrayPush, getPrototype$1 = _getPrototype, getSymbols$1 = _getSymbols, stubArray = stubArray_1;
+var nativeGetSymbols = Object.getOwnPropertySymbols;
+var getSymbolsIn$2 = !nativeGetSymbols ? stubArray : function(object) {
+  var result = [];
+  while (object) {
+    arrayPush$1(result, getSymbols$1(object));
+    object = getPrototype$1(object);
+  }
+  return result;
+};
+var _getSymbolsIn = getSymbolsIn$2;
+var copyObject = _copyObject, getSymbolsIn$1 = _getSymbolsIn;
+function copySymbolsIn$1(source, object) {
+  return copyObject(source, getSymbolsIn$1(source), object);
+}
+var _copySymbolsIn = copySymbolsIn$1;
+var arrayPush = _arrayPush, isArray$1 = isArray_1;
+function baseGetAllKeys$2(object, keysFunc, symbolsFunc) {
+  var result = keysFunc(object);
+  return isArray$1(object) ? result : arrayPush(result, symbolsFunc(object));
+}
+var _baseGetAllKeys = baseGetAllKeys$2;
+var baseGetAllKeys$1 = _baseGetAllKeys, getSymbols = _getSymbols, keys$1 = keys_1;
+function getAllKeys$1(object) {
+  return baseGetAllKeys$1(object, keys$1, getSymbols);
+}
+var _getAllKeys = getAllKeys$1;
+var baseGetAllKeys = _baseGetAllKeys, getSymbolsIn = _getSymbolsIn, keysIn$1 = keysIn_1;
+function getAllKeysIn$1(object) {
+  return baseGetAllKeys(object, keysIn$1, getSymbolsIn);
+}
+var _getAllKeysIn = getAllKeysIn$1;
+var getNative$3 = _getNative, root$4 = _root;
+var DataView$2 = getNative$3(root$4, "DataView");
+var _DataView = DataView$2;
+var getNative$2 = _getNative, root$3 = _root;
+var Promise$2 = getNative$2(root$3, "Promise");
+var _Promise = Promise$2;
+var getNative$1 = _getNative, root$2 = _root;
+var Set$2 = getNative$1(root$2, "Set");
+var _Set = Set$2;
+var getNative = _getNative, root$1 = _root;
+var WeakMap$2 = getNative(root$1, "WeakMap");
+var _WeakMap = WeakMap$2;
+var DataView$1 = _DataView, Map$1 = _Map, Promise$1 = _Promise, Set$1 = _Set, WeakMap$1 = _WeakMap, baseGetTag = _baseGetTag, toSource = _toSource;
+var mapTag$3 = "[object Map]", objectTag$1 = "[object Object]", promiseTag = "[object Promise]", setTag$3 = "[object Set]", weakMapTag$1 = "[object WeakMap]";
+var dataViewTag$2 = "[object DataView]";
+var dataViewCtorString = toSource(DataView$1), mapCtorString = toSource(Map$1), promiseCtorString = toSource(Promise$1), setCtorString = toSource(Set$1), weakMapCtorString = toSource(WeakMap$1);
+var getTag$3 = baseGetTag;
+if (DataView$1 && getTag$3(new DataView$1(new ArrayBuffer(1))) != dataViewTag$2 || Map$1 && getTag$3(new Map$1()) != mapTag$3 || Promise$1 && getTag$3(Promise$1.resolve()) != promiseTag || Set$1 && getTag$3(new Set$1()) != setTag$3 || WeakMap$1 && getTag$3(new WeakMap$1()) != weakMapTag$1) {
+  getTag$3 = function(value) {
+    var result = baseGetTag(value), Ctor = result == objectTag$1 ? value.constructor : void 0, ctorString = Ctor ? toSource(Ctor) : "";
+    if (ctorString) {
+      switch (ctorString) {
+        case dataViewCtorString:
+          return dataViewTag$2;
+        case mapCtorString:
+          return mapTag$3;
+        case promiseCtorString:
+          return promiseTag;
+        case setCtorString:
+          return setTag$3;
+        case weakMapCtorString:
+          return weakMapTag$1;
+      }
+    }
+    return result;
+  };
+}
+var _getTag = getTag$3;
+var objectProto = Object.prototype;
+var hasOwnProperty = objectProto.hasOwnProperty;
+function initCloneArray$1(array) {
+  var length = array.length, result = new array.constructor(length);
+  if (length && typeof array[0] == "string" && hasOwnProperty.call(array, "index")) {
+    result.index = array.index;
+    result.input = array.input;
+  }
+  return result;
+}
+var _initCloneArray = initCloneArray$1;
+var root = _root;
+var Uint8Array$2 = root.Uint8Array;
+var _Uint8Array = Uint8Array$2;
+var Uint8Array$1 = _Uint8Array;
+function cloneArrayBuffer$3(arrayBuffer) {
+  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+  new Uint8Array$1(result).set(new Uint8Array$1(arrayBuffer));
+  return result;
+}
+var _cloneArrayBuffer = cloneArrayBuffer$3;
+var cloneArrayBuffer$2 = _cloneArrayBuffer;
+function cloneDataView$1(dataView, isDeep) {
+  var buffer = isDeep ? cloneArrayBuffer$2(dataView.buffer) : dataView.buffer;
+  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
+}
+var _cloneDataView = cloneDataView$1;
+var reFlags = /\w*$/;
+function cloneRegExp$1(regexp) {
+  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
+  result.lastIndex = regexp.lastIndex;
+  return result;
+}
+var _cloneRegExp = cloneRegExp$1;
+var Symbol$1 = _Symbol;
+var symbolProto = Symbol$1 ? Symbol$1.prototype : void 0, symbolValueOf = symbolProto ? symbolProto.valueOf : void 0;
+function cloneSymbol$1(symbol) {
+  return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
+}
+var _cloneSymbol = cloneSymbol$1;
+var cloneArrayBuffer$1 = _cloneArrayBuffer;
+function cloneTypedArray$1(typedArray, isDeep) {
+  var buffer = isDeep ? cloneArrayBuffer$1(typedArray.buffer) : typedArray.buffer;
+  return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+}
+var _cloneTypedArray = cloneTypedArray$1;
+var cloneArrayBuffer = _cloneArrayBuffer, cloneDataView = _cloneDataView, cloneRegExp = _cloneRegExp, cloneSymbol = _cloneSymbol, cloneTypedArray = _cloneTypedArray;
+var boolTag$1 = "[object Boolean]", dateTag$1 = "[object Date]", mapTag$2 = "[object Map]", numberTag$1 = "[object Number]", regexpTag$1 = "[object RegExp]", setTag$2 = "[object Set]", stringTag$1 = "[object String]", symbolTag$1 = "[object Symbol]";
+var arrayBufferTag$1 = "[object ArrayBuffer]", dataViewTag$1 = "[object DataView]", float32Tag$1 = "[object Float32Array]", float64Tag$1 = "[object Float64Array]", int8Tag$1 = "[object Int8Array]", int16Tag$1 = "[object Int16Array]", int32Tag$1 = "[object Int32Array]", uint8Tag$1 = "[object Uint8Array]", uint8ClampedTag$1 = "[object Uint8ClampedArray]", uint16Tag$1 = "[object Uint16Array]", uint32Tag$1 = "[object Uint32Array]";
+function initCloneByTag$1(object, tag, isDeep) {
+  var Ctor = object.constructor;
+  switch (tag) {
+    case arrayBufferTag$1:
+      return cloneArrayBuffer(object);
+    case boolTag$1:
+    case dateTag$1:
+      return new Ctor(+object);
+    case dataViewTag$1:
+      return cloneDataView(object, isDeep);
+    case float32Tag$1:
+    case float64Tag$1:
+    case int8Tag$1:
+    case int16Tag$1:
+    case int32Tag$1:
+    case uint8Tag$1:
+    case uint8ClampedTag$1:
+    case uint16Tag$1:
+    case uint32Tag$1:
+      return cloneTypedArray(object, isDeep);
+    case mapTag$2:
+      return new Ctor();
+    case numberTag$1:
+    case stringTag$1:
+      return new Ctor(object);
+    case regexpTag$1:
+      return cloneRegExp(object);
+    case setTag$2:
+      return new Ctor();
+    case symbolTag$1:
+      return cloneSymbol(object);
+  }
+}
+var _initCloneByTag = initCloneByTag$1;
+var isObject$1 = isObject_1;
+var objectCreate = Object.create;
+var baseCreate$1 = function() {
+  function object() {
+  }
+  return function(proto) {
+    if (!isObject$1(proto)) {
+      return {};
+    }
+    if (objectCreate) {
+      return objectCreate(proto);
+    }
+    object.prototype = proto;
+    var result = new object();
+    object.prototype = void 0;
+    return result;
+  };
+}();
+var _baseCreate = baseCreate$1;
+var baseCreate = _baseCreate, getPrototype = _getPrototype, isPrototype = _isPrototype;
+function initCloneObject$1(object) {
+  return typeof object.constructor == "function" && !isPrototype(object) ? baseCreate(getPrototype(object)) : {};
+}
+var _initCloneObject = initCloneObject$1;
+var getTag$2 = _getTag, isObjectLike$1 = isObjectLike_1;
+var mapTag$1 = "[object Map]";
+function baseIsMap$1(value) {
+  return isObjectLike$1(value) && getTag$2(value) == mapTag$1;
+}
+var _baseIsMap = baseIsMap$1;
+var baseIsMap = _baseIsMap, baseUnary$1 = _baseUnary, nodeUtil$1 = _nodeUtilExports;
+var nodeIsMap = nodeUtil$1 && nodeUtil$1.isMap;
+var isMap$1 = nodeIsMap ? baseUnary$1(nodeIsMap) : baseIsMap;
+var isMap_1 = isMap$1;
+var getTag$1 = _getTag, isObjectLike = isObjectLike_1;
+var setTag$1 = "[object Set]";
+function baseIsSet$1(value) {
+  return isObjectLike(value) && getTag$1(value) == setTag$1;
+}
+var _baseIsSet = baseIsSet$1;
+var baseIsSet = _baseIsSet, baseUnary = _baseUnary, nodeUtil = _nodeUtilExports;
+var nodeIsSet = nodeUtil && nodeUtil.isSet;
+var isSet$1 = nodeIsSet ? baseUnary(nodeIsSet) : baseIsSet;
+var isSet_1 = isSet$1;
+var Stack = _Stack, arrayEach = _arrayEach, assignValue = _assignValue, baseAssign = _baseAssign, baseAssignIn = _baseAssignIn, cloneBuffer = _cloneBufferExports, copyArray = _copyArray, copySymbols = _copySymbols, copySymbolsIn = _copySymbolsIn, getAllKeys = _getAllKeys, getAllKeysIn = _getAllKeysIn, getTag = _getTag, initCloneArray = _initCloneArray, initCloneByTag = _initCloneByTag, initCloneObject = _initCloneObject, isArray = isArray_1, isBuffer = isBufferExports, isMap = isMap_1, isObject = isObject_1, isSet = isSet_1, keys = keys_1, keysIn = keysIn_1;
+var CLONE_DEEP_FLAG$1 = 1, CLONE_FLAT_FLAG = 2, CLONE_SYMBOLS_FLAG$1 = 4;
+var argsTag = "[object Arguments]", arrayTag = "[object Array]", boolTag = "[object Boolean]", dateTag = "[object Date]", errorTag = "[object Error]", funcTag = "[object Function]", genTag = "[object GeneratorFunction]", mapTag = "[object Map]", numberTag = "[object Number]", objectTag = "[object Object]", regexpTag = "[object RegExp]", setTag = "[object Set]", stringTag = "[object String]", symbolTag = "[object Symbol]", weakMapTag = "[object WeakMap]";
+var arrayBufferTag = "[object ArrayBuffer]", dataViewTag = "[object DataView]", float32Tag = "[object Float32Array]", float64Tag = "[object Float64Array]", int8Tag = "[object Int8Array]", int16Tag = "[object Int16Array]", int32Tag = "[object Int32Array]", uint8Tag = "[object Uint8Array]", uint8ClampedTag = "[object Uint8ClampedArray]", uint16Tag = "[object Uint16Array]", uint32Tag = "[object Uint32Array]";
+var cloneableTags = {};
+cloneableTags[argsTag] = cloneableTags[arrayTag] = cloneableTags[arrayBufferTag] = cloneableTags[dataViewTag] = cloneableTags[boolTag] = cloneableTags[dateTag] = cloneableTags[float32Tag] = cloneableTags[float64Tag] = cloneableTags[int8Tag] = cloneableTags[int16Tag] = cloneableTags[int32Tag] = cloneableTags[mapTag] = cloneableTags[numberTag] = cloneableTags[objectTag] = cloneableTags[regexpTag] = cloneableTags[setTag] = cloneableTags[stringTag] = cloneableTags[symbolTag] = cloneableTags[uint8Tag] = cloneableTags[uint8ClampedTag] = cloneableTags[uint16Tag] = cloneableTags[uint32Tag] = true;
+cloneableTags[errorTag] = cloneableTags[funcTag] = cloneableTags[weakMapTag] = false;
+function baseClone$1(value, bitmask, customizer, key, object, stack2) {
+  var result, isDeep = bitmask & CLONE_DEEP_FLAG$1, isFlat = bitmask & CLONE_FLAT_FLAG, isFull = bitmask & CLONE_SYMBOLS_FLAG$1;
+  if (customizer) {
+    result = object ? customizer(value, key, object, stack2) : customizer(value);
+  }
+  if (result !== void 0) {
+    return result;
+  }
+  if (!isObject(value)) {
+    return value;
+  }
+  var isArr = isArray(value);
+  if (isArr) {
+    result = initCloneArray(value);
+    if (!isDeep) {
+      return copyArray(value, result);
+    }
+  } else {
+    var tag = getTag(value), isFunc = tag == funcTag || tag == genTag;
+    if (isBuffer(value)) {
+      return cloneBuffer(value, isDeep);
+    }
+    if (tag == objectTag || tag == argsTag || isFunc && !object) {
+      result = isFlat || isFunc ? {} : initCloneObject(value);
+      if (!isDeep) {
+        return isFlat ? copySymbolsIn(value, baseAssignIn(result, value)) : copySymbols(value, baseAssign(result, value));
+      }
+    } else {
+      if (!cloneableTags[tag]) {
+        return object ? value : {};
+      }
+      result = initCloneByTag(value, tag, isDeep);
+    }
+  }
+  stack2 || (stack2 = new Stack());
+  var stacked = stack2.get(value);
+  if (stacked) {
+    return stacked;
+  }
+  stack2.set(value, result);
+  if (isSet(value)) {
+    value.forEach(function(subValue) {
+      result.add(baseClone$1(subValue, bitmask, customizer, subValue, value, stack2));
+    });
+  } else if (isMap(value)) {
+    value.forEach(function(subValue, key2) {
+      result.set(key2, baseClone$1(subValue, bitmask, customizer, key2, value, stack2));
+    });
+  }
+  var keysFunc = isFull ? isFlat ? getAllKeysIn : getAllKeys : isFlat ? keysIn : keys;
+  var props = isArr ? void 0 : keysFunc(value);
+  arrayEach(props || value, function(subValue, key2) {
+    if (props) {
+      key2 = subValue;
+      subValue = value[key2];
+    }
+    assignValue(result, key2, baseClone$1(subValue, bitmask, customizer, key2, value, stack2));
+  });
+  return result;
+}
+var _baseClone = baseClone$1;
+var baseClone = _baseClone;
+var CLONE_DEEP_FLAG = 1, CLONE_SYMBOLS_FLAG = 4;
+function cloneDeep(value) {
+  return baseClone(value, CLONE_DEEP_FLAG | CLONE_SYMBOLS_FLAG);
+}
+var cloneDeep_1 = cloneDeep;
+const cloneDeep$1 = /* @__PURE__ */ getDefaultExportFromCjs(cloneDeep_1);
+const DEFAULT_RELAY = "wss://nos.lol";
+const DEFAULT_RELAYS = [
+  "wss://nos.lol",
+  // USA
+  "wss://relay.damus.io",
+  // Cannada
+  "wss://relay.snort.social",
+  // France
+  "wss://relay.nostr.band",
+  // Finland
+  "wss://eden.nostr.land"
+  // USA
+];
+const fallbackRelays = [
+  "wss://nos.lol",
+  // USA
+  "wss://relay.damus.io",
+  // Cannada
+  "wss://relay.nostr.band",
+  // Finland
+  "wss://relay.snort.social",
+  // France
+  "wss://relay.primal.net",
+  // Cannada
+  "wss://eden.nostr.land",
+  // USA
+  "wss://nostr.wine",
+  // USA
+  "wss://offchain.pub",
+  // USA
+  "wss://relay.nostr.bg",
+  // Germany
+  "wss://relay.mostr.pub"
+  // Cannada
+];
+const DEFAULT_EVENTS_COUNT = 20;
+const POST_LINES_COUNT = 15;
+const POST_TEXT_LENGTH = 500;
+const getReferenceName = (reference) => {
+  const details = reference.profile_details;
+  const npub = getNpub(reference.profile.pubkey);
+  const name = details.name || details.username || details.display_name || `${npub.slice(0, 15)}...`;
+  return `@${name}`;
+};
+const getPartsContentLength = (parts) => {
+  return parts.reduce((acc, part) => acc + part.value.length, 0);
+};
+const getPartsContentLengthByText = (parts) => {
+  return parts.reduce((acc, part) => acc + part.textValue.length, 0);
+};
+const getPartsContentLines = (parts) => {
+  if (!parts.length)
+    return 0;
+  return getTextLines(parts.map((part) => part.value).join("")).length;
+};
+const cutPartText = (rawText, parts) => {
+  const lengthLimit = POST_TEXT_LENGTH - getPartsContentLength(parts);
+  const linesLimit = POST_LINES_COUNT - getPartsContentLines(parts);
+  if (lengthLimit < 0 || linesLimit < 0)
+    return "";
+  return cutTextByLengthAndLine(rawText, lengthLimit, linesLimit);
+};
+const getSortedReferences = (event) => {
+  const references = cloneDeep$1(event.references);
+  const { content } = event;
+  if (!references)
+    return [];
+  const cachedIndexes = [];
+  references.forEach((ref2) => {
+    const { text } = ref2;
+    let index = content.indexOf(text);
+    while (cachedIndexes.includes(index) && index !== -1) {
+      index = content.indexOf(text, index + text.length);
+    }
+    ref2.textIndex = index;
+    cachedIndexes.push(index);
+  });
+  references.sort((a, b) => {
+    return a.textIndex - b.textIndex;
+  });
+  return references;
+};
+const splitEventContentByParts = (event, toSlice) => {
+  const parts = [];
+  let eventRestText = event.content;
+  try {
+    getSortedReferences(event).forEach((reference) => {
+      const refIndex = eventRestText.indexOf(reference.text);
+      const beforeReferenceText = eventRestText.slice(0, refIndex);
+      const partValue2 = toSlice ? cutPartText(beforeReferenceText, parts) : beforeReferenceText;
+      parts.push({ type: "text", value: partValue2, textValue: partValue2 });
+      if (toSlice && partValue2 < beforeReferenceText) {
+        throw new Error("Event content reached length limit");
+      }
+      const name = getReferenceName(reference);
+      const npub = getNpub(reference.profile.pubkey);
+      if (toSlice && name.length >= POST_TEXT_LENGTH) {
+        throw new Error("Event content reached length limit");
+      }
+      parts.push({ type: "profile", value: name, textValue: reference.text, npub });
+      eventRestText = eventRestText.slice(refIndex + reference.text.length);
+    });
+  } catch (e) {
+    return parts;
+  }
+  const partValue = toSlice ? cutPartText(eventRestText, parts) : eventRestText;
+  parts.push({ type: "text", value: partValue, textValue: partValue });
+  return parts;
+};
+const _hoisted_1$C = { class: "event-content" };
+const _hoisted_2$x = { key: 0 };
+const _hoisted_3$r = { key: 1 };
+const _hoisted_4$m = ["onClick"];
+const _hoisted_5$g = { key: 0 };
+const _sfc_main$H = /* @__PURE__ */ defineComponent({
   __name: "EventText",
   props: {
     event: {},
-    slice: {}
+    slice: { type: Boolean }
   },
   setup(__props) {
     const props = __props;
@@ -14224,80 +15550,15 @@ const _sfc_main$G = /* @__PURE__ */ defineComponent({
     const npubStore = useNpub();
     const userStore = useUser();
     const contentParts = ref([]);
+    const sliceContent = ref(props.slice ?? true);
+    const toggleMore = ref(false);
     onMounted(() => {
-      contentParts.value = updateContentParts(props.event, props.slice);
+      const parts = splitEventContentByParts(props.event, sliceContent.value);
+      contentParts.value = parts;
+      toggleMore.value = isShowMoreBtnNeeded(parts);
     });
-    onBeforeUpdate(() => {
-      contentParts.value = updateContentParts(props.event, props.slice);
-    });
-    const sliceParts = (parts, sliceCount) => {
-      let slicedParts = [];
-      let str = "";
-      for (const p2 of parts) {
-        const startLength = str.length;
-        str += p2.value;
-        if (str.length <= sliceCount) {
-          slicedParts.push(p2);
-        } else {
-          if (p2.type === "text") {
-            const difference = sliceCount - startLength;
-            p2.value = p2.value.slice(0, difference);
-          }
-          slicedParts.push(p2);
-          slicedParts.push({ type: "text", value: "..." });
-          break;
-        }
-      }
-      return slicedParts;
-    };
-    const updateContentParts = (event, sliceContent) => {
-      const rawContent = event.content;
-      const references = event.references;
-      let parts = [];
-      if (!(references == null ? void 0 : references.length)) {
-        parts.push({ type: "text", value: rawContent });
-        return parts;
-      }
-      const cachedIndexes = [];
-      references.forEach((ref2) => {
-        let index = rawContent.indexOf(ref2.text);
-        if (cachedIndexes.includes(index)) {
-          for (const ci of cachedIndexes) {
-            if (!cachedIndexes.includes(index))
-              break;
-            index = rawContent.indexOf(ref2.text, index + ref2.text.length);
-          }
-        }
-        ref2.textIndex = index;
-        cachedIndexes.push(index);
-      });
-      references.sort((a, b) => {
-        return a.textIndex - b.textIndex;
-      });
-      let currentTextPart = rawContent;
-      references.forEach((ref2) => {
-        const currIndex = currentTextPart.indexOf(ref2.text);
-        const part1 = currentTextPart.slice(0, currIndex);
-        const part2 = currentTextPart.slice(currIndex + ref2.text.length);
-        const name = getReferenceName(ref2);
-        parts.push({ type: "text", value: part1 });
-        parts.push({ type: "profile", value: name, npub: getNpub(ref2.profile.pubkey) });
-        currentTextPart = part2;
-      });
-      parts.push({ type: "text", value: currentTextPart });
-      if (sliceContent) {
-        parts = sliceParts(parts, sliceContent);
-      }
-      return parts;
-    };
-    const getReferenceName = (reference) => {
-      const details = reference.profile_details;
-      const npub = getNpub(reference.profile.pubkey);
-      const name = details.name || details.username || details.display_name || `${npub.slice(0, 15)}...`;
-      return `@${name}`;
-    };
-    const getNpub = (pubkey) => {
-      return nip19_exports.npubEncode(pubkey);
+    const isShowMoreBtnNeeded = (parts) => {
+      return props.slice && props.event.content.length > getPartsContentLengthByText(parts);
     };
     const handleClickMention = (mentionNpub) => {
       if (!mentionNpub)
@@ -14306,27 +15567,39 @@ const _sfc_main$G = /* @__PURE__ */ defineComponent({
       userStore.updateRoutingStatus(true);
       router2.push({ path: `/user/${mentionNpub}` });
     };
+    const toggleShowMore = () => {
+      sliceContent.value = !sliceContent.value;
+      contentParts.value = splitEventContentByParts(props.event, sliceContent.value);
+    };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$B, [
-        (openBlock(true), createElementBlock(Fragment, null, renderList(contentParts.value, (part) => {
-          return openBlock(), createElementBlock("span", null, [
-            part.type === "text" ? (openBlock(), createElementBlock("span", _hoisted_2$w, toDisplayString(part.value), 1)) : createCommentVNode("", true),
-            part.type === "profile" ? (openBlock(), createElementBlock("span", _hoisted_3$q, [
-              createBaseVNode("a", {
-                onClick: withModifiers(() => handleClickMention(part.npub), ["prevent"]),
-                href: "#"
-              }, toDisplayString(part.value), 9, _hoisted_4$l)
-            ])) : createCommentVNode("", true)
-          ]);
-        }), 256))
-      ]);
+      return openBlock(), createElementBlock(Fragment, null, [
+        createBaseVNode("div", _hoisted_1$C, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(contentParts.value, (part, i2) => {
+            return openBlock(), createElementBlock("span", { key: i2 }, [
+              part.type === "text" ? (openBlock(), createElementBlock("span", _hoisted_2$x, toDisplayString(part.value), 1)) : createCommentVNode("", true),
+              part.type === "profile" ? (openBlock(), createElementBlock("span", _hoisted_3$r, [
+                createBaseVNode("a", {
+                  onClick: withModifiers(() => handleClickMention(part.npub), ["prevent"]),
+                  href: "#"
+                }, toDisplayString(part.value), 9, _hoisted_4$m)
+              ])) : createCommentVNode("", true)
+            ]);
+          }), 128))
+        ]),
+        toggleMore.value ? (openBlock(), createElementBlock("div", _hoisted_5$g, [
+          createBaseVNode("span", {
+            class: "show-more",
+            onClick: toggleShowMore
+          }, " Show " + toDisplayString(sliceContent.value ? "more" : "less"), 1)
+        ])) : createCommentVNode("", true)
+      ], 64);
     };
   }
 });
-const EventText_vue_vue_type_style_index_0_scoped_2c0eedfd_lang = "";
-const EventText = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["__scopeId", "data-v-2c0eedfd"]]);
-const _hoisted_1$A = ["name", "disabled", "rows", "placeholder"];
-const _sfc_main$F = /* @__PURE__ */ defineComponent({
+const EventText_vue_vue_type_style_index_0_scoped_dd830508_lang = "";
+const EventText = /* @__PURE__ */ _export_sfc(_sfc_main$H, [["__scopeId", "data-v-dd830508"]]);
+const _hoisted_1$B = ["name", "disabled", "rows", "placeholder"];
+const _sfc_main$G = /* @__PURE__ */ defineComponent({
   __name: "Textarea",
   props: {
     rows: {},
@@ -14366,14 +15639,14 @@ const _sfc_main$F = /* @__PURE__ */ defineComponent({
         onFocus: handleFocus,
         onBlur: handleBlur,
         class: normalizeClass([{ json: _ctx.isJson, "no-border": _ctx.noBorder }])
-      }, null, 42, _hoisted_1$A)), [
+      }, null, 42, _hoisted_1$B)), [
         [vModelText, text.value]
       ]);
     };
   }
 });
 const Textarea_vue_vue_type_style_index_0_scoped_0b1d3662_lang = "";
-const Textarea = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["__scopeId", "data-v-0b1d3662"]]);
+const Textarea = /* @__PURE__ */ _export_sfc(_sfc_main$G, [["__scopeId", "data-v-0b1d3662"]]);
 function isBytes(a) {
   return a instanceof Uint8Array || a != null && typeof a === "object" && a.constructor.name === "Uint8Array";
 }
@@ -14467,6 +15740,11 @@ const useNsec = defineStore("nsec", () => {
   const nsec = ref("");
   const rememberMe = ref(false);
   const cachedNsec = ref("");
+  function clear2() {
+    updateNsec("");
+    updateCachedNsec("");
+    setRememberMe(false);
+  }
   function updateNsec(value) {
     nsec.value = value;
   }
@@ -14542,7 +15820,8 @@ const useNsec = defineStore("nsec", () => {
     getPrivkeyBytes,
     getPrivkeyHex,
     getPrivkey,
-    isNsecValidTemp
+    isNsecValidTemp,
+    clear: clear2
   };
 });
 const useImages = defineStore("images", () => {
@@ -14562,18 +15841,18 @@ const useRelay = defineStore("relay", () => {
   const additionalRelaysUrlsForSignedEvent = ref([]);
   const connectedUserReadRelayUrls = ref([]);
   const connectedUserWriteRelaysUrls = ref([]);
-  const reedRelays = ref([]);
+  const readRelays = ref([]);
   const writeRelays = ref([]);
   const isConnectingToReadWriteRelays = ref(false);
   const isConnectedToReadWriteRelays = ref(false);
   const connectedFeedRelaysUrls = ref([]);
   const userDMRelaysUrls = ref([]);
   const userReadWriteRelays = computed(() => {
-    const unique = /* @__PURE__ */ new Set([...reedRelays.value, ...writeRelays.value]);
+    const unique = /* @__PURE__ */ new Set([...readRelays.value, ...writeRelays.value]);
     const read = [];
     const write = [];
     unique.forEach((r) => {
-      if (reedRelays.value.includes(r) && !writeRelays.value.includes(r)) {
+      if (readRelays.value.includes(r) && !writeRelays.value.includes(r)) {
         read.push({ url: r, type: "read" });
       } else {
         write.push({ url: r, type: "write" });
@@ -14609,7 +15888,7 @@ const useRelay = defineStore("relay", () => {
     return relays;
   });
   const nip65Tags = computed(() => {
-    const read = reedRelays.value;
+    const read = readRelays.value;
     const write = writeRelays.value;
     const unique = /* @__PURE__ */ new Set([...read, ...write]);
     const tags = [];
@@ -14650,6 +15929,10 @@ const useRelay = defineStore("relay", () => {
   function setConnectedUserWriteRelayUrls(value) {
     connectedUserWriteRelaysUrls.value = value.map((r) => normalizeURL$1(r));
   }
+  function setConnectedUserReadWriteRelays(value) {
+    setConnectedUserReadRelayUrls(value.read);
+    setConnectedUserWriteRelayUrls(value.write);
+  }
   function addConnectedUserWriteRelay(value) {
     const url = normalizeURL$1(value);
     if (!url)
@@ -14666,11 +15949,15 @@ const useRelay = defineStore("relay", () => {
   function setConnectedFeedRelayUrls(value) {
     connectedFeedRelaysUrls.value = value.map((r) => normalizeURL$1(r));
   }
-  function setReedRelays(value) {
-    reedRelays.value = value.map((r) => normalizeURL$1(r));
+  function setReadRelays(value) {
+    readRelays.value = value.map((r) => normalizeURL$1(r));
   }
   function setWriteRelays(value) {
     writeRelays.value = value.map((r) => normalizeURL$1(r));
+  }
+  function setReadWriteRelays(value) {
+    setReadRelays(value.read);
+    setWriteRelays(value.write);
   }
   function addWriteRelay(value) {
     if (writeRelays.value.includes(value))
@@ -14686,10 +15973,10 @@ const useRelay = defineStore("relay", () => {
       return false;
     if (userReadWriteRelaysUrls.value.includes(url))
       return false;
-    reedRelays.value.push(url);
+    readRelays.value.push(url);
   }
   function removeUserRelay(value) {
-    reedRelays.value = reedRelays.value.filter((r) => r !== value);
+    readRelays.value = readRelays.value.filter((r) => r !== value);
     writeRelays.value = writeRelays.value.filter((r) => r !== value);
     connectedUserReadRelayUrls.value = connectedUserReadRelayUrls.value.filter((r) => r !== value);
     connectedUserWriteRelaysUrls.value = connectedUserWriteRelaysUrls.value.filter(
@@ -14705,11 +15992,9 @@ const useRelay = defineStore("relay", () => {
   function updateRelayAdditionalRelaysUrlsForSignedEvent(index, value) {
     additionalRelaysUrlsForSignedEvent.value[index] = value.length ? normalizeURL$1(value) : "";
   }
-  function setIsConnectingToReadWriteRelaysStatus(value) {
-    isConnectingToReadWriteRelays.value = value;
-  }
-  function setIsConnectedToReadWriteRelaysStatus(value) {
-    isConnectedToReadWriteRelays.value = value;
+  function setReadWriteRelaysStatus(value) {
+    isConnectingToReadWriteRelays.value = value.connecting;
+    isConnectedToReadWriteRelays.value = value.connected;
   }
   function setUserDMRelaysUrls(value) {
     userDMRelaysUrls.value = value.map((r) => normalizeURL$1(r));
@@ -14718,7 +16003,7 @@ const useRelay = defineStore("relay", () => {
     currentRelay.value = {};
     connectedUserReadRelayUrls.value = [];
     connectedUserWriteRelaysUrls.value = [];
-    reedRelays.value = [];
+    readRelays.value = [];
     writeRelays.value = [];
     isConnectingToReadWriteRelays.value = false;
     isConnectedToReadWriteRelays.value = false;
@@ -14740,9 +16025,9 @@ const useRelay = defineStore("relay", () => {
     additionalRelaysUrlsForSignedEvent,
     updateRelayAdditionalRelaysUrlsForSignedEvent,
     connectedFeedRelaysPrettyStr,
-    reedRelays,
+    readRelays,
     writeRelays,
-    setReedRelays,
+    setReadRelays,
     setWriteRelays,
     isConnectedToRelay,
     userReadWriteRelays,
@@ -14757,18 +16042,19 @@ const useRelay = defineStore("relay", () => {
     setConnectedFeedRelayUrls,
     connectedUserReadRelayUrlsWithSelectedRelay,
     isConnectingToReadWriteRelays,
-    setIsConnectingToReadWriteRelaysStatus,
     setConnectedUserWriteRelayUrls,
     connectedUserWriteRelaysUrls,
     connectedUserReadWriteUrlsWithSelectedRelay,
-    setIsConnectedToReadWriteRelaysStatus,
     isConnectedToReadWriteRelays,
     userChatRelaysUrls,
     setUserDMRelaysUrls,
     clear: clear2,
     addConnectedUserReadRelay,
     addConnectedUserWriteRelay,
-    removeConnectedUserWriteRelay
+    removeConnectedUserWriteRelay,
+    setReadWriteRelays,
+    setReadWriteRelaysStatus,
+    setConnectedUserReadWriteRelays
   };
 });
 const useMetasCache = defineStore("metasCache", () => {
@@ -14797,8 +16083,8 @@ const useMetasCache = defineStore("metasCache", () => {
     setMetaValue
   };
 });
-const _sfc_main$E = {};
-const _hoisted_1$z = {
+const _sfc_main$F = {};
+const _hoisted_1$A = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "22",
   height: "22",
@@ -14806,18 +16092,18 @@ const _hoisted_1$z = {
   class: "bi bi-link-45deg",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$v = /* @__PURE__ */ createBaseVNode("path", { d: "M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" }, null, -1);
-const _hoisted_3$p = /* @__PURE__ */ createBaseVNode("path", { d: "M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" }, null, -1);
-const _hoisted_4$k = [
-  _hoisted_2$v,
-  _hoisted_3$p
+const _hoisted_2$w = /* @__PURE__ */ createBaseVNode("path", { d: "M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" }, null, -1);
+const _hoisted_3$q = /* @__PURE__ */ createBaseVNode("path", { d: "M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" }, null, -1);
+const _hoisted_4$l = [
+  _hoisted_2$w,
+  _hoisted_3$q
 ];
 function _sfc_render$7(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$z, _hoisted_4$k);
+  return openBlock(), createElementBlock("svg", _hoisted_1$A, _hoisted_4$l);
 }
-const LinkIcon = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$7]]);
-const _sfc_main$D = {};
-const _hoisted_1$y = {
+const LinkIcon = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$7]]);
+const _sfc_main$E = {};
+const _hoisted_1$z = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "22",
   height: "22",
@@ -14825,16 +16111,16 @@ const _hoisted_1$y = {
   class: "bi bi-check2",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$u = /* @__PURE__ */ createBaseVNode("path", { d: "M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" }, null, -1);
-const _hoisted_3$o = [
-  _hoisted_2$u
+const _hoisted_2$v = /* @__PURE__ */ createBaseVNode("path", { d: "M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" }, null, -1);
+const _hoisted_3$p = [
+  _hoisted_2$v
 ];
 function _sfc_render$6(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$y, _hoisted_3$o);
+  return openBlock(), createElementBlock("svg", _hoisted_1$z, _hoisted_3$p);
 }
-const CheckIcon = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$6]]);
-const _sfc_main$C = {};
-const _hoisted_1$x = {
+const CheckIcon = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$6]]);
+const _sfc_main$D = {};
+const _hoisted_1$y = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "18",
   height: "18",
@@ -14842,18 +16128,18 @@ const _hoisted_1$x = {
   class: "bi bi-check-square",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$t = /* @__PURE__ */ createBaseVNode("path", { d: "M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" }, null, -1);
-const _hoisted_3$n = /* @__PURE__ */ createBaseVNode("path", { d: "M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" }, null, -1);
-const _hoisted_4$j = [
-  _hoisted_2$t,
-  _hoisted_3$n
+const _hoisted_2$u = /* @__PURE__ */ createBaseVNode("path", { d: "M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" }, null, -1);
+const _hoisted_3$o = /* @__PURE__ */ createBaseVNode("path", { d: "M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" }, null, -1);
+const _hoisted_4$k = [
+  _hoisted_2$u,
+  _hoisted_3$o
 ];
 function _sfc_render$5(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$x, _hoisted_4$j);
+  return openBlock(), createElementBlock("svg", _hoisted_1$y, _hoisted_4$k);
 }
-const CheckSquareIcon = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$5]]);
-const _sfc_main$B = {};
-const _hoisted_1$w = {
+const CheckSquareIcon = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["render", _sfc_render$5]]);
+const _sfc_main$C = {};
+const _hoisted_1$x = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -14861,19 +16147,19 @@ const _hoisted_1$w = {
   class: "bi bi-diagram-2-fill",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$s = /* @__PURE__ */ createBaseVNode("path", {
+const _hoisted_2$t = /* @__PURE__ */ createBaseVNode("path", {
   "fill-rule": "evenodd",
   d: "M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 5 7h2.5V6A1.5 1.5 0 0 1 6 4.5zm-3 8A1.5 1.5 0 0 1 4.5 10h1A1.5 1.5 0 0 1 7 11.5v1A1.5 1.5 0 0 1 5.5 14h-1A1.5 1.5 0 0 1 3 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 9 12.5z"
 }, null, -1);
-const _hoisted_3$m = [
-  _hoisted_2$s
+const _hoisted_3$n = [
+  _hoisted_2$t
 ];
 function _sfc_render$4(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$w, _hoisted_3$m);
+  return openBlock(), createElementBlock("svg", _hoisted_1$x, _hoisted_3$n);
 }
-const ThreadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$4]]);
-const _sfc_main$A = {};
-const _hoisted_1$v = {
+const ThreadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$C, [["render", _sfc_render$4]]);
+const _sfc_main$B = {};
+const _hoisted_1$w = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "18",
   height: "18",
@@ -14881,40 +16167,40 @@ const _hoisted_1$v = {
   class: "bi bi-exclamation-octagon",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$r = /* @__PURE__ */ createBaseVNode("path", { d: "M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z" }, null, -1);
-const _hoisted_3$l = /* @__PURE__ */ createBaseVNode("path", { d: "M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" }, null, -1);
-const _hoisted_4$i = [
-  _hoisted_2$r,
-  _hoisted_3$l
+const _hoisted_2$s = /* @__PURE__ */ createBaseVNode("path", { d: "M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z" }, null, -1);
+const _hoisted_3$m = /* @__PURE__ */ createBaseVNode("path", { d: "M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" }, null, -1);
+const _hoisted_4$j = [
+  _hoisted_2$s,
+  _hoisted_3$m
 ];
 function _sfc_render$3(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$v, _hoisted_4$i);
+  return openBlock(), createElementBlock("svg", _hoisted_1$w, _hoisted_4$j);
 }
-const InvalidSignatureIcon = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["render", _sfc_render$3]]);
-const _hoisted_1$u = { class: "thread" };
-const _hoisted_2$q = {
+const InvalidSignatureIcon = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$3]]);
+const _hoisted_1$v = { class: "thread" };
+const _hoisted_2$r = {
   key: 0,
   class: "loading-thread"
 };
-const _hoisted_3$k = { class: "event-card" };
-const _hoisted_4$h = {
+const _hoisted_3$l = { class: "event-card" };
+const _hoisted_4$i = {
   key: 0,
   class: "event-img"
 };
 const _hoisted_5$f = ["src", "title"];
-const _hoisted_6$b = {
+const _hoisted_6$a = {
   key: 1,
   class: "bi bi-person-circle author-pic__alternate"
 };
-const _hoisted_7$9 = { class: "event-content" };
-const _hoisted_8$8 = { class: "event-header" };
-const _hoisted_9$8 = ["href"];
-const _hoisted_10$8 = { class: "event-username-text" };
+const _hoisted_7$8 = { class: "event-content" };
+const _hoisted_8$7 = { class: "event-header" };
+const _hoisted_9$7 = ["href"];
+const _hoisted_10$7 = { class: "event-username-text" };
 const _hoisted_11$7 = {
   key: 0,
   class: "event-replying-to"
 };
-const _hoisted_12$7 = {
+const _hoisted_12$6 = {
   key: 1,
   class: "replying-to-separator"
 };
@@ -14943,12 +16229,11 @@ const _hoisted_28$1 = {
   key: 2,
   class: "replies"
 };
-const _sfc_main$z = /* @__PURE__ */ defineComponent({
+const _sfc_main$A = /* @__PURE__ */ defineComponent({
   __name: "EventContent",
   props: {
     event: {},
     pool: {},
-    pubKey: {},
     index: {},
     hasReplyBtn: { type: Boolean },
     isMainEvent: { type: Boolean },
@@ -14983,16 +16268,21 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
     const isLoadingReplies = ref(false);
     const ancestorsEvents = ref([]);
     const isLoadingThread = ref(false);
+    const isMounted = ref(true);
     const handleToggleRawData = (eventId) => {
       if (props.isMainEvent) {
         return emit2("toggleRawData", eventId);
       }
       props.event.showRawData = !props.event.showRawData;
     };
+    const isSearchPage = computed(() => router2.currentRoute.value.name === "Search");
     onMounted(() => {
       if (Object.keys(props.event).length === 0)
         return;
       isSigVerified.value = verifyEvent(props.event);
+    });
+    onUnmounted(() => {
+      isMounted.value = false;
     });
     const displayName = (author, pubkey) => {
       if (author) {
@@ -15071,9 +16361,9 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
       });
       const eTagsForReply = [];
       if (existedETags.length) {
-        const root = existedETags.find((tag) => tag[3] === "root");
-        if (root) {
-          eTagsForReply.push(root);
+        const root2 = existedETags.find((tag) => tag[3] === "root");
+        if (root2) {
+          eTagsForReply.push(root2);
         } else {
           eTagsForReply.push(existedETags[0]);
         }
@@ -15105,7 +16395,7 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
       const { pool } = props;
       if (pubkeysMentions.length) {
         const allRelays = [
-          ...relayStore.reedRelays,
+          ...relayStore.readRelays,
           ...relayStore.writeRelays,
           relayStore.currentRelay.url
         ];
@@ -15154,6 +16444,8 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
       }
       isLoadingReplies.value = true;
       let replies = await pool.querySync(currentReadRelays, { kinds: [1], "#e": [event.id] });
+      if (!isMounted.value)
+        return;
       if (event.isRoot) {
         replies = filterRootEventReplies(event, replies);
       } else {
@@ -15174,6 +16466,8 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
         pool,
         isRootPosts
       );
+      if (!isMounted.value)
+        return;
       eventReplies.value = replies;
       showReplies.value = true;
       isLoadingReplies.value = false;
@@ -15269,6 +16563,8 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
         event,
         event.replyingTo.event
       );
+      if (!isMounted.value)
+        return;
       const ancestors = ancestorsChain.reverse();
       isLoadingThread.value = false;
       ancestorsEvents.value = ancestors;
@@ -15279,7 +16575,7 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
     return (_ctx, _cache) => {
       const _component_EventContent = resolveComponent("EventContent", true);
       return openBlock(), createElementBlock(Fragment, null, [
-        createBaseVNode("div", _hoisted_1$u, [
+        createBaseVNode("div", _hoisted_1$v, [
           (openBlock(true), createElementBlock(Fragment, null, renderList(ancestorsEvents.value, (aEvent, i2) => {
             return openBlock(), createElementBlock("div", {
               class: "ancestor",
@@ -15295,9 +16591,9 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
               }, null, 8, ["onToggleRawData", "event", "currentReadRelays", "pool", "hasReplyBtn", "threadDescender"])
             ]);
           }), 128)),
-          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_2$q, "Loading thread...")) : createCommentVNode("", true)
+          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_2$r, "Loading thread...")) : createCommentVNode("", true)
         ]),
-        createBaseVNode("div", _hoisted_3$k, [
+        createBaseVNode("div", _hoisted_3$l, [
           createBaseVNode("div", {
             class: normalizeClass(["event-card__content", { flipped: _ctx.event.showRawData }])
           }, [
@@ -15305,28 +16601,30 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
               class: normalizeClass([
                 "event-card__front",
                 "event__presentable-date",
-                { "event-card__front_custom": _ctx.pubKey === _ctx.event.pubkey }
+                {
+                  "event-card__front_custom": !isSearchPage.value && unref(nsecStore).getPubkey() === _ctx.event.pubkey
+                }
               ])
             }, [
-              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_4$h, [
+              unref(imagesStore).showImages ? (openBlock(), createElementBlock("div", _hoisted_4$i, [
                 _ctx.event.author ? (openBlock(), createElementBlock("img", {
                   key: 0,
                   class: normalizeClass(["author-pic", { "author-pic__squared": !_ctx.event.author.picture }]),
                   src: _ctx.event.author.picture,
                   title: `Avatar for ${_ctx.event.author.name}`,
                   alt: "user's avatar"
-                }, null, 10, _hoisted_5$f)) : (openBlock(), createElementBlock("i", _hoisted_6$b))
+                }, null, 10, _hoisted_5$f)) : (openBlock(), createElementBlock("i", _hoisted_6$a))
               ])) : createCommentVNode("", true),
-              createBaseVNode("div", _hoisted_7$9, [
-                createBaseVNode("div", _hoisted_8$8, [
+              createBaseVNode("div", _hoisted_7$8, [
+                createBaseVNode("div", _hoisted_8$7, [
                   createBaseVNode("div", null, [
                     createBaseVNode("a", {
                       class: "event-username-link",
                       onClick: _cache[0] || (_cache[0] = withModifiers(() => handleUserClick(_ctx.event.pubkey), ["prevent"])),
                       href: unref(getUserUrlPath)(_ctx.event.pubkey)
                     }, [
-                      createBaseVNode("b", _hoisted_10$8, toDisplayString(displayName(_ctx.event.author, _ctx.event.pubkey)), 1)
-                    ], 8, _hoisted_9$8)
+                      createBaseVNode("b", _hoisted_10$7, toDisplayString(displayName(_ctx.event.author, _ctx.event.pubkey)), 1)
+                    ], 8, _hoisted_9$7)
                   ]),
                   createBaseVNode("div", null, toDisplayString(unref(formatedDate)(_ctx.event.created_at)), 1)
                 ]),
@@ -15339,7 +16637,7 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
                     createVNode(ThreadIcon),
                     createTextVNode(" View thread ")
                   ])) : createCommentVNode("", true),
-                  _ctx.isMainEvent ? (openBlock(), createElementBlock("span", _hoisted_12$7, "  |  ")) : createCommentVNode("", true),
+                  _ctx.isMainEvent ? (openBlock(), createElementBlock("span", _hoisted_12$6, "  |  ")) : createCommentVNode("", true),
                   createBaseVNode("span", null, [
                     createTextVNode(" Replying to "),
                     createBaseVNode("a", {
@@ -15350,10 +16648,13 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
                   ])
                 ])) : createCommentVNode("", true),
                 createBaseVNode("div", _hoisted_14$5, [
-                  createVNode(EventText, { event: _ctx.event }, null, 8, ["event"])
+                  createVNode(EventText, {
+                    event: _ctx.event,
+                    slice: true
+                  }, null, 8, ["event"])
                 ]),
                 createBaseVNode("div", _hoisted_15$5, [
-                  createVNode(_sfc_main$H, {
+                  createVNode(_sfc_main$I, {
                     onShowReplyField: handleToggleReplyField,
                     onHandleShowReplies: handleLoadReplies,
                     onHandleHideReplies: handleHideReplies,
@@ -15388,7 +16689,7 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
               class: normalizeClass([
                 "event-card__back",
                 {
-                  "event-card__back_custom": _ctx.pubKey === _ctx.event.pubkey,
+                  "event-card__back_custom": !isSearchPage.value && unref(nsecStore).getPubkey() === _ctx.event.pubkey,
                   "event-details-first": _ctx.index === 0
                 }
               ])
@@ -15470,10 +16771,10 @@ const _sfc_main$z = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const EventContent_vue_vue_type_style_index_0_scoped_6dee6863_lang = "";
-const EventContent = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["__scopeId", "data-v-6dee6863"]]);
-const _sfc_main$y = {};
-const _hoisted_1$t = {
+const EventContent_vue_vue_type_style_index_0_scoped_37238d40_lang = "";
+const EventContent = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["__scopeId", "data-v-37238d40"]]);
+const _sfc_main$z = {};
+const _hoisted_1$u = {
   xmlns: "http://www.w3.org/2000/svg",
   width: "16",
   height: "16",
@@ -15481,17 +16782,17 @@ const _hoisted_1$t = {
   class: "bi bi-arrows-expand",
   viewBox: "0 0 16 16"
 };
-const _hoisted_2$p = /* @__PURE__ */ createBaseVNode("path", {
+const _hoisted_2$q = /* @__PURE__ */ createBaseVNode("path", {
   "fill-rule": "evenodd",
   d: "M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8ZM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2ZM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10Z"
 }, null, -1);
-const _hoisted_3$j = [
-  _hoisted_2$p
+const _hoisted_3$k = [
+  _hoisted_2$q
 ];
 function _sfc_render$2(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$t, _hoisted_3$j);
+  return openBlock(), createElementBlock("svg", _hoisted_1$u, _hoisted_3$k);
 }
-const ExpandArrow = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$2]]);
+const ExpandArrow = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["render", _sfc_render$2]]);
 const usePool = defineStore("pool", () => {
   const pool = ref(new SimplePool());
   function resetPool() {
@@ -15499,36 +16800,34 @@ const usePool = defineStore("pool", () => {
   }
   return { pool, resetPool };
 });
-const _withScopeId$g = (n) => (pushScopeId("data-v-5f3cf145"), n = n(), popScopeId(), n);
-const _hoisted_1$s = { class: "event" };
-const _hoisted_2$o = { key: 0 };
-const _hoisted_3$i = {
+const _withScopeId$g = (n) => (pushScopeId("data-v-194b5fa5"), n = n(), popScopeId(), n);
+const _hoisted_1$t = { class: "event" };
+const _hoisted_2$p = { key: 0 };
+const _hoisted_3$j = {
   key: 1,
   class: "replies"
 };
-const _hoisted_4$g = { class: "replies__other-link" };
+const _hoisted_4$h = { class: "replies__other-link" };
 const _hoisted_5$e = /* @__PURE__ */ _withScopeId$g(() => /* @__PURE__ */ createBaseVNode("span", { class: "replies__other-text" }, " Show more replies ", -1));
-const _hoisted_6$a = {
+const _hoisted_6$9 = {
   key: 1,
   class: "replies__other"
 };
-const _hoisted_7$8 = {
+const _hoisted_7$7 = {
   key: 2,
   class: "replies__other"
 };
-const _hoisted_8$7 = { class: "replies__other-text" };
-const _hoisted_9$7 = { key: 4 };
-const _hoisted_10$7 = {
+const _hoisted_8$6 = { class: "replies__other-text" };
+const _hoisted_9$6 = { key: 4 };
+const _hoisted_10$6 = {
   key: 5,
   class: "replies__list"
 };
-const _hoisted_11$6 = { class: "replies__list-item" };
-const _hoisted_12$6 = /* @__PURE__ */ _withScopeId$g(() => /* @__PURE__ */ createBaseVNode("div", { class: "replies__list-item-line-horizontal" }, null, -1));
-const _sfc_main$x = /* @__PURE__ */ defineComponent({
+const _hoisted_11$6 = /* @__PURE__ */ _withScopeId$g(() => /* @__PURE__ */ createBaseVNode("div", { class: "replies__list-item-line-horizontal" }, null, -1));
+const _sfc_main$y = /* @__PURE__ */ defineComponent({
   __name: "ParentEventView",
   props: {
     event: {},
-    pubKey: {},
     index: {},
     hasReplyBtn: { type: Boolean },
     showRootReplies: { type: Boolean },
@@ -15548,18 +16847,22 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
     const isLoadingFirstReply = ref(false);
     const replyEvent = ref(null);
     const eventReplies = ref([]);
+    const isMounted = ref(true);
     onMounted(async () => {
       await loadRepliesPreiew();
     });
+    onUnmounted(() => {
+      isMounted.value = false;
+    });
     const loadRepliesPreiew = async () => {
       const { event, currentReadRelays } = props;
-      if (!currentReadRelays.length)
-        return;
       let replies = await pool.querySync(currentReadRelays, { kinds: [1], "#e": [event.id] });
+      if (!isMounted.value)
+        return;
       if (props.showRootReplies) {
-        replies = replies.filter((reply2) => nip10IsFirstLevelReplyForEvent(event.id, reply2));
+        replies = replies.filter((reply2) => nip10IsFirstLevelReply(event.id, reply2));
       } else {
-        replies = replies.filter((reply2) => nip10IsReplyForEvent(event.id, reply2));
+        replies = replies.filter((reply2) => nip10IsSecondLevelReply(event.id, reply2));
       }
       if (!replies.length)
         return;
@@ -15576,6 +16879,8 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
         pool,
         isRootPosts,
         (reply2) => {
+          if (!isMounted.value)
+            return;
           replyEvent.value = reply2;
           isLoadingFirstReply.value = false;
         }
@@ -15595,6 +16900,8 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
         return;
       isLoadingThread.value = true;
       let replies = await pool.querySync(currentReadRelays, { kinds: [1], "#e": [event.id] });
+      if (!isMounted.value)
+        return;
       if (event.isRoot) {
         replies = filterRootEventReplies(event, replies);
       } else {
@@ -15614,6 +16921,8 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
         pool,
         isRootPosts
       );
+      if (!isMounted.value)
+        return;
       eventReplies.value = replies;
       showAllReplies.value = true;
       isLoadingThread.value = false;
@@ -15627,7 +16936,7 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
       }
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$s, [
+      return openBlock(), createElementBlock("div", _hoisted_1$t, [
         (openBlock(), createBlock(EventContent, {
           key: _ctx.event.id,
           onLoadRootReplies: loadRootReplies,
@@ -15635,27 +16944,26 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
           onToggleRawData: _cache[0] || (_cache[0] = (eventId) => handleToggleRawData(eventId, true)),
           onLoadMoreReplies: handleLoadMoreReplies,
           event: _ctx.event,
-          pubKey: _ctx.pubKey,
           isMainEvent: true,
           currentReadRelays: _ctx.currentReadRelays,
           pool: unref(pool),
           hasReplyBtn: _ctx.hasReplyBtn
-        }, null, 8, ["event", "pubKey", "currentReadRelays", "pool", "hasReplyBtn"])),
-        isLoadingFirstReply.value ? (openBlock(), createElementBlock("div", _hoisted_2$o, "Loading replies...")) : createCommentVNode("", true),
-        replyEvent.value ? (openBlock(), createElementBlock("div", _hoisted_3$i, [
+        }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"])),
+        isLoadingFirstReply.value ? (openBlock(), createElementBlock("div", _hoisted_2$p, "Loading replies...")) : createCommentVNode("", true),
+        replyEvent.value ? (openBlock(), createElementBlock("div", _hoisted_3$j, [
           !showAllReplies.value && showMoreRepliesBtn.value && !isLoadingThread.value ? (openBlock(), createElementBlock("div", {
             key: 0,
             onClick: handleLoadMoreReplies,
             class: "replies__other"
           }, [
-            createBaseVNode("span", _hoisted_4$g, [
+            createBaseVNode("span", _hoisted_4$h, [
               _hoisted_5$e,
               createVNode(ExpandArrow)
             ])
           ])) : createCommentVNode("", true),
-          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_6$a, "Loading replies...")) : createCommentVNode("", true),
-          showAllReplies.value && showMoreRepliesBtn.value ? (openBlock(), createElementBlock("div", _hoisted_7$8, [
-            createBaseVNode("span", _hoisted_8$7, " Loaded " + toDisplayString(eventReplies.value.length) + " replies ", 1)
+          isLoadingThread.value ? (openBlock(), createElementBlock("div", _hoisted_6$9, "Loading replies...")) : createCommentVNode("", true),
+          showAllReplies.value && showMoreRepliesBtn.value ? (openBlock(), createElementBlock("div", _hoisted_7$7, [
+            createBaseVNode("span", _hoisted_8$6, " Loaded " + toDisplayString(eventReplies.value.length) + " replies ", 1)
           ])) : createCommentVNode("", true),
           createBaseVNode("div", {
             class: normalizeClass([
@@ -15671,7 +16979,7 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
             key: 3,
             class: normalizeClass(["line-horizontal", { "line-horizontal_height": showMoreRepliesBtn.value }])
           }, null, 2)) : createCommentVNode("", true),
-          !showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_9$7, [
+          !showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_9$6, [
             (openBlock(), createBlock(EventContent, {
               key: replyEvent.value.id,
               event: replyEvent.value,
@@ -15680,10 +16988,13 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
               hasReplyBtn: _ctx.hasReplyBtn
             }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"]))
           ])) : createCommentVNode("", true),
-          showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_10$7, [
+          showAllReplies.value ? (openBlock(), createElementBlock("div", _hoisted_10$6, [
             (openBlock(true), createElementBlock(Fragment, null, renderList(eventReplies.value, (reply, i2) => {
-              return openBlock(), createElementBlock("div", _hoisted_11$6, [
-                _hoisted_12$6,
+              return openBlock(), createElementBlock("div", {
+                class: "replies__list-item",
+                key: reply.id
+              }, [
+                _hoisted_11$6,
                 createBaseVNode("div", {
                   class: normalizeClass([
                     "replies__list-item-line-vertical",
@@ -15698,20 +17009,19 @@ const _sfc_main$x = /* @__PURE__ */ defineComponent({
                   hasReplyBtn: _ctx.hasReplyBtn
                 }, null, 8, ["event", "currentReadRelays", "pool", "hasReplyBtn"]))
               ]);
-            }), 256))
+            }), 128))
           ])) : createCommentVNode("", true)
         ])) : createCommentVNode("", true)
       ]);
     };
   }
 });
-const ParentEventView_vue_vue_type_style_index_0_scoped_5f3cf145_lang = "";
-const ParentEventView = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["__scopeId", "data-v-5f3cf145"]]);
-const _sfc_main$w = /* @__PURE__ */ defineComponent({
+const ParentEventView_vue_vue_type_style_index_0_scoped_194b5fa5_lang = "";
+const ParentEventView = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["__scopeId", "data-v-194b5fa5"]]);
+const _sfc_main$x = /* @__PURE__ */ defineComponent({
   __name: "RelayEventsList",
   props: {
     events: {},
-    pubKey: {},
     currentReadRelays: {}
   },
   emits: ["toggleRawData"],
@@ -15729,27 +17039,26 @@ const _sfc_main$w = /* @__PURE__ */ defineComponent({
             onToggleRawData: handleToggleRawData,
             currentReadRelays: _ctx.currentReadRelays,
             event,
-            pubKey: _ctx.pubKey,
             index: i2,
             showRootReplies: true,
             hasReplyBtn: true
-          }, null, 8, ["currentReadRelays", "event", "pubKey", "index"]);
+          }, null, 8, ["currentReadRelays", "event", "index"]);
         }), 128))
       ]);
     };
   }
 });
-const RelayEventsList_vue_vue_type_style_index_0_scoped_421078f4_lang = "";
-const RelayEventsList = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["__scopeId", "data-v-421078f4"]]);
-const _hoisted_1$r = {
+const RelayEventsList_vue_vue_type_style_index_0_scoped_4e38e019_lang = "";
+const RelayEventsList = /* @__PURE__ */ _export_sfc(_sfc_main$x, [["__scopeId", "data-v-4e38e019"]]);
+const _hoisted_1$s = {
   key: 0,
   class: "pagination"
 };
-const _hoisted_2$n = { key: 0 };
-const _hoisted_3$h = { key: 1 };
-const _hoisted_4$f = { key: 1 };
+const _hoisted_2$o = { key: 0 };
+const _hoisted_3$i = { key: 1 };
+const _hoisted_4$g = { key: 1 };
 const _hoisted_5$d = { key: 4 };
-const _sfc_main$v = /* @__PURE__ */ defineComponent({
+const _sfc_main$w = /* @__PURE__ */ defineComponent({
   __name: "Pagination",
   props: {
     pagesCount: {},
@@ -15778,9 +17087,9 @@ const _sfc_main$v = /* @__PURE__ */ defineComponent({
     );
     return (_ctx, _cache) => {
       const _component_router_link = resolveComponent("router-link");
-      return _ctx.pagesCount > 1 ? (openBlock(), createElementBlock("div", _hoisted_1$r, [
+      return _ctx.pagesCount > 1 ? (openBlock(), createElementBlock("div", _hoisted_1$s, [
         createTextVNode(" Pages: "),
-        _ctx.pagesCount < 5 ? (openBlock(), createElementBlock("span", _hoisted_2$n, [
+        _ctx.pagesCount < 5 ? (openBlock(), createElementBlock("span", _hoisted_2$o, [
           (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.pagesCount, (page) => {
             return openBlock(), createBlock(_component_router_link, {
               key: page,
@@ -15794,7 +17103,7 @@ const _sfc_main$v = /* @__PURE__ */ defineComponent({
             }, 1032, ["class", "to"]);
           }), 128))
         ])) : createCommentVNode("", true),
-        _ctx.pagesCount >= 5 ? (openBlock(), createElementBlock("span", _hoisted_3$h, [
+        _ctx.pagesCount >= 5 ? (openBlock(), createElementBlock("span", _hoisted_3$i, [
           _ctx.currentPage >= 3 ? (openBlock(), createBlock(_component_router_link, {
             key: 1,
             class: normalizeClass(["pagination__link"]),
@@ -15805,7 +17114,7 @@ const _sfc_main$v = /* @__PURE__ */ defineComponent({
             ]),
             _: 1
           }, 8, ["to"])) : createCommentVNode("", true),
-          _ctx.currentPage > 3 ? (openBlock(), createElementBlock("span", _hoisted_4$f, "...")) : createCommentVNode("", true),
+          _ctx.currentPage > 3 ? (openBlock(), createElementBlock("span", _hoisted_4$g, "...")) : createCommentVNode("", true),
           _ctx.currentPage != 1 ? (openBlock(), createBlock(_component_router_link, {
             key: _ctx.currentPage - 1,
             class: normalizeClass(["pagination__link"]),
@@ -15853,38 +17162,42 @@ const _sfc_main$v = /* @__PURE__ */ defineComponent({
   }
 });
 const Pagination_vue_vue_type_style_index_0_scoped_6b61b6ba_lang = "";
-const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["__scopeId", "data-v-6b61b6ba"]]);
+const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["__scopeId", "data-v-6b61b6ba"]]);
 const useFeed = defineStore("feed", () => {
   const events = ref([]);
   const showNewEventsBadge = ref(false);
   const newEventsBadgeImageUrls = ref([]);
-  const newEventsBadgeCount = ref(0);
   const newEventsToShow = ref([]);
   const paginationEventsIds = ref([]);
   const messageToBroadcast = ref("");
   const signedJson = ref("");
-  const newEventsBadgeUpdateInterval = ref(0);
+  const updateInterval = ref(0);
   const timeToGetNewPosts = ref(0);
   const selectedFeedSource = ref("network");
-  const eventsId = computed(() => events.value.map((e) => e.id));
-  const newEventsToShowIds = computed(() => newEventsToShow.value.map((e) => e.id));
-  const isFollowsSource = computed(() => selectedFeedSource.value === "follows");
-  const isNetworkSource = computed(() => selectedFeedSource.value === "network");
   const isLoadingFeedSource = ref(false);
   const isLoadingNewEvents = ref(false);
   const isLoadingMore = ref(false);
   const isMountAfterLogin = ref(false);
   const toRemountFeed = ref(false);
+  const eventsId = computed(() => events.value.map((e) => e.id));
+  const newEventsToShowIds = computed(() => newEventsToShow.value.map((e) => e.id));
+  const newEventsBadgeCount = computed(() => newEventsToShow.value.length);
+  const isFollowsSource = computed(() => selectedFeedSource.value === "follows");
+  const isNetworkSource = computed(() => selectedFeedSource.value === "network");
   function clear2() {
-    clearNewEventsBadgeUpdateInterval();
-    events.value = [];
-    showNewEventsBadge.value = false;
-    newEventsToShow.value = [];
-    paginationEventsIds.value = [];
+    sourceSelectDataRefresh();
     selectedFeedSource.value = "network";
     isLoadingFeedSource.value = false;
     isLoadingNewEvents.value = false;
     isLoadingMore.value = false;
+  }
+  function sourceSelectDataRefresh() {
+    clearUpdateInterval();
+    events.value = [];
+    showNewEventsBadge.value = false;
+    newEventsBadgeImageUrls.value = [];
+    newEventsToShow.value = [];
+    paginationEventsIds.value = [];
   }
   function updateEvents(value) {
     events.value = value;
@@ -15903,9 +17216,6 @@ const useFeed = defineStore("feed", () => {
   }
   function setNewEventsBadgeImageUrls(value) {
     newEventsBadgeImageUrls.value = value;
-  }
-  function setNewEventsBadgeCount(value) {
-    newEventsBadgeCount.value = value;
   }
   function updateNewEventsToShow(value) {
     newEventsToShow.value = value;
@@ -15940,15 +17250,35 @@ const useFeed = defineStore("feed", () => {
   function setMountAfterLogin(value) {
     isMountAfterLogin.value = value;
   }
-  function clearNewEventsBadgeUpdateInterval() {
-    clearInterval(newEventsBadgeUpdateInterval.value);
-    newEventsBadgeUpdateInterval.value = 0;
+  function clearUpdateInterval() {
+    clearInterval(updateInterval.value);
+    updateInterval.value = 0;
   }
   function setToRemountFeed(value) {
     toRemountFeed.value = value;
   }
-  function resetTimeToGetNewPostsToNow() {
+  function refreshPostsFetchTime() {
     timeToGetNewPosts.value = Math.floor(Date.now() / 1e3);
+  }
+  function filterAndUpdateNewEventsToShow(events2) {
+    const filteredEvents = [];
+    events2.sort((a, b) => a.created_at - b.created_at).forEach((e) => {
+      if (eventsId.value.includes(e.id))
+        return;
+      if (newEventsToShowIds.value.includes(e.id))
+        return;
+      if (paginationEventsIds.value.includes(e.id))
+        return;
+      const nip10Data = nip10_exports.parse(e);
+      if (nip10Data.reply || nip10Data.root)
+        return;
+      filteredEvents.push({
+        id: e.id,
+        pubkey: e.pubkey,
+        created_at: e.created_at
+      });
+    });
+    newEventsToShow.value = [...newEventsToShow.value, ...filteredEvents];
   }
   return {
     events,
@@ -15959,7 +17289,6 @@ const useFeed = defineStore("feed", () => {
     newEventsBadgeImageUrls,
     setNewEventsBadgeImageUrls,
     newEventsBadgeCount,
-    setNewEventsBadgeCount,
     newEventsToShow,
     updateNewEventsToShow,
     pushToNewEventsToShow,
@@ -15984,28 +17313,30 @@ const useFeed = defineStore("feed", () => {
     isMountAfterLogin,
     setMountAfterLogin,
     eventsId,
-    newEventsBadgeUpdateInterval,
-    clearNewEventsBadgeUpdateInterval,
+    updateInterval,
+    clearUpdateInterval,
     clear: clear2,
     toRemountFeed,
     setToRemountFeed,
     newEventsToShowIds,
     timeToGetNewPosts,
-    resetTimeToGetNewPostsToNow
+    refreshPostsFetchTime,
+    filterAndUpdateNewEventsToShow,
+    sourceSelectDataRefresh
   };
 });
 const _withScopeId$f = (n) => (pushScopeId("data-v-decfe70f"), n = n(), popScopeId(), n);
-const _hoisted_1$q = { class: "message-footer" };
-const _hoisted_2$m = /* @__PURE__ */ _withScopeId$f(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-braces presigned-icon" }, null, -1));
-const _hoisted_3$g = /* @__PURE__ */ _withScopeId$f(() => /* @__PURE__ */ createBaseVNode("span", null, "Send presigned message", -1));
-const _hoisted_4$e = [
-  _hoisted_2$m,
-  _hoisted_3$g
+const _hoisted_1$r = { class: "message-footer" };
+const _hoisted_2$n = /* @__PURE__ */ _withScopeId$f(() => /* @__PURE__ */ createBaseVNode("i", { class: "bi bi-braces presigned-icon" }, null, -1));
+const _hoisted_3$h = /* @__PURE__ */ _withScopeId$f(() => /* @__PURE__ */ createBaseVNode("span", null, "Send presigned message", -1));
+const _hoisted_4$f = [
+  _hoisted_2$n,
+  _hoisted_3$h
 ];
 const _hoisted_5$c = ["disabled"];
-const _hoisted_6$9 = { class: "error" };
-const _hoisted_7$7 = { class: "warning" };
-const _sfc_main$u = /* @__PURE__ */ defineComponent({
+const _hoisted_6$8 = { class: "error" };
+const _hoisted_7$6 = { class: "warning" };
+const _sfc_main$v = /* @__PURE__ */ defineComponent({
   __name: "MessageInput",
   props: {
     sentEventIds: {},
@@ -16107,11 +17438,11 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
             onFocus: handleFocus,
             onBlur: handleBlur
           }, null, 8, ["disabled", "rows"]),
-          createBaseVNode("div", _hoisted_1$q, [
+          createBaseVNode("div", _hoisted_1$r, [
             createBaseVNode("button", {
               onClick: toggleMessageType,
               class: "send-presigned-btn"
-            }, _hoisted_4$e),
+            }, _hoisted_4$f),
             createBaseVNode("button", {
               disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay,
               class: normalizeClass(["send-btn", { disabled: _ctx.isSendingMessage || !unref(relayStore).isConnectedToRelay }]),
@@ -16119,17 +17450,17 @@ const _sfc_main$u = /* @__PURE__ */ defineComponent({
             }, toDisplayString(_ctx.isSendingMessage ? "Posting..." : "Post"), 11, _hoisted_5$c)
           ])
         ], 2),
-        createBaseVNode("div", _hoisted_6$9, toDisplayString(msgErr.value), 1),
-        createBaseVNode("div", _hoisted_7$7, toDisplayString(msgNotice.value), 1)
+        createBaseVNode("div", _hoisted_6$8, toDisplayString(msgErr.value), 1),
+        createBaseVNode("div", _hoisted_7$6, toDisplayString(msgNotice.value), 1)
       ], 64);
     };
   }
 });
 const MessageInput_vue_vue_type_style_index_0_scoped_decfe70f_lang = "";
-const MessageInput = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["__scopeId", "data-v-decfe70f"]]);
+const MessageInput = /* @__PURE__ */ _export_sfc(_sfc_main$v, [["__scopeId", "data-v-decfe70f"]]);
 const _withScopeId$e = (n) => (pushScopeId("data-v-030e0684"), n = n(), popScopeId(), n);
-const _hoisted_1$p = { class: "signed-message-desc" };
-const _hoisted_2$l = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("p", { class: "signed-message-desc_p" }, [
+const _hoisted_1$q = { class: "signed-message-desc" };
+const _hoisted_2$m = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("p", { class: "signed-message-desc_p" }, [
   /* @__PURE__ */ createTextVNode(" Event should be signed with your private key in advance. More details about events and signatures are "),
   /* @__PURE__ */ createBaseVNode("a", {
     target: "_blank",
@@ -16137,17 +17468,17 @@ const _hoisted_2$l = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ create
   }, "here"),
   /* @__PURE__ */ createTextVNode(". ")
 ], -1));
-const _hoisted_3$f = { class: "signed-message-desc_p" };
-const _hoisted_4$d = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("br", null, null, -1));
+const _hoisted_3$g = { class: "signed-message-desc_p" };
+const _hoisted_4$e = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("br", null, null, -1));
 const _hoisted_5$b = { class: "warning" };
-const _hoisted_6$8 = {
+const _hoisted_6$7 = {
   key: 0,
   class: "additional-relays"
 };
-const _hoisted_7$6 = { class: "additional-relay-field" };
-const _hoisted_8$6 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("span", { class: "aditinal-relay-num" }, "1.", -1));
-const _hoisted_9$6 = ["value"];
-const _hoisted_10$6 = { class: "additional-relay-field" };
+const _hoisted_7$5 = { class: "additional-relay-field" };
+const _hoisted_8$5 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("span", { class: "aditinal-relay-num" }, "1.", -1));
+const _hoisted_9$5 = ["value"];
+const _hoisted_10$5 = { class: "additional-relay-field" };
 const _hoisted_11$5 = { class: "aditinal-relay-num" };
 const _hoisted_12$5 = ["onInput"];
 const _hoisted_13$4 = /* @__PURE__ */ _withScopeId$e(() => /* @__PURE__ */ createBaseVNode("div", { class: "message-field-label" }, [
@@ -16165,7 +17496,7 @@ const _hoisted_17$3 = [
 const _hoisted_18$2 = ["disabled"];
 const _hoisted_19$2 = { class: "error" };
 const _hoisted_20$2 = { class: "warning" };
-const _sfc_main$t = /* @__PURE__ */ defineComponent({
+const _sfc_main$u = /* @__PURE__ */ defineComponent({
   __name: "SignedEventInput",
   props: {
     isSendingMessage: { type: Boolean },
@@ -16233,13 +17564,13 @@ const _sfc_main$t = /* @__PURE__ */ defineComponent({
     return (_ctx, _cache) => {
       var _a, _b;
       return openBlock(), createElementBlock(Fragment, null, [
-        createBaseVNode("div", _hoisted_1$p, [
-          _hoisted_2$l,
-          createBaseVNode("p", _hoisted_3$f, [
+        createBaseVNode("div", _hoisted_1$q, [
+          _hoisted_2$m,
+          createBaseVNode("p", _hoisted_3$g, [
             createTextVNode(" Event will be broadcasted to a selected relay("),
             createBaseVNode("em", null, toDisplayString(unref(relayStore).isConnectedToRelay ? unref(relayStore).currentRelay.url : "available after connect"), 1),
             createTextVNode("). You can add more relays to retransmit the event. "),
-            _hoisted_4$d
+            _hoisted_4$e
           ]),
           createBaseVNode("p", { class: "signed-message-desc_p" }, [
             createBaseVNode("button", {
@@ -16248,19 +17579,19 @@ const _sfc_main$t = /* @__PURE__ */ defineComponent({
             }, "Add relay")
           ]),
           createBaseVNode("div", _hoisted_5$b, toDisplayString(addRelayNotice.value), 1),
-          unref(relayStore).additionalRelaysCountForSignedEvent > 0 ? (openBlock(), createElementBlock("div", _hoisted_6$8, [
-            createBaseVNode("div", _hoisted_7$6, [
-              _hoisted_8$6,
+          unref(relayStore).additionalRelaysCountForSignedEvent > 0 ? (openBlock(), createElementBlock("div", _hoisted_6$7, [
+            createBaseVNode("div", _hoisted_7$5, [
+              _hoisted_8$5,
               createBaseVNode("input", {
                 class: "additional-relay-input",
                 readonly: "",
                 value: ((_a = unref(relayStore).currentRelay) == null ? void 0 : _a.url) ? `${(_b = unref(relayStore).currentRelay) == null ? void 0 : _b.url} (selected)` : "Firstly connect to default relay",
                 type: "text"
-              }, null, 8, _hoisted_9$6)
+              }, null, 8, _hoisted_9$5)
             ]),
             (openBlock(true), createElementBlock(Fragment, null, renderList(unref(relayStore).additionalRelaysCountForSignedEvent, (i2) => {
               return openBlock(), createElementBlock("div", { key: i2 }, [
-                createBaseVNode("div", _hoisted_10$6, [
+                createBaseVNode("div", _hoisted_10$5, [
                   createBaseVNode("span", _hoisted_11$5, toDisplayString(i2 + 1) + ".", 1),
                   createBaseVNode("input", {
                     class: "additional-relay-input",
@@ -16307,10 +17638,10 @@ const _sfc_main$t = /* @__PURE__ */ defineComponent({
   }
 });
 const SignedEventInput_vue_vue_type_style_index_0_scoped_030e0684_lang = "";
-const SignedEventInput = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["__scopeId", "data-v-030e0684"]]);
-const _hoisted_1$o = { class: "message-field-wrapper" };
-const _hoisted_2$k = { class: "error" };
-const _sfc_main$s = /* @__PURE__ */ defineComponent({
+const SignedEventInput = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["__scopeId", "data-v-030e0684"]]);
+const _hoisted_1$p = { class: "message-field-wrapper" };
+const _hoisted_2$l = { class: "error" };
+const _sfc_main$t = /* @__PURE__ */ defineComponent({
   __name: "MessageWrapper",
   props: {
     newEvents: {}
@@ -16435,7 +17766,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
       broadcastMsgError.value = "";
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$o, [
+      return openBlock(), createElementBlock("div", _hoisted_1$p, [
         isPresignedMessage.value ? (openBlock(), createBlock(SignedEventInput, {
           key: 0,
           onBroadcastEvent: broadcastEvent,
@@ -16451,16 +17782,16 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
           sentEventIds: sentEventIds.value,
           isSendingMessage: isSendingMessage.value
         }, null, 8, ["sentEventIds", "isSendingMessage"])),
-        createBaseVNode("div", _hoisted_2$k, toDisplayString(broadcastMsgError.value), 1)
+        createBaseVNode("div", _hoisted_2$l, toDisplayString(broadcastMsgError.value), 1)
       ]);
     };
   }
 });
-const MessageWrapper_vue_vue_type_style_index_0_scoped_5959c1f5_lang = "";
-const MessageWrapper = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["__scopeId", "data-v-5959c1f5"]]);
-const _hoisted_1$n = { class: "dropdown" };
-const _hoisted_2$j = ["data-value"];
-const _sfc_main$r = /* @__PURE__ */ defineComponent({
+const MessageWrapper_vue_vue_type_style_index_0_scoped_f969993f_lang = "";
+const MessageWrapper = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["__scopeId", "data-v-f969993f"]]);
+const _hoisted_1$o = { class: "dropdown" };
+const _hoisted_2$k = ["data-value"];
+const _sfc_main$s = /* @__PURE__ */ defineComponent({
   __name: "Dropdown",
   props: {
     listItems: {},
@@ -16538,7 +17869,7 @@ const _sfc_main$r = /* @__PURE__ */ defineComponent({
       items.value.classList.remove("open");
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$n, [
+      return openBlock(), createElementBlock("div", _hoisted_1$o, [
         createBaseVNode("button", {
           ref_key: "selectBtn",
           ref: selectBtn,
@@ -16556,7 +17887,7 @@ const _sfc_main$r = /* @__PURE__ */ defineComponent({
               key: `item-${i2}`,
               "data-value": item.key,
               class: normalizeClass(["item", { active: i2 === selectedIndex.value }])
-            }, toDisplayString(item.value), 11, _hoisted_2$j);
+            }, toDisplayString(item.value), 11, _hoisted_2$k);
           }), 128))
         ], 512)
       ]);
@@ -16564,8 +17895,8 @@ const _sfc_main$r = /* @__PURE__ */ defineComponent({
   }
 });
 const Dropdown_vue_vue_type_style_index_0_scoped_600a84f1_lang = "";
-const Dropdown = /* @__PURE__ */ _export_sfc(_sfc_main$r, [["__scopeId", "data-v-600a84f1"]]);
-const _sfc_main$q = /* @__PURE__ */ defineComponent({
+const Dropdown = /* @__PURE__ */ _export_sfc(_sfc_main$s, [["__scopeId", "data-v-600a84f1"]]);
+const _sfc_main$r = /* @__PURE__ */ defineComponent({
   __name: "FeedSourceSelect",
   props: {
     disabled: { type: Boolean }
@@ -16606,14 +17937,14 @@ const _sfc_main$q = /* @__PURE__ */ defineComponent({
   }
 });
 const _withScopeId$d = (n) => (pushScopeId("data-v-35ca07dd"), n = n(), popScopeId(), n);
-const _hoisted_1$m = { class: "custom-checkbox" };
-const _hoisted_2$i = ["checked"];
-const _hoisted_3$e = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("span", { class: "checkmark" }, null, -1));
-const _hoisted_4$c = {
+const _hoisted_1$n = { class: "custom-checkbox" };
+const _hoisted_2$j = ["checked"];
+const _hoisted_3$f = /* @__PURE__ */ _withScopeId$d(() => /* @__PURE__ */ createBaseVNode("span", { class: "checkmark" }, null, -1));
+const _hoisted_4$d = {
   class: "label-text",
   for: "checkbox"
 };
-const _sfc_main$p = /* @__PURE__ */ defineComponent({
+const _sfc_main$q = /* @__PURE__ */ defineComponent({
   __name: "Checkbox",
   props: {
     label: {},
@@ -16626,25 +17957,25 @@ const _sfc_main$p = /* @__PURE__ */ defineComponent({
       emit2("onChange", event);
     };
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1$m, [
+      return openBlock(), createElementBlock("div", _hoisted_1$n, [
         createBaseVNode("label", null, [
           createBaseVNode("input", {
             id: "checkbox",
             onChange,
             checked: _ctx.checked,
             type: "checkbox"
-          }, null, 40, _hoisted_2$i),
-          _hoisted_3$e,
-          createBaseVNode("span", _hoisted_4$c, toDisplayString(_ctx.label), 1)
+          }, null, 40, _hoisted_2$j),
+          _hoisted_3$f,
+          createBaseVNode("span", _hoisted_4$d, toDisplayString(_ctx.label), 1)
         ])
       ]);
     };
   }
 });
 const Checkbox_vue_vue_type_style_index_0_scoped_35ca07dd_lang = "";
-const Checkbox = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["__scopeId", "data-v-35ca07dd"]]);
-const _hoisted_1$l = { class: "wrapper" };
-const _sfc_main$o = /* @__PURE__ */ defineComponent({
+const Checkbox = /* @__PURE__ */ _export_sfc(_sfc_main$q, [["__scopeId", "data-v-35ca07dd"]]);
+const _hoisted_1$m = { class: "wrapper" };
+const _sfc_main$p = /* @__PURE__ */ defineComponent({
   __name: "ShowImagesCheckbox",
   setup(__props) {
     const imagesStore = useImages();
@@ -16653,7 +17984,7 @@ const _sfc_main$o = /* @__PURE__ */ defineComponent({
     };
     return (_ctx, _cache) => {
       const _component_router_link = resolveComponent("router-link");
-      return openBlock(), createElementBlock("div", _hoisted_1$l, [
+      return openBlock(), createElementBlock("div", _hoisted_1$m, [
         createVNode(Checkbox, {
           onOnChange: toggleImages,
           checked: unref(imagesStore).showImages,
@@ -16674,12 +18005,12 @@ const _sfc_main$o = /* @__PURE__ */ defineComponent({
   }
 });
 const ShowImagesCheckbox_vue_vue_type_style_index_0_lang = "";
-const _hoisted_1$k = { class: "feed-header" };
-const _hoisted_2$h = {
+const _hoisted_1$l = { class: "feed-header" };
+const _hoisted_2$i = {
   key: 0,
   class: "warning"
 };
-const _sfc_main$n = /* @__PURE__ */ defineComponent({
+const _sfc_main$o = /* @__PURE__ */ defineComponent({
   __name: "FeedHeader",
   props: {
     isDisabledSourceSelect: { type: Boolean }
@@ -16695,57 +18026,68 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
     };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
-        createBaseVNode("div", _hoisted_1$k, [
-          createVNode(_sfc_main$q, {
+        createBaseVNode("div", _hoisted_1$l, [
+          createVNode(_sfc_main$r, {
             class: "dropdown",
             disabled: props.isDisabledSourceSelect,
             onShowFeedNotice: showFeedNotice
           }, null, 8, ["disabled"]),
-          createVNode(_sfc_main$o)
+          createVNode(_sfc_main$p)
         ]),
-        notice.value.length ? (openBlock(), createElementBlock("div", _hoisted_2$h, toDisplayString(notice.value), 1)) : createCommentVNode("", true)
+        notice.value.length ? (openBlock(), createElementBlock("div", _hoisted_2$i, toDisplayString(notice.value), 1)) : createCommentVNode("", true)
       ], 64);
     };
   }
 });
 const FeedHeader_vue_vue_type_style_index_0_scoped_03f1c3ab_lang = "";
-const FeedHeader = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["__scopeId", "data-v-03f1c3ab"]]);
-const DEFAULT_RELAY = "wss://nos.lol";
-const DEFAULT_RELAYS = [
-  "wss://nos.lol",
-  // USA
-  "wss://relay.damus.io",
-  // Cannada
-  "wss://relay.snort.social",
-  // France
-  "wss://relay.nostr.band",
-  // Finland
-  "wss://eden.nostr.land"
-  // USA
-];
-const fallbackRelays = [
-  "wss://nos.lol",
-  // USA
-  "wss://relay.damus.io",
-  // Cannada
-  "wss://relay.nostr.band",
-  // Finland
-  "wss://relay.snort.social",
-  // France
-  "wss://relay.primal.net",
-  // Cannada
-  "wss://eden.nostr.land",
-  // USA
-  "wss://nostr.wine",
-  // USA
-  "wss://offchain.pub",
-  // USA
-  "wss://relay.nostr.bg",
-  // Germany
-  "wss://relay.mostr.pub"
-  // Cannada
-];
-const DEFAULT_EVENTS_COUNT = 20;
+const FeedHeader = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["__scopeId", "data-v-03f1c3ab"]]);
+const _withScopeId$c = (n) => (pushScopeId("data-v-b3f65980"), n = n(), popScopeId(), n);
+const _hoisted_1$k = {
+  key: 0,
+  class: "new-events__imgs"
+};
+const _hoisted_2$h = ["src"];
+const _hoisted_3$e = ["src"];
+const _hoisted_4$c = { class: "new-events__text" };
+const _hoisted_5$a = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("b", null, "↑", -1));
+const _sfc_main$n = /* @__PURE__ */ defineComponent({
+  __name: "NewEventsBadge",
+  emits: ["loadNewRelayEvents"],
+  setup(__props, { emit: __emit }) {
+    const feedStore = useFeed();
+    const imagesStore = useImages();
+    const newAuthorImg1 = computed(() => feedStore.newEventsBadgeImageUrls[0]);
+    const newAuthorImg2 = computed(() => feedStore.newEventsBadgeImageUrls[1]);
+    const newEventsCount = computed(() => feedStore.newEventsBadgeCount);
+    const emit2 = __emit;
+    const loadNewRelayEvents = () => {
+      emit2("loadNewRelayEvents");
+    };
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", {
+        onClick: loadNewRelayEvents,
+        class: normalizeClass(["new-events", { "new-events_top-shifted": unref(feedStore).isLoadingNewEvents }])
+      }, [
+        unref(imagesStore).showImages && unref(feedStore).newEventsBadgeImageUrls.length ? (openBlock(), createElementBlock("div", _hoisted_1$k, [
+          createBaseVNode("img", {
+            class: "new-events__img",
+            src: newAuthorImg1.value,
+            alt: "user's avatar"
+          }, null, 8, _hoisted_2$h),
+          createBaseVNode("img", {
+            class: "new-events__img",
+            src: newAuthorImg2.value,
+            alt: "user's avatar"
+          }, null, 8, _hoisted_3$e)
+        ])) : createCommentVNode("", true),
+        createBaseVNode("span", _hoisted_4$c, toDisplayString(newEventsCount.value) + " new note" + toDisplayString(newEventsCount.value > 1 ? "s" : ""), 1),
+        _hoisted_5$a
+      ], 2);
+    };
+  }
+});
+const NewEventsBadge_vue_vue_type_style_index_0_scoped_b3f65980_lang = "";
+const NewEventsBadge = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["__scopeId", "data-v-b3f65980"]]);
 const timeout = (ms) => {
   return new Promise((resolve2) => setTimeout(resolve2, ms));
 };
@@ -16770,8 +18112,8 @@ const connectToSelectedRelay = async (relayUrl) => {
   return relay;
 };
 const getConnectedReadWriteRelays = async (pool, readAndWriteRelays) => {
-  const userConnectedReadRelays = [];
-  const userConnectedWriteRelays = [];
+  const connectedRead = [];
+  const connectedWrite = [];
   if (readAndWriteRelays.length) {
     const result = await Promise.all(
       readAndWriteRelays.map(async (r) => {
@@ -16786,14 +18128,14 @@ const getConnectedReadWriteRelays = async (pool, readAndWriteRelays) => {
     );
     result.forEach((r) => {
       if (r.connected) {
-        userConnectedReadRelays.push(r.url);
+        connectedRead.push(r.url);
         if (r.type === "write") {
-          userConnectedWriteRelays.push(r.url);
+          connectedWrite.push(r.url);
         }
       }
     });
   }
-  return { userConnectedReadRelays, userConnectedWriteRelays };
+  return { read: connectedRead, write: connectedWrite };
 };
 const getFollowsConnectedRelaysMap = async (follows, connectedUserRelays, pool) => {
   const followsRelaysMap = {};
@@ -16842,41 +18184,38 @@ const getFollowsConnectedRelaysMap = async (follows, connectedUserRelays, pool) 
   }
   return followsRelaysMap;
 };
-const asyncClosePool = async (pool) => {
-  const relays = Array.from(pool.relays.keys());
-  pool.close(relays);
-  const isClosed = (ws) => !ws || ws.readyState === WebSocket.CLOSED;
-  const relayClosePromises = relays.map(async (url) => {
-    var _a;
-    const ws = (_a = pool.relays.get(url)) == null ? void 0 : _a.ws;
-    if (!ws)
-      return;
-    while (!isClosed(ws)) {
-      await new Promise((resolve2) => setTimeout(resolve2, 100));
-    }
+const getUserFollows = async (pubkey, relays, pool) => {
+  const follows = await pool.get(relays, {
+    kinds: [EVENT_KIND.FOLLOW_LIST],
+    limit: 1,
+    authors: [pubkey]
   });
-  await Promise.all(relayClosePromises);
+  return follows;
 };
-const _withScopeId$c = (n) => (pushScopeId("data-v-7abbe2bf"), n = n(), popScopeId(), n);
+const getUserRelaysList = async (pubkey, relays, pool) => {
+  return await pool.get(relays, {
+    kinds: [EVENT_KIND.RELAY_LIST_META],
+    authors: [pubkey],
+    limit: 1
+  });
+};
+const getUserMeta = async (pubkey, relays, pool) => {
+  return await pool.get(relays, {
+    kinds: [EVENT_KIND.META],
+    authors: [pubkey],
+    limit: 1
+  });
+};
 const _hoisted_1$j = { id: "feed" };
-const _hoisted_2$g = { class: "columns" };
-const _hoisted_3$d = {
+const _hoisted_2$g = {
   key: 0,
   class: "connecting-notice"
 };
-const _hoisted_4$b = {
+const _hoisted_3$d = {
   key: 1,
   class: "connecting-notice"
 };
-const _hoisted_5$a = {
-  key: 0,
-  class: "new-events__imgs"
-};
-const _hoisted_6$7 = ["src"];
-const _hoisted_7$5 = ["src"];
-const _hoisted_8$5 = { class: "new-events__text" };
-const _hoisted_9$5 = /* @__PURE__ */ _withScopeId$c(() => /* @__PURE__ */ createBaseVNode("b", { class: "new-events__arrow" }, "↑", -1));
-const _hoisted_10$5 = {
+const _hoisted_4$b = {
   key: 3,
   class: "loading-more"
 };
@@ -16887,13 +18226,10 @@ const _sfc_main$m = /* @__PURE__ */ defineComponent({
   },
   setup(__props) {
     const relayStore = useRelay();
-    const imagesStore = useImages();
     const feedStore = useFeed();
     const nsecStore = useNsec();
     const poolStore = usePool();
     const metasCacheStore = useMetasCache();
-    const newAuthorImg1 = computed(() => feedStore.newEventsBadgeImageUrls[0]);
-    const newAuthorImg2 = computed(() => feedStore.newEventsBadgeImageUrls[1]);
     const route = useRoute();
     const router2 = useRouter();
     const currentPage = ref(1);
@@ -16914,9 +18250,7 @@ const _sfc_main$m = /* @__PURE__ */ defineComponent({
     watch(
       () => feedStore.selectedFeedSource,
       async () => {
-        if (relayStore.currentRelay.connected && nsecStore.isValidNsecPresented()) {
-          await changeFeedSource();
-        }
+        await mountFeed();
       }
     );
     watch(
@@ -16935,149 +18269,135 @@ const _sfc_main$m = /* @__PURE__ */ defineComponent({
       }
       if (feedStore.toRemountFeed) {
         feedStore.setToRemountFeed(false);
-        remountFeed();
+        mountFeed();
       }
     });
-    const changeFeedSource = async () => {
-      await remountFeed();
-    };
     function disableSelect() {
       isDisabledSourceSelect.value = true;
     }
     function enableSelect() {
       isDisabledSourceSelect.value = false;
     }
-    const remountFeed = async () => {
-      disableSelect();
-      feedStore.clearNewEventsBadgeUpdateInterval();
-      feedStore.setShowNewEventsBadge(false);
-      feedStore.updateNewEventsToShow([]);
-      feedStore.updatePaginationEventsIds([]);
-      feedStore.updateEvents([]);
-      await mountFeed();
-    };
+    function getInitialFeedRelays() {
+      return relayStore.connectedUserReadRelayUrls.length ? relayStore.connectedUserReadRelayUrls : [relayStore.currentRelay.url];
+    }
     async function mountFeed() {
       disableSelect();
+      feedStore.sourceSelectDataRefresh();
       feedStore.setLoadingFeedSourceStatus(true);
       const pubkey = nsecStore.getPubkey();
-      let feedRelays = relayStore.connectedUserReadRelayUrls.length ? relayStore.connectedUserReadRelayUrls : [relayStore.currentRelay.url];
-      let followsRelaysMap = {};
-      const folowsRelaysSet = /* @__PURE__ */ new Set();
+      let initialFeedRelays = getInitialFeedRelays();
       let followsPubkeys = [];
+      let folowsConnectedRelays = [];
+      let followsConnectedRelaysMap = {};
       if (feedStore.isFollowsSource && pubkey.length) {
-        const follows = await pool.get(feedRelays, {
-          kinds: [EVENT_KIND.FOLLOW_LIST],
-          limit: 1,
-          authors: [pubkey]
-        });
-        if (follows) {
-          followsPubkeys = follows.tags.map((f) => f[1]);
-          followsRelaysMap = await getFollowsConnectedRelaysMap(
-            follows,
-            feedRelays,
-            pool
-          );
-          for (const relays of Object.values(followsRelaysMap)) {
-            relays.forEach((r) => folowsRelaysSet.add(r));
-          }
-        }
+        ({ followsPubkeys, followsConnectedRelaysMap, folowsConnectedRelays } = await getMountFollowsData(pubkey, initialFeedRelays));
       }
-      if (folowsRelaysSet.size) {
-        feedRelays = Array.from(folowsRelaysSet);
-      }
+      const feedRelays = folowsConnectedRelays.length ? folowsConnectedRelays : initialFeedRelays;
       relayStore.setConnectedFeedRelayUrls(feedRelays);
-      let postsFilter = { kinds: [1], limit: DEFAULT_EVENTS_COUNT };
-      if (followsPubkeys.length) {
-        postsFilter.authors = followsPubkeys;
-      }
-      feedStore.resetTimeToGetNewPostsToNow();
-      let posts = await listRootEvents(pool, feedRelays, [postsFilter]);
-      posts = posts.sort((a, b) => b.created_at - a.created_at);
+      const posts = await getMountFeedEvents(followsPubkeys, feedRelays);
       const isRootPosts = true;
       await loadAndInjectDataToPosts(
         posts,
         null,
-        followsRelaysMap,
+        followsConnectedRelaysMap,
         feedRelays,
         metasCacheStore,
         pool,
         isRootPosts,
         (post) => {
           feedStore.pushToEvents(post);
+          feedStore.pushToPaginationEventsIds(post.id);
           if (feedStore.isLoadingFeedSource) {
             feedStore.setLoadingFeedSourceStatus(false);
             feedStore.setLoadingMoreStatus(true);
           }
-          feedStore.pushToPaginationEventsIds(post.id);
         }
       );
       feedStore.setLoadingMoreStatus(false);
-      let subscribePostsFilter = { kinds: [1] };
-      if (followsPubkeys.length) {
-        subscribePostsFilter.authors = followsPubkeys;
-      }
-      feedStore.newEventsBadgeUpdateInterval = setInterval(async () => {
-        const currentInterval = feedStore.newEventsBadgeUpdateInterval;
-        await getFeedUpdates(feedRelays, subscribePostsFilter, currentInterval);
-      }, 3e3);
+      await subscribeFeedForUpdates(followsPubkeys, feedRelays);
       enableSelect();
     }
+    async function getMountFollowsData(pubkey, relays) {
+      const folowsRelaysSet = /* @__PURE__ */ new Set();
+      let followsConnectedRelaysMap = {};
+      let followsPubkeys = [];
+      const follows = await getUserFollows(pubkey, relays, pool);
+      if (follows) {
+        followsPubkeys = follows.tags.map((f) => f[1]);
+        followsConnectedRelaysMap = await getFollowsConnectedRelaysMap(
+          follows,
+          relays,
+          pool
+        );
+        for (const relays2 of Object.values(followsConnectedRelaysMap)) {
+          relays2.forEach((r) => folowsRelaysSet.add(r));
+        }
+      }
+      return {
+        followsPubkeys,
+        followsConnectedRelaysMap,
+        folowsConnectedRelays: Array.from(folowsRelaysSet)
+      };
+    }
+    async function getMountFeedEvents(pubkeys, relays) {
+      let postsFilter = { kinds: [EVENT_KIND.TEXT_NOTE], limit: DEFAULT_EVENTS_COUNT };
+      if (pubkeys.length) {
+        postsFilter.authors = pubkeys;
+      }
+      feedStore.refreshPostsFetchTime();
+      const posts = await listRootEvents(pool, relays, [postsFilter]);
+      return posts.sort((a, b) => b.created_at - a.created_at);
+    }
+    const subscribeFeedForUpdates = async (pubkeys, relays) => {
+      let filter = { kinds: [EVENT_KIND.TEXT_NOTE] };
+      if (pubkeys.length) {
+        filter.authors = pubkeys;
+      }
+      feedStore.updateInterval = setInterval(async () => {
+        await getFeedUpdates(relays, filter, feedStore.updateInterval);
+      }, 3e3);
+    };
     const getFeedUpdates = async (feedRelays, subscribePostsFilter, currentInterval) => {
       if (feedStore.isLoadingNewEvents)
         return;
       subscribePostsFilter.since = feedStore.timeToGetNewPosts;
-      feedStore.resetTimeToGetNewPostsToNow();
-      let newEvents = await pool.querySync(feedRelays, subscribePostsFilter);
-      if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
+      feedStore.refreshPostsFetchTime();
+      const newEvents = await pool.querySync(feedRelays, subscribePostsFilter);
+      if (!isFeedUpdateIntervalValid(currentInterval))
         return;
-      }
-      newEvents = newEvents.sort((a, b) => a.created_at - b.created_at);
-      newEvents.forEach((event) => {
-        if (feedStore.eventsId.includes(event.id))
-          return;
-        if (feedStore.newEventsToShowIds.includes(event.id))
-          return;
-        if (feedStore.paginationEventsIds.includes(event.id))
-          return;
-        const nip10Data = nip10_exports.parse(event);
-        if (nip10Data.reply || nip10Data.root)
-          return;
-        feedStore.pushToNewEventsToShow({
-          id: event.id,
-          pubkey: event.pubkey,
-          created_at: event.created_at
-        });
-      });
-      await updateNewEventsElement(currentInterval);
+      feedStore.filterAndUpdateNewEventsToShow(newEvents);
+      if (!feedStore.newEventsToShow.length)
+        return;
+      feedStore.setShowNewEventsBadge(true);
+      const newBadgeImages = await getNewEventsBadgeImages(feedRelays);
+      if (!isFeedUpdateIntervalValid(currentInterval))
+        return;
+      if (!newBadgeImages.length)
+        return;
+      feedStore.setNewEventsBadgeImageUrls(newBadgeImages);
     };
-    async function updateNewEventsElement(currentInterval) {
-      var _a, _b;
-      if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
-        return;
-      }
-      const relays = relayStore.connectedFeedRelaysUrls;
-      if (!relays.length)
-        return;
+    const isFeedUpdateIntervalValid = (interval) => {
+      return feedStore.updateInterval === interval;
+    };
+    const getNewEventsBadgeImages = async (feedRelays) => {
       const eventsToShow = feedStore.newEventsToShow;
       if (eventsToShow.length < 2)
-        return;
-      feedStore.setNewEventsBadgeCount(eventsToShow.length);
-      feedStore.setShowNewEventsBadge(true);
+        return [];
       const pub1 = eventsToShow[eventsToShow.length - 1].pubkey;
       const pub2 = eventsToShow[eventsToShow.length - 2].pubkey;
       const eventsListOptions1 = { kinds: [0], authors: [pub1], limit: 1 };
       const eventsListOptions2 = { kinds: [0], authors: [pub2], limit: 1 };
-      const author1 = await pool.querySync(relays, eventsListOptions1);
-      const author2 = await pool.querySync(relays, eventsListOptions2);
-      if (feedStore.newEventsBadgeUpdateInterval !== currentInterval) {
-        return;
-      }
-      if (!((_a = author1[0]) == null ? void 0 : _a.content) || !((_b = author2[0]) == null ? void 0 : _b.content))
-        return;
-      const authorImg1 = JSON.parse(author1[0].content).picture;
-      const authorImg2 = JSON.parse(author2[0].content).picture;
-      feedStore.setNewEventsBadgeImageUrls([authorImg1, authorImg2]);
-    }
+      const [author1, author2] = await Promise.all([
+        pool.get(feedRelays, eventsListOptions1),
+        pool.get(feedRelays, eventsListOptions2)
+      ]);
+      if (!(author1 == null ? void 0 : author1.content) || !(author2 == null ? void 0 : author2.content))
+        return [];
+      const authorImg1 = JSON.parse(author1.content).picture;
+      const authorImg2 = JSON.parse(author2.content).picture;
+      return [authorImg1, authorImg2];
+    };
     const showFeedPage = async (page, ignoreLoadingStatus = false) => {
       if (!ignoreLoadingStatus && feedStore.isLoadingNewEvents)
         return;
@@ -17119,6 +18439,7 @@ const _sfc_main$m = /* @__PURE__ */ defineComponent({
       router2.push({ path: `${route.path}` });
       let eventsToShow = [...feedStore.newEventsToShow];
       feedStore.updateNewEventsToShow([]);
+      feedStore.setNewEventsBadgeImageUrls([]);
       const ids = eventsToShow.map((e) => e.id).reverse();
       const newPaginationEventsIds = [...feedStore.paginationEventsIds];
       newPaginationEventsIds.unshift(...ids);
@@ -17135,53 +18456,33 @@ const _sfc_main$m = /* @__PURE__ */ defineComponent({
           newEvents: unref(feedStore).newEventsToShow
         }, null, 8, ["newEvents"]),
         createVNode(FeedHeader, { isDisabledSourceSelect: isDisabledSourceSelect.value }, null, 8, ["isDisabledSourceSelect"]),
-        createBaseVNode("div", _hoisted_2$g, [
-          createBaseVNode("div", {
-            class: normalizeClass(["events", { events_hidden: currPath.value === "/log" }])
-          }, [
-            unref(feedStore).isLoadingFeedSource ? (openBlock(), createElementBlock("div", _hoisted_3$d, " Loading feed from " + toDisplayString(unref(feedStore).selectedFeedSource) + "... ", 1)) : createCommentVNode("", true),
-            unref(feedStore).isLoadingNewEvents ? (openBlock(), createElementBlock("div", _hoisted_4$b, " Loading new notes... ")) : createCommentVNode("", true),
-            unref(feedStore).showNewEventsBadge ? (openBlock(), createElementBlock("div", {
-              key: 2,
-              onClick: loadNewRelayEvents,
-              class: normalizeClass(["new-events", { "new-events_top-shifted": unref(feedStore).isLoadingNewEvents }])
-            }, [
-              unref(imagesStore).showImages && unref(feedStore).newEventsBadgeImageUrls.length ? (openBlock(), createElementBlock("div", _hoisted_5$a, [
-                createBaseVNode("img", {
-                  class: "new-events__img",
-                  src: newAuthorImg1.value,
-                  alt: "user's avatar"
-                }, null, 8, _hoisted_6$7),
-                createBaseVNode("img", {
-                  class: "new-events__img",
-                  src: newAuthorImg2.value,
-                  alt: "user's avatar"
-                }, null, 8, _hoisted_7$5)
-              ])) : createCommentVNode("", true),
-              createBaseVNode("span", _hoisted_8$5, toDisplayString(unref(feedStore).newEventsBadgeCount) + " new notes", 1),
-              _hoisted_9$5
-            ], 2)) : createCommentVNode("", true),
-            createVNode(RelayEventsList, {
-              events: unref(feedStore).events,
-              pubKey: unref(nsecStore).getPubkey(),
-              showImages: unref(imagesStore).showImages,
-              currentReadRelays: unref(relayStore).connectedFeedRelaysUrls,
-              onToggleRawData: unref(feedStore).toggleEventRawData
-            }, null, 8, ["events", "pubKey", "showImages", "currentReadRelays", "onToggleRawData"]),
-            unref(feedStore).isLoadingMore ? (openBlock(), createElementBlock("div", _hoisted_10$5, "Loading more posts...")) : createCommentVNode("", true),
-            createVNode(Pagination, {
-              pagesCount: pagesCount.value,
-              currentPage: currentPage.value,
-              onShowPage: showFeedPage
-            }, null, 8, ["pagesCount", "currentPage"])
-          ], 2)
-        ])
+        createBaseVNode("div", {
+          class: normalizeClass(["events", { events_hidden: currPath.value === "/log" }])
+        }, [
+          unref(feedStore).isLoadingFeedSource ? (openBlock(), createElementBlock("div", _hoisted_2$g, " Loading feed from " + toDisplayString(unref(feedStore).selectedFeedSource) + "... ", 1)) : createCommentVNode("", true),
+          unref(feedStore).isLoadingNewEvents ? (openBlock(), createElementBlock("div", _hoisted_3$d, "Loading new notes...")) : createCommentVNode("", true),
+          unref(feedStore).showNewEventsBadge ? (openBlock(), createBlock(NewEventsBadge, {
+            key: 2,
+            onLoadNewRelayEvents: loadNewRelayEvents
+          })) : createCommentVNode("", true),
+          createVNode(RelayEventsList, {
+            events: unref(feedStore).events,
+            currentReadRelays: unref(relayStore).connectedFeedRelaysUrls,
+            onToggleRawData: unref(feedStore).toggleEventRawData
+          }, null, 8, ["events", "currentReadRelays", "onToggleRawData"]),
+          unref(feedStore).isLoadingMore ? (openBlock(), createElementBlock("div", _hoisted_4$b, "Loading more posts...")) : createCommentVNode("", true),
+          createVNode(Pagination, {
+            pagesCount: pagesCount.value,
+            currentPage: currentPage.value,
+            onShowPage: showFeedPage
+          }, null, 8, ["pagesCount", "currentPage"])
+        ], 2)
       ]);
     };
   }
 });
-const Feed_vue_vue_type_style_index_0_scoped_7abbe2bf_lang = "";
-const Feed = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["__scopeId", "data-v-7abbe2bf"]]);
+const Feed_vue_vue_type_style_index_0_scoped_b4a79c3a_lang = "";
+const Feed = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["__scopeId", "data-v-b4a79c3a"]]);
 const _hoisted_1$i = /* @__PURE__ */ createStaticVNode('<h3>Slightly Private App</h3><p><a href="https://nostr.com">nostr</a> is public, censorship-resistant social network. It&#39;s simple: <ol><li>Select a relay from the list, or specify a <a href="https://nostr.watch/" target="_blank">custom URL</a></li><li><em>Optionally</em>, set your private key, to create new messages</li></ol></p><p> Traditional social networks can suppress certain posts or users. In nostr, every message is signed by user&#39;s <em>private key</em> and broadcasted to <em>relays</em>. <strong>Messages are tamper-resistant</strong>: no one can edit them, or the signature will become invalid. <strong>Users can&#39;t be blocked</strong>: even if a relay blocks someone, it&#39;s always possible to switch to a different one, or create up a personal relay. </p><p> The app is available at <a href="http://nostr.spa">nostr.spa</a>. You can: <ul><li><em>Connect</em> and see relay&#39;s global feed.</li><li><em>Post</em> new messages to the relay.</li><li><em>Broadcast</em> a pre-signed message. No need to enter a private key.</li><li><em>Search</em> information about a user or an event.</li></ul></p>', 4);
 const _hoisted_5$9 = /* @__PURE__ */ createStaticVNode("<ul><li>No tracking from our end</li><li>Private keys are not sent anywhere. They are stored in RAM of your device</li><li>Relay will see your ip+browser after you click <em>Connect</em> button</li><li>GitHub will see ip+browser of anyone who&#39;s using the app, because it&#39;s hosted on GitHub Pages. They won&#39;t see any nostr-specific interactions you will make</li><li><em>Show avatars</em> feature will leak your ip+browser to random people on the internet. Since there are no centralized servers in nostr, every user can specify their own URL for avatar hosting. Meaning, users can control the hosting webservers and see logs</li><li><em>Remember me</em> feature will write private key you&#39;ve entered to browser&#39;s Local Storage, which is usually stored on your device&#39;s disk</li><li>VPN or TOR usage is advised, <em>as with any nostr client</em>, to prevent ip leakage</li></ul>", 1);
 const _hoisted_6$6 = /* @__PURE__ */ createStaticVNode('<h3>Open source</h3><p> The lightweight nostr client is built to showcase <a href="/noble/">noble</a> cryptography. Signing is done using <a target="_blank" href="https://github.com/paulmillr/noble-curves">noble-curves</a>, while <a target="_blank" href="https://github.com/paulmillr/scure-base">scure-base</a> is used for bech32, <a target="_blank" href="https://github.com/nbd-wtf/nostr-tools">nostr-tools</a> are used for general nostr utilities and Vue.js is utilized for UI. Check out <a target="_blank" href="https://github.com/paulmillr/paulmillr.github.io">the source code</a>. You are welcome to host the client on your personal website. </p>', 2);
@@ -17264,7 +18565,7 @@ const useOwnProfile = defineStore("ownProfile", () => {
   }
   return { contactsEvent, updateContactsEvent, updateMeta, username, pubkey };
 });
-const _withScopeId$b = (n) => (pushScopeId("data-v-7d13b372"), n = n(), popScopeId(), n);
+const _withScopeId$b = (n) => (pushScopeId("data-v-a59aedde"), n = n(), popScopeId(), n);
 const _hoisted_1$h = { class: "event" };
 const _hoisted_2$f = {
   key: 0,
@@ -17385,8 +18686,8 @@ const _sfc_main$k = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const UserEvent_vue_vue_type_style_index_0_scoped_7d13b372_lang = "";
-const UserEvent = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["__scopeId", "data-v-7d13b372"]]);
+const UserEvent_vue_vue_type_style_index_0_scoped_a59aedde_lang = "";
+const UserEvent = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["__scopeId", "data-v-a59aedde"]]);
 const TWO_DAYS = 2 * 24 * 60 * 60;
 const secureRandom = () => {
   return crypto.getRandomValues(new Uint32Array(1))[0] / (4294967295 + 1);
@@ -17498,8 +18799,8 @@ const _sfc_main$j = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const FollowBtn_vue_vue_type_style_index_0_scoped_8646c4c8_lang = "";
-const FollowBtn = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["__scopeId", "data-v-8646c4c8"]]);
+const FollowBtn_vue_vue_type_style_index_0_scoped_4aaaa5fc_lang = "";
+const FollowBtn = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["__scopeId", "data-v-4aaaa5fc"]]);
 const _sfc_main$i = {};
 const _hoisted_1$g = {
   xmlns: "http://www.w3.org/2000/svg",
@@ -17519,7 +18820,7 @@ function _sfc_render$1(_ctx, _cache) {
   return openBlock(), createElementBlock("svg", _hoisted_1$g, _hoisted_4$9);
 }
 const DownloadIcon = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$1]]);
-const _withScopeId$a = (n) => (pushScopeId("data-v-f777a106"), n = n(), popScopeId(), n);
+const _withScopeId$a = (n) => (pushScopeId("data-v-b8cc5f48"), n = n(), popScopeId(), n);
 const _hoisted_1$f = {
   key: 0,
   class: "loading-notice"
@@ -17585,7 +18886,6 @@ const _sfc_main$h = /* @__PURE__ */ defineComponent({
     const userEvent = ref({});
     const userDetails = ref({});
     const isUserHasValidNip05 = ref(false);
-    ref("");
     const showNotFoundError = ref(false);
     const pubHex = ref("");
     const showLoadingUser = ref(false);
@@ -18047,8 +19347,8 @@ const _sfc_main$h = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const User_vue_vue_type_style_index_0_scoped_f777a106_lang = "";
-const User = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["__scopeId", "data-v-f777a106"]]);
+const User_vue_vue_type_style_index_0_scoped_b8cc5f48_lang = "";
+const User = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["__scopeId", "data-v-b8cc5f48"]]);
 const _withScopeId$9 = (n) => (pushScopeId("data-v-3ab5012e"), n = n(), popScopeId(), n);
 const _hoisted_1$e = /* @__PURE__ */ _withScopeId$9(() => /* @__PURE__ */ createBaseVNode("h4", null, "Images:", -1));
 const _sfc_main$g = /* @__PURE__ */ defineComponent({
@@ -18061,7 +19361,7 @@ const _sfc_main$g = /* @__PURE__ */ defineComponent({
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
         _hoisted_1$e,
-        createVNode(_sfc_main$o, {
+        createVNode(_sfc_main$p, {
           showImages: unref(imagesStore).showImages,
           onToggleImages: toggleImages
         }, null, 8, ["showImages"])
@@ -18071,7 +19371,7 @@ const _sfc_main$g = /* @__PURE__ */ defineComponent({
 });
 const Images_vue_vue_type_style_index_0_scoped_3ab5012e_lang = "";
 const Images = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["__scopeId", "data-v-3ab5012e"]]);
-const _withScopeId$8 = (n) => (pushScopeId("data-v-7acb228a"), n = n(), popScopeId(), n);
+const _withScopeId$8 = (n) => (pushScopeId("data-v-8131004c"), n = n(), popScopeId(), n);
 const _hoisted_1$d = /* @__PURE__ */ _withScopeId$8(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your relays:", -1));
 const _hoisted_2$c = { class: "error" };
 const _hoisted_3$9 = { class: "relays" };
@@ -18269,8 +19569,8 @@ const _sfc_main$f = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const Relays_vue_vue_type_style_index_0_scoped_7acb228a_lang = "";
-const Relays = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["__scopeId", "data-v-7acb228a"]]);
+const Relays_vue_vue_type_style_index_0_scoped_8131004c_lang = "";
+const Relays = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["__scopeId", "data-v-8131004c"]]);
 const _withScopeId$7 = (n) => (pushScopeId("data-v-b00f96f8"), n = n(), popScopeId(), n);
 const _hoisted_1$c = /* @__PURE__ */ _withScopeId$7(() => /* @__PURE__ */ createBaseVNode("h4", null, "Your Keys:", -1));
 const _hoisted_2$b = { class: "keys" };
@@ -18479,8 +19779,9 @@ const _sfc_main$c = /* @__PURE__ */ defineComponent({
   emits: ["clearAppState"],
   setup(__props, { emit: __emit }) {
     const emit2 = __emit;
-    const logout = () => {
-      emit2("clearAppState");
+    const logout = async () => {
+      const clearUserData = true;
+      await emit2("clearAppState", clearUserData);
     };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock(Fragment, null, [
@@ -18873,10 +20174,10 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
     return (_ctx, _cache) => {
       return openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.messages, (msg) => {
         return openBlock(), createElementBlock("div", {
-          class: normalizeClass(["message-line", { "own": msg.event.pubkey === _ctx.userPubkey }])
+          class: normalizeClass(["message-line", { own: msg.event.pubkey === _ctx.userPubkey }])
         }, [
           createBaseVNode("div", {
-            class: normalizeClass(["message", { "own": msg.event.pubkey === _ctx.userPubkey }])
+            class: normalizeClass(["message", { own: msg.event.pubkey === _ctx.userPubkey }])
           }, [
             createBaseVNode("div", null, toDisplayString(msg.event.content), 1)
           ], 2),
@@ -18886,8 +20187,8 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const ChatMessagesList_vue_vue_type_style_index_0_scoped_a4799345_lang = "";
-const ChatMessagesList = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-a4799345"]]);
+const ChatMessagesList_vue_vue_type_style_index_0_scoped_e04d9009_lang = "";
+const ChatMessagesList = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-e04d9009"]]);
 const _withScopeId$5 = (n) => (pushScopeId("data-v-05389505"), n = n(), popScopeId(), n);
 const _hoisted_1$8 = { class: "chats__text-field" };
 const _hoisted_2$8 = /* @__PURE__ */ _withScopeId$5(() => /* @__PURE__ */ createBaseVNode("button", {
@@ -19174,7 +20475,7 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
 });
 const ChatsConversation_vue_vue_type_style_index_0_scoped_e5e92b02_lang = "";
 const ChatsConversation = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-e5e92b02"]]);
-const _withScopeId$3 = (n) => (pushScopeId("data-v-f8464317"), n = n(), popScopeId(), n);
+const _withScopeId$3 = (n) => (pushScopeId("data-v-e31c8a70"), n = n(), popScopeId(), n);
 const _hoisted_1$5 = /* @__PURE__ */ _withScopeId$3(() => /* @__PURE__ */ createBaseVNode("label", { for: "start-chat-pubkey" }, [
   /* @__PURE__ */ createBaseVNode("strong", null, "Profile's public key")
 ], -1));
@@ -19261,9 +20562,9 @@ const _sfc_main$6 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const ChatCreateRoomForm_vue_vue_type_style_index_0_scoped_f8464317_lang = "";
-const ChatCreateRoomForm = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-f8464317"]]);
-const _withScopeId$2 = (n) => (pushScopeId("data-v-fccd00d5"), n = n(), popScopeId(), n);
+const ChatCreateRoomForm_vue_vue_type_style_index_0_scoped_e31c8a70_lang = "";
+const ChatCreateRoomForm = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-e31c8a70"]]);
+const _withScopeId$2 = (n) => (pushScopeId("data-v-cffd05cb"), n = n(), popScopeId(), n);
 const _hoisted_1$4 = /* @__PURE__ */ _withScopeId$2(() => /* @__PURE__ */ createBaseVNode("div", { class: "chats-desc" }, [
   /* @__PURE__ */ createBaseVNode("p", null, [
     /* @__PURE__ */ createTextVNode(" Chats use the new Nostr "),
@@ -19532,9 +20833,9 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const Chat_vue_vue_type_style_index_0_scoped_fccd00d5_lang = "";
-const Chat = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-fccd00d5"]]);
-const _withScopeId$1 = (n) => (pushScopeId("data-v-a6f94b84"), n = n(), popScopeId(), n);
+const Chat_vue_vue_type_style_index_0_scoped_cffd05cb_lang = "";
+const Chat = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-cffd05cb"]]);
+const _withScopeId$1 = (n) => (pushScopeId("data-v-eeff9cf8"), n = n(), popScopeId(), n);
 const _hoisted_1$3 = { class: "fields" };
 const _hoisted_2$3 = { class: "field" };
 const _hoisted_3$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ createBaseVNode("label", { class: "select-relay-label" }, [
@@ -19572,7 +20873,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
     const showCustomRelayUrl = computed(() => selectedRelay.value === "custom");
     const showRememberMe = computed(() => nsecStore.isValidNsecPresented());
     const loginError2 = ref("");
-    const isConnectingToRelays = ref(false);
+    const connectingStatus = ref(false);
     const dropdownRelays = DEFAULT_RELAYS.map((r) => ({ key: r, value: r })).concat({
       key: "custom",
       value: "Custom relay url"
@@ -19598,6 +20899,9 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
         }
       }
     );
+    const setConnectingStatus = (status) => {
+      connectingStatus.value = status;
+    };
     const isRedirectedFromSearch = () => {
       return history.state && /^\/(user|event)\/[a-zA-Z0-9]+$/g.test(history.state.back);
     };
@@ -19606,6 +20910,10 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
     };
     const showError = (msg) => {
       loginError2.value = msg;
+    };
+    const stopConnectingWithError = (msg) => {
+      setConnectingStatus(false);
+      showError(msg);
     };
     const handleConnectClick = async () => {
       let relayUrl = selectedRelay.value;
@@ -19620,84 +20928,63 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
       if (!relayUrl.length) {
         return showError("Invalid relay URL");
       }
-      if (isConnectingToRelays.value)
-        return;
       if (nsecStore.isNotValidNsecPresented()) {
         return showError("Private key is invalid. Please check it and try again.");
-      } else if (nsecStore.isValidNsecPresented()) {
-        nsecStore.updateCachedNsec(nsecStore.nsec);
       }
+      if (connectingStatus.value) {
+        return showError("Your are already connecting to the relay. Please wait.");
+      }
+      await connect(relayUrl);
+    };
+    const connect = async (relayUrl) => {
+      setConnectingStatus(true);
       let relay;
-      isConnectingToRelays.value = true;
       try {
         relay = await connectToSelectedRelay(relayUrl);
       } catch (err) {
-        isConnectingToRelays.value = false;
-        return showError(err.message);
+        return stopConnectingWithError(err.message);
       }
       relayStore.updateCurrentRelay(relay);
       if (nsecStore.isValidNsecPresented()) {
         const pubkey = nsecStore.getPubkey();
-        const authorMeta = await relayGet(
-          relay,
-          [{ kinds: [EVENT_KIND.META], limit: 1, authors: [pubkey] }],
-          3e3
-          // timeout
-        );
+        const authorMeta = await getUserMeta(pubkey, [relayUrl], pool);
         if (!authorMeta) {
-          isConnectingToRelays.value = false;
-          return showError(
+          return stopConnectingWithError(
             "Your profile was not found on the selected relay. Please check the private key or change the relay and try again."
           );
         }
         ownProfileStore.updateMeta(authorMeta);
         feedStore.setSelectedFeedSource("follows");
-        let relayListMeta = await relayGet(
-          relay,
-          [{ kinds: [EVENT_KIND.RELAY_LIST_META], limit: 1, authors: [pubkey] }],
-          3e3
-          // timeout
-        );
-        if (relayListMeta.tags.length) {
-          const relays = relayListMeta.tags.map((tag) => tag[1]);
-          const freshMeta = await pool.get(relays, {
-            kinds: [EVENT_KIND.RELAY_LIST_META],
-            authors: [pubkey],
-            limit: 1
-          });
-          if (freshMeta && freshMeta.tags.length && freshMeta.created_at > relayListMeta.created_at) {
-            relayListMeta = freshMeta;
-          }
-          const { read, write } = parseRelaysNip65(relayListMeta);
-          relayStore.setReedRelays(read);
-          relayStore.setWriteRelays(write);
+        let relaysList = await getUserRelaysList(pubkey, [relayUrl], pool);
+        if (relaysList == null ? void 0 : relaysList.tags.length) {
+          const freshRelaysList = await getFreshRelaysList(relaysList, relayUrl);
+          relayStore.setReadWriteRelays(parseRelaysNip65(freshRelaysList));
         }
-        relayStore.setIsConnectingToReadWriteRelaysStatus(true);
-        relayStore.setIsConnectedToReadWriteRelaysStatus(false);
-        const {
-          userConnectedReadRelays,
-          userConnectedWriteRelays
-        } = await getConnectedReadWriteRelays(pool, relayStore.userReadWriteRelays);
-        relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays);
-        relayStore.setConnectedUserWriteRelayUrls(userConnectedWriteRelays);
-        relayStore.setIsConnectingToReadWriteRelaysStatus(false);
-        relayStore.setIsConnectedToReadWriteRelaysStatus(true);
+        relayStore.setReadWriteRelaysStatus({ connecting: true, connected: false });
+        const userReadWriteRelays = relayStore.userReadWriteRelays;
+        const { read, write } = await getConnectedReadWriteRelays(pool, userReadWriteRelays);
+        relayStore.setConnectedUserReadWriteRelays({ read, write });
+        relayStore.setReadWriteRelaysStatus({ connecting: false, connected: true });
       }
-      isConnectingToRelays.value = false;
-      feedStore.setMountAfterLogin(true);
+      setConnectingStatus(false);
       if (redirectToUser) {
         userStore.updateRoutingStatus(true);
       }
+      feedStore.setMountAfterLogin(true);
       router2.push({ path: afterLoginPath });
     };
     const handleRememberMe = () => {
-      if (nsecStore.rememberMe) {
-        nsecStore.setRememberMe(false);
-        localStorage.clear();
-      } else {
-        nsecStore.setRememberMe(true);
-        localStorage.setItem("privkey", nsecStore.nsec);
+      nsecStore.setRememberMe(!nsecStore.rememberMe);
+      nsecStore.rememberMe ? localStorage.setItem("privkey", nsecStore.nsec) : localStorage.clear();
+    };
+    const getFreshRelaysList = async (oldList, alreadyUsedRelay) => {
+      const pubkey = oldList.pubkey;
+      const relays = oldList.tags.map((tag) => utils_exports.normalizeURL(tag[1])).filter((url) => url !== alreadyUsedRelay);
+      const freshList = await getUserRelaysList(pubkey, relays, pool);
+      if (freshList && freshList.tags.length && freshList.created_at >= oldList.created_at) {
+        return freshList;
       }
+      return oldList;
     };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1$3, [
@@ -19745,18 +21032,18 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
         ]),
         createBaseVNode("div", _hoisted_10, [
           createBaseVNode("button", {
-            disabled: isConnectingToRelays.value,
+            disabled: connectingStatus.value,
             onClick: handleConnectClick,
             class: "button button-block"
-          }, toDisplayString(isConnectingToRelays.value ? "Connecting..." : "Connect"), 9, _hoisted_11)
+          }, toDisplayString(connectingStatus.value ? "Connecting..." : "Connect"), 9, _hoisted_11)
         ]),
         createBaseVNode("div", _hoisted_12, toDisplayString(loginError2.value), 1)
       ]);
     };
   }
 });
-const Login_vue_vue_type_style_index_0_scoped_a6f94b84_lang = "";
-const Login = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-a6f94b84"]]);
+const Login_vue_vue_type_style_index_0_scoped_eeff9cf8_lang = "";
+const Login = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["__scopeId", "data-v-eeff9cf8"]]);
 const _withScopeId = (n) => (pushScopeId("data-v-aa016908"), n = n(), popScopeId(), n);
 const _hoisted_1$2 = { class: "tabs" };
 const _hoisted_2$2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createBaseVNode("span", { class: "tab-link-text" }, [
@@ -19939,8 +21226,8 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const MainSearchField_vue_vue_type_style_index_0_scoped_14bfe52e_lang = "";
-const MainSearchField = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-14bfe52e"]]);
+const MainSearchField_vue_vue_type_style_index_0_scoped_8b775bb0_lang = "";
+const MainSearchField = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__scopeId", "data-v-8b775bb0"]]);
 const _hoisted_1 = { class: "header" };
 const _hoisted_2 = ["href"];
 const _hoisted_3 = {
@@ -19968,9 +21255,8 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       userStore.updateRoutingStatus(true);
       router2.push({ path: getUserUrlPath(pubkey) });
     };
-    const handleLoginClick = () => {
-      const clearLocalStorage = false;
-      emit2("clearAppState", clearLocalStorage);
+    const handleLoginClick = async () => {
+      await emit2("clearAppState");
     };
     return (_ctx, _cache) => {
       return openBlock(), createElementBlock("div", _hoisted_1, [
@@ -20001,8 +21287,8 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const Header_vue_vue_type_style_index_0_scoped_7d7bd167_lang = "";
-const Header = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-7d7bd167"]]);
+const Header_vue_vue_type_style_index_0_scoped_3d644da3_lang = "";
+const Header = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-3d644da3"]]);
 const routes = [
   {
     path: "/feed",
@@ -20038,7 +21324,7 @@ const routes = [
   // },
   {
     path: "/user",
-    name: "User",
+    name: "Search",
     alias: ["/event"],
     components: {
       default: User,
@@ -20047,6 +21333,7 @@ const routes = [
   },
   {
     path: "/user/:id",
+    name: "Search",
     alias: ["/event/:id"],
     components: {
       default: User,
@@ -20102,34 +21389,18 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     var _a;
     const router2 = useRouter();
     const nsecStore = useNsec();
-    const relayStore = useRelay();
-    const feedStore = useFeed();
-    const imagesStore = useImages();
-    const poolStore = usePool();
-    const pool = poolStore.pool;
     const isRemembered = !!((_a = localStorage.getItem("privkey")) == null ? void 0 : _a.length);
     nsecStore.setRememberMe(isRemembered);
     const initialNsec = isRemembered ? localStorage.getItem("privkey") : "";
     nsecStore.updateNsec(initialNsec || "");
     const eventsLog = ref([]);
-    const clearAppState = async (clearLocalStorage = true) => {
-      var _a2;
-      feedStore.clearNewEventsBadgeUpdateInterval();
-      if (relayStore.isConnectedToRelay) {
-        (_a2 = relayStore.currentRelay) == null ? void 0 : _a2.close();
-      }
-      await asyncClosePool(pool);
-      feedStore.clear();
-      relayStore.clear();
-      poolStore.resetPool();
-      imagesStore.updateShowImages(false);
-      if (clearLocalStorage) {
+    const clearAppState = async (clearUserData = false) => {
+      if (clearUserData) {
         localStorage.clear();
-        nsecStore.updateCachedNsec("");
-        nsecStore.updateNsec("");
-        nsecStore.setRememberMe(false);
+        nsecStore.clear();
       }
-      router2.push("/login");
+      await router2.push("/login");
+      location.reload();
     };
     return (_ctx, _cache) => {
       const _component_router_view = resolveComponent("router-view");

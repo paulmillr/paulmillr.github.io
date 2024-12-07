@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
   import type { SimplePool, Event } from 'nostr-tools'
   import type { EventExtended } from './../types'
   import EventContent from './EventContent.vue'
@@ -7,10 +7,10 @@
   import {
     filterRootEventReplies,
     filterReplyEventReplies,
-    nip10IsFirstLevelReplyForEvent,
-    nip10IsReplyForEvent,
+    nip10IsFirstLevelReply,
+    nip10IsSecondLevelReply,
     loadAndInjectDataToPosts,
-  } from './../utils'
+  } from '../utils/utils'
 
   import { useMetasCache } from '@/stores/MetasCache'
   import { usePool } from '@/stores/Pool'
@@ -23,7 +23,6 @@
 
   const props = defineProps<{
     event: EventExtended
-    pubKey?: string
     index?: number
     hasReplyBtn?: boolean
     showRootReplies?: boolean
@@ -38,20 +37,26 @@
 
   const replyEvent = ref<EventExtended | null>(null)
   const eventReplies = ref<EventExtended[]>([])
+  const isMounted = ref(true)
 
   onMounted(async () => {
     await loadRepliesPreiew()
   })
 
+  onUnmounted(() => {
+    isMounted.value = false
+  })
+
   const loadRepliesPreiew = async () => {
     const { event, currentReadRelays } = props
-    if (!currentReadRelays.length) return
 
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
+    if (!isMounted.value) return
+
     if (props.showRootReplies) {
-      replies = replies.filter((reply: Event) => nip10IsFirstLevelReplyForEvent(event.id, reply))
+      replies = replies.filter((reply: Event) => nip10IsFirstLevelReply(event.id, reply))
     } else {
-      replies = replies.filter((reply: Event) => nip10IsReplyForEvent(event.id, reply))
+      replies = replies.filter((reply: Event) => nip10IsSecondLevelReply(event.id, reply))
     }
 
     if (!replies.length) return
@@ -69,6 +74,7 @@
       pool as SimplePool,
       isRootPosts,
       (reply) => {
+        if (!isMounted.value) return
         replyEvent.value = reply
         isLoadingFirstReply.value = false
       },
@@ -91,6 +97,7 @@
 
     isLoadingThread.value = true
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
+    if (!isMounted.value) return
 
     // filter first level replies
     if (event.isRoot) {
@@ -114,6 +121,7 @@
       pool as SimplePool,
       isRootPosts,
     )
+    if (!isMounted.value) return
 
     eventReplies.value = replies as EventExtended[]
     showAllReplies.value = true
@@ -139,7 +147,6 @@
       @toggleRawData="(eventId) => handleToggleRawData(eventId, true)"
       @loadMoreReplies="handleLoadMoreReplies"
       :event="(event as EventExtended)"
-      :pubKey="pubKey"
       :isMainEvent="true"
       :currentReadRelays="currentReadRelays"
       :pool="(pool as SimplePool)"
@@ -190,7 +197,7 @@
       </div>
 
       <div v-if="showAllReplies" class="replies__list">
-        <div class="replies__list-item" v-for="(reply, i) in eventReplies">
+        <div class="replies__list-item" v-for="(reply, i) in eventReplies" :key="reply.id">
           <div class="replies__list-item-line-horizontal"></div>
           <div
             :class="[

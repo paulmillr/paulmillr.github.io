@@ -12,7 +12,7 @@
     dedupByPubkeyAndSortEvents,
     getDisplayUsername,
     getNip19FromSearch,
-  } from '@/utils'
+  } from '@/utils/utils'
   import type { Author, EventExtended } from '@/types'
 
   import { gettingUserInfoId } from '@/store'
@@ -47,7 +47,7 @@
   const userEvent = ref(<Event>{})
   const userDetails = ref(<Author>{})
   const isUserHasValidNip05 = ref(false)
-  const pubKeyError = ref('')
+  // const pubKeyError = ref('')
   const showNotFoundError = ref(false)
   const pubHex = ref('')
   const showLoadingUser = ref(false)

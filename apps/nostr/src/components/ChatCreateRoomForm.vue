@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { isSHA256Hex } from '@/utils'
+  import { isSHA256Hex } from '@/utils/utils'
   import { nip19 } from 'nostr-tools'
   import { useRelay } from '@/stores/Relay'
 

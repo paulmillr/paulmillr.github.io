@@ -1,12 +1,15 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import { utils, Relay, type Event, SimplePool } from 'nostr-tools'
-  import { connectToSelectedRelay } from '@/utils/network'
+  import { utils, Relay, SimplePool, type Event } from 'nostr-tools'
   import { DEFAULT_RELAY, DEFAULT_RELAYS } from '@/app'
-  import { relayGet, parseRelaysNip65 } from '@/utils'
-  import { getConnectedReadWriteRelays } from '@/utils/network'
-  import { EVENT_KIND } from '@/nostr'
+  import { parseRelaysNip65 } from '@/utils/utils'
+  import {
+    connectToSelectedRelay,
+    getConnectedReadWriteRelays,
+    getUserRelaysList,
+    getUserMeta,
+  } from '@/utils/network'
   import Dropdown from '@/components/Dropdown.vue'
   import Checkbox from '@/components/Checkbox.vue'
 
@@ -18,7 +21,7 @@
   import { usePool } from '@/stores/Pool'
 
   const poolStore = usePool()
-  const pool = poolStore.pool
+  const pool = poolStore.pool as SimplePool
 
   const relayStore = useRelay()
   const nsecStore = useNsec()
@@ -31,7 +34,7 @@
   const showCustomRelayUrl = computed(() => selectedRelay.value === 'custom')
   const showRememberMe = computed(() => nsecStore.isValidNsecPresented())
   const loginError = ref('')
-  const isConnectingToRelays = ref(false)
+  const connectingStatus = ref(false)
 
   const dropdownRelays = DEFAULT_RELAYS.map((r: string) => ({ key: r, value: r })).concat({
     key: 'custom',
@@ -63,6 +66,10 @@
     },
   )
 
+  const setConnectingStatus = (status: boolean) => {
+    connectingStatus.value = status
+  }
+
   const isRedirectedFromSearch = () => {
     return history.state && /^\/(user|event)\/[a-zA-Z0-9]+$/g.test(history.state.back)
   }
@@ -75,12 +82,18 @@
     loginError.value = msg
   }
 
+  const stopConnectingWithError = (msg: string) => {
+    setConnectingStatus(false)
+    showError(msg)
+  }
+
   const handleConnectClick = async () => {
     let relayUrl = selectedRelay.value
     if (relayUrl === 'custom') {
       const customUrl = relayStore.selectInputCustomRelayUrl
       relayUrl = customUrl.length ? customUrl : ''
     }
+
     if (!relayUrl.length) {
       return showError('Please provide relay URL or choose one from the list.')
     }
@@ -90,36 +103,34 @@
       return showError('Invalid relay URL')
     }
 
-    if (isConnectingToRelays.value) return
-
     if (nsecStore.isNotValidNsecPresented()) {
       return showError('Private key is invalid. Please check it and try again.')
-    } else if (nsecStore.isValidNsecPresented()) {
-      nsecStore.updateCachedNsec(nsecStore.nsec)
     }
 
-    let relay: Relay
+    if (connectingStatus.value) {
+      return showError('Your are already connecting to the relay. Please wait.')
+    }
 
-    isConnectingToRelays.value = true
+    await connect(relayUrl)
+  }
+
+  const connect = async (relayUrl: string) => {
+    setConnectingStatus(true)
+
+    let relay: Relay
     try {
       relay = await connectToSelectedRelay(relayUrl)
     } catch (err: any) {
-      isConnectingToRelays.value = false
-      return showError(err.message)
+      return stopConnectingWithError(err.message)
     }
     relayStore.updateCurrentRelay(relay)
 
     if (nsecStore.isValidNsecPresented()) {
       const pubkey = nsecStore.getPubkey()
-      const authorMeta = (await relayGet(
-        relay,
-        [{ kinds: [EVENT_KIND.META], limit: 1, authors: [pubkey] }],
-        3000, // timeout
-      )) as Event
+      const authorMeta = await getUserMeta(pubkey, [relayUrl], pool)
 
       if (!authorMeta) {
-        isConnectingToRelays.value = false
-        return showError(
+        return stopConnectingWithError(
           'Your profile was not found on the selected relay. Please check the private key or change the relay and try again.',
         )
       }
@@ -127,71 +138,44 @@
       ownProfileStore.updateMeta(authorMeta)
       feedStore.setSelectedFeedSource('follows')
 
-      let relayListMeta = (await relayGet(
-        relay,
-        [{ kinds: [EVENT_KIND.RELAY_LIST_META], limit: 1, authors: [pubkey] }],
-        3000, // timeout
-      )) as Event
-
-      if (relayListMeta.tags.length) {
-        // refetch again relays list, because on selected relay data can be outdated
-        const relays = relayListMeta.tags.map((tag) => tag[1])
-        const freshMeta = await pool.get(relays, {
-          kinds: [EVENT_KIND.RELAY_LIST_META],
-          authors: [pubkey],
-          limit: 1,
-        })
-
-        // get the latest relay list meta from selected relay and user's relays
-        if (freshMeta && freshMeta.tags.length && freshMeta.created_at > relayListMeta.created_at) {
-          relayListMeta = freshMeta
-        }
-
-        const { read, write } = parseRelaysNip65(relayListMeta)
-        relayStore.setReedRelays(read)
-        relayStore.setWriteRelays(write)
+      let relaysList = await getUserRelaysList(pubkey, [relayUrl], pool)
+      if (relaysList?.tags.length) {
+        const freshRelaysList = await getFreshRelaysList(relaysList, relayUrl)
+        relayStore.setReadWriteRelays(parseRelaysNip65(freshRelaysList))
       }
 
-      // const startTime = Date.now()
-
-      relayStore.setIsConnectingToReadWriteRelaysStatus(true)
-      relayStore.setIsConnectedToReadWriteRelaysStatus(false)
-
-      const {
-        userConnectedReadRelays,
-        userConnectedWriteRelays,
-      }: {
-        userConnectedReadRelays: string[]
-        userConnectedWriteRelays: string[]
-      } = await getConnectedReadWriteRelays(pool as SimplePool, relayStore.userReadWriteRelays)
-      relayStore.setConnectedUserReadRelayUrls(userConnectedReadRelays)
-      relayStore.setConnectedUserWriteRelayUrls(userConnectedWriteRelays)
-
-      relayStore.setIsConnectingToReadWriteRelaysStatus(false)
-      relayStore.setIsConnectedToReadWriteRelaysStatus(true)
-
-      // const endTime = Date.now()
-      // const executionTime = (endTime - startTime) / 1000
-      // console.log(`Execution time for connecting relays: ${executionTime} seconds`)
+      relayStore.setReadWriteRelaysStatus({ connecting: true, connected: false })
+      const userReadWriteRelays = relayStore.userReadWriteRelays
+      const { read, write } = await getConnectedReadWriteRelays(pool, userReadWriteRelays)
+      relayStore.setConnectedUserReadWriteRelays({ read, write })
+      relayStore.setReadWriteRelaysStatus({ connecting: false, connected: true })
     }
 
-    isConnectingToRelays.value = false
-    feedStore.setMountAfterLogin(true)
+    setConnectingStatus(false)
 
     if (redirectToUser) {
       userStore.updateRoutingStatus(true)
     }
+    feedStore.setMountAfterLogin(true)
+
     router.push({ path: afterLoginPath })
   }
 
   const handleRememberMe = () => {
-    if (nsecStore.rememberMe) {
-      nsecStore.setRememberMe(false)
-      localStorage.clear()
-    } else {
-      nsecStore.setRememberMe(true)
-      localStorage.setItem('privkey', nsecStore.nsec)
+    nsecStore.setRememberMe(!nsecStore.rememberMe)
+    nsecStore.rememberMe ? localStorage.setItem('privkey', nsecStore.nsec) : localStorage.clear()
+  }
+
+  const getFreshRelaysList = async (oldList: Event, alreadyUsedRelay: string) => {
+    const pubkey = oldList.pubkey
+    const relays = oldList.tags
+      .map((tag) => utils.normalizeURL(tag[1]))
+      .filter((url) => url !== alreadyUsedRelay)
+    const freshList = await getUserRelaysList(pubkey, relays, pool)
+    if (freshList && freshList.tags.length && freshList.created_at >= oldList.created_at) {
+      return freshList
     }
+    return oldList
   }
 </script>
 
@@ -240,12 +224,8 @@
     </div>
 
     <div class="field">
-      <button
-        :disabled="isConnectingToRelays"
-        @click="handleConnectClick"
-        class="button button-block"
-      >
-        {{ isConnectingToRelays ? 'Connecting...' : 'Connect' }}
+      <button :disabled="connectingStatus" @click="handleConnectClick" class="button button-block">
+        {{ connectingStatus ? 'Connecting...' : 'Connect' }}
       </button>
     </div>
 

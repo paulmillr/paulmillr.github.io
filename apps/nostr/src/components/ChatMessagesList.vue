@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import { formatedDateYear } from '../utils'
-  import type { ChatMessage } from '@/types';
+  import { formatedDateYear } from '../utils/utils'
+  import type { ChatMessage } from '@/types'
 
   defineProps<{
     messages: ChatMessage[]
@@ -9,8 +9,8 @@
 </script>
 
 <template>
-  <div :class="['message-line', { 'own': msg.event.pubkey === userPubkey } ]" v-for="msg in messages">
-    <div :class="['message', { 'own': msg.event.pubkey === userPubkey } ]">
+  <div :class="['message-line', { own: msg.event.pubkey === userPubkey }]" v-for="msg in messages">
+    <div :class="['message', { own: msg.event.pubkey === userPubkey }]">
       <div>{{ msg.event.content }}</div>
     </div>
     <div class="message-date">

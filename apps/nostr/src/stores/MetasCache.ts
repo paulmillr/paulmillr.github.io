@@ -3,12 +3,12 @@ import { defineStore } from 'pinia'
 import type { Event } from 'nostr-tools'
 
 export const useMetasCache = defineStore('metasCache', () => {
-  const metas = ref<{ 
+  const metas = ref<{
     [key: string]: Event | null
   }>({})
 
   function addMeta(event: Event) {
-    metas.value[event.pubkey] = event 
+    metas.value[event.pubkey] = event
   }
 
   function getMeta(pubkey: string) {
@@ -33,6 +33,6 @@ export const useMetasCache = defineStore('metasCache', () => {
     getMeta,
     hasMeta,
     hasPubkey,
-    setMetaValue
+    setMetaValue,
   }
 })

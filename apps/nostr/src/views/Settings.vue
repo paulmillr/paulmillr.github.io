@@ -6,8 +6,9 @@
 
   const emit = defineEmits(['clearAppState'])
 
-  const logout = () => {
-    emit('clearAppState')
+  const logout = async () => {
+    const clearUserData = true
+    await emit('clearAppState', clearUserData)
   }
 </script>
 

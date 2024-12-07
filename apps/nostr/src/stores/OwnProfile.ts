@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Event } from 'nostr-tools'
 import type { Author } from '@/types'
-import { getDisplayUsername } from '@/utils'
+import { getDisplayUsername } from '@/utils/utils'
 
 export const useOwnProfile = defineStore('ownProfile', () => {
   const contactsEvent = ref(<Event | null>{})

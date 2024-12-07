@@ -3,7 +3,7 @@
   import { useRouter } from 'vue-router'
   import { useNpub } from '@/stores/Npub'
   import { useUser } from '@/stores/User'
-  import { isSHA256Hex, getNip19FromSearch } from '@/utils'
+  import { isSHA256Hex, getNip19FromSearch } from '@/utils/utils'
 
   const npubStore = useNpub()
   const userStore = useUser()
@@ -37,7 +37,7 @@
         } else {
           errorTimeout.value = setTimeout(() => {
             npubStore.setError(e.message)
-          }, 2000)
+          }, 2000) as unknown as number
         }
         return
       }

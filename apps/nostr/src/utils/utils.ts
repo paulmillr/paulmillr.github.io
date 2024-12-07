@@ -1,4 +1,4 @@
-import type { EventExtended, Nip65RelaysUrls, Author } from './types'
+import type { EventExtended, Nip65RelaysUrls, Author } from '../types'
 import {
   SimplePool,
   parseReferences,
@@ -9,8 +9,9 @@ import {
   type Event,
   type Filter,
 } from 'nostr-tools'
-import { EVENT_KIND } from './nostr'
+import { EVENT_KIND } from '../nostr'
 import { PURPLEPAG_RELAY_URL } from '@/nostr'
+import truncate from 'lodash/truncate'
 
 export const markNotesAsRoot = (posts: EventExtended[]) => {
   posts.forEach((post) => (post.isRoot = true))
@@ -85,7 +86,7 @@ const injectReplyingToDataToNotes = (
 export const injectRootRepliesToNote = (postEvent: EventExtended, repliesEvents: Event[]) => {
   let replies = 0
   for (const reply of repliesEvents) {
-    if (nip10IsFirstLevelReplyForEvent(postEvent.id, reply)) {
+    if (nip10IsFirstLevelReply(postEvent.id, reply)) {
       replies++
     }
   }
@@ -95,7 +96,7 @@ export const injectRootRepliesToNote = (postEvent: EventExtended, repliesEvents:
 export const injectNotRootRepliesToNote = (postEvent: EventExtended, repliesEvents: Event[]) => {
   let replies = 0
   for (const reply of repliesEvents) {
-    if (nip10IsReplyForEvent(postEvent.id, reply)) {
+    if (nip10IsSecondLevelReply(postEvent.id, reply)) {
       replies++
     }
   }
@@ -134,7 +135,7 @@ export const getNoteReferences = (postEvent: Event) => {
   const allReferencesPubkeys: Set<string> = new Set()
   const references = parseReferences(postEvent)
   for (let i = 0; i < references.length; i++) {
-    let { profile } = references[i]
+    const { profile } = references[i]
     if (!profile?.pubkey) continue
     allReferencesPubkeys.add(profile.pubkey)
   }
@@ -160,7 +161,7 @@ export const injectReferencesToNote = (
 
   const referencesToInject: any[] = []
   for (let i = 0; i < references.length; i++) {
-    let { profile } = references[i]
+    const { profile } = references[i]
     if (!profile?.pubkey) continue
     referencesMetas.forEach((meta) => {
       if (meta?.pubkey === profile?.pubkey) {
@@ -238,6 +239,7 @@ export const isLike = (content: string) => {
   return true
 }
 
+// extract to network utils
 export const isWsAvailable = (url: string, timeout: number = 5000) => {
   try {
     return new Promise((resolve) => {
@@ -270,6 +272,7 @@ export const isSHA256Hex = (hex: string) => {
   return /^[a-f0-9]{64}$/.test(hex)
 }
 
+// extract to network utils
 export const relayGet = (relay: Relay, filters: Filter[], timeout: number) => {
   const timout = new Promise((resolve) => {
     setTimeout(() => {
@@ -289,25 +292,6 @@ export const relayGet = (relay: Relay, filters: Filter[], timeout: number) => {
   })
 
   return Promise.race([connection, timout])
-}
-
-export const poolList = (
-  pool: SimplePool,
-  relays: string[],
-  filters: Filter[],
-): Promise<Event[]> => {
-  return new Promise((resolve) => {
-    const events = <Event[]>[]
-    let h = pool.subscribeMany(relays, filters, {
-      onevent(event) {
-        events.push(event)
-      },
-      oneose() {
-        resolve(events)
-        h.close()
-      },
-    })
-  })
 }
 
 export const parseRelaysNip65 = (event: Event) => {
@@ -335,6 +319,7 @@ export const parseRelaysNip65 = (event: Event) => {
   return relays
 }
 
+// extract to network utils
 export const publishEventToRelays = async (relays: string[], pool: any, event: Event) => {
   const promises = relays.map(async (relay: string) => {
     const promises = pool.publish([relay], event)
@@ -366,6 +351,7 @@ export const formatedDateYear = (date: number) => {
   })
 }
 
+// extract to network utils
 export const racePromises = (
   promises: Promise<any>[],
   handleSuccess: (result: any) => void,
@@ -394,12 +380,12 @@ export const racePromises = (
   })
 }
 
-export const nip10IsFirstLevelReplyForEvent = (eventId: string, reply: Event) => {
+export const nip10IsFirstLevelReply = (eventId: string, reply: Event) => {
   const nip10Data = nip10.parse(reply)
   return !nip10Data.reply && nip10Data?.root?.id === eventId
 }
 
-export const nip10IsReplyForEvent = (eventId: string, reply: Event) => {
+export const nip10IsSecondLevelReply = (eventId: string, reply: Event) => {
   const nip10Data = nip10.parse(reply)
   return nip10Data?.reply?.id === eventId || nip10Data?.root?.id === eventId
 }
@@ -444,7 +430,7 @@ export const loadAndInjectDataToPosts = async (
 
     const pubkeysForRequest: string[] = []
     allPubkeysToGet.forEach((pubkey) => {
-      if (!metasCacheStore.hasPubkey(author) && !cachedMetasPubkeys.has(pubkey)) {
+      if (!metasCacheStore.hasPubkey(pubkey) && !cachedMetasPubkeys.has(pubkey)) {
         pubkeysForRequest.push(pubkey)
       }
       cachedMetasPubkeys.add(pubkey)
@@ -523,6 +509,7 @@ export const loadAndInjectDataToPosts = async (
   }
 }
 
+// extract to network utils
 export const getEventWithAuthorById = async (
   eventId: string,
   relays: string[],
@@ -578,6 +565,7 @@ export const listRootEvents = (pool: SimplePool, relays: string[], filters: Filt
   })
 }
 
+// extract to network utils
 export const getMetaByPubkey = async (relays: string[], pubkey: string, pool: SimplePool) => {
   return await pool.get(relays, {
     kinds: [EVENT_KIND.META],
@@ -619,4 +607,30 @@ export const getNip19FromSearch = (query: string) => {
   }
 
   return nip19data
+}
+
+export const getTextLines = (text: string) => text.split(/\n/)
+
+export const cutTextByLine = (text: string, line: number): string => {
+  const lines = getTextLines(text)
+  if (lines.length <= line) return text
+  return lines.slice(0, line).join('\n')
+}
+
+export const cutTextByLength = (text: string, length: number) => {
+  if (text.length <= length) {
+    return text
+  }
+  return truncate(text, {
+    length: length,
+    separator: /,? +/,
+  })
+}
+
+export const cutTextByLengthAndLine = (text: string, length: number, lines: number) => {
+  return cutTextByLength(cutTextByLine(text, lines), length)
+}
+
+export const getNpub = (pubkey: string) => {
+  return nip19.npubEncode(pubkey)
 }

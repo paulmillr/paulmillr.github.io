@@ -7,7 +7,7 @@
   import { EVENT_KIND } from '@/nostr'
   import { finalizeEvent } from 'nostr-tools'
   import { now } from '@/utils/chat-crypto'
-  import { publishEventToRelays } from '@/utils'
+  import { publishEventToRelays } from '@/utils/utils'
 
   const emit = defineEmits(['toggleFollow', 'handleFollowError'])
 

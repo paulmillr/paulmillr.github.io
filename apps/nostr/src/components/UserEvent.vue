@@ -5,7 +5,7 @@
   import type { Author, EventExtended } from './../types'
   import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
   import InvalidSignatureIcon from './../icons/InvalidSignatureIcon.vue'
-  import { formatedDate } from './../utils'
+  import { formatedDate } from '../utils/utils'
 
   const props = defineProps<{
     event: EventExtended

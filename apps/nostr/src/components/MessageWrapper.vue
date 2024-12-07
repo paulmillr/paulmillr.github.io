@@ -3,7 +3,7 @@
   import type { Event } from 'nostr-tools'
   import MessageInput from '@/components/MessageInput.vue'
   import SignedEventInput from '@/components/SignedEventInput.vue'
-  import { isWsAvailable, publishEventToRelays } from '@/utils'
+  import { isWsAvailable, publishEventToRelays } from '@/utils/utils'
 
   import { useRelay } from '@/stores/Relay'
   import { usePool } from '@/stores/Pool'

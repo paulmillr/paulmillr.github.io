@@ -5,6 +5,7 @@
 import { SimplePool, Relay, utils, type Event } from 'nostr-tools'
 import { timeout } from '@/utils/helpers'
 import type { TypedRelay } from '@/types'
+import { EVENT_KIND } from '@/nostr'
 
 export const connectToSelectedRelay = async (relayUrl: string) => {
   let relay: Relay
@@ -34,8 +35,8 @@ export const getConnectedReadWriteRelays = async (
   pool: SimplePool,
   readAndWriteRelays: TypedRelay[],
 ) => {
-  const userConnectedReadRelays: string[] = []
-  const userConnectedWriteRelays: string[] = []
+  const connectedRead: string[] = []
+  const connectedWrite: string[] = []
 
   if (readAndWriteRelays.length) {
     const result = await Promise.all(
@@ -52,9 +53,9 @@ export const getConnectedReadWriteRelays = async (
 
     result.forEach((r) => {
       if (r.connected) {
-        userConnectedReadRelays.push(r.url)
+        connectedRead.push(r.url)
         if (r.type === 'write') {
-          userConnectedWriteRelays.push(r.url)
+          connectedWrite.push(r.url)
         }
       }
 
@@ -68,7 +69,7 @@ export const getConnectedReadWriteRelays = async (
     })
   }
 
-  return { userConnectedReadRelays, userConnectedWriteRelays }
+  return { read: connectedRead, write: connectedWrite }
 }
 
 export const getFollowsConnectedRelaysMap = async (
@@ -142,6 +143,31 @@ export const getFollowsConnectedRelaysMap = async (
   return followsRelaysMap
 }
 
+export const getUserFollows = async (pubkey: string, relays: string[], pool: SimplePool) => {
+  const follows = await pool.get(relays, {
+    kinds: [EVENT_KIND.FOLLOW_LIST],
+    limit: 1,
+    authors: [pubkey],
+  })
+  return follows
+}
+
+export const getUserRelaysList = async (pubkey: string, relays: string[], pool: SimplePool) => {
+  return await pool.get(relays, {
+    kinds: [EVENT_KIND.RELAY_LIST_META],
+    authors: [pubkey],
+    limit: 1,
+  })
+}
+
+export const getUserMeta = async (pubkey: string, relays: string[], pool: SimplePool) => {
+  return await pool.get(relays, {
+    kinds: [EVENT_KIND.META],
+    authors: [pubkey],
+    limit: 1,
+  })
+}
+
 export const closeWebSocket = (webSocket: WebSocket) => {
   return new Promise((resolve, reject) => {
     if (webSocket.readyState === WebSocket.CLOSING || webSocket.readyState === WebSocket.CLOSED) {
@@ -162,6 +188,7 @@ export const closeWebSocket = (webSocket: WebSocket) => {
 }
 
 /**
+ * TODO, maybe in nostr-tools will uppear function for ensuring that all relays are closed
  * function used internal private property of the pool, property "relays"
  * after updating nostr-tools, this function shoule be tested and updated if needed
  */

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import {
     nip19,
@@ -11,10 +11,10 @@
     type Event,
   } from 'nostr-tools'
   import type { EventExtended } from './../types'
-  import { loadAndInjectDataToPosts, getEventWithAuthorById } from './../utils'
+  import { loadAndInjectDataToPosts, getEventWithAuthorById } from '../utils/utils'
   import RawData from './RawData.vue'
   import EventActionsBar from './EventActionsBar.vue'
-  import EventText from './EventText.vue'
+  import EventText from './EventText/EventText.vue'
   import Textarea from '@/components/Textarea.vue'
   import { useNpub } from '@/stores/Npub'
   import { useNsec } from '@/stores/Nsec'
@@ -30,7 +30,7 @@
     filterRootEventReplies,
     filterReplyEventReplies,
     getUserUrlPath,
-  } from './../utils'
+  } from '../utils/utils'
   import LinkIcon from './../icons/LinkIcon.vue'
   import CheckIcon from './../icons/CheckIcon.vue'
   import CheckSquareIcon from './../icons/CheckSquareIcon.vue'
@@ -50,7 +50,6 @@
   const props = defineProps<{
     event: EventExtended
     pool: SimplePool
-    pubKey?: string
     index?: number
     hasReplyBtn?: boolean
     isMainEvent?: boolean
@@ -75,6 +74,7 @@
   const isLoadingReplies = ref(false)
   const ancestorsEvents = ref<Event[]>([])
   const isLoadingThread = ref(false)
+  const isMounted = ref(true)
 
   const handleToggleRawData = (eventId: string) => {
     if (props.isMainEvent) {
@@ -83,9 +83,15 @@
     props.event.showRawData = !props.event.showRawData
   }
 
+  const isSearchPage = computed(() => router.currentRoute.value.name === 'Search')
+
   onMounted(() => {
     if (Object.keys(props.event).length === 0) return
     isSigVerified.value = verifyEvent(props.event as Event)
+  })
+
+  onUnmounted(() => {
+    isMounted.value = false
   })
 
   const displayName = (author: any, pubkey: string) => {
@@ -220,7 +226,7 @@
     const { pool } = props
     if (pubkeysMentions.length) {
       const allRelays = [
-        ...relayStore.reedRelays,
+        ...relayStore.readRelays,
         ...relayStore.writeRelays,
         relayStore.currentRelay.url,
       ]
@@ -281,6 +287,8 @@
 
     // filter replies for particular event
     let replies = await pool.querySync(currentReadRelays, { kinds: [1], '#e': [event.id] })
+    if (!isMounted.value) return
+
     if (event.isRoot) {
       replies = filterRootEventReplies(event, replies)
     } else {
@@ -304,6 +312,7 @@
       pool as SimplePool,
       isRootPosts,
     )
+    if (!isMounted.value) return
 
     eventReplies.value = replies as EventExtended[]
     showReplies.value = true
@@ -416,8 +425,9 @@
       event as EventExtended,
       event.replyingTo.event,
     )
-    const ancestors = ancestorsChain.reverse()
+    if (!isMounted.value) return
 
+    const ancestors = ancestorsChain.reverse()
     isLoadingThread.value = false
     ancestorsEvents.value = ancestors
   }
@@ -449,7 +459,9 @@
         :class="[
           'event-card__front',
           'event__presentable-date',
-          { 'event-card__front_custom': pubKey === event.pubkey },
+          {
+            'event-card__front_custom': !isSearchPage && nsecStore.getPubkey() === event.pubkey,
+          },
         ]"
       >
         <div v-if="imagesStore.showImages" class="event-img">
@@ -499,7 +511,7 @@
           </div>
 
           <div class="event-body">
-            <EventText :event="event" />
+            <EventText :event="event" :slice="true" />
           </div>
 
           <div class="event-footer">
@@ -541,7 +553,7 @@
         :class="[
           'event-card__back',
           {
-            'event-card__back_custom': pubKey === event.pubkey,
+            'event-card__back_custom': !isSearchPage && nsecStore.getPubkey() === event.pubkey,
             'event-details-first': index === 0,
           },
         ]"

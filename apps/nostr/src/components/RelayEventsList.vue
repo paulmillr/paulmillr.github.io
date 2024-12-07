@@ -1,10 +1,9 @@
 <script setup lang="ts">
   import type { EventExtended } from './../types'
   import ParentEventView from './ParentEventView.vue'
-  
+
   defineProps<{
     events: EventExtended[]
-    pubKey: string
     currentReadRelays: string[]
   }>()
 
@@ -18,13 +17,12 @@
 <template>
   <div>
     <template v-for="(event, i) in events" :key="event.id">
-      <ParentEventView 
+      <ParentEventView
         class="event"
-        @toggleRawData="handleToggleRawData" 
+        @toggleRawData="handleToggleRawData"
         :currentReadRelays="currentReadRelays"
-        :event="event" 
-        :pubKey="pubKey"
-        :index="i" 
+        :event="event"
+        :index="i"
         :showRootReplies="true"
         :hasReplyBtn="true"
       />

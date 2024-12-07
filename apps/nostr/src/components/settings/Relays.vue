@@ -5,7 +5,7 @@
   import { useRelay } from '@/stores/Relay'
   import { useNsec } from '@/stores/Nsec'
   import { useFeed } from '@/stores/Feed'
-  import { publishEventToRelays } from '@/utils'
+  import { publishEventToRelays } from '@/utils/utils'
   import Checkbox from '@/components/Checkbox.vue'
 
   const poolStore = usePool()

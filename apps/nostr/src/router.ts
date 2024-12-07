@@ -42,7 +42,7 @@ const routes = [
   // },
   {
     path: '/user',
-    name: 'User',
+    name: 'Search',
     alias: ['/event'],
     components: {
       default: User,
@@ -51,6 +51,7 @@ const routes = [
   },
   {
     path: '/user/:id',
+    name: 'Search',
     alias: ['/event/:id'],
     components: {
       default: User,

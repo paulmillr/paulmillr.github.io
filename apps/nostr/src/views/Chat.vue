@@ -3,7 +3,7 @@
   import { SimplePool, utils, type Filter } from 'nostr-tools'
   import type { SubCloser } from 'nostr-tools/lib/types/abstract-pool'
   import { TWO_DAYS, now } from '@/utils/chat-crypto'
-  import { racePromises } from '@/utils'
+  import { racePromises } from '@/utils/utils'
   import {
     injectChatTitle,
     getChatRoomHash,

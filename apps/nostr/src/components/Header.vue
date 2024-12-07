@@ -9,7 +9,7 @@
   import { useNsec } from '@/stores/Nsec'
   import { useRouter } from 'vue-router'
   import { useRelay } from '@/stores/Relay'
-  import { getUserUrlPath } from '@/utils'
+  import { getUserUrlPath } from '@/utils/utils'
 
   const emit = defineEmits(['clearAppState'])
 
@@ -34,9 +34,8 @@
     router.push({ path: getUserUrlPath(pubkey) })
   }
 
-  const handleLoginClick = () => {
-    const clearLocalStorage = false
-    emit('clearAppState', clearLocalStorage)
+  const handleLoginClick = async () => {
+    await emit('clearAppState')
   }
 </script>
 
