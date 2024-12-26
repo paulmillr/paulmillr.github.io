@@ -93,6 +93,7 @@ Here is some software which uses Noble. You can [add new entry on github](https:
   - [age encryption in typescript](https://github.com/FiloSottile/typage)
   - [micro-key-producer](https://github.com/paulmillr/micro-key-producer) SSH, PGP, TOR, BLS key generation and [cli tool](https://news.ycombinator.com/item?id=39684380) on top of it
   - [session-user-id](https://github.com/theinfinityway/session_id) for Session messenger
+  - [crypt.fyi](https://crypt.fyi/)
   - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
   - BLS signatures: [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 - Everything that uses noble, tracked using GitHub dependency graph:
@@ -103,6 +104,7 @@ Here is some software which uses Noble. You can [add new entry on github](https:
 ### Resources, articles, documentation
 
 - [Learning fast elliptic-curve cryptography](/posts/noble-secp256k1-fast-ecc/)
+- Elliptic curves videos: [Why addition works](https://www.youtube.com/watch?v=XmygBPb7DPM)
 - EdDSA
   - [A Deep dive into Ed25519 Signatures](https://cendyne.dev/posts/2022-03-06-ed25519-signatures.html)
   - [Ed25519 Deep Dive Addendum](https://cendyne.dev/posts/2022-09-11-ed25519-deep-dive-addendum.html)
@@ -110,18 +112,22 @@ Here is some software which uses Noble. You can [add new entry on github](https:
   - [Taming the many EdDSAs](https://csrc.nist.gov/csrc/media/Presentations/2023/crclub-2023-03-08/images-media/20230308-crypto-club-slides--taming-the-many-EdDSAs.pdf) that describes concepts of Strong UnForgeability under Chosen Message Attacks and Strongly Binding Signatures
   - [Cofactor Explained: Clearing Elliptic Curves’ dirty little secret](https://loup-vaillant.fr/tutorials/cofactor)
   - [Surrounded by Elligators](https://loup-vaillant.fr/articles/implementing-elligator)
-- Pairings and BLS
-  - [BLS signatures for busy people](https://gist.github.com/paulmillr/18b802ad219b1aee34d773d08ec26ca2)
-  - [BLS12-381 for the rest of us](https://hackmd.io/@benjaminion/bls12-381)
-  - [Key concepts of pairings](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
-  - Pairing over bls12-381: [fields](https://research.nccgroup.com/2020/07/06/pairing-over-bls12-381-part-1-fields/), [curves](https://research.nccgroup.com/2020/07/13/pairing-over-bls12-381-part-2-curves/), [pairings](https://research.nccgroup.com/2020/08/13/pairing-over-bls12-381-part-3-pairing/)
-  - [Estimating the bit security of pairing-friendly curves](https://research.nccgroup.com/2022/02/03/estimating-the-bit-security-of-pairing-friendly-curves/)
 - Ciphers
   - [Fast-key-erasure random-number generators](https://blog.cr.yp.to/20170723-random.html)
   - [The design of Chacha20](https://loup-vaillant.fr/tutorials/chacha20-design)
   - [The design of Poly1305](https://loup-vaillant.fr/tutorials/poly1305-design)
   - [How to design a new block cipher?](https://crypto.stackexchange.com/a/39792/71535)
   - [NIST Workshop on Block Cipher Modes of Operation 2023](https://csrc.nist.gov/Events/2023/third-workshop-on-block-cipher-modes-of-operation) contains a lot of useful information
+- PQ and lattices
+  - [PQC for non-cryptographers](https://keymaterial.net/2024/08/30/pqc-for-non-cryptographers/)
+  - [PQC lectures](https://cryptography101.ca/kyber-dilithium/)
+  - Videos: [Learning with errors: unsolveable equations](https://www.youtube.com/watch?v=K026C5YaB3A), [Lattices](https://www.youtube.com/watch?v=QDdOoYdb748), [Shor's algorithm](https://www.youtube.com/watch?v=lvTqbM5Dq4Q)
+- Pairings and BLS
+  - [BLS signatures for busy people](https://gist.github.com/paulmillr/18b802ad219b1aee34d773d08ec26ca2)
+  - [BLS12-381 for the rest of us](https://hackmd.io/@benjaminion/bls12-381)
+  - [Key concepts of pairings](https://medium.com/@alonmuroch_65570/bls-signatures-part-2-key-concepts-of-pairings-27a8a9533d0c)
+  - Pairing over bls12-381: [fields](https://research.nccgroup.com/2020/07/06/pairing-over-bls12-381-part-1-fields/), [curves](https://research.nccgroup.com/2020/07/13/pairing-over-bls12-381-part-2-curves/), [pairings](https://research.nccgroup.com/2020/08/13/pairing-over-bls12-381-part-3-pairing/)
+  - [Estimating the bit security of pairing-friendly curves](https://research.nccgroup.com/2022/02/03/estimating-the-bit-security-of-pairing-friendly-curves/)
 - Multi-user / multi-key attacks
   - [Break a dozen secret keys, get a million more for free](https://blog.cr.yp.to/20151120-batchattacks.html)
   - [128 Bits of Security and 128 Bits of Security: Know the Difference](https://loup-vaillant.fr/tutorials/128-bits-of-security)
