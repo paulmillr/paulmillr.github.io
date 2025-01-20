@@ -1,158 +1,27 @@
-.photo {
-  width: 150px;
-  height: 150px;
-  border-radius: 100px;
+.hy {
+  margin-top: 2rem;
 }
-
-section.hy {
-  font-weight: 300;
-}
-
-@media only screen and (max-width: 568px) {
-  section {
-    width: auto;
-    padding: 20px;
-  }
-  #logo {
-    height: 150px !important;
-  }
-}
-
-.centered {
-  text-align: center;
-  font-size: 1.4em;
-}
-
-a, a:visited {
-  color: #F4364C !important;
-}
-
-a:hover {
-  color: #FF5066 !important;
-}
-
-.team {
-  text-align: center;
-  margin-top: 30px;
-}
-.team-member {
-  display: inline-block;
-  /*width: 270px;*/
-  padding: 0 25px;
-}
-
 blockquote {
-  background-color: #F2F0E5;
-  border-left: 10px solid #F4364C;
-  margin: 0;
-  padding: 20px;
+  background-color: #f2f0e5;
+  border-left: 1rem solid #f4364c;
+  margin: 2rem 0;
+  padding: 2rem 2rem 0.5rem 2rem;
   quotes: "“" "”" "“" "”";
 }
 blockquote::before {
-  color: #F4364C;
+  color: #f4364c;
   content: open-quote;
   font-size: 4em;
   line-height: 0.1em;
   margin-right: 0.25em;
   vertical-align: -0.4em;
 }
-.definition {
-  border-left-color: black;
-}
-.definition::before {
-  color: black;
-}
-blockquote p {
-  margin-bottom: 0;
-}
-blockquote img {
-  border-radius: 5px;
-}
-
-.logo {
-  background-image: url(./images/text-logo-ns@x2.png);
-  height: 300px;
-  width: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.twgh {
-  margin-top: 15px;
-}
-
-.contact input, .contact textarea {
-  font-size: 14pt;
-  padding: 10px;
-}
-.contact .name, .contact .message {width: 350px;}
-.contact .email, .contact .phone {width: 161px;}
-.contact .message {height: 100px; border-color: #ccc; width: 352px; resize: vertical;}
-.contact .left, .contact .right {
-  display: inline-block;
-  vertical-align: top;
-  width: 49%;
-}
-.contact .right, .contact-methods {
-  font-size: 18pt;
-  margin-top: 110px;
+.centered {
   text-align: center;
 }
-
-.contact-methods {
-  margin-top: 50px;
-  margin-bottom: 50px;
-}
-
-.submit-button {
-  margin-right: 17px;
-  float: right;
-}
-
-hr {
-  border: 0;
-  border-top: 1px dashed #999;
-}
-
-.thanks {
-  text-align: center;
-  font-size: 18pt;
-}
-
-@media screen and (max-width: 860px) {
-  .contact .left, .contact .right {
-    width: 392px;
-    margin: 0 auto;
-    float: none;
-  }
-  .contact .right {
-    margin-top: 35px;
-    margin-bottom: 35px;
-  }
-}
-
-/* Use x3 images for iPhone 6 plus and similar devices */
-@media only screen and (-webkit-min-device-pixel-ratio: 3),
-  only screen and (min-resolution: 3dppx), /* Default way */
-  only screen and (min-resolution: 350dpi) /* dppx fallback */ {
-  .logo {
-    background-image: url(./images/text-logo-ns@x3.png);
-  }
-}
-
 .logo-img {
+  border-radius: 2rem;
   width: 100%;
-  border-radius: 10px;
-}
-
-.logo-wrapper {
-  padding-right: 15%;
-  padding-left: 15%;
-}
-
-footer.dimmed {
-  visibility: hidden;
 }
 
 body {
