@@ -42,11 +42,11 @@ section.hy {
 }
 
 a, a:visited {
-  color: #F4364C;
+  color: #F4364C !important;
 }
 
 a:hover {
-  color: #FF5066;
+  color: #FF5066 !important;
 }
 
 .team {
