@@ -12,22 +12,22 @@
   font-weight: 700;
 } */
 
-.hy-body .photo {
+.photo {
   width: 150px;
   height: 150px;
   border-radius: 100px;
 }
 
-.hy-body section {
-  width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+section.hy {
+  /* width: 800px; */
+  /* margin: 0 auto;
+  padding: 20px; */
   font-weight: 300;
-  margin-top: 2.5%;
+  /* margin-top: 2.5%; */
 }
 
 @media only screen and (max-width: 568px) {
-  .hy-body section {
+  section {
     width: auto;
     padding: 20px;
   }
@@ -41,11 +41,11 @@
   font-size: 1.4em;
 }
 
-.hy-body a, .hy-body a:visited {
+a, a:visited {
   color: #F4364C;
 }
 
-.hy-body a:hover {
+a:hover {
   color: #FF5066;
 }
 
