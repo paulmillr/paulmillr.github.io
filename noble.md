@@ -1,8 +1,8 @@
 ---
 layout: noble
-title: 'Noble cryptography'
-title_project: 'noble'
-description: 'High-security, auditable set of contained cryptographic libraries and tools'
+title: "Noble cryptography"
+title_project: "noble"
+description: "High-security, auditable set of contained cryptographic libraries and tools"
 ---
 
 **noble cryptography** is a high-security, easily auditable set of contained cryptographic libraries with following features:
@@ -25,11 +25,11 @@ The code is also available on [gitlab](https://gitlab.com/paulmillr/backup) and 
 
 ### Audits
 
-At this point (Oct 2024), various parts of noble had 6 audits. I'm looking for:
+At this point (Jan 2025), various parts of noble had 6 audits. I'm looking for:
 
 1. Auditors, with good knowledge of cryptography and/or JS
-    - Paid: whenever there is enough funding
-    - Unpaid: whoever is willing to donate their time for the public good
+   - Paid: whenever there is enough funding
+   - Unpaid: whoever is willing to donate their time for the public good
 2. Funding, of paid auditors
 
 Contact me if you want to help with the effort.
@@ -80,12 +80,12 @@ Here is some software which uses Noble. You can [add new entry on github](https:
   - HDkey: [scure-bip32](https://github.com/paulmillr/scure-bip32), [bitcoinjs/bip32](https://github.com/bitcoinjs/bip32)
   - Trezor: [trezor-suite](https://github.com/trezor/trezor-suite/blob/f420619d60b3a88731865a3964857f6ba614ff6a/packages/connect/package.json#L53)
   - [CoinSpace](https://github.com/CoinSpace/CoinSpace) wallet was built purely with noble libraries: [btc](https://github.com/CoinSpace/cs-bitcoin-wallet), [evm](https://github.com/CoinSpace/cs-evm-wallet), [sol](https://github.com/CoinSpace/cs-solana-wallet),
-  [eos](https://github.com/CoinSpace/cs-eos-wallet),
-  [tron](https://github.com/CoinSpace/cs-tron-wallet),
-  [xmr](https://github.com/CoinSpace/cs-monero-wallet),
-  [ada](https://github.com/CoinSpace/cs-cardano-wallet)
-  - [micro-sol-signer](https://github.com/paulmillr/micro-sol-signer), [solana-web3.js](https://github.com/solana-labs/solana-web3.js), [avalanchejs](https://github.com/ava-labs/avalanchejs),  [near-api-js](https://github.com/near/near-api-js/blob/7c9142fed5a0ca10a710bd519f7d3543bd2a5a95/packages/crypto/package.json#L23), [polkadot.js](https://github.com/polkadot-js/common), [moneroj](https://github.com/beritani/moneroj), [cs-monero](https://github.com/CoinSpace/cs-monero-wallet),
-  [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client),
+    [eos](https://github.com/CoinSpace/cs-eos-wallet),
+    [tron](https://github.com/CoinSpace/cs-tron-wallet),
+    [xmr](https://github.com/CoinSpace/cs-monero-wallet),
+    [ada](https://github.com/CoinSpace/cs-cardano-wallet)
+  - [micro-sol-signer](https://github.com/paulmillr/micro-sol-signer), [solana-web3.js](https://github.com/solana-labs/solana-web3.js), [avalanchejs](https://github.com/ava-labs/avalanchejs), [near-api-js](https://github.com/near/near-api-js/blob/7c9142fed5a0ca10a710bd519f7d3543bd2a5a95/packages/crypto/package.json#L23), [polkadot.js](https://github.com/polkadot-js/common), [moneroj](https://github.com/beritani/moneroj), [cs-monero](https://github.com/CoinSpace/cs-monero-wallet),
+    [aztec](https://github.com/AztecProtocol/aztec-packages), [drand](https://github.com/drand/drand-client),
     [celo](https://github.com/celo-org/developer-tooling/blob/38b26316d615e836e21bbfe2f44853f7e8220e03/packages/sdk/cryptographic-utils/package.json#L28),
     [aptos-ts-sdk](https://github.com/aptos-labs/aptos-ts-sdk/blob/62de7f532feaa653556846eea6b66e33f7dc29d6/package.json#L53)
 - Others:
@@ -97,9 +97,9 @@ Here is some software which uses Noble. You can [add new entry on github](https:
   - [secp256k1 compatibility layer](https://github.com/ethereum/js-ethereum-cryptography/blob/2.0.0/src/secp256k1-compat.ts) for users who want to switch from secp256k1-node or tiny-secp256k1\. Allows to see which methods map to corresponding noble code.
   - BLS signatures: [BLS BBS signatures](https://github.com/Wind4Greg/BBS-Draft-Checks), [KZG trusted setup ceremony](https://github.com/dsrvlabs/czg-keremony), [genthresh.com](https://genthresh.com/) online demo of BLS aggregation
 - Everything that uses noble, tracked using GitHub dependency graph:
-  - [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents): 5K repos, 130 packages
-  - [curves](https://github.com/paulmillr/noble-curves/network/dependents): 240K repos, 600 packages
-  - [hashes](https://github.com/paulmillr/noble-hashes/network/dependents): 420K repos, 1300 packages
+  - [ciphers](https://github.com/paulmillr/noble-ciphers/network/dependents): 12K repos, 170 packages
+  - [curves](https://github.com/paulmillr/noble-curves/network/dependents): 280K repos, 750 packages
+  - [hashes](https://github.com/paulmillr/noble-hashes/network/dependents): 470K repos, 1500 packages
 
 ### Resources, articles, documentation
 
