@@ -13,6 +13,7 @@
 } */
 
 .hy-body {
+  background-color: white;
   font-size: initial;
 }
 
@@ -176,6 +177,7 @@ hr {
   padding-right: 15%;
   padding-left: 15%;
 }
+
 
 @media (prefers-color-scheme: dark) {
   .hy-body {
