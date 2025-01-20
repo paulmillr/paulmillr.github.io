@@ -12,11 +12,6 @@
   font-weight: 700;
 } */
 
-.hy-body {
-  background-color: white;
-  font-size: initial;
-}
-
 .hy-body .photo {
   width: 150px;
   height: 150px;
@@ -27,7 +22,6 @@
   width: 800px;
   margin: 0 auto;
   padding: 20px;
-  font-family: 'Museo Sans', 'Helvetica Neue', serif;
   font-weight: 300;
   margin-top: 2.5%;
 }
@@ -179,8 +173,11 @@ hr {
 }
 
 
+body {
+  background-color: white;
+}
 @media (prefers-color-scheme: dark) {
-  .hy-body {
+  body {
     background-color: #222;
     color: #ddd;
   }
