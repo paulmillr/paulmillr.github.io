@@ -172,10 +172,14 @@ hr {
   padding-left: 15%;
 }
 
+footer.dimmed {
+  visibility: hidden;
+}
 
 body {
   background-color: white;
 }
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #222;
