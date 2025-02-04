@@ -56,16 +56,29 @@ The only lib i've found useful, besides Noble, was [fastecdsa.py](https://github
 
 ### Public keys
 
-We will start with a function that takes private key and generates public key from it. Books tell us that to produce public key `Q` (a Point on EC), we need to multiply some base point `G` by a random number `q`: `Q = G × q`
+We will start with a function that takes private key and generates public key from it. Books tell us that to produce public key `Q` (a Point on EC), we need to multiply some base point `G` by a private key `q`, which is a scalar (number) `q`: `Q = G × q`.
 
-We need to do [elliptic curve point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication). Multiplying a point G by a number q is as simple as doing G + G + G...q times. But how do we add two points, `(x1, y1) + (x2, y2)` and get `(x3, y3)`? Let's glance over [hyperelliptic.org by Tanja Lange](http://hyperelliptic.org/EFD/g1p/auto-shortw.html):
+We need to do [elliptic curve point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication). Multiplying a point G by a number q is as simple as doing G + G + G...q times. But how do we add two points, `(x1, y1) + (x2, y2)` and get `(x3, y3)`? 
+
+**Adding two points**, in abstract terms, means drawing a straight line between them, and then flipping / negating / reflecting "y" coordinate. That means, instead of `(x3, y3)`, we will get `(x3, -y3)`. Why do we need to flip `y3`? Just for one reason: for point subtraction to work. Consider the image below and try to do `R - Q`. It means `R + -Q`, which means drawing a line between R and flipped Q, and if we draw that line we'll receive P.
+
+[![](/media/posts/noble-secp256k1-fast-ecc/curve.jpg)](/media/posts/noble-secp256k1-fast-ecc/curve.jpg)
+
+Let's glance over [hyperelliptic.org by Tanja Lange](http://hyperelliptic.org/EFD/g1p/auto-shortw.html):
 
 ```
+x₃ = (y₂-y₁)²/(x₂-x₁)² - x₁ - x₂
+y₃ = (2x₁+x₂)(y₂-y₁)/(x₂-x₁)-(y₂-y₁)³/(x₂-x₁)³-y₁
+# code-friendly
 x3 = (y2-y1)**2/(x2-x1)**2-x1-x2
 y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)**3/(x2-x1)**3-y1
 ```
 
-Simple, but not quite. Keep in mind: we're working in a finite field over some big prime `Curve.P`. This basically means all operations — additions, multiplications, subtractions — would be done `modulo Curve.P`. And, as it seems, there is no classic division in finite fields. Instead, a [*modular multiplicative inverse*](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is used. It is most efficiently calculated by iterative version of Euclid’s GCD algorithm. Let’s code this:
+Simple, but not quite. Keep in mind: we're working in a finite field over some big prime `Curve.P`. This basically means all operations — additions, multiplications, subtractions — would be done `modulo Curve.P`. And, as it seems, there is no classic division in finite fields. Instead, a [*modular multiplicative inverse*](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is used. It is most efficiently calculated by iterative version of Euclid’s GCD algorithm.
+
+What about point doubling? **Doubling is a special case.** We can't draw a straight line (like in addition) because there is no second point. For doubling to work, we need to calculate slope `lambda` of the tangent line: `λ = (3x₁² + a) / (2y₁)`.
+
+Let’s code this:
 
 ```typescript
 const CURVE = {
@@ -74,11 +87,20 @@ const CURVE = {
 };
 class Point {
   static ZERO = new Point(0n, 0n); // Point at infinity aka identity point aka zero
-  constructor(public x: bigint, public y: bigint) {}
+  x: bigint;
+  y: bigint;
+  constructor(x: bigint, y: bigint) {
+    this.x = x;
+    this.y = y;
+  }
   // Adds point to itself. http://hyperelliptic.org/EFD/g1p/auto-shortw.html
+  // Calculates slope of the tangent line
   double(): Point {
     const X1 = this.x;
     const Y1 = this.y;
+    // λ = (3x₁² + a) / (2y₁)
+    // x₃ = λ² - 2x₁
+    // y₃ = λ * (x₁ - x₃) - y₁
     const lam = mod(3n * X1 ** 2n * invert(2n * Y1, CURVE.P));
     const X3 = mod(lam * lam - 2n * X1);
     const Y3 = mod(lam * (X1 - X3) - Y1);
@@ -90,8 +112,8 @@ class Point {
     const [X1, Y1, X2, Y2] = [a.x, a.y, b.x, b.y];
     if (X1 === 0n || Y1 === 0n) return b;
     if (X2 === 0n || Y2 === 0n) return a;
-    if (X1 === X2 && Y1 === Y2) return this.double();
-    if (X1 === X2 && Y1 === -Y2) return Point.ZERO;
+    if (X1 === X2 && Y1 === Y2) return this.double(); // special case
+    if (X1 === X2 && Y1 === -Y2) return Point.ZERO; // special case
     const lam = mod((Y2 - Y1) * invert(X2 - X1, CURVE.P));
     const X3 = mod(lam * lam - X1 - X2);
     const Y3 = mod(lam * (X1 - X3) - Y1);
@@ -129,7 +151,7 @@ function invert(number: bigint, modulo: bigint = CURVE.P): bigint {
 Now, we can create `getPublicKey`, which is `Q = G × q`. We’ll add `Point#multiply` method which uses [double-and-add algorithm](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication).
 
 ```typescript
-// G x, y values taken from official secp256k1 document
+// G x, y values taken from official secp256k1 document: https://www.secg.org/sec2-v2.pdf
 CURVE.Gx = 55066263022277343669578718895168534326250603453777594175500187360389116729240n;
 CURVE.Gy = 32670510020758816978083085130507043184471273380659243275938904335757337482424n;
 class Point {
@@ -600,6 +622,5 @@ Some future plans in this direction:
 
 - We’ve already re-impelemented most of the techniques in [noble ed25519](https://github.com/paulmillr/noble-ed25519). This library also includes support for [ristretto255](https://ristretto.group/).
 - Getting [noble bls12-381](https://github.com/paulmillr/noble-bls12-381) production-ready & very fast. This particular elliptic curve may be hard to optimize, but we’ll see.
-- Finishing tiny, but useful [Python port of noble](https://github.com/paulmillr/noble.py/)
 
 Special thanks to [all contributors](https://github.com/paulmillr/noble-secp256k1#contributing) who gave advice about speed optimizations. Join us on our journey to auditable cryptography via [Twitter](https://twitter.com/paulmillr) & [GitHub](https://github.com/paulmillr).
