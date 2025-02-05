@@ -13,6 +13,8 @@ It was immediately clear that Elliptic Curve Cryptography (ECC) libraries must b
 
 [![](/media/posts/noble-secp256k1-fast-ecc/curve.jpg)](/media/posts/noble-secp256k1-fast-ecc/curve.jpg)
 
+[![](/media/posts/noble-secp256k1-fast-ecc/scheme.png)](/media/posts/noble-secp256k1-fast-ecc/scheme.png)
+
 - [State of cryptography in JS](#state-of-cryptography-in-js)
 - [Naïve first take](#na%c3%afve-first-take)
 - [Public keys](#public-keys)
@@ -156,7 +158,7 @@ const Gx =
 const Gy =
   32670510020758816978083085130507043184471273380659243275938904335757337482424n;
 const Point_BASE = affine(Gx, Gy);
-const mul = (q: AffinePoint, n: bigint) => {
+const mul_unsafe = (q: AffinePoint, n: bigint) => {
   let curr = affine(q.x, q.y);
   let p = Point_ZERO;
   while (n > 0n) {
@@ -167,7 +169,7 @@ const mul = (q: AffinePoint, n: bigint) => {
   return p;
 };
 function getPublicKey_unsafe(privateKey: bigint) {
-  return mul(Point_BASE, privateKey);
+  return mul_unsafe(Point_BASE, privateKey);
 }
 ```
 
@@ -240,7 +242,7 @@ function sign_slow_unsafe(msgh: Uint8Array, priv: bigint): Signature {
   do {
     const k = rand_k_from_1_to_N_small_bias();
     const ik = inv(k, N);
-    q = mul(Point_BASE, k);
+    q = mul_unsafe(Point_BASE, k);
     r = M(q.x, N);
     s = M(ik * M(m + d * r, N), N);
   } while (r === 0n || s === 0n);
@@ -256,8 +258,8 @@ function verify_slow(sig: Signature, msgh: Uint8Array, pub: AffinePoint) {
   const is = inv(sig.s, CURVE.n);
   const u1 = M(h * is, CURVE.n);
   const u2 = M(sig.r * is, CURVE.n);
-  const G_u1 = mul(Point_BASE, u1);
-  const P_u2 = mul(pub, u2);
+  const G_u1 = mul_unsafe(Point_BASE, u1);
+  const P_u2 = mul_unsafe(pub, u2);
   const R = add(G_u1, P_u2);
   const v = M(R.x, N);
   return v === sig.r;
@@ -305,8 +307,8 @@ const measure = (label: string, fn: any) => {
   fn();
   console.timeEnd(label);
 };
-measure("small DA", () => mul(Point_BASE, 2n));
-measure("large DA", () => mul(Point_BASE, 2n ** 255n - 19n));
+measure("small DA", () => mul_unsafe(Point_BASE, 2n));
+measure("large DA", () => mul_unsafe(Point_BASE, 2n ** 255n - 19n));
 // small DA: 0.075ms
 // large DA: 14.318ms
 // getPublicKey_unsafe 1: 12.468ms
@@ -314,9 +316,16 @@ measure("large DA", () => mul(Point_BASE, 2n ** 255n - 19n));
 // verify_slow: 19.073ms
 ```
 
-getPublicKey takes 190x as much time on a big private key, which means we’re definitely unprotected.
+Depending on a private key, it could take up to 190x more time to compute the public key.
+Seems like we are not protected. How could this be solved?
 
-Let's fix it. How about using a fake point in `double-and-add` when the bit is not hit:
+- Private key is 256 bits: 256 zeros or ones
+- Fast keys have many zeros and a few ones e.g. `0000001000000`
+- Slow keys have less zeros e.g. `1111011101111111`
+- Right now we only add points with each other when `1` is present
+- We need to ensure that we also do it when bit is `0`
+
+Very simple idea: when `1` is present, do business as usual. When `0` is present, add something to a fake point:
 
 ```typescript
 // Constant Time multiplication
@@ -331,7 +340,7 @@ const getPowers = (q: AffinePoint) => {
   }
   return points;
 };
-const mul_CT = (q: AffinePoint, n: bigint) => {
+const mul_CT_slow = (q: AffinePoint, n: bigint) => {
   const pows = getPowers(q);
   let p = Point_ZERO;
   let f = Point_ZERO; // fake point
@@ -345,13 +354,11 @@ const mul_CT = (q: AffinePoint, n: bigint) => {
 };
 ```
 
-We can see that in both cases `sign` and `verify` depend on multiplying G by something. Which is basically `getPublicKey`. So, it would be great if we could speed-up _multiplying Base Point G_. Since we are working with numbers up to 256 bits, let’s cache `G × 2 ** bit` for all 256 bits:
-
-Basically, when the addition isn't done, we add some garbage to a fake point. Let’s measure `getPublicKey` now.
+Let’s measure `getPublicKey` now.
 
 ```typescript
-measure("small CT", () => mul_CT(Point_BASE, 2n));
-measure("large CT", () => mul_CT(Point_BASE, 2n ** 255n - 19n));
+measure("small CT", () => mul_CT_slow(Point_BASE, 2n));
+measure("large CT", () => mul_CT_slow(Point_BASE, 2n ** 255n - 19n));
 // small CT: 13.197ms
 // large CT: 13.182ms
 ```
@@ -392,9 +399,9 @@ Converting a point to Projective form is even simpler: we set Z to 1, and copy X
 
 We’re also planning to implement dedicated `Point#double` & `add` methods using the [Renes-Costello-Batina 2015](https://eprint.iacr.org/2015/1060) exception-free addition / doubling formulas. "Exception-free" means those formulas avoid conditional branches, such as checking whether two points are identical (or zero), as seen in our initial mul implementation. Using exception-free formulas is important for constant-timeness.
 
-Finally, we will modify our `getPrecomputes_proj` function to operate exclusively on `Point` objects, converting them back to Affine form via `Point#toAffine()` just before returning results.
+Finally, we will modify our `getPrecomputes` function to operate exclusively on `Point` objects, converting them back to Affine form via `Point#toAffine()` just before returning results.
 
-We’ll change `getPrecomputes_proj` to work with `Point` everywhere. And just before return we’ll execute `Point#toAffine()` to get `AffinePoint`.
+We’ll change `getPrecomputes` to work with `Point` everywhere. And just before return we’ll execute `Point#toAffine()` to get `AffinePoint`.
 
 ```typescript
 // Point in 3d projective (x, y, z) coordinates
@@ -453,7 +460,7 @@ class Point {
 }
 const Proj_ZERO = Point.fromAffine(Point_ZERO);
 const Proj_BASE = Point.fromAffine(Point_BASE);
-const getPrecomputes_proj = (qxy: AffinePoint): Point[] => {
+const getPrecomputes = (qxy: AffinePoint): Point[] => {
   const q = Point.fromAffine(qxy);
   let points: Point[] = [];
   for (let bit = 0, dbl = q; bit <= 256; bit++, dbl = dbl.double()) {
@@ -461,8 +468,8 @@ const getPrecomputes_proj = (qxy: AffinePoint): Point[] => {
   }
   return points;
 };
-const mul_CT_proj = (q: AffinePoint, n: bigint) => {
-  const pows = getPrecomputes_proj(q);
+const mul_CT = (q: AffinePoint, n: bigint) => {
+  const pows = getPrecomputes(q);
   let p = Proj_ZERO;
   let f = Proj_ZERO; // fake point
   for (let bit = 0; bit <= 256; bit++) {
@@ -485,12 +492,23 @@ Woah! That’s 6.5x improvement for `multiply`.
 
 ### Precomputes and wNAF
 
-Let’s see if we can use faster point multiplication. We have been using double-and-add first, but then switched to full loop to preserve constant time.
+Currently,
 
-[w-ary non-adjacent form method](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication) (wNAF) allows to implement faster constant time multiplication. Our adjusted version of wNAF goes further. Instead of saving 256 points like we did before, we would save 520 (W=4), 4224 (W=8) or 557056 (W=16). We could also do this with windowed method, but wNAF saves us ½ RAM and is 2x faster in init time. The reason for this is that wNAF does addition and subtraction — and for subtraction it simply negates point, which can be done in constant time.
+Multiplying a point by scalar like `10101100` currently makes go bit-by-bit.
+
+- Simplest
+
+[w-ary non-adjacent form method](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication) (wNAF) allows to implement faster constant time multiplication. The idea is simple:
+
+- Right now we have been going bit-by-bit while multiplying a key like
+- Simplest precomputes would calculate
+- Instead of that, we can
+
+Our adjusted version of wNAF goes further. Instead of saving 256 points like we did before, we would save 520 (W=4), 4224 (W=8) or 557056 (W=16). We could also do this with windowed method, but wNAF saves us ½ RAM and is 2x faster in init time. The reason for this is that wNAF does addition and subtraction — and for subtraction it simply negates point, which can be done in constant time.
 
 ```typescript
-const W = 8;                                            // Precomputes-related code. W = window size
+const W = 8; // Precomputes-related code. W = window size
+// prettier-ignore
 const precompute = () => {                              // They give 12x faster getPublicKey(),
   const points: Point[] = [];                           // 10x sign(), 2x verify(). To achieve this,
   const windows = 256 / W + 1;                          // app needs to spend 40ms+ to calculate
@@ -503,6 +521,7 @@ const precompute = () => {                              // They give 12x faster 
   }                                                     // which multiplies user point by scalar,
   return points;                                        // when precomputes are using base point
 }
+// prettier-ignore
 const wNAF = (n: bigint): { p: Point; f: Point } => {   // w-ary non-adjacent form (wNAF) method.
                                                         // Compared to other point mult methods,
   const comp = Gpows || (Gpows = precompute());         // stores 2x less points using subtraction
@@ -527,12 +546,12 @@ const wNAF = (n: bigint): { p: Point; f: Point } => {   // w-ary non-adjacent fo
     }
   }
   return { p, f }                                       // return both real and fake points for JIT
-};        // !! you can disable precomputes by commenting-out call of the wNAF() inside Point#mul()
-multiplywNAF(n: bigint): Point {
-  const {p, f} = wNAF(n);
+};
+const mul_G_wnaf = (n: bigint) => {
+  const { p, f } = wNAF(n);
   f.toAffine(); // result ignored
   return p.toAffine();
-}
+};
 ```
 
 Let’s see where this lands us:
@@ -550,14 +569,14 @@ Let’s get hardcore. But not too much — otherwise, the code would be unaudita
 To improve performance even more, we must look at the properties at our underlying elliptic curve.
 We are using special case of short weistrass curve, called Koblitz Curve. Weistrass curve is defined by equation `y**2 = x**3+a*x+b`. Our “Koblitz” curve has `a=0, b=7`, which makes equation `y**2 = x**3+7`.
 
-Some folks mention that secp256k1 may not have a [backdoor that secp256r1 (aka NIST P-256) has](https://crypto.stackexchange.com/questions/10263/should-we-trust-the-nist-recommended-ecc-parameters), but we won’t dive deeply into this. Let’s just say secp256k1 params were chosen in a special transparent way that allows so-called **efficiently-computable endomorphism φ**.
+Some folks mention that secp256k1 may not have a [backdoor that secp256r1 / NIST P-256 has](https://crypto.stackexchange.com/questions/10263/should-we-trust-the-nist-recommended-ecc-parameters), but we won’t dive deeply into this. Let’s just say secp256k1 params were chosen in a special transparent way that allows so-called **efficiently-computable endomorphism φ**.
 
 This idea was popularized for the curve [by Hal Finney](https://gist.github.com/paulmillr/eb670806793e84df628a7c434a873066). Based on pages 125-129 of the Guide to Elliptic Curve Cryptography, by Hankerson, Menezes and Vanstone, it basically says that if we find special values β and λ, we could speed-up computation by placing them in right places: `lambda * Q = (beta*x mod p, y)`.
 
 There are a few changes we'll need to make:
 
-1. We need values λ and β. We need to split a number by which we’ll be multiplying `Point` or `ProjectivePoint`.
-2. We need to multiply points twice in `multiply` / `ProjectivePoint#multiplyUnsafe`.
+1. We need to split a number by which we’ll be multiplying `Point`
+2. We need to add two resulting points together. Ideally this change would have also been applied to precomputation code (reducing precomputation creation time / memory 2x), and to
 3. We need to change window param in `getPrecomputes` from 256 to 128 since we’re splitting 256-bit number into two 128-bit.
 
 ```typescript
@@ -610,19 +629,18 @@ Let's combine 3 different multiplication algorithms to get the fastest of all wo
 - Endomorphism is fast, but slower than wNAF. However, we didn't write endomorphism for
   fake points in the article. So, it can only be used for cases when timing attacks are not relevant.
   One such case is verification, which does not operate on private inputs.
-- For everything else there is `mul_CT_proj`, which is slower than endomorphism, but safe
+- For everything else there is `mul_CT`, which is slower than endomorphism, but safe
 
 Additionally, let's implement `getSharedSecret` (elliptic curve diffie-hellman).
 
 ```typescript
-const mul_combined = (q: AffinePoint, n: bigint, safe = true) => {
+const mul = (q: AffinePoint, n: bigint, safe = true) => {
   if (equals(q, Point_BASE)) return mul_G_wnaf(n);
-  if (safe) return mul_CT_proj(q, n);
-  else return mul_endo(q, n);
+  return safe ? mul_CT(q, n) : mul_endo(q, n);
 };
 
 function getPublicKey(privateKey: bigint) {
-  return mul_combined(Point_BASE, privateKey);
+  return mul(Point_BASE, privateKey);
 }
 
 function sign(msgh: Uint8Array, priv: bigint): Signature {
@@ -634,7 +652,7 @@ function sign(msgh: Uint8Array, priv: bigint): Signature {
   do {
     const k = rand_k_from_1_to_N_small_bias();
     const ik = inv(k, N);
-    q = mul_combined(Point_BASE, k);
+    q = mul(Point_BASE, k);
     r = M(q.x, N);
     s = M(ik * M(m + d * r, N), N);
   } while (r === 0n || s === 0n);
@@ -650,14 +668,14 @@ function verify(sig: Signature, msgh: Uint8Array, pub: AffinePoint): boolean {
   const is = inv(sig.s, N);
   const u1 = M(h * is, N);
   const u2 = M(sig.r * is, N);
-  const G_u1 = mul_combined(Point_BASE, u1);
-  const P_u2 = mul_combined(pub, u2, false);
+  const G_u1 = mul(Point_BASE, u1);
+  const P_u2 = mul(pub, u2, false);
   const R = add(G_u1, P_u2);
   const v = M(R.x, N);
   return v === sig.r;
 }
 function getSharedSecret(privA: bigint, pubB: AffinePoint) {
-  return mul_combined(pubB, privA);
+  return mul(pubB, privA);
 }
 ```
 
@@ -680,9 +698,9 @@ verify_slow: 19.073ms
 
 Awesome!
 
-### Extra
+### Extra tricks
 
-An extra trick worth mentioning is Montgomery Batch Inversion.
+One thing worth mentioning is Montgomery Batch Inversion.
 
 [![](/media/posts/noble-secp256k1-fast-ecc/batch.jpg)](/media/posts/noble-secp256k1-fast-ecc/batch.jpg)
 
