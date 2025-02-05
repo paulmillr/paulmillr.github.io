@@ -111,15 +111,15 @@ const M = (a: bigint, b: bigint = P) => {
   return r >= 0n ? r : b + r; // a % b = r
 };
 // prettier-ignore
-const inv = (num: bigint, md: bigint): bigint => {
-  if (num === 0n || md <= 0n) err('no inverse n=' + num + ' mod=' + md);
+const inv = (num: bigint, md: bigint): bigint => {      // modular inversion
+  if (num === 0n || md <= 0n) err('no inverse n=' + num + ' mod=' + md); // no neg exponent for now
   let a = M(num, md), b = md, x = 0n, y = 1n, u = 1n, v = 0n;
-  while (a !== 0n) { // modular inversion, uses euclidean gcd
-    const q = b / a, r = b % a; // not constant-time
+  while (a !== 0n) {                                    // uses euclidean gcd algorithm
+    const q = b / a, r = b % a;                         // not constant-time
     const m = x - u * q, n = y - v * q;
     b = a, a = r, x = u, y = v, u = m, v = n;
   }
-  return b === 1n ? M(x, md) : err('no inverse'); // b == gcd
+  return b === 1n ? M(x, md) : err('no inverse');       // b is gcd at this point
 };
 // Point in 2d affine (x, y) coordinates
 interface AffinePoint {
@@ -133,9 +133,9 @@ const Point_ZERO = { x: 0n, y: 0n }; // Point at infinity aka identity point aka
 const double = (a: AffinePoint) => {
   const [X1, Y1] = [a.x, a.y];
   // Calculates slope of the tangent line
-  const lam = M(3n * X1 ** 2n * inv(2n * Y1, P)); // λ = (3x1^2+a)/(2y1)
-  const X3 = M(lam * lam - 2n * X1); // x₃ = λ^2 - 2*x1
-  const Y3 = M(lam * (X1 - X3) - Y1); // y₃ = λ(x1 - x3) - y1
+  const lam = M(3n * X1 ** 2n * inv(2n * Y1, P)); // λ = (3x₁² + a) / (2y₁)
+  const X3 = M(lam * lam - 2n * X1); // x₃ = λ² - 2x₁
+  const Y3 = M(lam * (X1 - X3) - Y1); // y₃ = λ * (x₁ - x₃) - y₁
   return affine(X3, Y3);
 };
 // Adds point to other point. https://hyperelliptic.org/EFD/g1p/auto-shortw.html
@@ -143,8 +143,8 @@ const add = (a: AffinePoint, b: AffinePoint): AffinePoint => {
   const [X1, Y1, X2, Y2] = [a.x, a.y, b.x, b.y];
   if (X1 === 0n || Y1 === 0n) return b;
   if (X2 === 0n || Y2 === 0n) return a;
-  if (X1 === X2 && Y1 === M(-Y2)) return Point_ZERO; // special case
   if (X1 === X2 && Y1 === Y2) return double(a); // special case
+  if (X1 === X2 && Y1 === M(-Y2)) return Point_ZERO; // special case
   const lam = M((Y2 - Y1) * inv(X2 - X1, P));
   const X3 = M(lam * lam - X1 - X2);
   const Y3 = M(lam * (X1 - X3) - Y1);
@@ -152,7 +152,7 @@ const add = (a: AffinePoint, b: AffinePoint): AffinePoint => {
 };
 
 /** Generator / base point */
-// G x, y values taken from secp256k1 doc: https://www.secg.org/sec2-v2.pdf
+// G x, y values taken from official secp256k1 document: https://www.secg.org/sec2-v2.pdf
 const Gx =
   55066263022277343669578718895168534326250603453777594175500187360389116729240n;
 const Gy =
@@ -218,14 +218,13 @@ interface Signature {
   recovery?: number;
 }
 // Convert Uint8Array to bigint, big endian
+// prettier-ignore
 const bytesToNumBE = (bytes: Uint8Array): bigint => {
-  const hex = Array.from(bytes)
-    .map((e) => e.toString(16).padStart(2, "0"))
-    .join("");
+  const hex = Array.from(bytes).map((e) => e.toString(16).padStart(2, "0")).join("");
   return hex ? BigInt("0x" + hex) : 0n;
 };
 // Get random k from CSPRNG: eliminates 0 and keeps modulo bias small
-function rand_k_from_1_to_N_small_bias() {
+function rand_k_from_1_to_N_small_bias(): bigint {
   // We can't just fetch 32 bytes from CSPRNG: need +16 more to keep modulo bias irrelevant.
   const kbytes = crypto.getRandomValues(new Uint8Array(48));
   // Follow FIPS 186 B.4.1 recomendation to remove 0:
@@ -246,18 +245,20 @@ function sign_slow_unsafe(msgh: Uint8Array, priv: bigint): Signature {
     r = M(q.x, N);
     s = M(ik * M(m + d * r, N), N);
   } while (r === 0n || s === 0n);
-  // Ensure signatures are always "low-s", < N/2
-  // This limits malleability
   if (s > N >> 1n) {
     s = M(-s, N);
   }
   return { r, s };
 }
-function verify_slow(sig: Signature, msgh: Uint8Array, pub: AffinePoint) {
-  const h = M(bytesToNumBE(msgh), CURVE.n);
-  const is = inv(sig.s, CURVE.n);
-  const u1 = M(h * is, CURVE.n);
-  const u2 = M(sig.r * is, CURVE.n);
+function verify_slow(
+  sig: Signature,
+  msgh: Uint8Array,
+  pub: AffinePoint
+): boolean {
+  const h = M(bytesToNumBE(msgh), N);
+  const is = inv(sig.s, N);
+  const u1 = M(h * is, N);
+  const u2 = M(sig.r * is, N);
   const G_u1 = mul_unsafe(Point_BASE, u1);
   const P_u2 = mul_unsafe(pub, u2);
   const R = add(G_u1, P_u2);
@@ -394,7 +395,7 @@ Ay = Y / Z;
 Recall that `m/n = m * inv(n)`.
 Converting a point to Projective form is even simpler: we set Z to 1, and copy X and Y directly.
 
-We’re also planning to implement dedicated `Point#double` & `add` methods using the [Renes-Costello-Batina 2015](https://eprint.iacr.org/2015/1060) exception-free addition / doubling formulas. "Exception-free" means those formulas avoid conditional branches, such as checking whether two points are identical (or zero), as seen in our initial mul implementation. Using exception-free formulas is important for constant-timeness.
+We’re also planning to implement dedicated `Point#double` & `add` methods using the [Renes-Costello-Batina 2015](https://eprint.iacr.org/2015/1060) exception-free addition / doubling formulas. "Exception-free" means those formulas avoid conditional branches, such as checking whether two points are identical (or zero), as seen in our initial mul implementation. Using such formulas is important for constant-timeness.
 
 Finally, we will modify our `getPrecomputes` function to operate exclusively on `Point` objects, converting them back to Affine form via `Point#toAffine()` just before returning results.
 
@@ -411,8 +412,7 @@ class Point {
     this.py = y;
     this.pz = z;
   }
-  // Create 3d xyz point from 2d xy
-  // Edge case: (0, 0) => (0, 1, 0), not (0, 0, 1)
+  /** Create 3d xyz point from 2d xy. Edge case: (0, 0) => (0, 1, 0), not (0, 0, 1) */
   static fromAffine(p: AffinePoint): Point {
     return p.x === 0n && p.y === 0n
       ? new Point(0n, 1n, 0n)
@@ -507,7 +507,7 @@ const W = 8; // Precomputes-related code. W = window size
 const precompute = () => {                              // They give 12x faster getPublicKey(),
   const points: Point[] = [];                           // 10x sign(), 2x verify(). To achieve this,
   const windows = 256 / W + 1;                          // app needs to spend 40ms+ to calculate
-  let p = G, b = p;                                     // a lot of points related to base point G.
+  let p = Proj_BASE, b = p;                  // a lot of points related to base point G.
   for (let w = 0; w < windows; w++) {                   // Points are stored in array and used
     b = p;                                              // any time Gx multiplication is done.
     points.push(b);                                     // They consume 16-32 MiB of RAM.
@@ -516,12 +516,13 @@ const precompute = () => {                              // They give 12x faster 
   }                                                     // which multiplies user point by scalar,
   return points;                                        // when precomputes are using base point
 }
+let Gpows: Point[] | undefined = undefined; // precomputes for base point G
 // prettier-ignore
 const wNAF = (n: bigint): { p: Point; f: Point } => {   // w-ary non-adjacent form (wNAF) method.
                                                         // Compared to other point mult methods,
   const comp = Gpows || (Gpows = precompute());         // stores 2x less points using subtraction
   const neg = (cnd: boolean, p: Point) => { let n = p.negate(); return cnd ? n : p; } // negate
-  let p = I, f = G;                                     // f must be G, or could become I in the end
+  let p = Proj_ZERO, f = Proj_BASE;// f must be G, or could become I in the end
   const windows = 1 + 256 / W;                          // W=8 17 windows
   const wsize = 2 ** (W - 1);                           // W=8 128 window size
   const mask = BigInt(2 ** W - 1);                      // W=8 will create mask 0b11111111
@@ -541,7 +542,7 @@ const wNAF = (n: bigint): { p: Point; f: Point } => {   // w-ary non-adjacent fo
     }
   }
   return { p, f }                                       // return both real and fake points for JIT
-};
+}; // !! you can disable precomputes by commenting-out call of the wNAF() inside Point#mul()
 const mul_G_wnaf = (n: bigint) => {
   const { p, f } = wNAF(n);
   f.toAffine(); // result ignored
@@ -626,7 +627,8 @@ Let's combine 3 different multiplication algorithms to get the fastest of all wo
   One such case is verification, which does not operate on private inputs.
 - For everything else there is `mul_CT`, which is slower than endomorphism, but safe
 
-Additionally, let's implement `getSharedSecret` (elliptic curve diffie-hellman).
+Additionally, let's implement `getSharedSecret` (elliptic curve diffie-hellman), and add
+recovery bit to sign() output; to ensure a way to recover public keys from signatures.
 
 ```typescript
 const mul = (q: AffinePoint, n: bigint, safe = true) => {
