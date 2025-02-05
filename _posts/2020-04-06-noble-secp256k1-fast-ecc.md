@@ -569,11 +569,9 @@ Some folks mention that secp256k1 may not have a [backdoor that secp256r1 / NIST
 
 This idea was popularized for the curve [by Hal Finney](https://gist.github.com/paulmillr/eb670806793e84df628a7c434a873066). Based on pages 125-129 of the Guide to Elliptic Curve Cryptography, by Hankerson, Menezes and Vanstone, it basically says that if we find special values β and λ, we could speed-up computation by placing them in right places: `lambda * Q = (beta*x mod p, y)`.
 
-There are a few changes we'll need to make:
-
-1. We need to split a number by which we’ll be multiplying `Point`
-2. We need to add two resulting points together. Ideally this change would have also been applied to precomputation code (reducing precomputation creation time / memory 2x), and to
-3. We need to change window param in `getPrecomputes` from 256 to 128 since we’re splitting 256-bit number into two 128-bit.
+In `multiply`, we will need to split scalar into two, and then calculate sum of two resulting points.
+We can also adjust `mul_CT` and `mul_G_wnaf` (to reduce init time / memory by 2x),
+but we won't do that here.
 
 ```typescript
 const CURVE_beta =
