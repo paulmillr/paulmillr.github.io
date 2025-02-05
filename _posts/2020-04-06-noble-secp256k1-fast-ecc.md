@@ -107,15 +107,15 @@ const M = (a: bigint, b: bigint = P) => {
   return r >= 0n ? r : b + r; // a % b = r
 };
 // prettier-ignore
-const inv = (num: bigint, md: bigint): bigint => {      // modular inversion
-  if (num === 0n || md <= 0n) err('no inverse n=' + num + ' mod=' + md); // no neg exponent for now
+const inv = (num: bigint, md: bigint): bigint => {
+  if (num === 0n || md <= 0n) err('no inverse n=' + num + ' mod=' + md);
   let a = M(num, md), b = md, x = 0n, y = 1n, u = 1n, v = 0n;
-  while (a !== 0n) {                                    // uses euclidean gcd algorithm
-    const q = b / a, r = b % a;                         // not constant-time
+  while (a !== 0n) { // modular inversion, uses euclidean gcd
+    const q = b / a, r = b % a; // not constant-time
     const m = x - u * q, n = y - v * q;
     b = a, a = r, x = u, y = v, u = m, v = n;
   }
-  return b === 1n ? M(x, md) : err('no inverse');       // b is gcd at this point
+  return b === 1n ? M(x, md) : err('no inverse'); // b == gcd
 };
 // Point in 2d affine (x, y) coordinates
 interface AffinePoint {
@@ -148,7 +148,7 @@ const add = (a: AffinePoint, b: AffinePoint): AffinePoint => {
 };
 
 /** Generator / base point */
-// G x, y values taken from official secp256k1 document: https://www.secg.org/sec2-v2.pdf
+// G x, y values taken from secp256k1 doc: https://www.secg.org/sec2-v2.pdf
 const Gx =
   55066263022277343669578718895168534326250603453777594175500187360389116729240n;
 const Gy =
@@ -741,3 +741,14 @@ Some future plans in this direction:
 - Exploring ciphers, post-quantum, and everything else
 
 Join us on our journey to auditable cryptography via [X.com](https://x.com/paulmillr) & [GitHub](https://github.com/paulmillr).
+
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script id="MathJax-script" async
+  src="/media/posts/noble-secp256k1-fast-ecc/mathjax.js">
+</script>
