@@ -65,29 +65,29 @@ it's rare for libraries to be built on top of big integers. It's much easier to 
 We will start with a function that takes private key and generates public key from it.
 
 To generate a public key from a private key using elliptic curve cryptography (ECC), you need to perform [elliptic curve point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication). This involves multiplying the base (generator) point
-$G$ by the private key $p$ to obtain the public key $P$:
+`G` by the private key `p` to obtain the public key `P`:
 
-    $P = G * p$
+    P = G * p
 
-Multiplication can be thought of as repeated addition of the base point $G+G+G...$ - $p$ times.
-How do we add $(x1, y1) + (x2, y2)$ to get $(x3, y3)$?
+Multiplication can be thought of as repeated addition of the base point `G+G+G...` - `p` times.
+How do we add `(x1, y1) + (x2, y2)` to get `(x3, y3)`?
 
-- Imagine drawing a straight line between the two points $P$ and $Q$ on the elliptic curve
+- Imagine drawing a straight line between the two points P and Q on the elliptic curve
 - This line will generally intersect the curve at a third point.
-- Reflect this third point vertically (i.e., flip the y-coordinate) to get the resulting point $Q$, resulting in $(x3, -y3)$
+- Reflect this third point vertically (i.e., flip the y-coordinate) to get the resulting point Q, resulting in `(x3, -y3)`
   - This reflection is necessary to ensure that point subtraction works correctly; for example, when computing R - Q, you actually add R to the negation of Q. By flipping Q's y-coordinate and drawing the line between R and -Q, you obtain the expected result P.
 - When adding point to itself (doubling), there is a special case: we can't draw a straight line.
-  Instead, we calculate the slope (λ) of the tangent line at the point.
+  Instead, we calculate the slope (λ, lambda) of the tangent line at the point.
 
 In math terms [(source)](https://hyperelliptic.org/EFD/g1p/auto-shortw.html):
 
-- if $x1 \neq x2$:
-  - $\lambda = \frac{y2-y1}{x2-x1}$
-- if $x1 = x2$ and $y1 = y2$ (point doubling):
-  - $\lambda = \frac{3x1^2+a}{2y1}$
-- Using $\lambda$, the coordinates of the resulting point are:
-  - $x3 = \lambda^2 - x1 - x2$
-  - $y3 = \lambda(x1 - x3) - y1$
+- if `x1 != x2`:
+  - `λ = (y2-y1)/(x2-x1)`
+- if `x1 = x2` and `y1 = y2` (point doubling):
+  - `λ = (3x1^2+a)/(2y1)`
+- Using `λ`, the coordinates of the resulting point are:
+  - `x3 = λ^2 - x1 - x2`
+  - `y3 = λ(x1 - x3) - y1`
 
 Simple, but not quite. Keep in mind: we're working in a finite field over some big prime `P`. This basically means all operations — additions, multiplications, subtractions — would be done `modulo P`. And, there is no classic division in finite fields. Instead, a [_modular multiplicative inverse_](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is used. It is most efficiently calculated by iterative version of Euclid’s GCD algorithm.
 
@@ -178,32 +178,32 @@ Formulas for ECDSA sigs are simple.
 
 Let:
 
-- $m$ be the hash of the message, converted to a number.
-- $d$ be the private key, converted to a number.
-- $k$ be the secret (random) nonce number.
-- $G$ be the generator point.
-- $n$ be the order of the group.
+- `m` be the hash of the message, converted to a number.
+- `d` be the private key, converted to a number.
+- `k` be the secret (random) nonce number.
+- `G` be the generator point.
+- `n` be the order of the group.
 
 Then the signing process is defined as:
 
-$(x_1, y_1) = G \times k$
+`(x_1, y_1) = G × k`
 
-$r = x_1 \mod n$
+`r = x_1 mod n`
 
-$s = k^{-1} \times (m + d \cdot r) \mod n$
+`s = k^-1 ⋅ (m + d⋅r) mod n`
 
 For verification, given:
 
-- $r, s$ as the signature outputs.
-- $Q$ as the public key corresponding to the private key \( d \).
+- `r, s` as the signature outputs
+- `Q` as the public key corresponding to the private key `d`.
 
-$u_1 = (s^{-1} \times m) \mod n$
+`u_1 = s^{-1} ⋅ m mod n`
 
-$u_2 = (s^{-1} \times r) \mod n$
+`u_2 = s^{-1} ⋅ r mod n`
 
-$(x_2, y_2) = G \times u_1 + Q \times u_2$
+`(x_2, y_2) = G × u_1 + Q × u_2`
 
-$x_2 \mod n = r$
+`x_2 mod n = r`
 
 Let's code them:
 
@@ -726,7 +726,7 @@ which would slightly improve speed of `getPublicKey` and `sign`.
 Another useful trick is Multi-Scalar Multiplication (MSM).
 It is commonly implemented using [Pippenger algorithm](https://cr.yp.to/papers/pippenger.pdf).
 MSM could be used for calculating addition of many points at once:
-$aP + bQ + cR + ...$. It only makes sense to use it with bigger inputs.
+`aP + bQ + cR + ...`. It only makes sense to use it with bigger inputs.
 
 ### Future plans
 
@@ -741,14 +741,3 @@ Some future plans in this direction:
 - Exploring ciphers, post-quantum, and everything else
 
 Join us on our journey to auditable cryptography via [X.com](https://x.com/paulmillr) & [GitHub](https://github.com/paulmillr).
-
-<script>
-MathJax = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']]
-  }
-};
-</script>
-<script id="MathJax-script" async
-  src="/media/posts/noble-secp256k1-fast-ecc/mathjax.js">
-</script>
