@@ -22,9 +22,8 @@ It was immediately clear that Elliptic Curve Cryptography (ECC) libraries must b
 - [BigInts, JIT, GC and other scary words](#bigints-jit-gc-and-other-scary-words)
 - [Projective coordinates](#projective-coordinates)
 - [Precomputes and wNAF](#precomputes-and-wnaf)
-- [Unsafe multiplication for verification](#unsafe-multiplication-for-verification)
 - [Endomorphism](#endomorphism)
-- [Endgame combinations](#endgame-combinations)
+- [Endgame: combining everything](#endgame-combining-everything)
 - [Extra](#extra)
 - [Future plans](#future-plans)
 
@@ -32,10 +31,12 @@ It was immediately clear that Elliptic Curve Cryptography (ECC) libraries must b
 
 The state of JavaScript cryptography can be summed up in one word: "sad":
 
-- Dependency Hell: Many libraries are bloated with dependencies. As i’ve mentioned before, **every dependency is a potential security vulnerability** — any underlying package could get hacked & malwared. This is unacceptable for cryptographic primitives, which are made to defend user secrets.
-- Browser and Node.js Incompatibility: The `window.crypto` standard is complicated and lacks support for popular curves like secp256k1. Those APIs which do exist are terrible and make it easy to shoot oneself in foot
-- Unverifiable WASM: While WASM offers performance benefits, it lacks transparency and auditability.
-- Modular Arithmetic Issues: JavaScript's % operator is a remainder operator, not a true modulo, which necessitates re-implementing basic operations.
+- **Dependency Hell:** Many libraries are bloated with dependencies. As i’ve mentioned before, **every dependency is a potential security vulnerability** — any underlying package could get hacked & malwared. This is unacceptable for cryptographic primitives, which are made to defend user secrets.
+- **Bad WebCrypto**: The `window.crypto` standard is complicated and lacks support for popular curves like secp256k1. Those APIs which do exist are terrible and make it easy to shoot oneself in foot
+- **Unverifiable WASM:** While WASM offers performance benefits, it lacks transparency and auditability.
+  There is no infrastructure for reproducible builds and code signing. Everybody just downloads opaque binaries,
+  which could easily be infested
+- **Modular Arithmetic Issues:** JavaScript's % operator is a remainder operator, not a true modulo, which necessitates re-implementing basic operations.
 
 ### Naïve first take
 
@@ -56,31 +57,39 @@ for (i = 254; i >= 0; --i) {
 }
 ```
 
-The only lib i've found useful was [fastecdsa.py](https://github.com/AntonKueltz/fastecdsa). Unfortunately, almost every library doesn't support Big Integers. It's much easier to reason with numbers, instead of byte arrays.
+The only lib i've found useful was [fastecdsa.py](https://github.com/AntonKueltz/fastecdsa). Unfortunately,
+it's rare for libraries to be built on top of big integers. It's much easier to reason with numbers, instead of byte arrays, which everyone prefers.
 
 ### Public keys
 
-We will start with a function that takes private key and generates public key from it. Books tell us that to produce public key `Q` (a Point on EC), we need to multiply some base point `G` by a private key `q`, which is a scalar (number) `q`: `Q = G × q`.
+We will start with a function that takes private key and generates public key from it.
 
-We need to do [elliptic curve point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication). Multiplying a point G by a number q is as simple as doing G + G + G...q times. But how do we add two points, `(x1, y1) + (x2, y2)` and get `(x3, y3)`?
+To generate a public key from a private key using elliptic curve cryptography (ECC), you need to perform [elliptic curve point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication). This involves multiplying the base (generator) point
+$G$ by the private key $p$ to obtain the public key $P$:
 
-**Adding two points**, in abstract terms, means drawing a straight line between them, and then flipping / negating / reflecting "y" coordinate. That means, instead of `(x3, y3)`, we will get `(x3, -y3)`. Why do we need to flip `y3`? Just for one reason: for point subtraction to work. Consider the image below and try to do `R - Q`. It means `R + -Q`, which means drawing a line between R and flipped Q, and if we draw that line we'll receive P.
+    $P = G * p$
 
-[![](/media/posts/noble-secp256k1-fast-ecc/curve.jpg)](/media/posts/noble-secp256k1-fast-ecc/curve.jpg)
+Multiplication can be thought of as repeated addition of the base point $G+G+G...$ - $p$ times.
+How do we add $(x1, y1) + (x2, y2)$ to get $(x3, y3)$?
 
-Let's glance over [hyperelliptic.org by Tanja Lange](https://hyperelliptic.org/EFD/g1p/auto-shortw.html):
+- Imagine drawing a straight line between the two points $P$ and $Q$ on the elliptic curve
+- This line will generally intersect the curve at a third point.
+- Reflect this third point vertically (i.e., flip the y-coordinate) to get the resulting point $Q$, resulting in $(x3, -y3)$
+  - This reflection is necessary to ensure that point subtraction works correctly; for example, when computing R - Q, you actually add R to the negation of Q. By flipping Q's y-coordinate and drawing the line between R and -Q, you obtain the expected result P.
+- When adding point to itself (doubling), there is a special case: we can't draw a straight line.
+  Instead, we calculate the slope (λ) of the tangent line at the point.
 
-```
-x₃ = (y₂-y₁)²/(x₂-x₁)² - x₁ - x₂
-y₃ = (2x₁+x₂)(y₂-y₁)/(x₂-x₁)-(y₂-y₁)³/(x₂-x₁)³-y₁
-# code-friendly
-x3 = (y2-y1)**2/(x2-x1)**2-x1-x2
-y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)**3/(x2-x1)**3-y1
-```
+In math terms [(source)](https://hyperelliptic.org/EFD/g1p/auto-shortw.html):
 
-Simple, but not quite. Keep in mind: we're working in a finite field over some big prime `Curve.P`. This basically means all operations — additions, multiplications, subtractions — would be done `modulo Curve.P`. And, as it seems, there is no classic division in finite fields. Instead, a [_modular multiplicative inverse_](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is used. It is most efficiently calculated by iterative version of Euclid’s GCD algorithm.
+- if $x1 \neq x2$:
+  - $\lambda = \frac{y2-y1}{x2-x1}$
+- if $x1 = x2$ and $y1 = y2$ (point doubling):
+  - $\lambda = \frac{3x1^2+a}{2y1}$
+- Using $\lambda$, the coordinates of the resulting point are:
+  - $x3 = \lambda^2 - x1 - x2$
+  - $y3 = \lambda(x1 - x3) - y1$
 
-What about point doubling? **Doubling is a special case.** We can't draw a straight line (like in addition) because there is no second point. For doubling to work, we need to calculate slope `lambda` of the tangent line: `λ = (3x₁² + a) / (2y₁)`.
+Simple, but not quite. Keep in mind: we're working in a finite field over some big prime `P`. This basically means all operations — additions, multiplications, subtractions — would be done `modulo P`. And, there is no classic division in finite fields. Instead, a [_modular multiplicative inverse_](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is used. It is most efficiently calculated by iterative version of Euclid’s GCD algorithm.
 
 Let’s code this:
 
@@ -165,41 +174,50 @@ Yay, it works.
 ### Signatures
 
 A good ECC library should also be able to produce & verify signatures.
-Let’s take a look at formulas for ECDSA `sign` & `verify`:
+Formulas for ECDSA sigs are simple.
 
-```
-sign(m, d, k) where
-  m = hash of message, converted to number
-  d = private key, converted to number
-  k = secret (random) nonce number
-(x1, y1) = G × k
-r = x1 mod n
-s = (k**-1 * (m + dr) mod n
+Let:
 
-verify(r, s, m, Q) where
-  r, s = outputs from sign()
-  m = hash of message, converted to number
-  Q = public key for private key d, which signed m
-is = s**-1 mod n
-u1 = is*m mod n
-u2 = is*r mod n
-(x2, y2) = G×u1 + Q×u2
-x2n = x2 mod n
-x2n == r
-```
+- $m$ be the hash of the message, converted to a number.
+- $d$ be the private key, converted to a number.
+- $k$ be the secret (random) nonce number.
+- $G$ be the generator point.
+- $n$ be the order of the group.
+
+Then the signing process is defined as:
+
+$(x_1, y_1) = G \times k$
+
+$r = x_1 \mod n$
+
+$s = k^{-1} \times (m + d \cdot r) \mod n$
+
+For verification, given:
+
+- $r, s$ as the signature outputs.
+- $Q$ as the public key corresponding to the private key \( d \).
+
+$u_1 = (s^{-1} \times m) \mod n$
+
+$u_2 = (s^{-1} \times r) \mod n$
+
+$(x_2, y_2) = G \times u_1 + Q \times u_2$
+
+$x_2 \mod n = r$
 
 Let's code them:
 
-```ts
+```typescript
 interface Signature {
   r: bigint;
   s: bigint;
   recovery?: number;
 }
 // Convert Uint8Array to bigint, big endian
-// prettier-ignore
 const bytesToNumBE = (bytes: Uint8Array): bigint => {
-  const hex = Array.from(bytes).map((e) => e.toString(16).padStart(2, "0")).join("");
+  const hex = Array.from(bytes)
+    .map((e) => e.toString(16).padStart(2, "0"))
+    .join("");
   return hex ? BigInt("0x" + hex) : 0n;
 };
 // Get random k from CSPRNG: eliminates 0 and keeps modulo bias small
@@ -224,6 +242,8 @@ function sign_slow_unsafe(msgh: Uint8Array, priv: bigint): Signature {
     r = M(q.x, N);
     s = M(ik * M(m + d * r, N), N);
   } while (r === 0n || s === 0n);
+  // Ensure signatures are always "low-s", < N/2
+  // This limits malleability
   if (s > N >> 1n) {
     s = M(-s, N);
   }
@@ -246,21 +266,34 @@ function verify_slow(sig: Signature, msgh: Uint8Array, pub: AffinePoint) {
 
 You may have noticed we're using this weird algorithm for generating a random `k`.
 Why is that important?
-
 Turns out, if you reuse `k` to sign two different messages under the same private key,
-your key would get exposed and leaked. It's really bad.
+**your key would get exposed** and leaked. It's really bad.
 
-In our case, we've decided to fetch 48 bytes and FIPS 186 B.4.1
+There are two common ways of solving this situation:
+
+1. Fetch `k` from a secure source of randomness (CSPRNG)
+   - It was popular, until [PlayStation 3 private keys got leaked](https://en.wikipedia.org/wiki/PlayStation_3_homebrew), because PS3 CSPRNG was not
+     producing "quality randomness"
+   - In some cases it's really hard to ensure randomness is random
+2. Calculate `k` from `priv` and `msgh`. [RFC6979](https://datatracker.ietf.org/doc/html/rfc6979) does
+   exactly that, by using HMAC-DRBG
+   - Got massive adoption these days
+   - The DRBG seems a bit complicated: perhaps, if the RFC was created later, they could have just used something like HKDF
+   - While the method protects against bad randomness, it does not protect against so-called "fault attacks".
+     Suppose in the code above, an error happens in `inv` for some values of `inv(k, N)`.
+     It would get broken and produce garbage, leaking private keys.
+
+In the article we implement 1), while in the [result library](https://github.com/paulmillr/noble-secp256k1) we actually implement 2.
+
+Combining 1 and 2 is the best approach and described in RFC6979 3.6 (additional k). It's called "hedged signatures" / "deterministic signatures with noise" / "extra entropy".
 
 ### Fighting timing attacks
 
-[Timing attack](https://en.wikipedia.org/wiki/Timing_attack) is a side-channel attack, in which the attacker measures time your algorithms run and identifies secrets after analyzing the timings.
+[Timing attack](https://en.wikipedia.org/wiki/Timing_attack) are a type of side-channel attack where an adversary measures how long your algorithms take to execute, leveraging variations in execution time to infer secret information.
 
-Suppose you have a web app which signs user messages with your private key. Private key by definition could not be known by the public. A hacker observes timings of 100,000 requests to `/sign` endpoint with different inputs. If your software executes those in different timespans, hacker could deduce your private key! More sophisticated versions of side-channel attacks observe power consumption.
+Consider a web app that signs user messages with a private key — if the processing times for a high volume of requests (say, 100,000 calls to a `/sign` endpoint) differ based on the input, an attacker could potentially deduce the private key. More advanced side-channel methods even analyze power consumption to extract secrets.
 
-This means cryptographic software must act as if inputs are identical and take identical time to work on. Which means implementing char-by-char string comparison etc.
-
-Fortunately, timing attacks are not that widespread. You’re much more likely to get hacked through a third-party dependency.
+To mitigate these risks, cryptographic software must operate in constant time, making sure that operations like character-by-character string comparisons always take the same duration regardless of input. Fortunately, such timing attacks are relatively uncommon, and breaches are more likely to result from vulnerabilities in third-party dependencies.
 
 Let’s see if we’re protected against timing attacks right now:
 
@@ -338,22 +371,28 @@ Thus, whether we use native BigInts or a custom implementation like bn.js (which
 
 ### Projective coordinates
 
-Right now our call structure looks like this:
+Right now, our call structure consists of:
 
 - Initialization: 256 doubles
 - Multiplication: 256 adds
 
-Let’s look closely at what happens inside `add` and `double`. There are some additions, some multiplications and one **invert** (aka finite field division). If we do some profiling, we can see that `invert` is extremely slow. Like, 20 or 100 times slower than multiplication by itself. So, that’s 512 **invert**s per multiplication.
+Let's dive into what actually happens inside the `add` and `double` operations. Both of these functions perform several additions and multiplications, and crucially, each includes one **invert** (i.e., finite field division). Profiling reveals that invert is extremely slow — typically **20 to 100 times slower** than a multiplication—which means each multiplication might involve up to 512 inverts.
 
-[Projective (homogeneous) coordinates](https://en.wikipedia.org/wiki/Homogeneous_coordinates) are going to save the day. They are used to simplify and speed-up calculations. In our case, this would eliminate `invert` from both methods. By the way, our “default” x, y coordinates are called Affine.
+[Projective (or homogeneous) coordinates](https://en.wikipedia.org/wiki/Homogeneous_coordinates) provide an elegant solution by eliminating these costly inversions from both functions. Note that our default x, y coordinates are in Affine form. In projective coordinates, a point is represented by the triple (X, Y, Z); conversion between representations is straightforward. To convert from Projective to Affine, we use:
 
-Projective coordinates are represented by triple (X, Y, Z). To convert from Projective to Affine, we can use a simple formula: `Ax=X/Z, Ay=Y/Z` (remember that `m/n = m * inv(n)`). Converting **to** Projective is simpler: we set Z to 1 and copy X & Y.
+```
+Ax = X / Z;
+Ay = Y / Z;
+```
 
-If we've been using a low-level language, i'd pick .
+Recall that `m/n = m * inv(n)`.
+Converting a point to Projective form is even simpler: we set Z to 1, and copy X and Y directly.
 
-We’re also going to implement `ProjectivePoint#double` & `add` methods. We’ll take [Renes-Costello-Batina 2015](https://eprint.iacr.org/2015/1060) exception-free addition / doubling formulas. "Exception-free" means there is no `if` when the point is the same (check out our first `mul` implementation above).
+We’re also planning to implement dedicated `Point#double` & `add` methods using the [Renes-Costello-Batina 2015](https://eprint.iacr.org/2015/1060) exception-free addition / doubling formulas. "Exception-free" means those formulas avoid conditional branches, such as checking whether two points are identical (or zero), as seen in our initial mul implementation. Using exception-free formulas is important for constant-timeness.
 
-We’ll change `getPrecomputes_proj` to work with `ProjectivePoint` everywhere. And just before return we’ll execute `ProjectivePoint#toAffine()` to get `AffinePoint`.
+Finally, we will modify our `getPrecomputes_proj` function to operate exclusively on `Point` objects, converting them back to Affine form via `Point#toAffine()` just before returning results.
+
+We’ll change `getPrecomputes_proj` to work with `Point` everywhere. And just before return we’ll execute `Point#toAffine()` to get `AffinePoint`.
 
 ```typescript
 // Point in 3d projective (x, y, z) coordinates
@@ -366,7 +405,8 @@ class Point {
     this.py = y;
     this.pz = z;
   }
-  /** Create 3d xyz point from 2d xy. Edge case: (0, 0) => (0, 1, 0), not (0, 0, 1) */
+  // Create 3d xyz point from 2d xy
+  // Edge case: (0, 0) => (0, 1, 0), not (0, 0, 1)
   static fromAffine(p: AffinePoint): Point {
     return p.x === 0n && p.y === 0n
       ? new Point(0n, 1n, 0n)
@@ -383,8 +423,8 @@ class Point {
     const { px: X2, py: Y2, pz: Z2 } = other;
     const { a, b } = CURVE;
     let X3 = 0n, Y3 = 0n, Z3 = 0n;
-    const b3 = M(b * 3n);
-    let t0 = M(X1 * X2), t1 = M(Y1 * Y2), t2 = M(Z1 * Z2), t3 = M(X1 + Y1); // step 1
+    const b3 = M(b * 3n); // step 1
+    let t0 = M(X1 * X2), t1 = M(Y1 * Y2), t2 = M(Z1 * Z2), t3 = M(X1 + Y1);
     let t4 = M(X2 + Y2);                                // step 5
     t3 = M(t3 * t4); t4 = M(t0 + t1); t3 = M(t3 - t4); t4 = M(X1 + Z1);
     let t5 = M(X2 + Z2);                                // step 10
@@ -414,11 +454,7 @@ const Proj_BASE = Point.fromAffine(Point_BASE);
 const getPrecomputes_proj = (qxy: AffinePoint): Point[] => {
   const q = Point.fromAffine(qxy);
   let points: Point[] = [];
-  for (
-    let bit = 0, dbl = new Point(q.px, q.py, q.pz);
-    bit <= 256;
-    bit++, dbl = dbl.double()
-  ) {
+  for (let bit = 0, dbl = q; bit <= 256; bit++, dbl = dbl.double()) {
     points.push(dbl);
   }
   return points;
@@ -505,28 +541,6 @@ mul_G_wnaf: 0.196ms
 
 So, 10x faster; even though `init` got slightly slower. You may have noticed that it’s possible to adjust `wNAF` `W` parameter: it specifies how many precomputed points we’ll calculate.
 
-### Unsafe multiplication for verification
-
-Having cacheable base point multiplication is great, but `verify` (verifies the message hash has been signed by public key `P`) and `recoverPublicKey` (recovers public key from a signature) do multiplication of custom point by a scalar.
-
-Re-calculating cache for those every time isn’t really an option - it would take 34ms by itself. So, what we can do here?
-
-It turns out, we don’t need constant-time multiplication for those. We are working with public keys, not private keys, so we won’t leak theirs content. You may want to skip this step, but I don’t see how it impacts security in a meaningful way.
-
-So, let’s implement `ProjectivePoint#multiplyUnsafe` using the same code from our `double-and-add` algorithm. We’ll be working directly with ProjectivePoint Points in `verify` and `recoverPublicKey` .
-
-That gets us here:
-
-```
-// previous
-sign_slow_unsafe: 10.246ms
-verify_slow: 18.693ms
-
-// now
-sign: 0.256ms
-verify: 1.299ms
-```
-
 ### Endomorphism
 
 Let’s get hardcore. But not too much — otherwise, the code would be unauditable.
@@ -586,9 +600,19 @@ const mul_endo = (q: AffinePoint, n: bigint) => {
 };
 ```
 
-### Endgame combinations
+### Endgame: combining everything
 
-```ts
+Let's combine 3 different multiplication algorithms to get the fastest of all worlds:
+
+- wNAF can only be used for base / generator point, because we don't calculate it for others
+- Endomorphism is fast, but slower than wNAF. However, we didn't write endomorphism for
+  fake points in the article. So, it can only be used for cases when timing attacks are not relevant.
+  One such case is verification, which does not operate on private inputs.
+- For everything else there is `mul_CT_proj`, which is slower than endomorphism, but safe
+
+Additionally, let's implement `getSharedSecret` (elliptic curve diffie-hellman).
+
+```typescript
 const mul_combined = (q: AffinePoint, n: bigint, safe = true) => {
   if (equals(q, Point_BASE)) return mul_G_wnaf(n);
   if (safe) return mul_CT_proj(q, n);
@@ -643,7 +667,7 @@ sign: 0.258ms
 verify: 1.264ms
 ```
 
-Reminder, we started with:
+While we started with:
 
 ```
 getPublicKey_unsafe 1: 12.468ms
@@ -652,62 +676,57 @@ sign_slow_unsafe: 9.442ms
 verify_slow: 19.073ms
 ```
 
-Endomorphism gives us an improvement of about 25% for `verify` and `recoverPublicKey`. Awesome!
+Awesome!
 
 ### Extra
 
-There’s a trick called Montgomery Batch Inversion. Basically it works like the picture says. We get a bunch a numbers, do one inverse, and then we apply it to all numbers.
+An extra trick worth mentioning is Montgomery Batch Inversion.
 
 [![](/media/posts/noble-secp256k1-fast-ecc/batch.jpg)](/media/posts/noble-secp256k1-fast-ecc/batch.jpg)
 
-We don’t really use `invert` anywhere except for a few places at this point. So, i’ve thought it would be a great idea to implement batch inversion for cases like `verifyBatch`, that would take 50 signatures & verify them.
+We get a bunch a numbers, do one inverse, and then we apply it to all numbers.
+At this point, we don’t really use `invert` anywhere except for a few places.
 
 ```typescript
-function invertBatch(nums: bigint[], n: bigint = CURVE.P): bigint[] {
-  const len = nums.length;
-  const scratch = new Array(len);
-  let acc = 1n;
-  for (let i = 0; i < len; i++) {
-    if (nums[i] === 0n) continue;
-    scratch[i] = acc;
-    acc = mod(acc * nums[i], n);
-  }
-  acc = invert(acc, n);
-  for (let i = len - 1; i >= 0; i--) {
-    if (nums[i] === 0n) continue;
-    let tmp = mod(acc * nums[i], n);
-    nums[i] = mod(acc * scratch[i], n);
-    acc = tmp;
-  }
-  return nums;
+function invBatch(nums: bigint[]): bigint[] {
+  const tmp = new Array(nums.length);
+  // Walk from first to last, multiply them by each other MOD p
+  const lastMultiplied = nums.reduce((acc, num, i) => {
+    if (num === 0n) return acc;
+    tmp[i] = acc;
+    return M(acc * num);
+  }, 1n);
+  // Invert last element
+  const inverted = inv(lastMultiplied, P);
+  // Walk from last to first, multiply them by inverted each other MOD p
+  nums.reduceRight((acc, num, i) => {
+    if (num === 0n) return acc;
+    tmp[i] = M(acc * tmp[i]);
+    return M(acc * num);
+  }, inverted);
+  return tmp;
 }
+const invPointsBatch = (points: Point[]) => {
+  return points;
+  // const points = [p, f];
+  const inverted = invBatch(points.map((p) => p.pz));
+  return points.map((p, i) => Point.fromAffine(p.toAffine(inverted[i])));
+};
+
+// REPLACE in `mul_G_wnaf`:
+// return invPointsBatch([p, f])[0].toAffine();
+// REPLACE IN `wNAF`:
+// const comp = Gpows || (Gpows = invPointsBatch(precompute()));
 ```
 
-Unfortunately, profiling told me having one batch on 50-100 signatures saves about 2% of CPU time. And complicates code a lot. For those interested on implementing `verifyBatch` in a low-level language, check out [the source code](https://github.com/paulmillr/noble-secp256k1/issues/3).
+The gains are small, but could be used.
+One unexpected place is `wNAF`: we can normalize all precomputed points to have `Z=1`,
+which would slightly improve speed of `getPublicKey` and `sign`.
 
-For us, we could still apply batch inversion in an unexpected place. Which is: `Point#precomputeWindow`. Before returning points list, we will do this:
-
-```typescript
-function toAffineBatch(points: ProjectivePoint[]): Point[] {
-  const toInv = invertBatch(points.map((p) => p.z));
-  return points.map((p, i) => p.toAffine(toInv[i]));
-}
-points = ProjectivePoint.toAffineBatch(points).map(ProjectivePoint.fromAffine);
-```
-
-What are we doing here? We take Projective Points, convert them to affine points, and then create projective points again. Why?
-
-To normalize all `Z`s to `1`! As it turns out, the normalization speeds up our computation a bit:
-
-```
-getPublicKey x 4,101 ops/sec @ 243μs/op
-sign x 2,592 ops/sec @ 385μs/op
-verify x 441 ops/sec @ 2ms/op
-recoverPublicKey x 215 ops/sec @ 4ms/op
-getSharedSecret aka ecdh x 335 ops/sec @ 2ms/op
-```
-
-It even speeds up `getPublicKey` aka `Point#multiply`.
+Another useful trick is Multi-Scalar Multiplication (MSM).
+It is commonly implemented using [Pippenger algorithm](https://cr.yp.to/papers/pippenger.pdf).
+MSM could be used for calculating addition of many points at once:
+$aP + bQ + cR + ...$. It only makes sense to use it with bigger inputs.
 
 ### Future plans
 
