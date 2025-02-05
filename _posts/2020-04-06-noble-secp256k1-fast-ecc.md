@@ -19,14 +19,14 @@ It was immediately clear that Elliptic Curve Cryptography (ECC) libraries must b
 - [Naïve first take](#na%c3%afve-first-take)
 - [Public keys](#public-keys)
 - [Signatures](#signatures)
-- [Randomness, PlayStation and RFC6979](#randomness-playstation-and-rfc6979)
+- [Randomness and PlayStation](#randomness-and-playstation)
 - [Fighting timing attacks](#fighting-timing-attacks)
 - [BigInts, JIT, GC and other scary words](#bigints-jit-gc-and-other-scary-words)
-- [Projective coordinates](#projective-coordinates)
+- [Projecting...coordinates?](#projectingcoordinates)
 - [Precomputes and wNAF](#precomputes-and-wnaf)
 - [Endomorphism](#endomorphism)
 - [Endgame: combining everything](#endgame-combining-everything)
-- [Extra](#extra)
+- [Extra tricks](#extra-tricks)
 - [Future plans](#future-plans)
 
 ### State of cryptography in JS
@@ -266,7 +266,7 @@ function verify_slow(sig: Signature, msgh: Uint8Array, pub: AffinePoint) {
 }
 ```
 
-### Randomness, PlayStation and RFC6979
+### Randomness and PlayStation
 
 You may have noticed we're using this weird algorithm for generating a random `k`.
 Why is that important?
@@ -276,10 +276,11 @@ Turns out, if you reuse `k` to sign two different messages under the same privat
 There are two common ways of solving this situation:
 
 1. Fetch `k` from a secure source of randomness (CSPRNG)
-   - It was popular, until [PlayStation 3 private keys got leaked](https://en.wikipedia.org/wiki/PlayStation_3_homebrew), because PS3 CSPRNG was not
-     producing "quality randomness"
-   - In some cases it's really hard to ensure randomness is random
-2. Calculate `k` from `priv` and `msgh`. [RFC6979](https://datatracker.ietf.org/doc/html/rfc6979) does
+   - It was popular, until [PlayStation 3 private keys got leaked](https://en.wikipedia.org/wiki/PlayStation_3_homebrew), because PS3 CSPRNG randomness was not really random
+   - This is a big problem on some devices which are not able to generate enough entropy
+   - Entropy generator could also be malicious (backdoored)
+2. Calculate `k` from `priv` and `msgh` deterministically.
+   [RFC6979](https://datatracker.ietf.org/doc/html/rfc6979) does
    exactly that, by using HMAC-DRBG
    - Got massive adoption these days
    - The DRBG seems a bit complicated: perhaps, if the RFC was created later, they could have just used something like HKDF
@@ -287,7 +288,7 @@ There are two common ways of solving this situation:
      Suppose in the code above, an error happens in `inv` for some values of `inv(k, N)`.
      It would get broken and produce garbage, leaking private keys.
 
-In the article we implement 1), while in the [result library](https://github.com/paulmillr/noble-secp256k1) we actually implement 2.
+In the article we implement 1 for simplicity, while in the [library](https://github.com/paulmillr/noble-secp256k1) we implement 2. Article's version has some important tricks, like using FIPS 186 4.1 technique to fetch more randomness than necessary and eliminate zeros from produced values.
 
 Combining 1 and 2 is the best approach and described in RFC6979 3.6 (additional k). It's called "hedged signatures" / "deterministic signatures with noise" / "extra entropy".
 
@@ -331,11 +332,7 @@ Very simple idea: when `1` is present, do business as usual. When `0` is present
 // Constant Time multiplication
 const getPowers = (q: AffinePoint) => {
   let points: AffinePoint[] = [];
-  for (
-    let bit = 0, dbl = affine(q.x, q.y);
-    bit <= 256;
-    bit++, dbl = double(dbl)
-  ) {
+  for (let bit = 0, dbl = q; bit <= 256; bit++, dbl = double(dbl)) {
     points.push(dbl);
   }
   return points;
@@ -378,7 +375,7 @@ Thus, whether we use native BigInts or a custom implementation like bn.js (which
 
 “Constant-time” is impossible in javascript. That’s it. The best we can do is an algorithmic constant-time & removing dependencies which make us more likely to get malwared.
 
-### Projective coordinates
+### Projecting...coordinates?
 
 Right now, our call structure consists of:
 
@@ -460,7 +457,7 @@ class Point {
 }
 const Proj_ZERO = Point.fromAffine(Point_ZERO);
 const Proj_BASE = Point.fromAffine(Point_BASE);
-const getPrecomputes = (qxy: AffinePoint): Point[] => {
+const getPowersProj = (qxy: AffinePoint): Point[] => {
   const q = Point.fromAffine(qxy);
   let points: Point[] = [];
   for (let bit = 0, dbl = q; bit <= 256; bit++, dbl = dbl.double()) {
@@ -469,7 +466,7 @@ const getPrecomputes = (qxy: AffinePoint): Point[] => {
   return points;
 };
 const mul_CT = (q: AffinePoint, n: bigint) => {
-  const pows = getPrecomputes(q);
+  const pows = getPowersProj(q);
   let p = Proj_ZERO;
   let f = Proj_ZERO; // fake point
   for (let bit = 0; bit <= 256; bit++) {
@@ -492,19 +489,17 @@ Woah! That’s 6.5x improvement for `multiply`.
 
 ### Precomputes and wNAF
 
-Currently,
+Currently, we do 256 point additions, for each of 256 bits of a scalar, by which
+Point is multiplied.
+Simplest optimization would be to cache `getPowers` method.
+This way, powers of G would get precomputed once and for all.
 
-Multiplying a point by scalar like `10101100` currently makes go bit-by-bit.
+Instead of doing that, let's get more efficient and split scalar into 4/8/16-bit chunks,
+pre-compute powers AND additions within those chunks.
 
-- Simplest
+[w-ary non-adjacent form method](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication) (wNAF) allows to do exactly that. Instead of caching 256 points like we did before, we would cache 520 (W=4), 4224 (W=8) or 557056 (W=16) points.
 
-[w-ary non-adjacent form method](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication) (wNAF) allows to implement faster constant time multiplication. The idea is simple:
-
-- Right now we have been going bit-by-bit while multiplying a key like
-- Simplest precomputes would calculate
-- Instead of that, we can
-
-Our adjusted version of wNAF goes further. Instead of saving 256 points like we did before, we would save 520 (W=4), 4224 (W=8) or 557056 (W=16). We could also do this with windowed method, but wNAF saves us ½ RAM and is 2x faster in init time. The reason for this is that wNAF does addition and subtraction — and for subtraction it simply negates point, which can be done in constant time.
+We could also do this with alternative, "windowed method", but wNAF saves us ½ RAM and is 2x faster in init time. The reason for this is that wNAF does addition and subtraction — and for subtraction it simply negates point, which can be done in constant time.
 
 ```typescript
 const W = 8; // Precomputes-related code. W = window size
