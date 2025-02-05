@@ -67,7 +67,7 @@ We will start with a function that takes private key and generates public key fr
 To generate a public key from a private key using elliptic curve cryptography (ECC), you need to perform [elliptic curve point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication). This involves multiplying the base (generator) point
 `G` by the private key `p` to obtain the public key `P`:
 
-    P = G * p
+    P = G × p
 
 Multiplication can be thought of as repeated addition of the base point `G+G+G...` - `p` times.
 How do we add `(x1, y1) + (x2, y2)` to get `(x3, y3)`?
@@ -76,17 +76,19 @@ How do we add `(x1, y1) + (x2, y2)` to get `(x3, y3)`?
 - This line will generally intersect the curve at a third point.
 - Reflect this third point vertically (i.e., flip the y-coordinate) to get the resulting point Q, resulting in `(x3, -y3)`
   - This reflection is necessary to ensure that point subtraction works correctly; for example, when computing R - Q, you actually add R to the negation of Q. By flipping Q's y-coordinate and drawing the line between R and -Q, you obtain the expected result P.
-- When adding point to itself (doubling), there is a special case: we can't draw a straight line.
+- There is a special case for doubling. When point is added to itself, we can't draw a straight line.
   Instead, we calculate the slope (λ, lambda) of the tangent line at the point.
+- There is a special case for adding point to same flipped point: `P + -P` should equal to `0` (special point-at-infinity)
 
 In math terms [(source)](https://hyperelliptic.org/EFD/g1p/auto-shortw.html):
 
 - if `x1 != x2`:
   - `λ = (y2-y1)/(x2-x1)`
-- if `x1 = x2` and `y1 = y2` (point doubling):
-  - `λ = (3x1^2+a)/(2y1)`
-- Using `λ`, the coordinates of the resulting point are:
   - `x3 = λ^2 - x1 - x2`
+  - `y3 = λ(x1 - x3) - y1`
+- if `x1 = x2` and `y1 = y2` (point doubling):
+  - `λ = (3*x1^2+a)/(2y1)`
+  - `x3 = λ^2 - 2*x1`
   - `y3 = λ(x1 - x3) - y1`
 
 Simple, but not quite. Keep in mind: we're working in a finite field over some big prime `P`. This basically means all operations — additions, multiplications, subtractions — would be done `modulo P`. And, there is no classic division in finite fields. Instead, a [_modular multiplicative inverse_](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is used. It is most efficiently calculated by iterative version of Euclid’s GCD algorithm.
@@ -129,9 +131,9 @@ const Point_ZERO = { x: 0n, y: 0n }; // Point at infinity aka identity point aka
 const double = (a: AffinePoint) => {
   const [X1, Y1] = [a.x, a.y];
   // Calculates slope of the tangent line
-  const lam = M(3n * X1 ** 2n * inv(2n * Y1, P)); // λ = (3x₁² + a) / (2y₁)
-  const X3 = M(lam * lam - 2n * X1); // x₃ = λ² - 2x₁
-  const Y3 = M(lam * (X1 - X3) - Y1); // y₃ = λ * (x₁ - x₃) - y₁
+  const lam = M(3n * X1 ** 2n * inv(2n * Y1, P)); // λ = (3x1^2+a)/(2y1)
+  const X3 = M(lam * lam - 2n * X1); // x₃ = λ^2 - 2*x1
+  const Y3 = M(lam * (X1 - X3) - Y1); // y₃ = λ(x1 - x3) - y1
   return affine(X3, Y3);
 };
 // Adds point to other point. https://hyperelliptic.org/EFD/g1p/auto-shortw.html
@@ -139,8 +141,8 @@ const add = (a: AffinePoint, b: AffinePoint): AffinePoint => {
   const [X1, Y1, X2, Y2] = [a.x, a.y, b.x, b.y];
   if (X1 === 0n || Y1 === 0n) return b;
   if (X2 === 0n || Y2 === 0n) return a;
+  if (X1 === X2 && Y1 === M(-Y2)) return Point_ZERO; // special case
   if (X1 === X2 && Y1 === Y2) return double(a); // special case
-  if (X1 === X2 && Y1 === -Y2) return Point_ZERO; // special case
   const lam = M((Y2 - Y1) * inv(X2 - X1, P));
   const X3 = M(lam * lam - X1 - X2);
   const Y3 = M(lam * (X1 - X3) - Y1);
@@ -182,7 +184,7 @@ Let:
 - `d` be the private key, converted to a number.
 - `k` be the secret (random) nonce number.
 - `G` be the generator point.
-- `n` be the order of the group.
+- `n` be the order of the curve.
 
 Then the signing process is defined as:
 
@@ -197,13 +199,13 @@ For verification, given:
 - `r, s` as the signature outputs
 - `Q` as the public key corresponding to the private key `d`.
 
-`u_1 = s^{-1} ⋅ m mod n`
+`u_1 = s^-1 ⋅ m mod n`
 
-`u_2 = s^{-1} ⋅ r mod n`
+`u_2 = s^-1 ⋅ r mod n`
 
 `(x_2, y_2) = G × u_1 + Q × u_2`
 
-`x_2 mod n = r`
+`x_2 mod n == r`
 
 Let's code them:
 
