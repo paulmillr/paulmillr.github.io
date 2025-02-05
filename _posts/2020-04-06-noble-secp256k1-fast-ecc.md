@@ -748,11 +748,9 @@ MSM could be used for calculating addition of many points at once:
 We've got `sign` from unsafe 9.442ms to safe 0.258ms, a 36x speed-up.
 All without re-implementing bigints, esoteric math (well, besides endomorphism) and low-level languages. At this point it's the fastest secp256k1 lib in pure JavaScript.
 
-The code from the article is available on [gist.github.com](https://gist.github.com/paulmillr/cf508820ec1d56eb686e2b90d4997098). And full-featured 4kb [noble-secp256k1](https://github.com/paulmillr/noble-secp256k1) is ready to for use in all kinds of projects.
+- The code from the article is available on [gist.github.com](https://gist.github.com/paulmillr/cf508820ec1d56eb686e2b90d4997098)
+- Full-featured 4kb [noble-secp256k1](https://github.com/paulmillr/noble-secp256k1) is ready to for use in all kinds of projects.
+- Its larger sister project [noble-curves](https://github.com/paulmillr/noble-curves) is generic and safe standard for JS ECC cryptography, with ed25519, BLS12-381, and other crazy algorithms
 
-Some future plans in this direction:
-
-- Making [noble-curves](https://github.com/paulmillr/noble-curves) a generic and safe standard for JS ECC cryptography, with ed25519, BLS12-381, and other crazy algorithms
-- Exploring ciphers, post-quantum, and everything else
-
+In the future, it would be great to continue exploring ciphers, post-quantum, and everything else.
 Join us on our journey to auditable cryptography via [X.com](https://x.com/paulmillr) & [GitHub](https://github.com/paulmillr).
