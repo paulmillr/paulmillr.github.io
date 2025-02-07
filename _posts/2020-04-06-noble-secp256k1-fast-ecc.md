@@ -746,7 +746,8 @@ MSM could be used for calculating addition of many points at once:
 ### Future plans
 
 We've got `sign` from unsafe 9.442ms to safe 0.258ms, a 36x speed-up.
-All without re-implementing bigints, esoteric math (well, besides endomorphism) and low-level languages. At this point it's the fastest secp256k1 lib in pure JavaScript.
+All without re-implementing bigints, esoteric math (well, besides endomorphism) and low-level languages. At this point it's the fastest secp256k1 ECDSA lib in pure JavaScript.
+Something like [BIP340 Schnorr signatures](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) can easily be implemented on top of these primitives.
 
 - The code from the article is available on [gist.github.com](https://gist.github.com/paulmillr/cf508820ec1d56eb686e2b90d4997098)
 - Full-featured 4kb [noble-secp256k1](https://github.com/paulmillr/noble-secp256k1) is ready to for use in all kinds of projects.
