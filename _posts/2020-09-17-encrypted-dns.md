@@ -1,11 +1,13 @@
 ---
 layout: post
-title: 'iOS 14, Big Sur and DNS over HTTPS'
-tags: ['programming']
+title: "iOS 14, Big Sur and DNS over HTTPS"
+tags: ["programming"]
 highlight: true
 ---
 
 iOS 14 & MacOS Big Sur have finally added support for [DNS over HTTPS](https://en.wikipedia.org/wiki/DNS_over_HTTPS) and [DNS over TLS](https://en.wikipedia.org/wiki/DNS_over_TLS) standards — also known as encrypted DNS.
+
+tl;dr: navigate to [github.com/paulmillr/encrypted-dns](https://github.com/paulmillr/encrypted-dns) to install profiles.
 
 ### What is DOH / DOT?
 
