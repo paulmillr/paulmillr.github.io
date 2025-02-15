@@ -7,8 +7,9 @@
       {{ site.title }}{% if page.title != null %}&nbsp;&mdash; {{ page.title }}{% endif %}
     </title>
     {% if page.title != null %}
-    <meta property="og:title" content="{{ page.title }}" />
-    <meta property="og:image" content="https://paulmillr.com/assets/images/hy.png" />
+    <meta name="og:title" content="{{ page.title }}" />
+    <meta name="og:image" content="https://paulmillr.com/assets/images/hy.png" />
+    <meta name="twitter:image" content="https://paulmillr.com/assets/images/hy.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="{{ page.title }}" />
     <meta name="twitter:description" content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}" />
@@ -20,7 +21,7 @@
       content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}"
     />
     <meta
-      property="og:description"
+      name="og:description"
       content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}"
     />
     <meta name="author" content="Paul Miller" />
