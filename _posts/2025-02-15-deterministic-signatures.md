@@ -24,13 +24,13 @@ Implementing digital signatures from scratch is simple,
 i've described it in previous article: [Learning fast elliptic-curve cryptography](https://paulmillr.com/posts/noble-secp256k1-fast-ecc/).
 
 Signatures are usually either random or deterministic.
-"Random" means using pair (privkey=`d`, message=`m`) would always generate new signature.
+"Random" means using pair (`d`=privkey, `m`=message) would always generate new signature.
 "Deterministic" means (`d`, `m`) would always generate the same signature.
 
 Let's recall their shortened formulas.
 
 - _inputs_: `d` is a private key, `m` is a message to sign
-- _methods_: `rand` is function producing secure randomness, `hash` is a hashing function,
+- _functions_: `rand` produces secure randomness, `hash` creates cryptographic hash,
   `combine` is [HMAC-DRBG](https://en.wikipedia.org/wiki/NIST_SP_800-90A)
 - _operations_: `G × k` is elliptic curve scalar multiplication with G=generator point, `||` is byte concatenation, `⋅` is multiplication, `mod n` is modular reduction n=curve order
 

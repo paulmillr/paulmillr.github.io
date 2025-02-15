@@ -219,6 +219,9 @@ blockquote::before {
 blockquote::after {
   content: close-quote;
 }
+blockquote > p {
+  display: inline;
+}
 /* blockquote {
   background-color: #fef5f6;
   border-left: 1rem solid #f4364c;
