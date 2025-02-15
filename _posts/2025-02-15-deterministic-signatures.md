@@ -120,7 +120,7 @@ Let's illustrate how RFC6979 fault injection could look in JS:
 
     k_bytes = combine_hmac_drbg(d, m)
     k = num(k_bytes)
-    R = G.multiply(k) # multiply() only consumes num
+    R = G.multiply(k) // imagine mul expects num
     r = mod(R.x, n)
     s = mod(inv(k) * mod(m + d⋅r, n), n)
     // the buggy function which converts JS Uint8Array to bigint
@@ -186,7 +186,7 @@ What about adoption?
 - [RFC 8032](https://datatracker.ietf.org/doc/html/rfc8032) ed25519 does not support hedged signatures, however,
   Signal made an effort and created [XEdDSA](https://signal.org/docs/specifications/xeddsa/).
   Then Apple followed Signal
-  and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>).
+  and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>). The idea was formalized in [the mailing list from 2017](https://moderncrypto.org/mail-archive/curves/2017/000925.html).
 - While testing fully random signatures was complicated, hedged signatures are simpler:
   to verify something against a pre-generated set of vectors, you would to explicitly specify randomness, instead of fetching it from CSPRNG.
 
