@@ -179,6 +179,12 @@ also without leaking `k`:
 So, to break hedged signatures, an attacker would need to break _both_ randomness
 generator and inject a fault into generation process.
 
+Testing and auditability are solveable.
+While testing fully random signatures was complicated, hedged signatures are simpler:
+to verify something against a pre-generated set of vectors, you would to explicitly specify randomness, instead of fetching it from CSPRNG.
+If system's goal prioritizes auditability over security, it's also doable:
+entropy could be generated from some seed.
+
 What about adoption?
 
 - [RFC 6979](https://datatracker.ietf.org/doc/html/rfc6979) actually describes hedging [in section 3.6](https://datatracker.ietf.org/doc/html/rfc6979#section-3.6)! Libraries also do: for example, libsecp256k1 had it [since 2015](https://github.com/bitcoin-core/secp256k1/pull/229)
@@ -187,8 +193,6 @@ What about adoption?
   Signal made an effort and created [XEdDSA](https://signal.org/docs/specifications/xeddsa/).
   Then Apple followed Signal
   and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>). The idea was formalized in [the mailing list from 2017](https://moderncrypto.org/mail-archive/curves/2017/000925.html).
-- While testing fully random signatures was complicated, hedged signatures are simpler:
-  to verify something against a pre-generated set of vectors, you would to explicitly specify randomness, instead of fetching it from CSPRNG.
 
 ## Conclusion
 
