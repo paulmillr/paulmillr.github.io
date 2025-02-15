@@ -5,7 +5,7 @@ tags: ["programming"]
 highlight: true
 ---
 
-Deterministic signatures are praised as pinnacle of Elliptic Curve Cryptography.
+Deterministic signatures are praised as the pinnacle of Elliptic Curve Cryptography.
 ed25519 uses them. RFC 6979 spec describes them.
 They eliminate the whole class of issues with "bad randomness".
 
@@ -23,16 +23,16 @@ which allowed attackers to extract private keys, full determinism is not great.
 Implementing digital signatures from scratch is simple,
 i've described it in previous article: [Learning fast elliptic-curve cryptography](https://paulmillr.com/posts/noble-secp256k1-fast-ecc/).
 
-Signatures `sig = sign(d, m)` are usually random, or deterministic.
-"Random" means using private key `d` to sign a message `m` would always generate new signature.
-"Deterministic" means (`d`, `m`) would always produce the same, identical signature.
+Signatures are usually either random or deterministic.
+"Random" means using pair (privkey=`d`, message=`m`) would always generate new signature.
+"Deterministic" means (`d`, `m`) would always generate the same signature.
 
-Let's recall their _shortened formulas_ (consult specs for full ones).
+Let's recall their shortened formulas.
 
-- inputs: `d` is a private key, `m` is a message to sign
-- methods: `rand` is function producing secure randomness, `hash` is a hashing function,
+- _inputs_: `d` is a private key, `m` is a message to sign
+- _methods_: `rand` is function producing secure randomness, `hash` is a hashing function,
   `combine` is [HMAC-DRBG](https://en.wikipedia.org/wiki/NIST_SP_800-90A)
-- operations: `G × k` is elliptic curve scalar multiplication, `||` is byte concatenation, `⋅` is multiplication
+- _operations_: `G × k` is elliptic curve scalar multiplication, `||` is byte concatenation, `⋅` is multiplication
 
 ECDSA:
 
@@ -43,7 +43,7 @@ ECDSA:
     s = k^-1 ⋅ (m + d⋅r) mod n
     sig = r || s
 
-Schnorr (BIP340):
+Schnorr from BIP340:
 
     A = G × d
     t = d ^ hash(rand())
@@ -53,7 +53,7 @@ Schnorr (BIP340):
     s = (k + e⋅d) mod n
     sig = R || s
 
-EdDSA (ed25519):
+EdDSA ed25519 from RFC 8032:
 
     h = hash(d)
     d_ = h[0..32]
@@ -67,7 +67,7 @@ EdDSA (ed25519):
 
 ## Extracting keys using bad randomness
 
-Before deterministic sigs became popular, they were produced with randomness.
+Before deterministic signatures became popular, signatures were produced with randomness
 Every time anyone signed anything, a random sequence of bytes `k` (also known as "nonce") was generated.
 Then, `k` was used to produce a signature:
 
@@ -82,7 +82,7 @@ was required.
 
 > What happens if randomness is predictable?
 
-Predictable nonce `k` allows an attacker to extract private key from it:
+Predictable nonce `k` allows an attacker to extract private key from the signature:
 
     d = (r^-1)(s⋅k-m) mod n
 
@@ -105,7 +105,7 @@ After that, people invented and popularized deterministic signatures.
 Deterministic signatures guard against bad randomness.
 They produce `k` from private key `d` and message `m`:
 
-    `k = combine(d, m)`
+    k = combine(d, m)
 
 _Note: RFC 6979 uses HMAC-DRBG for combine, but if it was created later, it could have used simpler HKDF instead._
 
@@ -147,13 +147,13 @@ The result is the same: an error during sig generation.
 Hedged ("noisy" / "extra entropy") signatures combine both approaches.
 They generate k deterministically, then incorporate randomness into it.
 
-Let's look again at hedged sigs in RFC 6979:
+Let's look again at hedged signatures in RFC 6979:
 
     rnd = rand()
     k_bytes = combine_hmac_drbg(d, m, rnd)
     k = num(k_bytes)
 
-Here, randomness is XOR-ed with private key `d`, and is then fed into `hash`.
+Randomness is incorporated into DRBG, and is then fed into `hash`.
 
 > What if fault attack happens in a hedged signature scheme?
 
@@ -189,14 +189,14 @@ What about adoption?
   [Apple followed Signal](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>)
   and added hedged ed25519 to both CryptoKit and its Safari implementation of webcrypto.
 - While testing against fully random signatures was complicated, hedged signatures are simpler:
-  to verify something against pre-generated set of vectors, you would to explicitly specify randomness,
+  to verify something against a pre-generated set of vectors, you would to explicitly specify randomness,
   instead of fetching it from CSPRNG.
 
 ## Conclusion
 
-Try to always use hedged signatures. There is no disadvantage of doing so.
+Always try to use hedged signatures. There is no disadvantage in doing so.
 You would gain security against all kinds of bugs in signature generation process.
-After all, we could never be certain if there is a bug, or not.
+After all, we can never be certain if there is a bug.
 
 I've created [noble cryptography](https://paulmillr.com/noble/) in 2019
 to improve security of JS ecosystem.
