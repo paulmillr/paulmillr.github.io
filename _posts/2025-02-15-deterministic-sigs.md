@@ -32,12 +32,12 @@ Let's recall their shortened formulas.
 - _inputs_: `d` is a private key, `m` is a message to sign
 - _methods_: `rand` is function producing secure randomness, `hash` is a hashing function,
   `combine` is [HMAC-DRBG](https://en.wikipedia.org/wiki/NIST_SP_800-90A)
-- _operations_: `G × k` is elliptic curve scalar multiplication, `||` is byte concatenation, `⋅` is multiplication
+- _operations_: `G × k` is elliptic curve scalar multiplication with G=generator point, `||` is byte concatenation, `⋅` is multiplication, `mod n` is modular reduction n=curve order
 
 ECDSA:
 
-    k = rand() # a: random
-    k = combine(d, m) # b: deterministic, RFC 6979
+    k = rand() // a: random
+    k = combine(d, m) // b: deterministic, RFC 6979
     R = G × k
     r = R.x mod n
     s = k^-1 ⋅ (m + d⋅r) mod n
@@ -121,18 +121,15 @@ Let's illustrate how RFC6979 fault injection could look in JS:
     R = G.multiply(k) # multiply() only consumes num
     r = mod(R.x, n)
     s = mod(inv(k) * mod(m + d⋅r, n), n)
-
     // the buggy function which converts JS Uint8Array to bigint
     const num = (bytes) => BigInt('0x' + Array.from(bytes).map(b => b.toString(16)).join(''))
     // num(Uint8Array([1, 2, 15, 16, 255]))
     // expected: "01020f10ff", actual: "102f10ff"
 
 In this example, `num` generates identical outputs for distinct inputs `[1, 1, 30]` and `[17, 30]`.
-
 All attacker needs to do is convincing a user to sign two distinct specifically manipulated messages.
 Those would produce signatures with identical `k`, which means an attacker would be able to
 extract private key from them.
-
 In a real world, there are all kinds of places where a subtle bug can happen.
 Type-to-other-type conversion methods; byte fiddling routines, etc.
 
@@ -163,8 +160,7 @@ without leaking `k`:
     rnd = rand()
     k_bytes = combine_hmac_drbg(d, m, rnd)
     k = num(k_bytes)
-    # still ok: combine() would have failed for d, m
-    # but is saved by `rnd`
+    // still OK: combine() would've failed for (d, m) but is saved by `rnd`
 
 _“What if bad randomness is used in a hedged sig?”_
 
@@ -176,7 +172,7 @@ also without leaking `k`:
     rnd = 000000000...
     k_bytes = combine_hmac_drbg(d, m, rnd)
     k = num(k_bytes)
-    # still ok: combine() worked for d, m
+    // still OK: combine() would've failed for `rnd` but is saved by (d, m)
 
 So, to break hedged signatures, an attacker would need to break _both_ randomness
 generator and inject a fault into generation process.
