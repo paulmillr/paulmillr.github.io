@@ -82,17 +82,19 @@ was required.
 
 > What happens if randomness is predictable?
 
-Predictable nonce `k` allows an attacker to extract private key from it.
+Predictable nonce `k` allows an attacker to extract private key from it:
+
+    d = (r^-1)(s⋅k-m) mod n
 
 > What happens if randomness is reused?
 
 Reusing random nonce `k` allows attacker to extract private keys from two distinct signatures:
 
-    (s1 - s2) == (k^-1)(z1-z2)
-    k*(s1-s2) == (z1-z2)
-    k == (z1−z2)*(s1−s2)^-1
-    s == (k^-1)*(z+rx)
-    x == (r^-1)*(sk−z)
+    (s1-s2)   == (k^-1)(z1-z2)
+    k⋅(s1-s2) == (z1-z2)
+    k == (z1−z2)⋅(s1−s2)^-1
+    s == (k^-1)⋅(z+r⋅x)
+    x == (r^-1)⋅(s⋅k−z)
     where s1, s2 are s from sigs 1, 2; and
     all operations are mod n
 
