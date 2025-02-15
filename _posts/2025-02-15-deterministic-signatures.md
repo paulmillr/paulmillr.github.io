@@ -146,7 +146,7 @@ The result is the same: an error during sig generation.
 Hedged ("noisy" / "extra entropy") signatures combine both approaches.
 They generate k deterministically, then incorporate randomness into it.
 
-Let's look again at hedged signatures in RFC 6979:
+Let's add hedged signatures to RFC 6979:
 
     rnd = rand()
     k_bytes = combine_hmac_drbg(d, m, rnd)
@@ -186,7 +186,7 @@ What about adoption?
 - [RFC 8032](https://datatracker.ietf.org/doc/html/rfc8032) ed25519 does not support hedged signatures, however,
   Signal made an effort and created [XEdDSA](https://signal.org/docs/specifications/xeddsa/).
   Then Apple followed Signal
-  and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto]](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>).
+  and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>).
 - While testing fully random signatures was complicated, hedged signatures are simpler:
   to verify something against a pre-generated set of vectors, you would to explicitly specify randomness, instead of fetching it from CSPRNG.
 
