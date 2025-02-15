@@ -124,7 +124,7 @@ Let's illustrate how RFC6979 fault injection could look in JS:
     r = mod(R.x, n)
     s = mod(inv(k) * mod(m + d⋅r, n), n)
     // the buggy function which converts JS Uint8Array to bigint
-    const num = (bytes) => BigInt('0x' + Array.from(bytes).map(b => b.toString(16)).join(''))
+    const num = (u8a) => BigInt('0x' + [...u8a].map(b => b.toString(16)).join(''))
     // num(Uint8Array([1, 2, 15, 16, 255]))
     // expected: "01020f10ff", actual: "102f10ff"
 
