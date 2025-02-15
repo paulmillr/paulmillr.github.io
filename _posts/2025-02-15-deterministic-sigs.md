@@ -80,13 +80,13 @@ Which means, for example, one could not have used JS `Math.random()` - a
 [whole different algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
 was required.
 
-> What happens if randomness is predictable?
+_“What happens if randomness is predictable?”_
 
 Predictable nonce `k` allows an attacker to extract private key from the signature:
 
     d = (r^-1)(s⋅k-m) mod n
 
-> What happens if randomness is reused?
+_“What happens if randomness is reused?”_
 
 Reusing random nonce `k` allows attacker to extract private keys from two distinct signatures:
 
@@ -155,7 +155,7 @@ Let's look again at hedged signatures in RFC 6979:
 
 Randomness is incorporated into DRBG, and is then fed into `hash`.
 
-> What if fault attack happens in a hedged signature scheme?
+_“What if fault attack happens in a hedged sig?”_
 
 The generated randomness would still produce new random valid signature,
 without leaking `k`:
@@ -166,8 +166,9 @@ without leaking `k`:
     # still ok: combine() would have failed for d, m
     # but is saved by `rnd`
 
-> What if bad randomness is used in hedged signature scheme?
-> What happens if random nonce is **reused**?
+_“What if bad randomness is used in a hedged sig?”_
+
+_“What if nonce is reused in a hedged sig?”_
 
 The deterministic part would still produce new random valid signature,
 also without leaking `k`:
