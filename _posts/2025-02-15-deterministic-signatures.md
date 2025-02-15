@@ -80,13 +80,17 @@ Which means, for example, one could not have used JS `Math.random()` - a
 [whole different algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
 was required.
 
-_“What happens if randomness is predictable?”_
+> What if randomness is predictable?
+
+Methods like `Math.random()` are predictable.
+If you knew state of user system before values are generated,
+you could easily re-generate those.
 
 Predictable nonce `k` allows an attacker to extract private key from the signature:
 
     d = (r^-1)(s⋅k-m) mod n
 
-_“What happens if randomness is reused?”_
+> What if randomness is reused?
 
 Reusing random nonce `k` allows attacker to extract private keys from two distinct signatures:
 
@@ -152,7 +156,7 @@ Let's look again at hedged signatures in RFC 6979:
 
 Randomness is incorporated into DRBG, and is then fed into `hash`.
 
-_“What if fault attack happens in a hedged sig?”_
+> What if fault attack happens in a hedged sig?
 
 The generated randomness would still produce new random valid signature,
 without leaking `k`:
@@ -162,9 +166,9 @@ without leaking `k`:
     k = num(k_bytes)
     // still OK: combine() would've failed for (d, m) but is saved by `rnd`
 
-_“What if bad randomness is used in a hedged sig?”_
+> What if bad randomness is used in a hedged sig?
 
-_“What if nonce is reused in a hedged sig?”_
+> What if nonce is reused in a hedged sig?
 
 The deterministic part would still produce new random valid signature,
 also without leaking `k`:
@@ -183,11 +187,10 @@ What about adoption?
 - [BIP 340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) authors also made a wise decision, incorporating hedging by default
 - [RFC 8032](https://datatracker.ietf.org/doc/html/rfc8032) ed25519 does not support hedged signatures, however,
   Signal made an effort and created [XEdDSA](https://signal.org/docs/specifications/xeddsa/).
-  [Apple followed Signal](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>)
-  and added hedged ed25519 to both CryptoKit and its Safari implementation of webcrypto.
-- While testing against fully random signatures was complicated, hedged signatures are simpler:
-  to verify something against a pre-generated set of vectors, you would to explicitly specify randomness,
-  instead of fetching it from CSPRNG.
+  Then Apple followed Signal
+  and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto]](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>).
+- While testing fully random signatures was complicated, hedged signatures are simpler:
+  to verify something against a pre-generated set of vectors, you would to explicitly specify randomness, instead of fetching it from CSPRNG.
 
 ## Conclusion
 

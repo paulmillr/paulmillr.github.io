@@ -1,7 +1,7 @@
 /*! modern-normalize v2.0.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
 html {
-  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji';
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
   -moz-tab-size: 2;
@@ -25,7 +25,8 @@ code,
 kbd,
 samp,
 pre {
-  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo,
+    monospace;
   font-size: 1em;
 }
 small {
@@ -63,9 +64,9 @@ select {
   text-transform: none;
 }
 button,
-[type='button'],
-[type='reset'],
-[type='submit'] {
+[type="button"],
+[type="reset"],
+[type="submit"] {
   -webkit-appearance: button;
 }
 ::-moz-focus-inner {
@@ -88,7 +89,7 @@ progress {
 ::-webkit-outer-spin-button {
   height: auto;
 }
-[type='search'] {
+[type="search"] {
   -webkit-appearance: textfield;
   outline-offset: -2px;
 }
@@ -203,9 +204,36 @@ a:visited {
 .dimmed a,
 .dimmed a:visited,
 ol > li::marker,
-ul > li::marker {
+ul > li::marker,
+blockquote {
   color: #575653; /* f-700 */
 }
+blockquote {
+  quotes: "“" "”" "“" "”";
+  margin-left: 0.5em;
+  font-style: italic;
+}
+blockquote::before {
+  content: open-quote;
+}
+blockquote::after {
+  content: close-quote;
+}
+/* blockquote {
+  background-color: #fef5f6;
+  border-left: 1rem solid #f4364c;
+  margin: 2rem 0;
+  padding: 2rem 2rem 0.5rem 2rem;
+  quotes: "“" "”" "“" "”";
+}
+blockquote::before {
+  color: #f4364c;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+} */
 tr {
   border-bottom-color: #cecdc3; /* f-200 */
 }
@@ -245,7 +273,8 @@ pre {
   .dimmed a,
   .dimmed a:visited,
   ol > li::marker,
-  ul > li::marker {
+  ul > li::marker,
+  blockquote {
     color: #a09d98;
   }
   pre {
