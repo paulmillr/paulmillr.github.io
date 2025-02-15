@@ -67,7 +67,7 @@ EdDSA ed25519 from RFC 8032:
 
 ## Extracting keys using bad randomness
 
-Before deterministic signatures became popular, signatures were produced with randomness
+Before deterministic signatures became popular, signatures were produced with randomness.
 Every time anyone signed anything, a random sequence of bytes `k` (also known as "nonce") was generated.
 Then, `k` was used to produce a signature:
 
@@ -84,9 +84,7 @@ was required.
 
 Methods like `Math.random()` are predictable.
 If you knew state of user system before values are generated,
-you could easily re-generate those.
-
-Predictable nonce `k` allows an attacker to extract private key from the signature:
+you could easily re-generate those. Predictable nonce `k` allows an attacker to extract private key from the signature, which [happened with Sony PS3](https://en.wikipedia.org/wiki/PlayStation_3_homebrew):
 
     d = (r^-1)(s⋅k-m) mod n
 
