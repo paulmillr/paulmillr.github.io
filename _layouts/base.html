@@ -8,10 +8,12 @@
     </title>
     {% if page.title != null %}
     <meta property="og:title" content="{{ page.title }}" />
-    <meta property="og:image" content="/assets/images/hy.png" />
+    <meta property="og:image" content="https://paulmillr.com/assets/images/hy.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="{{ page.title }}" />
+    <meta name="twitter:description" content="{% if page.desc %}{{ page.desc }}{% else %}Paul Miller. I make projects which help developers to build awesome things{% endif %}" />
     <meta name="twitter:site" content="@paulmillr" />
+    <meta name="og:type" content="article" />
     {% endif %}
     <meta
       name="description"
