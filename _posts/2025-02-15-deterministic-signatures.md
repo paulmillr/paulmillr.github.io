@@ -205,3 +205,5 @@ to improve security of JS ecosystem.
 [noble-curves](https://github.com/paulmillr/noble-curves) implement
 hedged ECDSA, XEdDSA and BIP340.
 Feel free to copy the logic, use and re-distribute the code.
+Check out [micro-eth-signer](https://github.com/paulmillr/micro-eth-signer) and
+[btc-signer](https://github.com/paulmillr/scure-btc-signer) which have support for hedged signatures.
