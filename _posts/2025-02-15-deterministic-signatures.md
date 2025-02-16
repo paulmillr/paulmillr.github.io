@@ -180,10 +180,11 @@ So, to break hedged signatures, an attacker would need to break _both_ randomnes
 generator and inject a fault into generation process.
 
 Testing and auditability are solveable.
-While testing fully random signatures was complicated, hedged signatures are simpler:
-to verify something against a pre-generated set of vectors, you would to explicitly specify randomness, instead of fetching it from CSPRNG.
-If system's goal prioritizes auditability over security, it's also doable:
-entropy could be generated from some seed.
+While testing fully random signatures was complicated in the past, hedged signatures are simpler:
+to verify something against a pre-generated set of vectors,
+you have to explicitly specify randomness, instead of fetching it from CSPRNG.
+It is also possible to generate entropy from some seed, which makes the
+scheme auditable, albeit less secure than purely random.
 
 What about adoption?
 
