@@ -74,7 +74,7 @@ Then, `k` was used to produce a signature:
     k = rand()
 
 However, "random generation of k" is non-trivial task.
-In short, random k must always be **unpredictable** and **not previously used**.
+In short, k must always be **unpredictable** and **not previously used**.
 This could be achieved using ["cryptographically secure random"](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) (CSPRNG).
 
 > What if randomness is predictable?
@@ -179,7 +179,8 @@ also without leaking `k`:
 So, to break hedged signatures, an attacker would need to break _both_ randomness
 generator and inject a fault into generation process.
 
-Testing and auditability are solveable.
+Hedged signatures would be different every time.
+This is not a big deal: testing and auditability are solveable.
 While testing fully random signatures was complicated in the past, hedged signatures are simpler:
 to verify something against a pre-generated set of vectors,
 you have to explicitly specify randomness, instead of fetching it from CSPRNG.
