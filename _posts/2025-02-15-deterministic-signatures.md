@@ -92,16 +92,15 @@ you could easily re-generate those. Predictable nonce `k` allows an attacker to 
 
 Reusing random nonce `k` allows attacker to extract private keys from two distinct signatures:
 
-    s = k^-1 ⋅ (m + r⋅d) mod n
+    s = (k^-1)⋅(m+r⋅d) mod n
     s1-s2 == k^-1⋅(m1-m2)
     k(s1-s2) == m1-m2 // mul both by k
     k = ((s1-s2)^-1)⋅(m1-m2) // mul both by (s1-s2)^-1
-    s1 = (k^-1)(m1+rd)
+    s1 = (k^-1)(m1+r⋅d)
     r⋅d == s1⋅k-m1
     d = (r^-1)⋅(s1⋅k-m1) // mul both by r^-1
-    where s1, s2 are s from sigs 1, 2;
-    d = privkey, r is r from sigs 1, 2;
-    all operations are mod n
+    // where r, s1, s2 are r, s from sigs 1, 2;
+    // all operations are mod n
 
 After that, people invented and popularized deterministic signatures.
 
