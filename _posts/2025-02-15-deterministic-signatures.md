@@ -81,8 +81,10 @@ This could be achieved using ["cryptographically secure random"](https://en.wiki
 
 Methods like `Math.random()` are predictable -
 in JS, CSPRNG [getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) should be used instead.
-If you knew state of user system before values are generated,
-you could easily re-generate those. Predictable nonce `k` allows an attacker to extract private key from the signature, which [happened with Sony PS3](https://en.wikipedia.org/wiki/PlayStation_3_homebrew):
+Think of predictable generators as `fn(currTime)`:
+if you know state (`currTime`) before values are generated,
+you could easily re-generate those.
+Predictable nonce `k` allows an attacker to extract private key from the signature, which [happened with Sony PS3](https://en.wikipedia.org/wiki/PlayStation_3_homebrew):
 
     d = (r^-1)(s⋅k-m) mod n
 
