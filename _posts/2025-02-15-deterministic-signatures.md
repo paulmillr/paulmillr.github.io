@@ -75,14 +75,12 @@ Then, `k` was used to produce a signature:
 
 However, "random generation of k" is non-trivial task.
 In short, random k must always be **unpredictable** and **not previously used**.
-This could be achieved using ["cryptographically secure random" (CSPRNG)](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator).
-Which means, for example, one could not have used JS `Math.random()` - a
-[whole different algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
-was required.
+This could be achieved using ["cryptographically secure random"](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) (CSPRNG).
 
 > What if randomness is predictable?
 
-Methods like `Math.random()` are predictable.
+Methods like `Math.random()` are predictable -
+in JS, CSPRNG [getRandomValues](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) should be used instead.
 If you knew state of user system before values are generated,
 you could easily re-generate those. Predictable nonce `k` allows an attacker to extract private key from the signature, which [happened with Sony PS3](https://en.wikipedia.org/wiki/PlayStation_3_homebrew):
 
