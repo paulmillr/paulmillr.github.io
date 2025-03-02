@@ -222,12 +222,6 @@ blockquote::after {
 blockquote > p {
   display: inline;
 }
-.hy blockquote::after {
-  content: "";
-}
-.hy blockquote > p {
-  display: block;
-}
 tr {
   border-bottom-color: #cecdc3; /* f-200 */
 }

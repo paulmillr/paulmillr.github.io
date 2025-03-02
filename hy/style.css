@@ -1,16 +1,21 @@
 .hy {
   margin-top: 2rem;
 }
+.hy blockquote::after {
+  content: "";
+}
+.hy blockquote > p {
+  display: block;
+}
 blockquote {
   background-color: #fef5f6;
-  border-left: 1rem solid #f4364c;
+  border-left: 0.66rem solid #f4364c;
   margin: 2rem 0;
-  padding: 2rem 2rem 0.5rem 2rem;
+  padding: 1.5rem 1.5rem 0.1rem 1.5rem;
   quotes: "“" "”" "“" "”";
 }
 blockquote::before {
   color: #f4364c;
-  content: open-quote;
   font-size: 4em;
   line-height: 0.1em;
   margin-right: 0.25em;
