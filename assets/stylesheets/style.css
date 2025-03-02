@@ -222,21 +222,12 @@ blockquote::after {
 blockquote > p {
   display: inline;
 }
-/* blockquote {
-  background-color: #fef5f6;
-  border-left: 1rem solid #f4364c;
-  margin: 2rem 0;
-  padding: 2rem 2rem 0.5rem 2rem;
-  quotes: "“" "”" "“" "”";
+.hy blockquote::after {
+  content: "";
 }
-blockquote::before {
-  color: #f4364c;
-  content: open-quote;
-  font-size: 4em;
-  line-height: 0.1em;
-  margin-right: 0.25em;
-  vertical-align: -0.4em;
-} */
+.hy blockquote > p {
+  display: block;
+}
 tr {
   border-bottom-color: #cecdc3; /* f-200 */
 }
