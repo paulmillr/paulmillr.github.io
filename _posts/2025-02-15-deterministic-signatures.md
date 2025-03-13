@@ -193,15 +193,35 @@ What about adoption?
 
 - [RFC 6979](https://datatracker.ietf.org/doc/html/rfc6979) actually describes hedging [in section 3.6](https://datatracker.ietf.org/doc/html/rfc6979#section-3.6)! Libraries also do: for example, libsecp256k1 had it [since 2015](https://github.com/bitcoin-core/secp256k1/pull/229)
 - [BIP 340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) authors also made a wise decision, incorporating hedging by default
+- [irtf-cfrg-det-sigs-with-noise-05](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-det-sigs-with-noise-05) standard by IRTF is currently
+  in Draft phase.
 - [RFC 8032](https://datatracker.ietf.org/doc/html/rfc8032) ed25519 does not support hedged signatures, however,
   Signal made an effort and created [XEdDSA](https://signal.org/docs/specifications/xeddsa/).
   Then Apple followed Signal
   and added hedged ed25519 to both [CryptoKit and its Safari implementation of webcrypto](<https://developer.apple.com/documentation/cryptokit/curve25519/signing/privatekey/signature(for:)>). The idea was formalized in [the mailing list from 2017](https://moderncrypto.org/mail-archive/curves/2017/000925.html).
 
+### Disadvantages
+
+There are a few cons of using hedging:
+
+- DJB [mentioned in the blog post](https://blog.cr.yp.to/20140205-entropy.html) it's possible to exfiltrate
+  information.
+  - In his scheme, **attacker has access to secret data** and **is able to modify entropy** generation
+  - It can be argued that when an attacker already has access to secret data, it's already "too late"
+  - [Industry argues](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-det-sigs-with-noise-05)
+    risk from this is smaller than risks from pure determinism
+- Some folks argued about increased chance of fingerprinting
+  - An offline device can fingerprint all signatures by inserting particular bit sequence somewhere in r / s
+  - For example, a device can insert its 8-byte ID as first 8 bytes of "r": "cafecafe..."
+  - However, just grinding through first 2 bytes would need to produce 65536 signatures, on average (256\*256)
+  - Embedded device, such as offline signer, commonly have 35MHz CPU, which are slow and can't produce this much sigs in a small period
+  - In [JS library](https://github.com/paulmillr/noble-curves), only ~5K signatures per sec can be produced on a high-end device
+  - It is theoretically
+- Some ZK protocols rely on determinism
+
 ## Conclusion
 
-Always try to use hedged signatures. There is no disadvantage in doing so.
-You would gain security against all kinds of bugs in signature generation process.
+Using hedged signatures would add security against all kinds of bugs in signature generation process.
 After all, we can never be certain if there is a bug.
 
 I've created [noble cryptography](https://paulmillr.com/noble/) in 2019
