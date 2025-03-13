@@ -216,7 +216,6 @@ There are a few cons of using hedging:
   - However, just grinding through first 2 bytes would need to produce 65536 signatures, on average (256\*256)
   - Embedded device, such as offline signer, commonly have 35MHz CPU, which are slow and can't produce this much sigs in a small period
   - In [JS library](https://github.com/paulmillr/noble-curves), only ~5K signatures per sec can be produced on a high-end device
-  - It is theoretically
 - Some ZK protocols rely on determinism
 
 ## Conclusion
