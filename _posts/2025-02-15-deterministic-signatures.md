@@ -208,6 +208,8 @@ There are a few cons of using hedging:
   information.
   - In his scheme, **attacker has access to secret data** and **is able to modify entropy** generation
   - It can be argued that when an attacker already has access to secret data, it's already "too late"
+  - It's also not enough for entropy generator to "just hash secret + entropy and check" in ECDSA,
+    it must also do elliptic curve scalar multiplication; making the whole thing more complex
   - [Industry argues](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-det-sigs-with-noise-05)
     risk from this is smaller than risks from pure determinism
 - Some folks argued about increased chance of fingerprinting
